@@ -1,7 +1,9 @@
 package net.kunmc.lab.command;
 
 import dev.kotx.flylib.command.UsageBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.data.BlockData;
 
 import java.lang.reflect.Field;
@@ -10,6 +12,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -75,6 +78,21 @@ public final class ArgumentType<T> {
                     .filter(m -> m.name().equals(x.toString().toUpperCase()))
                     .findFirst()
                     .get()
+    );
+    public static final ArgumentType<UUID> UUID = new ArgumentType<>(
+            b -> b.textArgument("PlayerName", sb -> {
+                Arrays.stream(Bukkit.getOfflinePlayers())
+                        .map(OfflinePlayer::getName)
+                        .forEach(sb::suggest);
+            }),
+            x -> Arrays.stream(Bukkit.getOfflinePlayers())
+                    .map(OfflinePlayer::getName)
+                    .anyMatch(s -> s.equals(x)),
+            x -> Arrays.stream(Bukkit.getOfflinePlayers())
+                    .filter(p -> p.getName().equals(x))
+                    .findFirst()
+                    .get()
+                    .getUniqueId()
     );
 
     private static final Map<Class, ArgumentType> classArgumentTypeMap = new HashMap<Class, ArgumentType>() {{
