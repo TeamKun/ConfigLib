@@ -42,7 +42,7 @@ class ValueConfigItem extends Command {
         });
     }
 
-    private static Class<?> getGenericsClass(Value value) {
+    private static Class<?> getGenericsClass(Object value) {
         return Stream.iterate(((Object) value.getClass()), clazz -> ((Class<?>) clazz).getSuperclass())
                 .filter(Objects::nonNull)
                 .filter(Class.class::isInstance)

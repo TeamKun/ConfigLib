@@ -20,7 +20,10 @@ public abstract class BaseConfig {
     private final transient Plugin plugin;
     public final transient File configJSON;
     private final transient String entryName;
-    private static final transient Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithModifiers(Modifier.TRANSIENT).create();
+    private static final transient Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .excludeFieldsWithModifiers(Modifier.TRANSIENT)
+            .create();
 
     public BaseConfig(@NotNull Plugin plugin, @NotNull String entryName) {
         this.plugin = plugin;
@@ -83,8 +86,8 @@ public abstract class BaseConfig {
             if (Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
-
             field.setAccessible(true);
+
             try {
                 replaceField(field, src, dst);
             } catch (IllegalAccessException e) {
@@ -98,6 +101,11 @@ public abstract class BaseConfig {
             Value srcValue = ((Value) field.get(src));
             Value dstValue = ((Value) field.get(dst));
             replaceFields(field.getType(), srcValue, dstValue);
+
+            Class<?> fieldSuperClass = field.getType().getSuperclass();
+            if (!fieldSuperClass.equals(Object.class)) {
+                replaceFields(fieldSuperClass, srcValue, dstValue);
+            }
         } else {
             Object srcObj = field.get(src);
             field.set(dst, srcObj);
