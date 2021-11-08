@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.kunmc.lab.value.Value;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,11 +19,22 @@ import java.util.stream.Collectors;
 public abstract class BaseConfig {
     private final transient Plugin plugin;
     public final transient File configJSON;
+    private final transient String entryName;
     private static final transient Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithModifiers(Modifier.TRANSIENT).create();
 
-    public BaseConfig(Plugin plugin) {
+    public BaseConfig(@NotNull Plugin plugin, @NotNull String entryName) {
         this.plugin = plugin;
-        this.configJSON = new File(plugin.getDataFolder(), this.getClass().getSimpleName() + ".json");
+        this.entryName = entryName;
+        this.configJSON = new File(plugin.getDataFolder(), entryName() + ".json");
+    }
+
+    public String entryName() {
+        if (entryName.equals("")) {
+            String n = getClass().getSimpleName();
+            return n.substring(0, 1).toLowerCase() + n.substring(1);
+        } else {
+            return entryName;
+        }
     }
 
     public void saveConfig() {

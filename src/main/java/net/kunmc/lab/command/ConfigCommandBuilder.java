@@ -1,15 +1,20 @@
 package net.kunmc.lab.command;
 
+import dev.kotx.flylib.command.Command;
 import net.kunmc.lab.config.BaseConfig;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigCommandBuilder {
-    private final BaseConfig config;
+    private final List<BaseConfig> configList = new ArrayList<>();
     private boolean shouldUseList = true;
     private boolean shouldUseSet = true;
     private boolean shouldUseReload = true;
 
-    public ConfigCommandBuilder(BaseConfig config) {
-        this.config = config;
+    public ConfigCommandBuilder(@NotNull BaseConfig config) {
+        configList.add(config);
     }
 
     public ConfigCommandBuilder disableListCommand() {
@@ -27,18 +32,46 @@ public class ConfigCommandBuilder {
         return this;
     }
 
+    public ConfigCommandBuilder addConfig(@NotNull BaseConfig config) {
+        configList.add(config);
+        return this;
+    }
+
     public ConfigCommand build() {
         ConfigCommand configCommand = new ConfigCommand();
-        if (shouldUseList) {
-            configCommand.appendChild(new ConfigListCommand(config));
-        }
-        if (shouldUseSet) {
-            configCommand.appendChild(new ConfigSetCommand(config));
-        }
-        if (shouldUseReload) {
-            configCommand.appendChild(new ConfigReloadCommand(config));
+        for (Command c : createSubCommands()) {
+            configCommand.appendChild(c);
         }
 
         return configCommand;
+    }
+
+    private List<Command> createSubCommands() {
+        List<Command> subCommandList = new ArrayList<>();
+
+        if (configList.size() == 1) {
+            BaseConfig config = configList.get(0);
+            if (shouldUseList) {
+                subCommandList.add(new ConfigListCommand(config));
+            }
+            if (shouldUseSet) {
+                subCommandList.add(new ConfigSetCommand(config));
+            }
+            if (shouldUseReload) {
+                subCommandList.add(new ConfigReloadCommand(config));
+            }
+        } else {
+            if (shouldUseList) {
+                subCommandList.add(new ConfigListCommand(configList));
+            }
+            if (shouldUseSet) {
+                subCommandList.add(new ConfigSetCommand(configList));
+            }
+            if (shouldUseReload) {
+                subCommandList.add(new ConfigReloadCommand(configList));
+            }
+        }
+
+        return subCommandList;
     }
 }
