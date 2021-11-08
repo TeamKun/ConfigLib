@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import java.util.function.Consumer;
 
 public final class MaterialValue implements Value<Material> {
-    private Material value;
+    private String materialName;
     private final transient Consumer<Material> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
@@ -16,23 +16,23 @@ public final class MaterialValue implements Value<Material> {
     }
 
     public MaterialValue(Material value, Consumer<Material> onSet) {
-        this.value = value;
+        this.materialName = value.name();
         this.consumer = onSet;
     }
 
     @Override
     public Material value() {
-        return value;
+        return Material.valueOf(materialName);
     }
 
     @Override
     public void value(Material value) {
-        this.value = value;
+        this.materialName = value.name();
     }
 
     @Override
     public void onSetValue() {
-        consumer.accept(value);
+        consumer.accept(value());
     }
 
     @Override
@@ -62,6 +62,6 @@ public final class MaterialValue implements Value<Material> {
 
     @Override
     public String toString() {
-        return String.format("MaterialValue{value=%s,listable=%b,writable=%b}", value.toString(), listable, writable);
+        return String.format("MaterialValue{value=%s,listable=%b,writable=%b}", value().toString(), listable, writable);
     }
 }

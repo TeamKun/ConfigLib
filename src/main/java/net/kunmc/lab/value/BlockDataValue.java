@@ -1,11 +1,12 @@
 package net.kunmc.lab.value;
 
+import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
 import java.util.function.Consumer;
 
 public final class BlockDataValue implements Value<BlockData> {
-    private BlockData value;
+    private String materialName;
     private final transient Consumer<BlockData> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
@@ -16,23 +17,23 @@ public final class BlockDataValue implements Value<BlockData> {
     }
 
     public BlockDataValue(BlockData value, Consumer<BlockData> onSet) {
-        this.value = value;
+        this.materialName = value.getMaterial().name();
         this.consumer = onSet;
     }
 
     @Override
     public BlockData value() {
-        return value;
+        return Material.valueOf(materialName).createBlockData();
     }
 
     @Override
     public void value(BlockData value) {
-        this.value = value;
+        this.materialName = value.getMaterial().name();
     }
 
     @Override
     public void onSetValue() {
-        consumer.accept(value);
+        consumer.accept(value());
     }
 
     @Override
@@ -62,6 +63,6 @@ public final class BlockDataValue implements Value<BlockData> {
 
     @Override
     public String toString() {
-        return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}", value.toString(), listable, writable);
+        return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}", value(), listable, writable);
     }
 }
