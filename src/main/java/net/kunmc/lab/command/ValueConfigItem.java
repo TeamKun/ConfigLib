@@ -33,9 +33,9 @@ class ValueConfigItem extends Command {
                     return;
                 }
 
-                configValue.onSetValue();
+                configValue.onSetValue(newValue);
                 configValue.value(newValue);
-                ctx.success(configValue.succeedSetMessage(entryName, newValue));
+                ctx.success(configValue.succeedSetMessage(entryName));
 
                 config.saveConfigIfPresent();
             });

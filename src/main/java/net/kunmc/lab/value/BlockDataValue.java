@@ -33,8 +33,8 @@ public final class BlockDataValue implements Value<BlockData> {
     }
 
     @Override
-    public void onSetValue() {
-        consumer.accept(value());
+    public void onSetValue(BlockData newValue) {
+        consumer.accept(newValue);
     }
 
     @Override
@@ -73,7 +73,7 @@ public final class BlockDataValue implements Value<BlockData> {
     }
 
     @Override
-    public String succeedSetMessage(String entryName, BlockData newValue) {
-        return entryName + "の値を" + newValue.getMaterial().name() + "に設定しました.";
+    public String succeedSetMessage(String entryName) {
+        return entryName + "の値を" + materialName + "に設定しました.";
     }
 }

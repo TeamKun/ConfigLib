@@ -31,8 +31,8 @@ public final class MaterialValue implements Value<Material> {
     }
 
     @Override
-    public void onSetValue() {
-        consumer.accept(value());
+    public void onSetValue(Material newValue) {
+        consumer.accept(newValue);
     }
 
     @Override

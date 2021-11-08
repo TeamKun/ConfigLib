@@ -29,8 +29,8 @@ public final class BooleanValue implements Value<Boolean> {
     }
 
     @Override
-    public void onSetValue() {
-        consumer.accept(value);
+    public void onSetValue(Boolean newValue) {
+        consumer.accept(newValue);
     }
 
     @Override

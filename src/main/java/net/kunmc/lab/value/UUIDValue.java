@@ -52,8 +52,8 @@ public class UUIDValue implements Value<UUID> {
     }
 
     @Override
-    public void onSetValue() {
-        consumer.accept(value());
+    public void onSetValue(UUID newValue) {
+        consumer.accept(newValue);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class UUIDValue implements Value<UUID> {
     }
 
     @Override
-    public String succeedSetMessage(String entryName, UUID newValue) {
+    public String succeedSetMessage(String entryName) {
         return entryName + "の値を" + toOfflinePlayer().getName() + "に設定しました.";
     }
 

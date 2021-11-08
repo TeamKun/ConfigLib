@@ -72,8 +72,8 @@ public final class DoubleValue implements NumericValue<Double> {
     }
 
     @Override
-    public void onSetValue() {
-        consumer.accept(value);
+    public void onSetValue(Double newValue) {
+        consumer.accept(newValue);
     }
 
     @Override

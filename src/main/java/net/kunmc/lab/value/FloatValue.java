@@ -72,8 +72,8 @@ public final class FloatValue implements NumericValue<Float> {
     }
 
     @Override
-    public void onSetValue() {
-        consumer.accept(value);
+    public void onSetValue(Float newValue) {
+        consumer.accept(newValue);
     }
 
     @Override

@@ -42,8 +42,8 @@ public class StringValue implements Value<String> {
     }
 
     @Override
-    public void onSetValue() {
-        consumer.accept(value);
+    public void onSetValue(String newValue) {
+        consumer.accept(newValue);
     }
 
     @Override

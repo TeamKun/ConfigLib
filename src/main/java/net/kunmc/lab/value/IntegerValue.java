@@ -62,8 +62,8 @@ public final class IntegerValue implements NumericValue<Integer> {
     }
 
     @Override
-    public void onSetValue() {
-        consumer.accept(value);
+    public void onSetValue(Integer newValue) {
+        consumer.accept(newValue);
     }
 
     @Override

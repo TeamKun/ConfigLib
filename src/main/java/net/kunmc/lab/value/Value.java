@@ -7,7 +7,7 @@ public interface Value<T> {
 
     void value(T value);
 
-    void onSetValue();
+    void onSetValue(T newValue);
 
     boolean validate(T newValue);
 
@@ -23,7 +23,7 @@ public interface Value<T> {
         return "引数の値が不正です.";
     }
 
-    default String succeedSetMessage(String entryName, T newValue) {
-        return entryName + "の値を" + newValue + "に設定しました.";
+    default String succeedSetMessage(String entryName) {
+        return entryName + "の値を" + value() + "に設定しました.";
     }
 }
