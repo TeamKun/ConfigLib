@@ -1,5 +1,6 @@
 package net.kunmc.lab.value;
 
+import dev.kotx.flylib.command.CommandContext;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
@@ -64,5 +65,15 @@ public final class BlockDataValue implements Value<BlockData> {
     @Override
     public String toString() {
         return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}", value(), listable, writable);
+    }
+
+    @Override
+    public void sendListMessage(CommandContext ctx, String entryName) {
+        ctx.success(entryName + ": " + materialName);
+    }
+
+    @Override
+    public String succeedSetMessage(String entryName, BlockData newValue) {
+        return entryName + "の値を" + newValue.getMaterial().name() + "に設定しました.";
     }
 }
