@@ -44,6 +44,8 @@ class ConfigListCommand extends Command {
 
     private void exec(CommandContext ctx, BaseConfig config) {
         for (Field field : config.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+           
             Object value = null;
             try {
                 value = field.get(config);
