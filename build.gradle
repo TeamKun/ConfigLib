@@ -1,9 +1,10 @@
 plugins {
     id 'java'
     id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "maven-publish"
 }
 
-group 'net.kunmc.lab'
+group 'com.github.TeamKun'
 version '0.2.0'
 
 repositories {
@@ -23,6 +24,16 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.9'
 }
 
+def targetJavaVersion = 8
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
@@ -34,4 +45,16 @@ tasks.build.dependsOn tasks.shadowJar
 
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = group
+            artifactId = rootProject.name
+            version = version
+
+            from components.java
+        }
+    }
 }
