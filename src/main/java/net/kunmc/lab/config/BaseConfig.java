@@ -27,6 +27,8 @@ public abstract class BaseConfig {
     public BaseConfig(@NotNull Plugin plugin, @NotNull String entryName) {
         this.plugin = plugin;
         this.entryName = entryName;
+       
+        plugin.getDataFolder().mkdir();
         this.configJSON = new File(plugin.getDataFolder(), entryName() + ".json");
     }
 
@@ -40,6 +42,7 @@ public abstract class BaseConfig {
     }
 
     public void saveConfig() {
+
         try {
             configJSON.createNewFile();
             String json = gson.toJson(this);
