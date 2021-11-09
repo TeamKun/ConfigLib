@@ -8,7 +8,6 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -64,9 +63,9 @@ public abstract class BaseConfig {
         }
     }
 
-    public void loadConfig() throws FileNotFoundException {
+    public boolean loadConfig() {
         if (!configJSON.exists()) {
-            throw new FileNotFoundException(configJSON.getName() + " not found");
+            return false;
         }
 
         String json = null;
@@ -79,6 +78,8 @@ public abstract class BaseConfig {
 
         BaseConfig config = gson.fromJson(json, this.getClass());
         replaceFields(this.getClass(), config, this);
+
+        return true;
     }
 
     private void replaceFields(Class<?> clazz, Object src, Object dst) {

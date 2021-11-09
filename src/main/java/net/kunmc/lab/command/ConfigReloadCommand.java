@@ -5,7 +5,6 @@ import dev.kotx.flylib.command.CommandContext;
 import net.kunmc.lab.config.BaseConfig;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,11 +40,9 @@ class ConfigReloadCommand extends Command {
 
     private void exec(CommandContext ctx, BaseConfig config) {
         String fileName = config.configJSON.getName();
-        try {
-            config.loadConfig();
+        if (config.loadConfig()) {
             ctx.success(fileName + "を再読み込みしました.");
-        } catch (
-                FileNotFoundException e) {
+        } else {
             ctx.fail(fileName + "の読み込みに失敗しました.ファイルが存在しません.");
         }
     }
