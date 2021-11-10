@@ -1,6 +1,7 @@
 package net.kunmc.lab.command;
 
 import net.kunmc.lab.config.BaseConfig;
+import net.kunmc.lab.value.CollectionValue;
 import net.kunmc.lab.value.SingleValue;
 
 import java.lang.reflect.Field;
@@ -45,7 +46,7 @@ class ConfigSetCommand extends AccessibleCommand {
                     if (v.writableByCommand()) {
                         command.appendChild(new SingleValueConfigItem(field, v, config));
                     }
-                } else {
+                } else if (!(value instanceof CollectionValue)) {
                     command.appendChild(new PrimitiveConfigItem(field, config));
                 }
             }
