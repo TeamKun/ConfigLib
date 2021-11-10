@@ -22,7 +22,5 @@ public interface CollectionValue<T extends Collection<E>, E> extends Value<T> {
     String succeedRemoveMessage(String entryName, E element);
 
     String clearMessage(String entryName);
-
-    String suffixName();
 }
 

@@ -8,11 +8,9 @@ import java.util.stream.StreamSupport;
 
 public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterable<E> {
     protected Set<E> value;
-    protected String name;
 
-    public SetValue(@NotNull Set<E> value, @NotNull String name) {
+    public SetValue(@NotNull Set<E> value) {
         this.value = value;
-        this.name = name;
     }
 
     @Override
@@ -33,16 +31,6 @@ public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterabl
     @Override
     public boolean validateOnRemove(E element) {
         return value.contains(element);
-    }
-
-    @Override
-    public String suffixName() {
-        return name;
-    }
-
-    public <T extends SetValue<E>> T suffixName(String name) {
-        this.name = name;
-        return (T) this;
     }
 
     public int size() {

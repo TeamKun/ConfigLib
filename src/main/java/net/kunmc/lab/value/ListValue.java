@@ -7,11 +7,9 @@ import java.util.stream.Stream;
 
 public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Iterable<E> {
     protected List<E> value;
-    protected String name;
 
-    public ListValue(List<E> value, String name) {
+    public ListValue(List<E> value) {
         this.value = value;
-        this.name = name;
     }
 
     @Override
@@ -32,16 +30,6 @@ public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Itera
     @Override
     public boolean validateOnRemove(E element) {
         return value.contains(element);
-    }
-
-    @Override
-    public String suffixName() {
-        return name;
-    }
-
-    public <T extends ListValue<E>> T suffixName(String name) {
-        this.name = name;
-        return (T) this;
     }
 
     public int size() {
