@@ -5,38 +5,44 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.stream.Stream;
 
-public abstract class ListValue<T> implements Value<List<T>>, Iterable<T> {
-    protected List<T> value;
+public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Iterable<E> {
+    protected List<E> value;
+    protected String name;
 
-    public ListValue(List<T> value) {
+    public ListValue(List<E> value, String name) {
         this.value = value;
+        this.name = name;
     }
 
     @Override
-    public List<T> value() {
+    public List<E> value() {
         return this.value;
     }
 
     @Override
-    public void value(List<T> value) {
+    public void value(List<E> value) {
         this.value = value;
     }
 
     @Override
-    public final void onSetValue(List<T> newValue) {
-
-    }
-
-    @Override
-    public final boolean validate(List<T> newValue) {
+    public boolean validateOnAdd(E element) {
         return true;
     }
 
     @Override
-    public final boolean writableByCommand() {
-        return false;
+    public boolean validateOnRemove(E element) {
+        return value.contains(element);
     }
 
+    @Override
+    public String suffixName() {
+        return name;
+    }
+
+    public <T extends ListValue<E>> T suffixName(String name) {
+        this.name = name;
+        return (T) this;
+    }
 
     public int size() {
         return value.size();
@@ -52,7 +58,7 @@ public abstract class ListValue<T> implements Value<List<T>>, Iterable<T> {
 
     @NotNull
     @Override
-    public Iterator<T> iterator() {
+    public Iterator<E> iterator() {
         return value.iterator();
     }
 
@@ -62,11 +68,11 @@ public abstract class ListValue<T> implements Value<List<T>>, Iterable<T> {
     }
 
     @NotNull
-    public <T1> T1[] toArray(@NotNull T1[] a) {
+    public <T> T[] toArray(@NotNull T[] a) {
         return value.toArray(a);
     }
 
-    public boolean add(T t) {
+    public boolean add(E t) {
         return value.add(t);
     }
 
@@ -78,11 +84,11 @@ public abstract class ListValue<T> implements Value<List<T>>, Iterable<T> {
         return value.containsAll(c);
     }
 
-    public boolean addAll(@NotNull Collection<? extends T> c) {
+    public boolean addAll(@NotNull Collection<? extends E> c) {
         return value.addAll(c);
     }
 
-    public boolean addAll(int index, @NotNull Collection<? extends T> c) {
+    public boolean addAll(int index, @NotNull Collection<? extends E> c) {
         return value.addAll(index, c);
     }
 
@@ -98,19 +104,19 @@ public abstract class ListValue<T> implements Value<List<T>>, Iterable<T> {
         value.clear();
     }
 
-    public T get(int index) {
+    public E get(int index) {
         return value.get(index);
     }
 
-    public T set(int index, T element) {
+    public E set(int index, E element) {
         return value.set(index, element);
     }
 
-    public void add(int index, T element) {
+    public void add(int index, E element) {
         value.add(index, element);
     }
 
-    public T remove(int index) {
+    public E remove(int index) {
         return value.remove(index);
     }
 
@@ -123,25 +129,25 @@ public abstract class ListValue<T> implements Value<List<T>>, Iterable<T> {
     }
 
     @NotNull
-    public ListIterator<T> listIterator() {
+    public ListIterator<E> listIterator() {
         return value.listIterator();
     }
 
     @NotNull
-    public ListIterator<T> listIterator(int index) {
+    public ListIterator<E> listIterator(int index) {
         return value.listIterator(index);
     }
 
     @NotNull
-    public List<T> subList(int fromIndex, int toIndex) {
+    public List<E> subList(int fromIndex, int toIndex) {
         return value.subList(fromIndex, toIndex);
     }
 
-    public Stream<T> stream() {
+    public Stream<E> stream() {
         return value.stream();
     }
 
-    public Spliterator<T> spliterator() {
+    public Spliterator<E> spliterator() {
         return value.spliterator();
     }
 }

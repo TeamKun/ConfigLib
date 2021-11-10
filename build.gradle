@@ -22,6 +22,7 @@ dependencies {
     implementation group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
     implementation "dev.kotx:flylib-reloaded:0.4.1"
     implementation 'com.google.code.gson:gson:2.8.9'
+    implementation group: 'org.apache.poi', name: 'poi', version: '5.1.0'
 }
 
 def targetJavaVersion = 8

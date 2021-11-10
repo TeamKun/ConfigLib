@@ -1,9 +1,12 @@
 package net.kunmc.lab.value;
 
+import org.apache.poi.util.NotImplemented;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+@NotImplemented
 public abstract class MapValue<K, V> implements Value<Map<K, V>> {
     protected Map<K, V> value;
 
@@ -19,21 +22,6 @@ public abstract class MapValue<K, V> implements Value<Map<K, V>> {
     @Override
     public void value(Map<K, V> value) {
         this.value = value;
-    }
-
-    @Override
-    public final void onSetValue(Map<K, V> newValue) {
-
-    }
-
-    @Override
-    public final boolean validate(Map<K, V> newValue) {
-        return true;
-    }
-
-    @Override
-    public final boolean writableByCommand() {
-        return false;
     }
 
     public int size() {

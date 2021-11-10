@@ -1,12 +1,12 @@
 package net.kunmc.lab.value;
 
-public interface NumericValue<T extends Comparable<T>> extends Value<T> {
+public interface NumericValue<T extends Comparable<T>> extends SingleValue<T> {
     T min();
 
     T max();
 
     @Override
-    default boolean validate(T newValue) {
+    default boolean validateOnSet(T newValue) {
         return newValue.compareTo(min()) != -1 && newValue.compareTo(max()) != 1;
     }
 

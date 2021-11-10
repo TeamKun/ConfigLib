@@ -6,41 +6,43 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public abstract class SetValue<T> implements Value<Set<T>>, Iterable<T> {
-    protected Set<T> value;
+public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterable<E> {
+    protected Set<E> value;
+    protected String name;
 
-    public SetValue(Set<T> value) {
+    public SetValue(@NotNull Set<E> value, @NotNull String name) {
         this.value = value;
+        this.name = name;
     }
 
     @Override
-    public Set<T> value() {
+    public Set<E> value() {
         return this.value;
     }
 
     @Override
-    public void value(Set<T> value) {
+    public void value(Set<E> value) {
         this.value = value;
     }
 
     @Override
-    public final boolean writableByCommand() {
-        return false;
+    public boolean validateOnAdd(E element) {
+        return !value.contains(element);
     }
 
     @Override
-    public final void onSetValue(Set<T> newValue) {
-
+    public boolean validateOnRemove(E element) {
+        return value.contains(element);
     }
 
     @Override
-    public final boolean validate(Set<T> newValue) {
-        return true;
+    public String suffixName() {
+        return name;
     }
 
-    @Override
-    public boolean listable() {
-        return false;
+    public <T extends SetValue<E>> T suffixName(String name) {
+        this.name = name;
+        return (T) this;
     }
 
     public int size() {
@@ -55,33 +57,33 @@ public abstract class SetValue<T> implements Value<Set<T>>, Iterable<T> {
         return value.contains(o);
     }
 
-    public Iterator<T> iterator() {
+    public Iterator<E> iterator() {
         return value.iterator();
     }
 
     @NotNull
     public Object[] toArray() {
-        return new Object[0];
+        return value.toArray();
     }
 
     @NotNull
-    public <T1> T1[] toArray(@NotNull T1[] a) {
-        return null;
+    public <T> T[] toArray(@NotNull T[] a) {
+        return value.toArray(a);
     }
 
-    public boolean add(T o) {
+    public boolean add(E o) {
         return value.add(o);
     }
 
     public boolean remove(Object o) {
-        return false;
+        return value.remove(o);
     }
 
     public boolean containsAll(Collection<?> c) {
         return value.containsAll(c);
     }
 
-    public boolean addAll(Collection<? extends T> c) {
+    public boolean addAll(Collection<? extends E> c) {
         return value.addAll(c);
     }
 
@@ -105,11 +107,11 @@ public abstract class SetValue<T> implements Value<Set<T>>, Iterable<T> {
         return value.hashCode();
     }
 
-    public Stream<T> stream() {
+    public Stream<E> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
 
-    public Spliterator<T> spliterator() {
+    public Spliterator<E> spliterator() {
         return Spliterators.spliterator(value, 0);
     }
 }

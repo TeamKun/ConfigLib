@@ -2,7 +2,7 @@ package net.kunmc.lab.value;
 
 import java.util.function.Consumer;
 
-public class StringValue implements Value<String> {
+public class StringValue implements SingleValue<String> {
     private String value;
     private int min;
     private final int max;
@@ -47,7 +47,7 @@ public class StringValue implements Value<String> {
     }
 
     @Override
-    public boolean validate(String newValue) {
+    public boolean validateOnSet(String newValue) {
         return newValue.length() >= min && newValue.length() <= max;
     }
 

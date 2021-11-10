@@ -2,7 +2,7 @@ package net.kunmc.lab.command;
 
 import dev.kotx.flylib.command.Command;
 import net.kunmc.lab.config.BaseConfig;
-import net.kunmc.lab.value.Value;
+import net.kunmc.lab.value.SingleValue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-class ValueConfigItem extends Command {
-    public ValueConfigItem(Field field, Value configValue, BaseConfig config) {
+class SingleValueConfigItem extends Command {
+    public SingleValueConfigItem(Field field, SingleValue configValue, BaseConfig config) {
         super(field.getName());
 
         String entryName = field.getName();
@@ -19,7 +19,6 @@ class ValueConfigItem extends Command {
 
         usage(builder -> {
             type.appendArgument(builder);
-
             builder.executes(ctx -> {
                 Object argument = ctx.getTypedArgs().get(0);
                 if (!type.isCollectArgument(argument)) {
@@ -28,7 +27,7 @@ class ValueConfigItem extends Command {
                 }
 
                 Object newValue = type.argumentToValue(argument);
-                if (!configValue.validate(newValue)) {
+                if (!configValue.validateOnSet(newValue)) {
                     ctx.fail(configValue.failSetMessage(entryName, newValue));
                     return;
                 }

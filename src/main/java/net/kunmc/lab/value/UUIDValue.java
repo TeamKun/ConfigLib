@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class UUIDValue implements Value<UUID> {
+public class UUIDValue implements SingleValue<UUID> {
     private String playerName;
     private UUID uuid;
     private final transient Consumer<UUID> consumer;
@@ -57,7 +57,7 @@ public class UUIDValue implements Value<UUID> {
     }
 
     @Override
-    public boolean validate(UUID newValue) {
+    public boolean validateOnSet(UUID newValue) {
         return true;
     }
 

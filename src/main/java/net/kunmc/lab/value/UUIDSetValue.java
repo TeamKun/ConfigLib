@@ -32,7 +32,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     public UUIDSetValue(Set<UUID> value) {
-        super(value);
+        super(value, "");
     }
 
     @Override
@@ -56,5 +56,45 @@ public class UUIDSetValue extends SetValue<UUID> {
                 .collect(Collectors.joining(",")));
 
         ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
+    }
+
+    @Override
+    public boolean addableByCommand() {
+        return false;
+    }
+
+    @Override
+    public boolean removableByCommand() {
+        return false;
+    }
+
+    @Override
+    public boolean clearableByCommand() {
+        return false;
+    }
+
+    @Override
+    public String failAddMessage(String entryName, UUID element) {
+        return null;
+    }
+
+    @Override
+    public String succeedAddMessage(String entryName, UUID element) {
+        return null;
+    }
+
+    @Override
+    public String failRemoveMessage(String entryName, UUID element) {
+        return null;
+    }
+
+    @Override
+    public String succeedRemoveMessage(String entryName, UUID element) {
+        return null;
+    }
+
+    @Override
+    public String clearMessage(String entryName) {
+        return null;
     }
 }

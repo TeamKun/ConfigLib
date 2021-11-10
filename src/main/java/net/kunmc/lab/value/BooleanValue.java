@@ -2,7 +2,7 @@ package net.kunmc.lab.value;
 
 import java.util.function.Consumer;
 
-public final class BooleanValue implements Value<Boolean> {
+public final class BooleanValue implements SingleValue<Boolean> {
     private Boolean value;
     private final transient Consumer<Boolean> consumer;
     private transient Boolean listable = true;
@@ -34,7 +34,7 @@ public final class BooleanValue implements Value<Boolean> {
     }
 
     @Override
-    public boolean validate(Boolean newValue) {
+    public boolean validateOnSet(Boolean newValue) {
         return true;
     }
 

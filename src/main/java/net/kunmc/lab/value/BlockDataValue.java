@@ -6,7 +6,7 @@ import org.bukkit.block.data.BlockData;
 
 import java.util.function.Consumer;
 
-public final class BlockDataValue implements Value<BlockData> {
+public final class BlockDataValue implements SingleValue<BlockData> {
     private String materialName;
     private final transient Consumer<BlockData> consumer;
     private transient Boolean listable = true;
@@ -38,7 +38,7 @@ public final class BlockDataValue implements Value<BlockData> {
     }
 
     @Override
-    public boolean validate(BlockData newValue) {
+    public boolean validateOnSet(BlockData newValue) {
         return true;
     }
 

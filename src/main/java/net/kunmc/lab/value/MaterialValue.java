@@ -4,7 +4,7 @@ import org.bukkit.Material;
 
 import java.util.function.Consumer;
 
-public final class MaterialValue implements Value<Material> {
+public final class MaterialValue implements SingleValue<Material> {
     private String materialName;
     private final transient Consumer<Material> consumer;
     private transient Boolean listable = true;
@@ -36,7 +36,7 @@ public final class MaterialValue implements Value<Material> {
     }
 
     @Override
-    public boolean validate(Material newValue) {
+    public boolean validateOnSet(Material newValue) {
         return true;
     }
 
