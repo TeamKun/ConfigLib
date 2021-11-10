@@ -31,7 +31,7 @@ public final class ArgumentType<T> {
             double.class
     );
     public static final ArgumentType<Float> FLOAT = new ArgumentType<>(
-            b -> b.floatArgument("FloatArgumnet"),
+            b -> b.floatArgument("FloatArgument"),
             x -> true,
             x -> ((Float) x),
             float.class
