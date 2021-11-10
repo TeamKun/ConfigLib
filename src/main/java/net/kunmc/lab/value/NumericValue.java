@@ -11,7 +11,7 @@ public interface NumericValue<T extends Comparable<T>> extends SingleValue<T> {
     }
 
     @Override
-    default String failSetMessage(String entryName, T argument) {
+    default String invalidValueMessage(String entryName, T argument) {
         return entryName + "は" + min() + "以上" + max() + "以下の値を入力してください.";
     }
 }

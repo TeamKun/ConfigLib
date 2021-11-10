@@ -1,5 +1,7 @@
 package net.kunmc.lab.value;
 
+import dev.kotx.flylib.command.UsageBuilder;
+
 import java.util.function.Consumer;
 
 public class StringValue implements SingleValue<String> {
@@ -56,6 +58,21 @@ public class StringValue implements SingleValue<String> {
         return listable;
     }
 
+    @Override
+    public void appendArgument(UsageBuilder builder) {
+        builder.textArgument("StringArgument");
+    }
+
+    @Override
+    public boolean isCorrectArgument(Object argument) {
+        return argument instanceof String;
+    }
+
+    @Override
+    public String argumentToValue(Object argument) {
+        return argument.toString();
+    }
+
     public StringValue listable(boolean listable) {
         this.listable = listable;
         return this;
@@ -72,7 +89,7 @@ public class StringValue implements SingleValue<String> {
     }
 
     @Override
-    public String failSetMessage(String entryName, String argument) {
+    public String invalidValueMessage(String entryName, String argument) {
         return entryName + "は" + min + "以上" + max + "以下の文字数で入力してください";
     }
 

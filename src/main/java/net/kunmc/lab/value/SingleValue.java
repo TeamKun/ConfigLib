@@ -9,7 +9,7 @@ public interface SingleValue<T> extends Value<T> {
 
     boolean writableByCommand();
 
-    default String failSetMessage(String entryName, T newValue) {
+    default String invalidValueMessage(String entryName, T newValue) {
         return "引数の値が不正です.";
     }
 

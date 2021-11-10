@@ -1,5 +1,7 @@
 package net.kunmc.lab.value;
 
+import dev.kotx.flylib.command.UsageBuilder;
+
 import java.util.function.Consumer;
 
 public final class FloatValue implements NumericValue<Float> {
@@ -34,6 +36,21 @@ public final class FloatValue implements NumericValue<Float> {
     @Override
     public boolean listable() {
         return listable;
+    }
+
+    @Override
+    public void appendArgument(UsageBuilder builder) {
+        builder.floatArgument("FloatArgument");
+    }
+
+    @Override
+    public boolean isCorrectArgument(Object argument) {
+        return argument instanceof Float;
+    }
+
+    @Override
+    public Float argumentToValue(Object argument) {
+        return ((Float) argument);
     }
 
     public FloatValue listable(boolean listable) {

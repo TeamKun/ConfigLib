@@ -1,5 +1,7 @@
 package net.kunmc.lab.value;
 
+import dev.kotx.flylib.command.UsageBuilder;
+
 import java.util.function.Consumer;
 
 public final class BooleanValue implements SingleValue<Boolean> {
@@ -41,6 +43,23 @@ public final class BooleanValue implements SingleValue<Boolean> {
     @Override
     public boolean listable() {
         return listable;
+    }
+
+    @Override
+    public void appendArgument(UsageBuilder builder) {
+        builder.booleanArgument("BooleanArgument", sb -> {
+            sb.suggest("true").suggest("false");
+        });
+    }
+
+    @Override
+    public boolean isCorrectArgument(Object argument) {
+        return argument instanceof Boolean;
+    }
+
+    @Override
+    public Boolean argumentToValue(Object argument) {
+        return ((Boolean) argument);
     }
 
     public BooleanValue listable(boolean listable) {

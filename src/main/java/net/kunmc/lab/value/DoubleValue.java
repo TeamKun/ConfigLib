@@ -1,5 +1,7 @@
 package net.kunmc.lab.value;
 
+import dev.kotx.flylib.command.UsageBuilder;
+
 import java.util.function.Consumer;
 
 public final class DoubleValue implements NumericValue<Double> {
@@ -34,6 +36,21 @@ public final class DoubleValue implements NumericValue<Double> {
     @Override
     public boolean listable() {
         return listable;
+    }
+
+    @Override
+    public void appendArgument(UsageBuilder builder) {
+        builder.doubleArgument("DoubleArgument");
+    }
+
+    @Override
+    public boolean isCorrectArgument(Object argument) {
+        return argument instanceof Double;
+    }
+
+    @Override
+    public Double argumentToValue(Object argument) {
+        return ((Double) argument);
     }
 
     public DoubleValue listable(boolean listable) {

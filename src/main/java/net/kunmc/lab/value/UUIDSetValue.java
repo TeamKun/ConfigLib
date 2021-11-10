@@ -2,6 +2,7 @@ package net.kunmc.lab.value;
 
 import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.CommandContext;
+import dev.kotx.flylib.command.UsageBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,7 +33,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     public UUIDSetValue(Set<UUID> value) {
-        super(value, "");
+        super(value);
     }
 
     @Override
@@ -56,6 +57,30 @@ public class UUIDSetValue extends SetValue<UUID> {
                 .collect(Collectors.joining(",")));
 
         ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
+    }
+
+    @Override
+    public void appendArgument(UsageBuilder builder) {
+        builder.textArgument("PlayerName", sb -> {
+            Arrays.stream(Bukkit.getOfflinePlayers())
+                    .map(OfflinePlayer::getName)
+                    .forEach(sb::suggest);
+        });
+    }
+
+    @Override
+    public boolean isCorrectArgument(Object argument) {
+        return Arrays.stream(Bukkit.getOfflinePlayers())
+                .map(OfflinePlayer::getName)
+                .anyMatch(s -> s.equals(argument));
+    }
+
+    @Override
+    public Set<UUID> argumentToValue(Object argument) {
+        return Arrays.stream(Bukkit.getOfflinePlayers())
+                .filter(p -> p.getName().equals(argument))
+                .map(OfflinePlayer::getUniqueId)
+                .collect(Collectors.toSet());
     }
 
     @Override

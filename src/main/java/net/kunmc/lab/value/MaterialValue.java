@@ -1,7 +1,9 @@
 package net.kunmc.lab.value;
 
+import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.Material;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 public final class MaterialValue implements SingleValue<Material> {
@@ -43,6 +45,30 @@ public final class MaterialValue implements SingleValue<Material> {
     @Override
     public boolean listable() {
         return listable;
+    }
+
+    @Override
+    public void appendArgument(UsageBuilder builder) {
+        builder.textArgument("MaterialName", sb -> {
+            Arrays.stream(Material.values())
+                    .map(Material::name)
+                    .map(String::toLowerCase)
+                    .forEach(sb::suggest);
+        });
+    }
+
+    @Override
+    public boolean isCorrectArgument(Object argument) {
+        return Arrays.stream(Material.values())
+                .anyMatch(m -> m.name().equals(argument.toString().toUpperCase()));
+    }
+
+    @Override
+    public Material argumentToValue(Object argument) {
+        return Arrays.stream(Material.values())
+                .filter(m -> m.name().equals(argument.toString().toUpperCase()))
+                .findFirst()
+                .get();
     }
 
     public MaterialValue listable(boolean listable) {

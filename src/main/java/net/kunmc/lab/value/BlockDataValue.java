@@ -1,9 +1,11 @@
 package net.kunmc.lab.value;
 
 import dev.kotx.flylib.command.CommandContext;
+import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 public final class BlockDataValue implements SingleValue<BlockData> {
@@ -70,6 +72,33 @@ public final class BlockDataValue implements SingleValue<BlockData> {
     @Override
     public void sendListMessage(CommandContext ctx, String entryName) {
         ctx.success(entryName + ": " + materialName);
+    }
+
+    @Override
+    public void appendArgument(UsageBuilder builder) {
+        builder.textArgument("BlockName", sb -> {
+            Arrays.stream(Material.values())
+                    .filter(Material::isBlock)
+                    .map(Material::name)
+                    .map(String::toLowerCase)
+                    .forEach(sb::suggest);
+        });
+    }
+
+    @Override
+    public boolean isCorrectArgument(Object argument) {
+        return Arrays.stream(Material.values())
+                .filter(Material::isBlock)
+                .anyMatch(m -> m.name().equals(argument.toString().toUpperCase()));
+    }
+
+    @Override
+    public BlockData argumentToValue(Object argument) {
+        return Arrays.stream(Material.values())
+                .filter(m -> m.name().equals(argument.toString().toUpperCase()))
+                .map(Material::createBlockData)
+                .findFirst()
+                .get();
     }
 
     @Override
