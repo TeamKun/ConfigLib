@@ -2,18 +2,22 @@ package net.kunmc.lab.command;
 
 import dev.kotx.flylib.command.Command;
 import net.kunmc.lab.config.BaseConfig;
+import net.kunmc.lab.value.CollectionValue;
+import net.kunmc.lab.value.SingleValue;
+import net.kunmc.lab.value.Value;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 enum SubCommandType {
     Add("add",
-            x -> !x.getCollectionValueFields().isEmpty(),
+            x -> x.getCollectionValues().stream().anyMatch(CollectionValue::addableByCommand),
             ConfigAddCommand::new,
             ConfigAddCommand::new),
     Remove("remove",
-            x -> !x.getCollectionValueFields().isEmpty(),
+            x -> x.getCollectionValues().stream().anyMatch(CollectionValue::removableByCommand),
             ConfigRemoveCommand::new,
             ConfigRemoveCommand::new),
     Reload("reload",
@@ -21,14 +25,14 @@ enum SubCommandType {
             ConfigReloadCommand::new,
             ConfigReloadCommand::new),
     Clear("clear",
-            x -> !x.getCollectionValueFields().isEmpty(),
+            x -> x.getCollectionValues().stream().anyMatch(CollectionValue::clearableByCommand),
             ConfigClearCommand::new,
             ConfigClearCommand::new),
-    Set("set", x -> !x.getSingleValueFields().isEmpty(),
+    Set("set", x -> x.getSingleValues().stream().anyMatch(SingleValue::writableByCommand),
             ConfigSetCommand::new,
             ConfigSetCommand::new),
     List("list",
-            x -> !(x.getSingleValueFields().isEmpty() && x.getCollectionValueFields().isEmpty()),
+            x -> Stream.concat(x.getSingleValues().stream(), x.getCollectionValues().stream()).anyMatch(Value::listable),
             ConfigListCommand::new,
             ConfigListCommand::new);
 
