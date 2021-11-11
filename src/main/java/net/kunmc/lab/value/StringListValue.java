@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class StringListValue extends ListValue<String> {
     public StringListValue(String... strings) {
-        this(Arrays.asList(strings));
+        this(Arrays.stream(strings).collect(Collectors.toList()));
     }
 
     public StringListValue(List<String> value) {
