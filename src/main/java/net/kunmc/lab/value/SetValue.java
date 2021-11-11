@@ -23,16 +23,6 @@ public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterabl
         this.value = value;
     }
 
-    @Override
-    public boolean validateOnAdd(E element) {
-        return !value.contains(element);
-    }
-
-    @Override
-    public boolean validateOnRemove(E element) {
-        return value.contains(element);
-    }
-
     public int size() {
         return value.size();
     }

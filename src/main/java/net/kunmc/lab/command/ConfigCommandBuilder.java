@@ -10,6 +10,7 @@ import java.util.List;
 public class ConfigCommandBuilder {
     private final List<BaseConfig> configList = new ArrayList<>();
     private boolean shouldUseList = true;
+    private boolean shouldUseAdd = true;
     private boolean shouldUseSet = true;
     private boolean shouldUseReload = true;
 
@@ -19,6 +20,11 @@ public class ConfigCommandBuilder {
 
     public ConfigCommandBuilder disableListCommand() {
         this.shouldUseList = false;
+        return this;
+    }
+
+    public ConfigCommandBuilder disableAddCommand() {
+        this.shouldUseAdd = false;
         return this;
     }
 
@@ -54,6 +60,9 @@ public class ConfigCommandBuilder {
             if (shouldUseList) {
                 subCommandList.add(new ConfigListCommand(config));
             }
+            if (shouldUseAdd) {
+                subCommandList.add(new ConfigAddCommand(config));
+            }
             if (shouldUseSet) {
                 subCommandList.add(new ConfigSetCommand(config));
             }
@@ -63,6 +72,9 @@ public class ConfigCommandBuilder {
         } else {
             if (shouldUseList) {
                 subCommandList.add(new ConfigListCommand(configList));
+            }
+            if (shouldUseAdd) {
+                subCommandList.add(new ConfigAddCommand(configList));
             }
             if (shouldUseSet) {
                 subCommandList.add(new ConfigSetCommand(configList));

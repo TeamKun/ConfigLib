@@ -99,27 +99,45 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public String failAddMessage(String entryName, UUID element) {
-        return null;
+    public boolean validateOnAdd(Set<UUID> element) {
+        return !value.containsAll(element);
     }
 
     @Override
-    public String succeedAddMessage(String entryName, UUID element) {
-        return null;
+    public boolean validateOnRemove(Set<UUID> element) {
+        return value.containsAll(element);
     }
 
     @Override
-    public String failRemoveMessage(String entryName, UUID element) {
-        return null;
+    public String failAddMessage(String entryName, Set<UUID> element) {
+        UUID uuid = element.toArray(new UUID[0])[0];
+        OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
+        return p.getName() + "はすでに" + entryName + "に追加されています.";
     }
 
     @Override
-    public String succeedRemoveMessage(String entryName, UUID element) {
-        return null;
+    public String succeedAddMessage(String entryName, Set<UUID> element) {
+        UUID uuid = element.toArray(new UUID[0])[0];
+        OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
+        return entryName + "に" + p.getName() + "を追加しました.";
+    }
+
+    @Override
+    public String failRemoveMessage(String entryName, Set<UUID> element) {
+        UUID uuid = element.toArray(new UUID[0])[0];
+        OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
+        return p.getName() + "は" + entryName + "に追加されていませんでした.";
+    }
+
+    @Override
+    public String succeedRemoveMessage(String entryName, Set<UUID> element) {
+        UUID uuid = element.toArray(new UUID[0])[0];
+        OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
+        return entryName + "から" + p.getName() + "を削除しました.";
     }
 
     @Override
     public String clearMessage(String entryName) {
-        return null;
+        return entryName + "をクリアしました.";
     }
 }

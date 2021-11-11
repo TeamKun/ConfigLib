@@ -9,17 +9,17 @@ public interface CollectionValue<T extends Collection<E>, E> extends Value<T> {
 
     boolean clearableByCommand();
 
-    boolean validateOnAdd(E element);
+    boolean validateOnAdd(T element);
 
-    boolean validateOnRemove(E element);
+    boolean validateOnRemove(T element);
 
-    String failAddMessage(String entryName, E element);
+    String failAddMessage(String entryName, T element);
 
-    String succeedAddMessage(String entryName, E element);
+    String succeedAddMessage(String entryName, T element);
 
-    String failRemoveMessage(String entryName, E element);
+    String failRemoveMessage(String entryName, T element);
 
-    String succeedRemoveMessage(String entryName, E element);
+    String succeedRemoveMessage(String entryName, T element);
 
     String clearMessage(String entryName);
 }
