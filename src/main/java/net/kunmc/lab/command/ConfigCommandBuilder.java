@@ -3,8 +3,13 @@ package net.kunmc.lab.command;
 import dev.kotx.flylib.command.Command;
 import net.kunmc.lab.config.BaseConfig;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ConfigCommandBuilder {
     private final Set<BaseConfig> configSet = new HashSet<>();
@@ -55,38 +60,43 @@ public class ConfigCommandBuilder {
 
     public ConfigCommand build() {
         ConfigCommand configCommand = new ConfigCommand();
-        for (Command c : createSubCommands()) {
-            configCommand.appendChild(c);
+        for (Command cmd : createSubCommands()) {
+            configCommand.appendChild(cmd);
         }
 
         return configCommand;
     }
 
-    private List<Command> createSubCommands() {
-        List<Command> subCommandList = new ArrayList<>();
-
+    private Set<Command> createSubCommands() {
+        Set<Command> subCommandSet = new HashSet<>();
         for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeBooleanMap.entrySet()) {
             SubCommandType type = entry.getKey();
-            boolean b = entry.getValue();
-            subCommandTypeBooleanMap.put(type, type.hasEntryFor(configSet) && b);
+            Set<BaseConfig> usedConfigs = type.hasEntryFor(configSet).entrySet().stream()
+                    .filter(Map.Entry::getValue)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+
+            if (entry.getValue()) {
+                Command cmd = createSubCommand(usedConfigs, type);
+                if (cmd != null) {
+                    subCommandSet.add(cmd);
+                }
+            }
+        }
+
+        return subCommandSet;
+    }
+
+    private @Nullable Command createSubCommand(Set<BaseConfig> configSet, SubCommandType type) {
+        if (configSet.size() == 0) {
+            return null;
         }
 
         if (configSet.size() == 1) {
             BaseConfig config = configSet.toArray(new BaseConfig[0])[0];
-
-            for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeBooleanMap.entrySet()) {
-                if (entry.getValue()) {
-                    subCommandList.add(entry.getKey().of(config));
-                }
-            }
+            return type.of(config);
         } else {
-            for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeBooleanMap.entrySet()) {
-                if (entry.getValue()) {
-                    subCommandList.add(entry.getKey().of(configSet));
-                }
-            }
+            return type.of(configSet);
         }
-
-        return subCommandList;
     }
 }
