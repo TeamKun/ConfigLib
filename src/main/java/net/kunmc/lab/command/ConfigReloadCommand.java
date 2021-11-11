@@ -41,7 +41,7 @@ class ConfigReloadCommand extends Command {
     }
 
     private void exec(CommandContext ctx, BaseConfig config) {
-        String fileName = config.configJSON.getName();
+        String fileName = config.getConfigFile().getName();
         if (config.loadConfig()) {
             ctx.success(fileName + "を再読み込みしました.");
         } else {

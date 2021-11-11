@@ -21,20 +21,40 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class BaseConfig {
-    private final transient Plugin plugin;
-    public final transient File configJSON;
-    private final transient String entryName;
+    private transient Plugin plugin;
+    private transient String entryName;
     private static final transient Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .excludeFieldsWithModifiers(Modifier.TRANSIENT)
             .create();
 
-    public BaseConfig(@NotNull Plugin plugin, @NotNull String entryName) {
-        this.plugin = plugin;
-        this.entryName = entryName;
+    public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Class<T> clazz, @NotNull Plugin plugin) {
+        String filename = configJSON.getName();
+        String json = readJson(configJSON);
 
+        T config = gson.fromJson(json, clazz);
+        config.setPlugin(plugin);
+        config.setEntryName(filename.substring(0, filename.lastIndexOf('.')));
+
+        return config;
+    }
+
+    public BaseConfig(@NotNull Plugin plugin, @NotNull String entryName) {
+        setPlugin(plugin);
+        this.entryName = entryName;
+    }
+
+    protected void setPlugin(Plugin plugin) {
+        this.plugin = plugin;
         plugin.getDataFolder().mkdir();
-        this.configJSON = new File(plugin.getDataFolder(), entryName() + ".json");
+    }
+
+    protected void setEntryName(String entryName) {
+        this.entryName = entryName;
+    }
+
+    public File getConfigFile() {
+        return new File(plugin.getDataFolder(), entryName() + ".json");
     }
 
     public String entryName() {
@@ -90,44 +110,53 @@ public abstract class BaseConfig {
                 .collect(Collectors.toList());
     }
 
+    private static String readJson(File jsonFile) {
+        String json = null;
+        try {
+            json = Files.readLines(jsonFile, StandardCharsets.UTF_8).stream()
+                    .collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return json;
+    }
+
+    private static void writeJson(File jsonFile, String json) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(jsonFile), StandardCharsets.UTF_8)) {
+            writer.write(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void saveConfig() {
         try {
-            configJSON.createNewFile();
-            String json = gson.toJson(this);
-            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(configJSON), StandardCharsets.UTF_8)) {
-                writer.write(json);
-            }
+            getConfigFile().createNewFile();
+            writeJson(getConfigFile(), gson.toJson(this));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void saveConfigIfAbsent() {
-        if (!configJSON.exists()) {
+        if (!getConfigFile().exists()) {
             saveConfig();
         }
     }
 
     public void saveConfigIfPresent() {
-        if (configJSON.exists()) {
+        if (getConfigFile().exists()) {
             saveConfig();
         }
     }
 
     public boolean loadConfig() {
-        if (!configJSON.exists()) {
+        if (!getConfigFile().exists()) {
             return false;
         }
 
-        String json = null;
-        try {
-            json = Files.readLines(configJSON, StandardCharsets.UTF_8).stream()
-                    .collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        BaseConfig config = gson.fromJson(json, this.getClass());
+        BaseConfig config = gson.fromJson(readJson(getConfigFile()), this.getClass());
         replaceFields(this.getClass(), config, this);
 
         return true;
