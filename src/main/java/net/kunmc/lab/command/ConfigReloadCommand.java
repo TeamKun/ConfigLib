@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 class ConfigReloadCommand extends Command {
     private final List<BaseConfig> configList = new ArrayList<>();
@@ -16,15 +17,15 @@ class ConfigReloadCommand extends Command {
         configList.add(config);
     }
 
-    public ConfigReloadCommand(@NotNull List<BaseConfig> configList) {
+    public ConfigReloadCommand(@NotNull Set<BaseConfig> configSet) {
         super(SubCommandType.Reload.name);
 
-        if (configList.isEmpty()) {
-            throw new IllegalArgumentException("configList is empty");
+        if (configSet.isEmpty()) {
+            throw new IllegalArgumentException("configSet is empty");
         }
-        this.configList.addAll(configList);
+        this.configList.addAll(configSet);
 
-        for (BaseConfig config : configList) {
+        for (BaseConfig config : configSet) {
             children(new Command(config.entryName()) {
                 @Override
                 public void execute(@NotNull CommandContext ctx) {

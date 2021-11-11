@@ -6,7 +6,7 @@ import net.kunmc.lab.value.CollectionValue;
 import net.kunmc.lab.value.SingleValue;
 import net.kunmc.lab.value.Value;
 
-import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -39,9 +39,9 @@ enum SubCommandType {
     final String name;
     final Predicate<BaseConfig> hasEntryFor;
     final Function<BaseConfig, Command> instantiator;
-    final Function<List<BaseConfig>, Command> instantiator2;
+    final Function<Set<BaseConfig>, Command> instantiator2;
 
-    SubCommandType(String name, Predicate<BaseConfig> hasEntryFor, Function<BaseConfig, Command> instantiator, Function<List<BaseConfig>, Command> instantiator2) {
+    SubCommandType(String name, Predicate<BaseConfig> hasEntryFor, Function<BaseConfig, Command> instantiator, Function<Set<BaseConfig>, Command> instantiator2) {
         this.name = name;
         this.hasEntryFor = hasEntryFor;
         this.instantiator = instantiator;
@@ -52,8 +52,8 @@ enum SubCommandType {
         return hasEntryFor.test(config);
     }
 
-    public boolean hasEntryFor(List<BaseConfig> configList) {
-        return configList.stream()
+    public boolean hasEntryFor(Set<BaseConfig> configSet) {
+        return configSet.stream()
                 .anyMatch(this::hasEntryFor);
     }
 
@@ -61,7 +61,7 @@ enum SubCommandType {
         return instantiator.apply(config);
     }
 
-    public Command of(List<BaseConfig> config) {
+    public Command of(Set<BaseConfig> config) {
         return instantiator2.apply(config);
     }
 }

@@ -4,7 +4,7 @@ import net.kunmc.lab.config.BaseConfig;
 import net.kunmc.lab.value.SingleValue;
 
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.Set;
 
 class ConfigSetCommand extends AccessibleCommand {
     public ConfigSetCommand(BaseConfig config) {
@@ -12,14 +12,14 @@ class ConfigSetCommand extends AccessibleCommand {
         init(config, this);
     }
 
-    public ConfigSetCommand(List<BaseConfig> configList) {
+    public ConfigSetCommand(Set<BaseConfig> configSet) {
         super(SubCommandType.Set.name);
 
-        if (configList.isEmpty()) {
-            throw new IllegalArgumentException("configList is emptry");
+        if (configSet.isEmpty()) {
+            throw new IllegalArgumentException("configSet is emptry");
         }
 
-        for (BaseConfig config : configList) {
+        for (BaseConfig config : configSet) {
             children(new AccessibleCommand(config.entryName()) {
                 {
                     init(config, this);

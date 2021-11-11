@@ -4,17 +4,14 @@ import dev.kotx.flylib.command.Command;
 import net.kunmc.lab.config.BaseConfig;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ConfigCommandBuilder {
-    private final List<BaseConfig> configList = new ArrayList<>();
+    private final Set<BaseConfig> configSet = new HashSet<>();
     private final Map<SubCommandType, Boolean> subCommandTypeBooleanMap = new HashMap<>();
 
     public ConfigCommandBuilder(@NotNull BaseConfig config) {
-        configList.add(config);
+        configSet.add(config);
 
         for (SubCommandType subCommand : SubCommandType.values()) {
             subCommandTypeBooleanMap.put(subCommand, true);
@@ -52,7 +49,7 @@ public class ConfigCommandBuilder {
     }
 
     public ConfigCommandBuilder addConfig(@NotNull BaseConfig config) {
-        configList.add(config);
+        configSet.add(config);
         return this;
     }
 
@@ -71,11 +68,11 @@ public class ConfigCommandBuilder {
         for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeBooleanMap.entrySet()) {
             SubCommandType type = entry.getKey();
             boolean b = entry.getValue();
-            subCommandTypeBooleanMap.put(type, type.hasEntryFor(configList) && b);
+            subCommandTypeBooleanMap.put(type, type.hasEntryFor(configSet) && b);
         }
 
-        if (configList.size() == 1) {
-            BaseConfig config = configList.get(0);
+        if (configSet.size() == 1) {
+            BaseConfig config = configSet.toArray(new BaseConfig[0])[0];
 
             for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeBooleanMap.entrySet()) {
                 if (entry.getValue()) {
@@ -85,7 +82,7 @@ public class ConfigCommandBuilder {
         } else {
             for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeBooleanMap.entrySet()) {
                 if (entry.getValue()) {
-                    subCommandList.add(entry.getKey().of(configList));
+                    subCommandList.add(entry.getKey().of(configSet));
                 }
             }
         }

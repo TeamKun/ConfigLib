@@ -6,7 +6,7 @@ import net.kunmc.lab.value.CollectionValue;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 class ConfigRemoveCommand extends AccessibleCommand {
     public ConfigRemoveCommand(BaseConfig config) {
@@ -14,14 +14,14 @@ class ConfigRemoveCommand extends AccessibleCommand {
         init(config, this);
     }
 
-    public ConfigRemoveCommand(List<BaseConfig> configList) {
+    public ConfigRemoveCommand(Set<BaseConfig> configSet) {
         super(SubCommandType.Remove.name);
 
-        if (configList.isEmpty()) {
-            throw new IllegalArgumentException("configList is empty");
+        if (configSet.isEmpty()) {
+            throw new IllegalArgumentException("configSet is empty");
         }
 
-        for (BaseConfig config : configList) {
+        for (BaseConfig config : configSet) {
             children(new AccessibleCommand(config.entryName()) {
                 {
                     init(config, this);

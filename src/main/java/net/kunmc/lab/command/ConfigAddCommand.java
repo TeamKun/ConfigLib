@@ -6,7 +6,7 @@ import net.kunmc.lab.value.CollectionValue;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 class ConfigAddCommand extends AccessibleCommand {
     public ConfigAddCommand(BaseConfig config) {
@@ -14,14 +14,14 @@ class ConfigAddCommand extends AccessibleCommand {
         init(config, this);
     }
 
-    public ConfigAddCommand(List<BaseConfig> configList) {
+    public ConfigAddCommand(Set<BaseConfig> configSet) {
         super(SubCommandType.Add.name);
 
-        if (configList.isEmpty()) {
-            throw new IllegalArgumentException("configList is empty");
+        if (configSet.isEmpty()) {
+            throw new IllegalArgumentException("configSet is empty");
         }
 
-        for (BaseConfig config : configList) {
+        for (BaseConfig config : configSet) {
             children(new AccessibleCommand(config.entryName()) {
                 {
                     init(config, this);

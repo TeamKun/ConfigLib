@@ -7,7 +7,7 @@ import net.kunmc.lab.value.CollectionValue;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 class ConfigClearCommand extends AccessibleCommand {
     public ConfigClearCommand(BaseConfig config) {
@@ -15,14 +15,14 @@ class ConfigClearCommand extends AccessibleCommand {
         init(config, this);
     }
 
-    public ConfigClearCommand(List<BaseConfig> configList) {
+    public ConfigClearCommand(Set<BaseConfig> configSet) {
         super(SubCommandType.Clear.name);
 
-        if (configList.isEmpty()) {
-            throw new IllegalArgumentException("configList is empty");
+        if (configSet.isEmpty()) {
+            throw new IllegalArgumentException("configSet is empty");
         }
 
-        for (BaseConfig config : configList) {
+        for (BaseConfig config : configSet) {
             children(new AccessibleCommand(config.entryName()) {
                 {
                     init(config, this);

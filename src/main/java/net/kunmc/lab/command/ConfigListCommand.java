@@ -7,7 +7,7 @@ import net.kunmc.lab.value.Value;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.Set;
 
 class ConfigListCommand extends Command {
     private BaseConfig config;
@@ -17,14 +17,14 @@ class ConfigListCommand extends Command {
         this.config = config;
     }
 
-    public ConfigListCommand(List<BaseConfig> configList) {
+    public ConfigListCommand(Set<BaseConfig> configSet) {
         super(SubCommandType.List.name);
 
-        if (configList.isEmpty()) {
-            throw new IllegalArgumentException("configList is emptry");
+        if (configSet.isEmpty()) {
+            throw new IllegalArgumentException("configSet is empty");
         }
 
-        for (BaseConfig config : configList) {
+        for (BaseConfig config : configSet) {
             children(new Command(config.entryName()) {
                 @Override
                 public void execute(@NotNull CommandContext ctx) {
