@@ -16,8 +16,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class UUIDSetValue extends SetValue<UUID> {
-    private transient Boolean listable = true;
-
     public UUIDSetValue(UUID... uuids) {
         this(Sets.newHashSet(uuids));
     }
