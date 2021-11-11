@@ -10,12 +10,12 @@ import java.util.List;
 
 class ConfigAddCommand extends AccessibleCommand {
     public ConfigAddCommand(BaseConfig config) {
-        super(SubCommand.Add.name);
+        super(SubCommandType.Add.name);
         init(config, this);
     }
 
     public ConfigAddCommand(List<BaseConfig> configList) {
-        super(SubCommand.Add.name);
+        super(SubCommandType.Add.name);
 
         if (configList.isEmpty()) {
             throw new IllegalArgumentException("configList is empty");

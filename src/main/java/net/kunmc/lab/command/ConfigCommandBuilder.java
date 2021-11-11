@@ -11,43 +11,43 @@ import java.util.Map;
 
 public class ConfigCommandBuilder {
     private final List<BaseConfig> configList = new ArrayList<>();
-    private final Map<SubCommand, Boolean> subCommandBooleanMap = new HashMap<>();
+    private final Map<SubCommandType, Boolean> subCommandTypeBooleanMap = new HashMap<>();
 
     public ConfigCommandBuilder(@NotNull BaseConfig config) {
         configList.add(config);
 
-        for (SubCommand subCommand : SubCommand.values()) {
-            subCommandBooleanMap.put(subCommand, true);
+        for (SubCommandType subCommand : SubCommandType.values()) {
+            subCommandTypeBooleanMap.put(subCommand, true);
         }
     }
 
     public ConfigCommandBuilder disableListCommand() {
-        subCommandBooleanMap.put(SubCommand.List, false);
+        subCommandTypeBooleanMap.put(SubCommandType.List, false);
         return this;
     }
 
     public ConfigCommandBuilder disableAddCommand() {
-        subCommandBooleanMap.put(SubCommand.Add, false);
+        subCommandTypeBooleanMap.put(SubCommandType.Add, false);
         return this;
     }
 
     public ConfigCommandBuilder disableRemoveCommand() {
-        subCommandBooleanMap.put(SubCommand.Remove, false);
+        subCommandTypeBooleanMap.put(SubCommandType.Remove, false);
         return this;
     }
 
     public ConfigCommandBuilder disableClearCommand() {
-        subCommandBooleanMap.put(SubCommand.Clear, false);
+        subCommandTypeBooleanMap.put(SubCommandType.Clear, false);
         return this;
     }
 
     public ConfigCommandBuilder disableSetCommand() {
-        subCommandBooleanMap.put(SubCommand.Set, false);
+        subCommandTypeBooleanMap.put(SubCommandType.Set, false);
         return this;
     }
 
     public ConfigCommandBuilder disableReloadCommand() {
-        subCommandBooleanMap.put(SubCommand.Reload, false);
+        subCommandTypeBooleanMap.put(SubCommandType.Reload, false);
         return this;
     }
 
@@ -71,13 +71,13 @@ public class ConfigCommandBuilder {
         if (configList.size() == 1) {
             BaseConfig config = configList.get(0);
 
-            for (Map.Entry<SubCommand, Boolean> entry : subCommandBooleanMap.entrySet()) {
+            for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeBooleanMap.entrySet()) {
                 if (entry.getValue()) {
                     subCommandList.add(entry.getKey().of(config));
                 }
             }
         } else {
-            for (Map.Entry<SubCommand, Boolean> entry : subCommandBooleanMap.entrySet()) {
+            for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeBooleanMap.entrySet()) {
                 if (entry.getValue()) {
                     subCommandList.add(entry.getKey().of(configList));
                 }

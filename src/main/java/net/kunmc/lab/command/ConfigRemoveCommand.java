@@ -10,12 +10,12 @@ import java.util.List;
 
 class ConfigRemoveCommand extends AccessibleCommand {
     public ConfigRemoveCommand(BaseConfig config) {
-        super(SubCommand.Remove.name);
+        super(SubCommandType.Remove.name);
         init(config, this);
     }
 
     public ConfigRemoveCommand(List<BaseConfig> configList) {
-        super(SubCommand.Remove.name);
+        super(SubCommandType.Remove.name);
 
         if (configList.isEmpty()) {
             throw new IllegalArgumentException("configList is empty");

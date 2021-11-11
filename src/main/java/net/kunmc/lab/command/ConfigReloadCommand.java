@@ -12,13 +12,13 @@ class ConfigReloadCommand extends Command {
     private final List<BaseConfig> configList = new ArrayList<>();
 
     public ConfigReloadCommand(@NotNull BaseConfig config) {
-        super(SubCommand.Reload.name);
+        super(SubCommandType.Reload.name);
         configList.add(config);
     }
 
     public ConfigReloadCommand(@NotNull List<BaseConfig> configList) {
-        super(SubCommand.Reload.name);
-       
+        super(SubCommandType.Reload.name);
+
         if (configList.isEmpty()) {
             throw new IllegalArgumentException("configList is empty");
         }

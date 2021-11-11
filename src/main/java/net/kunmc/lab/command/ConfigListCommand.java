@@ -13,13 +13,13 @@ class ConfigListCommand extends Command {
     private BaseConfig config;
 
     public ConfigListCommand(BaseConfig config) {
-        super(SubCommand.List.name);
+        super(SubCommandType.List.name);
         this.config = config;
     }
 
     public ConfigListCommand(List<BaseConfig> configList) {
-        super(SubCommand.List.name);
-       
+        super(SubCommandType.List.name);
+
         if (configList.isEmpty()) {
             throw new IllegalArgumentException("configList is emptry");
         }

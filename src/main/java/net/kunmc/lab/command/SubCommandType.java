@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-enum SubCommand {
+enum SubCommandType {
     Add("add",
             x -> !x.getCollectionValueFields().isEmpty(),
             ConfigAddCommand::new,
@@ -37,7 +37,7 @@ enum SubCommand {
     final Function<BaseConfig, Command> instantiator;
     final Function<List<BaseConfig>, Command> instantiator2;
 
-    SubCommand(String name, Predicate<BaseConfig> hasEntryFor, Function<BaseConfig, Command> instantiator, Function<List<BaseConfig>, Command> instantiator2) {
+    SubCommandType(String name, Predicate<BaseConfig> hasEntryFor, Function<BaseConfig, Command> instantiator, Function<List<BaseConfig>, Command> instantiator2) {
         this.name = name;
         this.hasEntryFor = hasEntryFor;
         this.instantiator = instantiator;
