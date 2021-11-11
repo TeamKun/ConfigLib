@@ -5,48 +5,49 @@ import net.kunmc.lab.config.BaseConfig;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ConfigCommandBuilder {
     private final List<BaseConfig> configList = new ArrayList<>();
-    private boolean shouldUseList = true;
-    private boolean shouldUseAdd = true;
-    private boolean shouldUseRemove = true;
-    private boolean shouldUseClear = true;
-    private boolean shouldUseSet = true;
-    private boolean shouldUseReload = true;
+    private final Map<SubCommand, Boolean> subCommandBooleanMap = new HashMap<>();
 
     public ConfigCommandBuilder(@NotNull BaseConfig config) {
         configList.add(config);
+
+        for (SubCommand subCommand : SubCommand.values()) {
+            subCommandBooleanMap.put(subCommand, true);
+        }
     }
 
     public ConfigCommandBuilder disableListCommand() {
-        this.shouldUseList = false;
+        subCommandBooleanMap.put(SubCommand.List, false);
         return this;
     }
 
     public ConfigCommandBuilder disableAddCommand() {
-        this.shouldUseAdd = false;
+        subCommandBooleanMap.put(SubCommand.Add, false);
         return this;
     }
 
     public ConfigCommandBuilder disableRemoveCommand() {
-        this.shouldUseRemove = false;
+        subCommandBooleanMap.put(SubCommand.Remove, false);
         return this;
     }
 
     public ConfigCommandBuilder disableClearCommand() {
-        this.shouldUseClear = false;
+        subCommandBooleanMap.put(SubCommand.Clear, false);
         return this;
     }
 
     public ConfigCommandBuilder disableSetCommand() {
-        this.shouldUseSet = false;
+        subCommandBooleanMap.put(SubCommand.Set, false);
         return this;
     }
 
     public ConfigCommandBuilder disableReloadCommand() {
-        this.shouldUseReload = false;
+        subCommandBooleanMap.put(SubCommand.Reload, false);
         return this;
     }
 
@@ -69,42 +70,17 @@ public class ConfigCommandBuilder {
 
         if (configList.size() == 1) {
             BaseConfig config = configList.get(0);
-            if (shouldUseList) {
-                subCommandList.add(new ConfigListCommand(config));
-            }
-            if (shouldUseAdd) {
-                subCommandList.add(new ConfigAddCommand(config));
-            }
-            if (shouldUseRemove) {
-                subCommandList.add(new ConfigRemoveCommand(config));
-            }
-            if (shouldUseClear) {
-                subCommandList.add(new ConfigClearCommand(config));
-            }
-            if (shouldUseSet) {
-                subCommandList.add(new ConfigSetCommand(config));
-            }
-            if (shouldUseReload) {
-                subCommandList.add(new ConfigReloadCommand(config));
+
+            for (Map.Entry<SubCommand, Boolean> entry : subCommandBooleanMap.entrySet()) {
+                if (entry.getValue()) {
+                    subCommandList.add(entry.getKey().of(config));
+                }
             }
         } else {
-            if (shouldUseList) {
-                subCommandList.add(new ConfigListCommand(configList));
-            }
-            if (shouldUseAdd) {
-                subCommandList.add(new ConfigAddCommand(configList));
-            }
-            if (shouldUseClear) {
-                subCommandList.add(new ConfigClearCommand(configList));
-            }
-            if (shouldUseRemove) {
-                subCommandList.add(new ConfigRemoveCommand(configList));
-            }
-            if (shouldUseSet) {
-                subCommandList.add(new ConfigSetCommand(configList));
-            }
-            if (shouldUseReload) {
-                subCommandList.add(new ConfigReloadCommand(configList));
+            for (Map.Entry<SubCommand, Boolean> entry : subCommandBooleanMap.entrySet()) {
+                if (entry.getValue()) {
+                    subCommandList.add(entry.getKey().of(configList));
+                }
             }
         }
 

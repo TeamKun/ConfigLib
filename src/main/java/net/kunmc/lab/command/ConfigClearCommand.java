@@ -12,12 +12,12 @@ import java.util.List;
 
 class ConfigClearCommand extends AccessibleCommand {
     public ConfigClearCommand(BaseConfig config) {
-        super("clear");
+        super(SubCommand.Clear.name);
         init(config, this);
     }
 
     public ConfigClearCommand(List<BaseConfig> configList) {
-        super("clear");
+        super(SubCommand.Clear.name);
 
         if (configList.isEmpty()) {
             throw new IllegalArgumentException("configList is empty");

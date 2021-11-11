@@ -13,12 +13,13 @@ class ConfigListCommand extends Command {
     private BaseConfig config;
 
     public ConfigListCommand(BaseConfig config) {
-        super("list");
+        super(SubCommand.List.name);
         this.config = config;
     }
 
     public ConfigListCommand(List<BaseConfig> configList) {
-        super("list");
+        super(SubCommand.List.name);
+       
         if (configList.isEmpty()) {
             throw new IllegalArgumentException("configList is emptry");
         }
@@ -45,7 +46,7 @@ class ConfigListCommand extends Command {
     private void exec(CommandContext ctx, BaseConfig config) {
         for (Field field : config.getClass().getDeclaredFields()) {
             field.setAccessible(true);
-           
+
             Object value = null;
             try {
                 value = field.get(config);

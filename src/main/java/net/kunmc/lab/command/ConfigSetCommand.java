@@ -9,12 +9,13 @@ import java.util.List;
 
 class ConfigSetCommand extends AccessibleCommand {
     public ConfigSetCommand(BaseConfig config) {
-        super("set");
+        super(SubCommand.Set.name);
         init(config, this);
     }
 
     public ConfigSetCommand(List<BaseConfig> configList) {
-        super("set");
+        super(SubCommand.Set.name);
+       
         if (configList.isEmpty()) {
             throw new IllegalArgumentException("configList is emptry");
         }

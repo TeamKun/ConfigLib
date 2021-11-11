@@ -9,15 +9,15 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
 
-public class ConfigAddCommand extends AccessibleCommand {
+class ConfigAddCommand extends AccessibleCommand {
     public ConfigAddCommand(BaseConfig config) {
-        super("add");
+        super(SubCommand.Add.name);
         init(config, this);
     }
 
     public ConfigAddCommand(List<BaseConfig> configList) {
-        super("add");
-
+        super(SubCommand.Add.name);
+       
         if (configList.isEmpty()) {
             throw new IllegalArgumentException("configList is empty");
         }

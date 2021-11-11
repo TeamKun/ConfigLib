@@ -8,7 +8,7 @@ import net.kunmc.lab.value.CollectionValue;
 import java.lang.reflect.Field;
 import java.util.Collection;
 
-public abstract class CollectionValueConfigItem extends Command {
+abstract class CollectionValueConfigItem extends Command {
     protected final Field field;
     protected final CollectionValue configValue;
     protected final BaseConfig config;
