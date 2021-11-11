@@ -28,6 +28,16 @@ public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterabl
     }
 
     @Override
+    public boolean validateOnAdd(Set<E> element) {
+        return !value.containsAll(element);
+    }
+
+    @Override
+    public boolean validateOnRemove(Set<E> element) {
+        return value.containsAll(element);
+    }
+
+    @Override
     public boolean listable() {
         return listable;
     }
