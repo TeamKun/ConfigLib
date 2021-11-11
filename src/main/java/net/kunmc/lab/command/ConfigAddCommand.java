@@ -33,9 +33,6 @@ public class ConfigAddCommand extends AccessibleCommand {
 
     private static void init(BaseConfig config, AccessibleCommand command) {
         for (Field field : config.getClass().getDeclaredFields()) {
-            if (!Modifier.isPublic(field.getModifiers())) {
-                continue;
-            }
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
