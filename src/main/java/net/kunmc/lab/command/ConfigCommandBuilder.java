@@ -12,6 +12,7 @@ public class ConfigCommandBuilder {
     private boolean shouldUseList = true;
     private boolean shouldUseAdd = true;
     private boolean shouldUseRemove = true;
+    private boolean shouldUseClear = true;
     private boolean shouldUseSet = true;
     private boolean shouldUseReload = true;
 
@@ -31,6 +32,11 @@ public class ConfigCommandBuilder {
 
     public ConfigCommandBuilder disableRemoveCommand() {
         this.shouldUseRemove = false;
+        return this;
+    }
+
+    public ConfigCommandBuilder disableClearCommand() {
+        this.shouldUseClear = false;
         return this;
     }
 
@@ -72,6 +78,9 @@ public class ConfigCommandBuilder {
             if (shouldUseRemove) {
                 subCommandList.add(new ConfigRemoveCommand(config));
             }
+            if (shouldUseClear) {
+                subCommandList.add(new ConfigClearCommand(config));
+            }
             if (shouldUseSet) {
                 subCommandList.add(new ConfigSetCommand(config));
             }
@@ -84,6 +93,9 @@ public class ConfigCommandBuilder {
             }
             if (shouldUseAdd) {
                 subCommandList.add(new ConfigAddCommand(configList));
+            }
+            if (shouldUseClear) {
+                subCommandList.add(new ConfigClearCommand(configList));
             }
             if (shouldUseRemove) {
                 subCommandList.add(new ConfigRemoveCommand(configList));
