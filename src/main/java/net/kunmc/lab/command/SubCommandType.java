@@ -6,9 +6,11 @@ import net.kunmc.lab.value.CollectionValue;
 import net.kunmc.lab.value.SingleValue;
 import net.kunmc.lab.value.Value;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 enum SubCommandType {
@@ -52,9 +54,9 @@ enum SubCommandType {
         return hasEntryFor.test(config);
     }
 
-    public boolean hasEntryFor(Set<BaseConfig> configSet) {
+    public Map<BaseConfig, Boolean> hasEntryFor(Set<BaseConfig> configSet) {
         return configSet.stream()
-                .anyMatch(this::hasEntryFor);
+                .collect(Collectors.toMap(baseConfig -> baseConfig, this::hasEntryFor));
     }
 
     public Command of(BaseConfig config) {
