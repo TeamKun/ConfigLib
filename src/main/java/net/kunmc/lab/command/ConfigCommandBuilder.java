@@ -68,6 +68,12 @@ public class ConfigCommandBuilder {
     private List<Command> createSubCommands() {
         List<Command> subCommandList = new ArrayList<>();
 
+        for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeBooleanMap.entrySet()) {
+            SubCommandType type = entry.getKey();
+            boolean b = entry.getValue();
+            subCommandTypeBooleanMap.put(type, type.hasEntryFor(configList) && b);
+        }
+
         if (configList.size() == 1) {
             BaseConfig config = configList.get(0);
 
