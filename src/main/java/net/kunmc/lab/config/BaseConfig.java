@@ -10,11 +10,12 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -93,7 +94,7 @@ public abstract class BaseConfig {
         try {
             configJSON.createNewFile();
             String json = gson.toJson(this);
-            try (FileWriter writer = new FileWriter(configJSON)) {
+            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(configJSON), StandardCharsets.UTF_8)) {
                 writer.write(json);
             }
         } catch (IOException e) {
@@ -120,7 +121,7 @@ public abstract class BaseConfig {
 
         String json = null;
         try {
-            json = Files.readLines(configJSON, Charset.defaultCharset()).stream()
+            json = Files.readLines(configJSON, StandardCharsets.UTF_8).stream()
                     .collect(Collectors.joining(System.lineSeparator()));
         } catch (IOException e) {
             e.printStackTrace();
