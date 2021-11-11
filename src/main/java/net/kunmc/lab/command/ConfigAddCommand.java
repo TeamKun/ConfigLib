@@ -48,7 +48,9 @@ public class ConfigAddCommand extends AccessibleCommand {
                 e.printStackTrace();
             }
 
-            command.appendChild(new ConfigItem(field, value, config));
+            if (value.addableByCommand()) {
+                command.appendChild(new ConfigItem(field, value, config));
+            }
         }
     }
 
@@ -65,13 +67,13 @@ public class ConfigAddCommand extends AccessibleCommand {
 
         @Override
         String invalidMessage(String entryName, Collection value) {
-            return configValue.failAddMessage(entryName, value);
+            return configValue.invalidValueMessageOnAdd(entryName, value);
         }
 
         @Override
         void writeProcess(CommandContext ctx, String entryName, Collection value) {
             ((Collection) configValue.value()).addAll(value);
-            ctx.success(configValue.succeedAddMessage(entryName, value));
+            ctx.success(configValue.succeedMessageOnAdd(entryName, value));
         }
     }
 }

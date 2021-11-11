@@ -109,28 +109,28 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public String failAddMessage(String entryName, Set<UUID> element) {
+    public String invalidValueMessageOnAdd(String entryName, Set<UUID> element) {
         UUID uuid = element.toArray(new UUID[0])[0];
         OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
         return p.getName() + "はすでに" + entryName + "に追加されています.";
     }
 
     @Override
-    public String succeedAddMessage(String entryName, Set<UUID> element) {
+    public String succeedMessageOnAdd(String entryName, Set<UUID> element) {
         UUID uuid = element.toArray(new UUID[0])[0];
         OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
         return entryName + "に" + p.getName() + "を追加しました.";
     }
 
     @Override
-    public String failRemoveMessage(String entryName, Set<UUID> element) {
+    public String invalidValueMessageOnRemove(String entryName, Set<UUID> element) {
         UUID uuid = element.toArray(new UUID[0])[0];
         OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
         return p.getName() + "は" + entryName + "に追加されていませんでした.";
     }
 
     @Override
-    public String succeedRemoveMessage(String entryName, Set<UUID> element) {
+    public String succeedMessageOnRemove(String entryName, Set<UUID> element) {
         UUID uuid = element.toArray(new UUID[0])[0];
         OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
         return entryName + "から" + p.getName() + "を削除しました.";

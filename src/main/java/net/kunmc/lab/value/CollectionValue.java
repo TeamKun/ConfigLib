@@ -13,13 +13,13 @@ public interface CollectionValue<T extends Collection<E>, E> extends Value<T> {
 
     boolean validateOnRemove(T element);
 
-    String failAddMessage(String entryName, T element);
+    String invalidValueMessageOnAdd(String entryName, T element);
 
-    String succeedAddMessage(String entryName, T element);
+    String succeedMessageOnAdd(String entryName, T element);
 
-    String failRemoveMessage(String entryName, T element);
+    String invalidValueMessageOnRemove(String entryName, T element);
 
-    String succeedRemoveMessage(String entryName, T element);
+    String succeedMessageOnRemove(String entryName, T element);
 
     String clearMessage(String entryName);
 }
