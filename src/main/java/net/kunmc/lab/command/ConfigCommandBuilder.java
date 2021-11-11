@@ -13,43 +13,43 @@ import java.util.stream.Collectors;
 
 public class ConfigCommandBuilder {
     private final Set<BaseConfig> configSet = new HashSet<>();
-    private final Map<SubCommandType, Boolean> subCommandTypeBooleanMap = new HashMap<>();
+    private final Map<SubCommandType, Boolean> subCommandTypeEnabledMap = new HashMap<>();
 
     public ConfigCommandBuilder(@NotNull BaseConfig config) {
         configSet.add(config);
 
         for (SubCommandType subCommand : SubCommandType.values()) {
-            subCommandTypeBooleanMap.put(subCommand, true);
+            subCommandTypeEnabledMap.put(subCommand, true);
         }
     }
 
     public ConfigCommandBuilder disableListCommand() {
-        subCommandTypeBooleanMap.put(SubCommandType.List, false);
+        subCommandTypeEnabledMap.put(SubCommandType.List, false);
         return this;
     }
 
     public ConfigCommandBuilder disableAddCommand() {
-        subCommandTypeBooleanMap.put(SubCommandType.Add, false);
+        subCommandTypeEnabledMap.put(SubCommandType.Add, false);
         return this;
     }
 
     public ConfigCommandBuilder disableRemoveCommand() {
-        subCommandTypeBooleanMap.put(SubCommandType.Remove, false);
+        subCommandTypeEnabledMap.put(SubCommandType.Remove, false);
         return this;
     }
 
     public ConfigCommandBuilder disableClearCommand() {
-        subCommandTypeBooleanMap.put(SubCommandType.Clear, false);
+        subCommandTypeEnabledMap.put(SubCommandType.Clear, false);
         return this;
     }
 
     public ConfigCommandBuilder disableSetCommand() {
-        subCommandTypeBooleanMap.put(SubCommandType.Set, false);
+        subCommandTypeEnabledMap.put(SubCommandType.Set, false);
         return this;
     }
 
     public ConfigCommandBuilder disableReloadCommand() {
-        subCommandTypeBooleanMap.put(SubCommandType.Reload, false);
+        subCommandTypeEnabledMap.put(SubCommandType.Reload, false);
         return this;
     }
 
@@ -69,7 +69,7 @@ public class ConfigCommandBuilder {
 
     private Set<Command> createSubCommands() {
         Set<Command> subCommandSet = new HashSet<>();
-        for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeBooleanMap.entrySet()) {
+        for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeEnabledMap.entrySet()) {
             SubCommandType type = entry.getKey();
             Set<BaseConfig> usedConfigs = type.hasEntryFor(configSet).entrySet().stream()
                     .filter(Map.Entry::getValue)
