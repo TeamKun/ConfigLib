@@ -7,6 +7,10 @@ import java.util.stream.Stream;
 
 public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Iterable<E> {
     protected List<E> value;
+    protected transient boolean listable = true;
+    protected transient boolean addable = true;
+    protected transient boolean removable = true;
+    protected transient boolean clearable = true;
 
     public ListValue(List<E> value) {
         this.value = value;
@@ -30,6 +34,46 @@ public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Itera
     @Override
     public boolean validateOnRemove(List<E> element) {
         return value.contains(element);
+    }
+
+    @Override
+    public boolean listable() {
+        return listable;
+    }
+
+    public <T extends ListValue<E>> T listable(boolean listable) {
+        this.listable = listable;
+        return (T) this;
+    }
+
+    @Override
+    public boolean addableByCommand() {
+        return addable;
+    }
+
+    public <T extends ListValue<E>> T addableByCommand(boolean addable) {
+        this.addable = addable;
+        return (T) this;
+    }
+
+    @Override
+    public boolean removableByCommand() {
+        return removable;
+    }
+
+    public <T extends ListValue<E>> T removableByCommand(boolean removable) {
+        this.removable = removable;
+        return (T) this;
+    }
+
+    @Override
+    public boolean clearableByCommand() {
+        return clearable;
+    }
+
+    public <T extends ListValue<E>> T clearableByCommand(boolean clearable) {
+        this.clearable = clearable;
+        return (T) this;
     }
 
     public int size() {

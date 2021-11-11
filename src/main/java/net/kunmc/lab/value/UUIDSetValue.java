@@ -37,16 +37,6 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public boolean listable() {
-        return listable;
-    }
-
-    public UUIDSetValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
-
-    @Override
     public void sendListMessage(CommandContext ctx, String entryName) {
         String header = "-----" + entryName + "-----";
         ctx.message(ChatColor.YELLOW + header);
@@ -83,20 +73,6 @@ public class UUIDSetValue extends SetValue<UUID> {
                 .collect(Collectors.toSet());
     }
 
-    @Override
-    public boolean addableByCommand() {
-        return false;
-    }
-
-    @Override
-    public boolean removableByCommand() {
-        return false;
-    }
-
-    @Override
-    public boolean clearableByCommand() {
-        return false;
-    }
 
     @Override
     public boolean validateOnAdd(Set<UUID> element) {
