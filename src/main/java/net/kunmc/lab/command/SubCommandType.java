@@ -39,9 +39,9 @@ enum SubCommandType {
             ConfigListCommand::new);
 
     final String name;
-    final Predicate<BaseConfig> hasEntryFor;
-    final Function<BaseConfig, Command> instantiator;
-    final Function<Set<BaseConfig>, Command> instantiator2;
+    private final Predicate<BaseConfig> hasEntryFor;
+    private final Function<BaseConfig, Command> instantiator;
+    private final Function<Set<BaseConfig>, Command> instantiator2;
 
     SubCommandType(String name, Predicate<BaseConfig> hasEntryFor, Function<BaseConfig, Command> instantiator, Function<Set<BaseConfig>, Command> instantiator2) {
         this.name = name;
