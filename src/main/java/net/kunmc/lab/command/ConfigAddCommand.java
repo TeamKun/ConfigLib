@@ -5,7 +5,6 @@ import net.kunmc.lab.config.BaseConfig;
 import net.kunmc.lab.value.CollectionValue;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,7 +16,7 @@ class ConfigAddCommand extends AccessibleCommand {
 
     public ConfigAddCommand(List<BaseConfig> configList) {
         super(SubCommand.Add.name);
-       
+
         if (configList.isEmpty()) {
             throw new IllegalArgumentException("configList is empty");
         }
@@ -32,15 +31,7 @@ class ConfigAddCommand extends AccessibleCommand {
     }
 
     private static void init(BaseConfig config, AccessibleCommand command) {
-        for (Field field : config.getClass().getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
-            if (!CollectionValue.class.isAssignableFrom(field.getType())) {
-                continue;
-            }
-            field.setAccessible(true);
-
+        for (Field field : config.getCollectionValueFields()) {
             CollectionValue<? extends Collection<?>, ?> value = null;
             try {
                 value = ((CollectionValue<? extends Collection<?>, ?>) field.get(config));

@@ -6,7 +6,6 @@ import net.kunmc.lab.config.BaseConfig;
 import net.kunmc.lab.value.CollectionValue;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,15 +32,7 @@ class ConfigClearCommand extends AccessibleCommand {
     }
 
     private static void init(BaseConfig config, AccessibleCommand command) {
-        for (Field field : config.getClass().getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
-            if (!CollectionValue.class.isAssignableFrom(field.getType())) {
-                continue;
-            }
-            field.setAccessible(true);
-
+        for (Field field : config.getCollectionValueFields()) {
             CollectionValue value = null;
             try {
                 value = (CollectionValue) field.get(config);

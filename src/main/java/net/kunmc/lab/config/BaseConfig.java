@@ -3,6 +3,8 @@ package net.kunmc.lab.config;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.kunmc.lab.value.CollectionValue;
+import net.kunmc.lab.value.SingleValue;
 import net.kunmc.lab.value.Value;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +15,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class BaseConfig {
@@ -39,6 +43,22 @@ public abstract class BaseConfig {
         } else {
             return entryName;
         }
+    }
+
+    public List<Field> getSingleValueFields() {
+        return Arrays.stream(getClass().getDeclaredFields())
+                .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                .filter(f -> SingleValue.class.isAssignableFrom(f.getType()))
+                .peek(f -> f.setAccessible(true))
+                .collect(Collectors.toList());
+    }
+
+    public List<Field> getCollectionValueFields() {
+        return Arrays.stream(getClass().getDeclaredFields())
+                .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                .filter(f -> CollectionValue.class.isAssignableFrom(f.getType()))
+                .peek(f -> f.setAccessible(true))
+                .collect(Collectors.toList());
     }
 
     public void saveConfig() {
