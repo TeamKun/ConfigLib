@@ -61,6 +61,34 @@ public abstract class BaseConfig {
                 .collect(Collectors.toList());
     }
 
+    public List<SingleValue<?>> getSingleValues() {
+        return getSingleValueFields().stream()
+                .map(f -> {
+                    try {
+                        return f.get(this);
+                    } catch (IllegalAccessException exception) {
+                        exception.printStackTrace();
+                        return null;
+                    }
+                })
+                .map(x -> ((SingleValue<?>) x))
+                .collect(Collectors.toList());
+    }
+
+    public List<CollectionValue<?, ?>> getCollectionValues() {
+        return getCollectionValueFields().stream()
+                .map(f -> {
+                    try {
+                        return f.get(this);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .map(x -> ((CollectionValue<?, ?>) x))
+                .collect(Collectors.toList());
+    }
+
     public void saveConfig() {
         try {
             configJSON.createNewFile();
