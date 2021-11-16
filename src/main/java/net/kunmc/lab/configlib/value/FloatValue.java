@@ -40,7 +40,7 @@ public final class FloatValue implements NumericValue<Float> {
 
     @Override
     public void appendArgument(UsageBuilder builder) {
-        builder.floatArgument("FloatArgument");
+        builder.floatArgument("FloatArgument", min(), max());
     }
 
     @Override

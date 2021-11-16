@@ -40,7 +40,7 @@ public final class DoubleValue implements NumericValue<Double> {
 
     @Override
     public void appendArgument(UsageBuilder builder) {
-        builder.doubleArgument("DoubleArgument");
+        builder.doubleArgument("DoubleArgument", min(), max());
     }
 
     @Override

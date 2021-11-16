@@ -40,7 +40,7 @@ public final class IntegerValue implements NumericValue<Integer> {
 
     @Override
     public void appendArgument(UsageBuilder builder) {
-        builder.integerArgument("IntegerArgument");
+        builder.integerArgument("IntegerArgument", min(), max());
     }
 
     @Override
