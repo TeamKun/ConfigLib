@@ -5,7 +5,6 @@ import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -33,8 +32,8 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     public UUIDValue(UUID value, Consumer<UUID> onSet) {
-        this.playerName = Bukkit.getOfflinePlayer(value).getName();
         this.uuid = value;
+        this.playerName = playerName();
         this.consumer = onSet;
     }
 
@@ -46,7 +45,7 @@ public class UUIDValue implements SingleValue<UUID> {
     @Override
     public void value(UUID value) {
         this.uuid = value;
-        this.playerName = toOfflinePlayer().getName();
+        this.playerName = playerName();
     }
 
     public void value(Player player) {
@@ -83,12 +82,28 @@ public class UUIDValue implements SingleValue<UUID> {
         return this;
     }
 
-    public @NotNull OfflinePlayer toOfflinePlayer() {
-        return Bukkit.getOfflinePlayer(value());
+    public @Nullable OfflinePlayer toOfflinePlayer() {
+        if (uuid != null) {
+            return Bukkit.getOfflinePlayer(uuid);
+        }
+
+        return null;
     }
 
     public @Nullable Player toPlayer() {
-        return Bukkit.getPlayer(value());
+        if (uuid != null) {
+            return Bukkit.getPlayer(uuid);
+        }
+
+        return null;
+    }
+
+    public String playerName() {
+        if (uuid != null) {
+            return Bukkit.getOfflinePlayer(uuid).getName();
+        }
+
+        return "";
     }
 
     @Override
@@ -98,18 +113,19 @@ public class UUIDValue implements SingleValue<UUID> {
 
     @Override
     public String succeedSetMessage(String entryName) {
-        return entryName + "の値を" + toOfflinePlayer().getName() + "に設定しました.";
+        return entryName + "の値を" + playerName() + "に設定しました.";
     }
 
     @Override
     public void sendListMessage(CommandContext ctx, String entryName) {
-        ctx.success(entryName + ": " + toOfflinePlayer().getName());
+        ctx.success(entryName + ": " + playerName());
     }
 
     @Override
     public void appendArgument(UsageBuilder builder) {
         builder.textArgument("PlayerName", sb -> {
             Arrays.stream(Bukkit.getOfflinePlayers())
+                    .filter(p -> !p.getUniqueId().equals(uuid))
                     .map(OfflinePlayer::getName)
                     .forEach(sb::suggest);
         });
