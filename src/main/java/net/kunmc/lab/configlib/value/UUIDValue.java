@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 public class UUIDValue implements SingleValue<UUID> {
     private String playerName;
     private UUID uuid;
+    private boolean onlyOnline = false;
     private final transient Consumer<UUID> consumer;
     private transient boolean listable = true;
     private transient boolean writable = true;
@@ -35,6 +36,11 @@ public class UUIDValue implements SingleValue<UUID> {
         this.uuid = value;
         this.playerName = playerName();
         this.consumer = onSet;
+    }
+
+    public UUIDValue onlyOnline(boolean onlyOnline) {
+        this.onlyOnline = onlyOnline;
+        return this;
     }
 
     @Override
@@ -125,6 +131,7 @@ public class UUIDValue implements SingleValue<UUID> {
     public void appendArgument(UsageBuilder builder) {
         builder.textArgument("PlayerName", sb -> {
             Arrays.stream(Bukkit.getOfflinePlayers())
+                    .filter(p -> !onlyOnline || p.isOnline())
                     .filter(p -> !p.getUniqueId().equals(uuid))
                     .map(OfflinePlayer::getName)
                     .forEach(sb::suggest);
@@ -134,6 +141,7 @@ public class UUIDValue implements SingleValue<UUID> {
     @Override
     public boolean isCorrectArgument(Object argument) {
         return Arrays.stream(Bukkit.getOfflinePlayers())
+                .filter(p -> !onlyOnline || p.isOnline())
                 .map(OfflinePlayer::getName)
                 .anyMatch(s -> s.equals(argument));
     }
