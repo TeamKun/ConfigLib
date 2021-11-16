@@ -142,6 +142,7 @@ public class UUIDValue implements SingleValue<UUID> {
     public boolean isCorrectArgument(Object argument) {
         return Arrays.stream(Bukkit.getOfflinePlayers())
                 .filter(p -> !onlyOnline || p.isOnline())
+                .filter(p -> !p.getUniqueId().equals(uuid))
                 .map(OfflinePlayer::getName)
                 .anyMatch(s -> s.equals(argument));
     }
@@ -153,5 +154,14 @@ public class UUIDValue implements SingleValue<UUID> {
                 .findFirst()
                 .get()
                 .getUniqueId();
+    }
+
+    @Override
+    public String incorrectArgumentMessage(Object argument) {
+        if (argument.equals(playerName)) {
+            return argument + "はすでに設定されているプレイヤーです.";
+        } else {
+            return argument + "は不正な名前です.";
+        }
     }
 }
