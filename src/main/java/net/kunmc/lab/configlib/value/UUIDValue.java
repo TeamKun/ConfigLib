@@ -7,17 +7,20 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 public class UUIDValue implements SingleValue<UUID> {
     private String playerName;
     private UUID uuid;
-    private boolean onlyOnline = false;
     private final transient Consumer<UUID> consumer;
     private transient boolean listable = true;
     private transient boolean writable = true;
+
+    public UUIDValue() {
+        this(((UUID) null));
+    }
 
     public UUIDValue(Player player) {
         this(player.getUniqueId());
@@ -36,11 +39,6 @@ public class UUIDValue implements SingleValue<UUID> {
         this.uuid = value;
         this.playerName = playerName();
         this.consumer = onSet;
-    }
-
-    public UUIDValue onlyOnline(boolean onlyOnline) {
-        this.onlyOnline = onlyOnline;
-        return this;
     }
 
     @Override
@@ -129,39 +127,48 @@ public class UUIDValue implements SingleValue<UUID> {
 
     @Override
     public void appendArgument(UsageBuilder builder) {
-        builder.textArgument("PlayerName", sb -> {
-            Arrays.stream(Bukkit.getOfflinePlayers())
-                    .filter(p -> !onlyOnline || p.isOnline())
+        builder.entityArgument("target", true, false, sb -> {
+            Bukkit.getOnlinePlayers().stream()
                     .filter(p -> !p.getUniqueId().equals(uuid))
-                    .map(OfflinePlayer::getName)
+                    .map(Player::getName)
                     .forEach(sb::suggest);
+            sb.suggest("@r");
         });
     }
 
     @Override
     public boolean isCorrectArgument(Object argument) {
-        return Arrays.stream(Bukkit.getOfflinePlayers())
-                .filter(p -> !onlyOnline || p.isOnline())
-                .filter(p -> !p.getUniqueId().equals(uuid))
-                .map(OfflinePlayer::getName)
-                .anyMatch(s -> s.equals(argument));
+        List<Player> list = ((List<Player>) argument);
+
+        if (list.size() != 1) {
+            return false;
+        }
+
+        return !list.get(0).getUniqueId().equals(uuid);
     }
 
     @Override
     public UUID argumentToValue(Object argument) {
-        return Arrays.stream(Bukkit.getOfflinePlayers())
-                .filter(p -> p.getName().equals(argument))
-                .findFirst()
-                .get()
-                .getUniqueId();
+        return ((List<Player>) argument).get(0).getUniqueId();
     }
 
     @Override
     public String incorrectArgumentMessage(Object argument) {
-        if (argument.equals(playerName)) {
-            return argument + "はすでに設定されているプレイヤーです.";
-        } else {
-            return argument + "は不正な名前です.";
+        List<Player> list = ((List<Player>) argument);
+
+        if (list.isEmpty()) {
+            return "プレイヤーが見つかりませんでした.";
         }
+
+        if (list.size() > 1) {
+            return "複数人のプレイヤーを設定することはできません.";
+        }
+
+        Player p = list.get(0);
+        if (p.getUniqueId().equals(uuid)) {
+            return p.getName() + "はすでに設定されているプレイヤーです.";
+        }
+
+        return "could not reach";
     }
 }
