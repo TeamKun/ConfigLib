@@ -13,6 +13,9 @@ repositories {
         name = "papermc-repo"
         url = "https://papermc.io/repo/repository/maven-public/"
     }
+    maven {
+        url "https://libraries.minecraft.net"
+    }
 }
 
 dependencies {
@@ -23,6 +26,8 @@ dependencies {
     compileOnly "dev.kotx:flylib-reloaded:0.4.1"
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation group: 'org.apache.poi', name: 'poi', version: '5.1.0'
+    compileOnly fileTree(dir: "./libs/", include: "patched*.jar")
+    compileOnly 'com.mojang:brigadier:1.0.18'
 }
 
 def targetJavaVersion = 8
