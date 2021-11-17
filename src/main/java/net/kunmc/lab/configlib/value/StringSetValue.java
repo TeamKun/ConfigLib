@@ -22,22 +22,22 @@ public class StringSetValue extends SetValue<String> {
     }
 
     @Override
-    public String invalidValueMessageOnAdd(String entryName, Set<String> element) {
+    public String invalidValueMessageForAdd(String entryName, Set<String> element) {
         return element.toArray(new String[0])[0] + "はすでに" + entryName + "に追加されています.";
     }
 
     @Override
-    public String succeedMessageOnAdd(String entryName, Set<String> element) {
+    public String succeedMessageForAdd(String entryName, Set<String> element) {
         return entryName + "に" + element.toArray(new String[0])[0] + "を追加しました.";
     }
 
     @Override
-    public String invalidValueMessageOnRemove(String entryName, Set<String> element) {
+    public String invalidValueMessageForRemove(String entryName, Set<String> element) {
         return element.toArray(new String[0])[0] + "は" + entryName + "に追加されていませんでした.";
     }
 
     @Override
-    public String succeedMessageOnRemove(String entryName, Set<String> element) {
+    public String succeedMessageForRemove(String entryName, Set<String> element) {
         return entryName + "から" + element.toArray(new String[0])[0] + "を削除しました.";
     }
 
@@ -57,17 +57,32 @@ public class StringSetValue extends SetValue<String> {
     }
 
     @Override
-    public void appendArgument(UsageBuilder builder) {
+    public void appendArgumentForAdd(UsageBuilder builder) {
         builder.textArgument("StringArgument");
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument) {
+    public void appendArgumentForRemove(UsageBuilder builder) {
+        builder.textArgument("StringArgument");
+    }
+
+    @Override
+    public boolean isCorrectArgumentForAdd(Object argument) {
         return true;
     }
 
     @Override
-    public Set<String> argumentToValue(Object argument) {
+    public boolean isCorrectArgumentForRemove(Object argument) {
+        return true;
+    }
+
+    @Override
+    public Set<String> argumentToValueForAdd(Object argument) {
+        return Collections.singleton(argument.toString());
+    }
+
+    @Override
+    public Set<String> argumentToValueForRemove(Object argument) {
         return Collections.singleton(argument.toString());
     }
 }

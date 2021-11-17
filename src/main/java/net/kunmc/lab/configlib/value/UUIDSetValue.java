@@ -48,7 +48,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public void appendArgument(UsageBuilder builder) {
+    public void appendArgumentForAdd(UsageBuilder builder) {
         builder.textArgument("PlayerName", sb -> {
             Arrays.stream(Bukkit.getOfflinePlayers())
                     .map(OfflinePlayer::getName)
@@ -57,54 +57,77 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument) {
+    public void appendArgumentForRemove(UsageBuilder builder) {
+        builder.textArgument("PlayerName", sb -> {
+            Arrays.stream(Bukkit.getOfflinePlayers())
+                    .map(OfflinePlayer::getName)
+                    .forEach(sb::suggest);
+        });
+    }
+
+    @Override
+    public boolean isCorrectArgumentForAdd(Object argument) {
         return Arrays.stream(Bukkit.getOfflinePlayers())
                 .map(OfflinePlayer::getName)
                 .anyMatch(s -> s.equals(argument));
     }
 
     @Override
-    public Set<UUID> argumentToValue(Object argument) {
+    public boolean isCorrectArgumentForRemove(Object argument) {
+        return Arrays.stream(Bukkit.getOfflinePlayers())
+                .map(OfflinePlayer::getName)
+                .anyMatch(s -> s.equals(argument));
+    }
+
+    @Override
+    public Set<UUID> argumentToValueForAdd(Object argument) {
         return Arrays.stream(Bukkit.getOfflinePlayers())
                 .filter(p -> p.getName().equals(argument))
                 .map(OfflinePlayer::getUniqueId)
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public Set<UUID> argumentToValueForRemove(Object argument) {
+        return Arrays.stream(Bukkit.getOfflinePlayers())
+                .filter(p -> p.getName().equals(argument))
+                .map(OfflinePlayer::getUniqueId)
+                .collect(Collectors.toSet());
+    }
 
     @Override
-    public boolean validateOnAdd(Set<UUID> element) {
+    public boolean validateForAdd(Set<UUID> element) {
         return !value.containsAll(element);
     }
 
     @Override
-    public boolean validateOnRemove(Set<UUID> element) {
+    public boolean validateForRemove(Set<UUID> element) {
         return value.containsAll(element);
     }
 
     @Override
-    public String invalidValueMessageOnAdd(String entryName, Set<UUID> element) {
+    public String invalidValueMessageForAdd(String entryName, Set<UUID> element) {
         UUID uuid = element.toArray(new UUID[0])[0];
         OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
         return p.getName() + "はすでに" + entryName + "に追加されています.";
     }
 
     @Override
-    public String succeedMessageOnAdd(String entryName, Set<UUID> element) {
+    public String succeedMessageForAdd(String entryName, Set<UUID> element) {
         UUID uuid = element.toArray(new UUID[0])[0];
         OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
         return entryName + "に" + p.getName() + "を追加しました.";
     }
 
     @Override
-    public String invalidValueMessageOnRemove(String entryName, Set<UUID> element) {
+    public String invalidValueMessageForRemove(String entryName, Set<UUID> element) {
         UUID uuid = element.toArray(new UUID[0])[0];
         OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
         return p.getName() + "は" + entryName + "に追加されていませんでした.";
     }
 
     @Override
-    public String succeedMessageOnRemove(String entryName, Set<UUID> element) {
+    public String succeedMessageForRemove(String entryName, Set<UUID> element) {
         UUID uuid = element.toArray(new UUID[0])[0];
         OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
         return entryName + "から" + p.getName() + "を削除しました.";

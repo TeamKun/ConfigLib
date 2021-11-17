@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.CommandContext;
+import dev.kotx.flylib.command.UsageBuilder;
 
 public interface SingleValue<T> extends Value<T> {
     boolean validateOnSet(T newValue);
@@ -8,6 +9,16 @@ public interface SingleValue<T> extends Value<T> {
     void onSetValue(T newValue);
 
     boolean writableByCommand();
+
+    void appendArgument(UsageBuilder builder);
+
+    boolean isCorrectArgument(Object argument);
+
+    T argumentToValue(Object argument);
+
+    default String incorrectArgumentMessage(Object argument) {
+        return argument + "は不正な引数です.";
+    }
 
     default String invalidValueMessage(String entryName, T newValue) {
         return "引数の値が不正です.";

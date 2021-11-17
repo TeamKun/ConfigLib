@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.command;
 
 import dev.kotx.flylib.command.Command;
 import dev.kotx.flylib.command.CommandContext;
+import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.config.BaseConfig;
 import net.kunmc.lab.configlib.value.CollectionValue;
 
@@ -22,16 +23,16 @@ abstract class CollectionValueConfigItem extends Command {
         String entryName = field.getName();
 
         usage(builder -> {
-            configValue.appendArgument(builder);
+            appendArgument(builder);
 
             builder.executes(ctx -> {
                 Object argument = ctx.getTypedArgs().get(0);
-                if (!configValue.isCorrectArgument(argument)) {
-                    ctx.fail(configValue.incorrectArgumentMessage(argument));
+                if (!isCorrectArgument(argument)) {
+                    ctx.fail(incorrectArgumentMessage(argument));
                     return;
                 }
 
-                Collection newValue = configValue.argumentToValue(argument);
+                Collection newValue = argumentToValue(argument);
                 if (!validate(newValue)) {
                     ctx.fail(invalidMessage(entryName, newValue));
                     return;
@@ -43,6 +44,14 @@ abstract class CollectionValueConfigItem extends Command {
             });
         });
     }
+
+    abstract void appendArgument(UsageBuilder builder);
+
+    abstract boolean isCorrectArgument(Object argument);
+
+    abstract String incorrectArgumentMessage(Object argument);
+
+    abstract Collection argumentToValue(Object argument);
 
     abstract boolean validate(Collection value);
 

@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.command;
 
 import dev.kotx.flylib.command.CommandContext;
+import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.config.BaseConfig;
 import net.kunmc.lab.configlib.value.CollectionValue;
 
@@ -50,21 +51,41 @@ class ConfigAddCommand extends AccessibleCommand {
             super(field, configValue, config);
         }
 
+        @Override
+        void appendArgument(UsageBuilder builder) {
+            configValue.appendArgumentForAdd(builder);
+        }
+
+        @Override
+        boolean isCorrectArgument(Object argument) {
+            return configValue.isCorrectArgumentForAdd(argument);
+        }
+
+        @Override
+        String incorrectArgumentMessage(Object argument) {
+            return configValue.incorrectArgumentMessageForAdd(argument);
+        }
+
+        @Override
+        Collection argumentToValue(Object argument) {
+            return configValue.argumentToValueForAdd(argument);
+        }
+
 
         @Override
         boolean validate(Collection value) {
-            return configValue.validateOnAdd(value);
+            return configValue.validateForAdd(value);
         }
 
         @Override
         String invalidMessage(String entryName, Collection value) {
-            return configValue.invalidValueMessageOnAdd(entryName, value);
+            return configValue.invalidValueMessageForAdd(entryName, value);
         }
 
         @Override
         void writeProcess(CommandContext ctx, String entryName, Collection value) {
             ((Collection) configValue.value()).addAll(value);
-            ctx.success(configValue.succeedMessageOnAdd(entryName, value));
+            ctx.success(configValue.succeedMessageForAdd(entryName, value));
         }
     }
 }

@@ -27,12 +27,12 @@ public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Itera
     }
 
     @Override
-    public boolean validateOnAdd(List<E> element) {
+    public boolean validateForAdd(List<E> element) {
         return true;
     }
 
     @Override
-    public boolean validateOnRemove(List<E> element) {
+    public boolean validateForRemove(List<E> element) {
         return value.contains(element);
     }
 

@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.command;
 
 import dev.kotx.flylib.command.CommandContext;
+import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.config.BaseConfig;
 import net.kunmc.lab.configlib.value.CollectionValue;
 
@@ -51,19 +52,39 @@ class ConfigRemoveCommand extends AccessibleCommand {
         }
 
         @Override
+        void appendArgument(UsageBuilder builder) {
+            configValue.appendArgumentForRemove(builder);
+        }
+
+        @Override
+        boolean isCorrectArgument(Object argument) {
+            return configValue.isCorrectArgumentForRemove(argument);
+        }
+
+        @Override
+        String incorrectArgumentMessage(Object argument) {
+            return configValue.incorrectArgumentMessageForRemove(argument);
+        }
+
+        @Override
+        Collection argumentToValue(Object argument) {
+            return configValue.argumentToValueForRemove(argument);
+        }
+
+        @Override
         boolean validate(Collection value) {
-            return configValue.validateOnRemove(value);
+            return configValue.validateForRemove(value);
         }
 
         @Override
         String invalidMessage(String entryName, Collection value) {
-            return configValue.invalidValueMessageOnRemove(entryName, value);
+            return configValue.invalidValueMessageForRemove(entryName, value);
         }
 
         @Override
         void writeProcess(CommandContext ctx, String entryName, Collection value) {
             ((Collection) configValue.value()).removeAll(value);
-            ctx.success(configValue.succeedMessageOnRemove(entryName, value));
+            ctx.success(configValue.succeedMessageForRemove(entryName, value));
         }
     }
 }
