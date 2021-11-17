@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-enum SubCommandType {
+public enum SubCommandType {
     Add("add",
             x -> x.getCollectionValues().stream().anyMatch(CollectionValue::addableByCommand),
             ConfigAddCommand::new,
@@ -38,7 +38,7 @@ enum SubCommandType {
             ConfigListCommand::new,
             ConfigListCommand::new);
 
-    final String name;
+    public final String name;
     private final Predicate<BaseConfig> hasEntryFor;
     private final Function<BaseConfig, Command> instantiator;
     private final Function<Set<BaseConfig>, Command> instantiator2;
