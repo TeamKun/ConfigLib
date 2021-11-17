@@ -9,13 +9,21 @@ import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
 public class UnparsedArgument implements Argument<String> {
     private final String name;
     private final SuggestionAction suggestionAction;
 
-    public UnparsedArgument(String name, SuggestionAction suggestionAction) {
+    public UnparsedArgument(String name, Supplier<List<String>> suggestionSupplier) {
         this.name = name;
-        this.suggestionAction = suggestionAction;
+        this.suggestionAction = sb -> {
+            sb.suggestAll(suggestionSupplier.get().stream()
+                    .filter(s -> s.startsWith(sb.getArgs().get(0)))
+                    .collect(Collectors.toList()));
+        };
     }
 
     @NotNull
