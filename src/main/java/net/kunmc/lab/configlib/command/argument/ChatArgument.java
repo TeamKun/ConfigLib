@@ -25,7 +25,7 @@ public class ChatArgument implements Argument<String> {
     @Override
     public String parse(@NotNull com.mojang.brigadier.context.CommandContext<net.minecraft.server.v1_16_R3.CommandListenerWrapper> commandContext, @NotNull String s) {
         try {
-            return ArgumentChat.a(commandContext, s).getText();
+            return ArgumentChat.a(commandContext, s).getString();
         } catch (CommandSyntaxException e) {
             e.printStackTrace();
             return null;
