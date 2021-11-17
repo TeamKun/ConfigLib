@@ -46,6 +46,7 @@ tasks.withType(JavaCompile) {
 
 shadowJar {
     archiveFileName = "${rootProject.name}-${version}.jar"
+    exclude "net/minecraft"
 }
 tasks.build.dependsOn tasks.shadowJar
 
@@ -63,4 +64,8 @@ publishing {
             from components.java
         }
     }
+}
+
+jar {
+    exclude "net/minecraft"
 }
