@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UUIDSetValue extends SetValue<UUID> {
     private boolean onlyOnline = true;
@@ -55,9 +56,7 @@ public class UUIDSetValue extends SetValue<UUID> {
         List<Argument<?>> arguments = CommandUtil.getArguments(builder);
 
         arguments.add(new UnparsedArgument("target", () -> {
-            List<String> list = Arrays.stream(Bukkit.getOfflinePlayers())
-                    .filter(p -> !value.contains(p.getUniqueId()))
-                    .filter(p -> !onlyOnline || p.isOnline())
+            List<String> list = getPlayerStreamForAdd()
                     .map(OfflinePlayer::getName)
                     .collect(Collectors.toList());
             if (!list.isEmpty()) {
@@ -91,9 +90,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     public boolean isCorrectArgumentForAdd(Object argument) {
         return argument.equals("@a") ||
                 argument.equals("@r") ||
-                Arrays.stream(Bukkit.getOfflinePlayers())
-                        .filter(p -> !value.contains(p.getUniqueId()))
-                        .filter(p -> !onlyOnline || p.isOnline())
+                getPlayerStreamForAdd()
                         .map(OfflinePlayer::getName)
                         .anyMatch(s -> s.equals(argument));
     }
@@ -134,12 +131,18 @@ public class UUIDSetValue extends SetValue<UUID> {
     public Set<UUID> argumentToValueForAdd(Object argument) {
         String s = argument.toString();
 
-        if (s.startsWith("@")) {
-            return Arrays.stream(Bukkit.getOfflinePlayers())
-                    .filter(p -> !value.contains(p.getUniqueId()))
-                    .filter(p -> !onlyOnline || p.isOnline())
+        if (s.equals("@a")) {
+            return getPlayerStreamForAdd()
                     .map(OfflinePlayer::getUniqueId)
                     .collect(Collectors.toSet());
+        }
+
+        if (s.startsWith("@r")) {
+            List<UUID> list = getPlayerStreamForAdd()
+                    .map(OfflinePlayer::getUniqueId)
+                    .collect(Collectors.toList());
+            Collections.shuffle(list);
+            return Sets.newHashSet(list.get(0));
         }
 
         return Sets.newHashSet(Bukkit.getOfflinePlayerIfCached(s).getUniqueId());
@@ -162,7 +165,14 @@ public class UUIDSetValue extends SetValue<UUID> {
         return Sets.newHashSet(Bukkit.getOfflinePlayerIfCached(s).getUniqueId());
     }
 
+    private Stream<OfflinePlayer> getPlayerStreamForAdd() {
+        return Arrays.stream(Bukkit.getOfflinePlayers())
+                .filter(p -> !value.contains(p.getUniqueId()))
+                .filter(p -> !onlyOnline || p.isOnline());
+    }
+
     @Override
+
     public boolean validateForAdd(Set<UUID> element) {
         return !value.containsAll(element);
     }
