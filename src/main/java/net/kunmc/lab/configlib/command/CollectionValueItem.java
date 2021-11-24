@@ -1,6 +1,5 @@
 package net.kunmc.lab.configlib.command;
 
-import dev.kotx.flylib.command.Command;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.config.BaseConfig;
@@ -9,15 +8,16 @@ import net.kunmc.lab.configlib.value.CollectionValue;
 import java.lang.reflect.Field;
 import java.util.Collection;
 
-abstract class CollectionValueConfigItem extends Command {
+abstract class CollectionValueItem extends AccessibleCommand {
     protected final Field field;
-    protected final CollectionValue configValue;
+    protected final CollectionValue value;
     protected final BaseConfig config;
 
-    public CollectionValueConfigItem(Field field, CollectionValue<?, ?> configValue, BaseConfig config) {
-        super(field.getName());
+    public CollectionValueItem(String operationName, Field field, CollectionValue value, BaseConfig config) {
+        super(operationName);
+
         this.field = field;
-        this.configValue = configValue;
+        this.value = value;
         this.config = config;
 
         String entryName = field.getName();

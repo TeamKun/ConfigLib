@@ -28,23 +28,8 @@ public class ConfigCommandBuilder {
         return this;
     }
 
-    public ConfigCommandBuilder disableAddCommand() {
-        subCommandTypeEnabledMap.put(SubCommandType.Add, false);
-        return this;
-    }
-
-    public ConfigCommandBuilder disableRemoveCommand() {
-        subCommandTypeEnabledMap.put(SubCommandType.Remove, false);
-        return this;
-    }
-
-    public ConfigCommandBuilder disableClearCommand() {
-        subCommandTypeEnabledMap.put(SubCommandType.Clear, false);
-        return this;
-    }
-
-    public ConfigCommandBuilder disableSetCommand() {
-        subCommandTypeEnabledMap.put(SubCommandType.Set, false);
+    public ConfigCommandBuilder disableModifyCommand() {
+        subCommandTypeEnabledMap.put(SubCommandType.Modify, false);
         return this;
     }
 

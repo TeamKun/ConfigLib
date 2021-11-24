@@ -172,7 +172,6 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-
     public boolean validateForAdd(Set<UUID> element) {
         return !value.containsAll(element);
     }
