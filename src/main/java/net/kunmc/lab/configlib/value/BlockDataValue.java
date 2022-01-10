@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 public final class BlockDataValue implements SingleValue<BlockData> {
-    private String materialName;
+    private BlockData value;
     private final transient Consumer<BlockData> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
@@ -20,18 +20,18 @@ public final class BlockDataValue implements SingleValue<BlockData> {
     }
 
     public BlockDataValue(BlockData value, Consumer<BlockData> onSet) {
-        this.materialName = value.getMaterial().name();
+        this.value = value;
         this.consumer = onSet;
     }
 
     @Override
     public BlockData value() {
-        return Material.valueOf(materialName).createBlockData();
+        return value;
     }
 
     @Override
     public void value(BlockData value) {
-        this.materialName = value.getMaterial().name();
+        this.value = value;
     }
 
     @Override
@@ -71,7 +71,7 @@ public final class BlockDataValue implements SingleValue<BlockData> {
 
     @Override
     public void sendListMessage(CommandContext ctx, String entryName) {
-        ctx.success(entryName + ": " + materialName);
+        ctx.success(entryName + ": " + value.getMaterial().name());
     }
 
     @Override
@@ -103,6 +103,6 @@ public final class BlockDataValue implements SingleValue<BlockData> {
 
     @Override
     public String succeedSetMessage(String entryName) {
-        return entryName + "の値を" + materialName + "に設定しました.";
+        return entryName + "の値を" + value.getMaterial().name() + "に設定しました.";
     }
 }

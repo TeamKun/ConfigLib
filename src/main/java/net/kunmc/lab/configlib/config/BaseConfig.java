@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import net.kunmc.lab.configlib.value.CollectionValue;
 import net.kunmc.lab.configlib.value.SingleValue;
 import net.kunmc.lab.configlib.value.Value;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,7 @@ public abstract class BaseConfig {
             .setPrettyPrinting()
             .excludeFieldsWithModifiers(Modifier.TRANSIENT)
             .registerTypeHierarchyAdapter(Team.class, new TeamTypeAdapter())
+            .registerTypeHierarchyAdapter(BlockData.class, new BlockDataTypeAdapter())
             .create();
 
     public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Class<T> clazz, @NotNull Plugin plugin) {
