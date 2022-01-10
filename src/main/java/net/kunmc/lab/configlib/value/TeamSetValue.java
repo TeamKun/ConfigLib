@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -15,8 +16,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * If you need completions on add, should set scoreboard instance with scoreboard#Scoreboard
- * TODO fix w
+ * If you need completions on "add" with NewScoreboard, you should register it with scoreboard(Scoreboard) method.
+ * When you use NewScoreboard, this class can't be deserialized. Therefore, a field must be qualified as transient at that time.
  */
 public class TeamSetValue extends SetValue<Team> {
     private transient Scoreboard scoreboard;
@@ -27,13 +28,14 @@ public class TeamSetValue extends SetValue<Team> {
 
     public TeamSetValue(@NotNull Set<Team> value) {
         super(value);
+        scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
     }
 
-    public Scoreboard scoreboard() {
+    public @NotNull Scoreboard scoreboard() {
         return scoreboard;
     }
 
-    public TeamSetValue scoreboard(Scoreboard scoreboard) {
+    public TeamSetValue scoreboard(@NotNull Scoreboard scoreboard) {
         this.scoreboard = scoreboard;
         return this;
     }
@@ -66,10 +68,6 @@ public class TeamSetValue extends SetValue<Team> {
     @Override
     public void appendArgumentForAdd(UsageBuilder builder) {
         builder.textArgument("TeamName", suggestionBuilder -> {
-            if (scoreboard == null) {
-                return;
-            }
-           
             scoreboard.getTeams().stream()
                     .map(Team::getName)
                     .filter(name -> value.stream()
