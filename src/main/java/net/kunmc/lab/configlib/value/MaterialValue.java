@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class MaterialValue implements SingleValue<Material> {
-    private String materialName;
+    private Material value;
     private final transient Consumer<Material> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
@@ -21,18 +21,18 @@ public final class MaterialValue implements SingleValue<Material> {
     }
 
     public MaterialValue(Material value, Consumer<Material> onSet) {
-        this.materialName = value.name();
+        this.value = value;
         this.consumer = onSet;
     }
 
     @Override
     public Material value() {
-        return Material.valueOf(materialName);
+        return value;
     }
 
     @Override
     public void value(Material value) {
-        this.materialName = value.name();
+        this.value = value;
     }
 
     @Override
