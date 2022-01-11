@@ -1,7 +1,10 @@
 package net.kunmc.lab.configlib.value;
 
+import dev.kotx.flylib.command.SuggestionAction;
 import dev.kotx.flylib.command.UsageBuilder;
+import dev.kotx.flylib.command.arguments.TextArgument;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -13,6 +16,10 @@ public class StringValue implements SingleValue<String> {
     private transient final Consumer<String> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
+    protected transient String name = "StringValue";
+    protected transient TextArgument.Type type = TextArgument.Type.WORD;
+    protected transient SuggestionAction suggestionAction = builder -> {
+    };
 
     public StringValue(String value) {
         this(value, x -> {
@@ -33,6 +40,21 @@ public class StringValue implements SingleValue<String> {
         this.min = min;
         this.max = max;
         this.consumer = onSet;
+    }
+
+    public StringValue name(@NotNull String name) {
+        this.name = name;
+        return this;
+    }
+
+    public StringValue type(@NotNull TextArgument.Type type) {
+        this.type = type;
+        return this;
+    }
+
+    public StringValue suggestionAction(@NotNull SuggestionAction action) {
+        this.suggestionAction = action;
+        return this;
     }
 
     @Override
@@ -62,7 +84,7 @@ public class StringValue implements SingleValue<String> {
 
     @Override
     public void appendArgument(UsageBuilder builder) {
-        builder.textArgument("StringArgument");
+        builder.textArgument(name, type, suggestionAction);
     }
 
     @Override
