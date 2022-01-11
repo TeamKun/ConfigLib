@@ -26,7 +26,7 @@ public class BlockDataTypeAdapter extends TypeAdapter<BlockData> {
         try {
             m = Material.valueOf(s);
         } catch (IllegalArgumentException e) {
-            throw new IOException("s is invalid Material name");
+            throw new IOException(s + " is invalid Material name");
         }
 
         if (!m.isBlock()) {
