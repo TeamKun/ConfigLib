@@ -26,7 +26,7 @@ class ConfigReloadCommand extends Command {
         this.configList.addAll(configSet);
 
         for (BaseConfig config : configSet) {
-            children(new Command(config.setEntryName()) {
+            children(new Command(config.entryName()) {
                 @Override
                 public void execute(@NotNull CommandContext ctx) {
                     exec(ctx, config);

@@ -49,19 +49,19 @@ public abstract class BaseConfig {
         setPlugin(plugin);
     }
 
-    public boolean isEnableGet() {
+    public boolean isGetEnabled() {
         return enableGet;
     }
 
-    public boolean isEnableList() {
+    public boolean isListEnabled() {
         return enableList;
     }
 
-    public boolean isEnableModify() {
+    public boolean isModifyEnabled() {
         return enableModify;
     }
 
-    public boolean isEnableReload() {
+    public boolean isReloadEnabled() {
         return enableReload;
     }
 
@@ -75,10 +75,10 @@ public abstract class BaseConfig {
     }
 
     public File getConfigFile() {
-        return new File(plugin.getDataFolder(), setEntryName() + ".json");
+        return new File(plugin.getDataFolder(), entryName() + ".json");
     }
 
-    public String setEntryName() {
+    public String entryName() {
         if (entryName.equals("")) {
             String n = getClass().getSimpleName();
             return n.substring(0, 1).toLowerCase() + n.substring(1);

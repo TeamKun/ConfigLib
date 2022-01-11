@@ -23,7 +23,7 @@ class ConfigModifyCommand extends AccessibleCommand {
         }
 
         for (BaseConfig config : configSet) {
-            children(new AccessibleCommand(config.setEntryName()) {
+            children(new AccessibleCommand(config.entryName()) {
                 {
                     init(config, this);
                 }
