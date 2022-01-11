@@ -4,10 +4,12 @@ import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.util.function.Consumer;
 
@@ -33,6 +35,22 @@ public class LocationValue implements SingleValue<Location> {
     public LocationValue(Location location, Consumer<Location> onSet) {
         value = location;
         consumer = onSet;
+    }
+
+    public Block getBlock() {
+        if (value == null) {
+            return null;
+        }
+
+        return value.getBlock();
+    }
+
+    public Vector toVector() {
+        if (value == null) {
+            return null;
+        }
+
+        return value.toVector();
     }
 
     @Override
@@ -102,7 +120,7 @@ public class LocationValue implements SingleValue<Location> {
         this.listable = listable;
         return this;
     }
-   
+
     @Override
     public boolean listable() {
         return listable;
