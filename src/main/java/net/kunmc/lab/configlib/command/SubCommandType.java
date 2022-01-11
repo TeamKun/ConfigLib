@@ -26,7 +26,11 @@ enum SubCommandType {
             x -> ConfigUtil.getCollectionValues(x).stream()
                     .anyMatch(v -> v.addableByCommand() || v.removableByCommand() || v.clearableByCommand()) || ConfigUtil.getSingleValues(x).stream().anyMatch(SingleValue::writableByCommand),
             ConfigModifyCommand::new,
-            ConfigModifyCommand::new);
+            ConfigModifyCommand::new),
+    Get("get",
+            x -> Stream.concat(ConfigUtil.getSingleValues(x).stream(), ConfigUtil.getCollectionValues(x).stream()).anyMatch(Value::listable),
+            ConfigGetCommand::new,
+            ConfigGetCommand::new);
 
     public final String name;
     private final Predicate<BaseConfig> hasEntryFor;

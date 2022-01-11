@@ -38,6 +38,11 @@ public class ConfigCommandBuilder {
         return this;
     }
 
+    public ConfigCommandBuilder disableGetCommand() {
+        subCommandTypeEnabledMap.put(SubCommandType.Get, false);
+        return this;
+    }
+
     public ConfigCommandBuilder addConfig(@NotNull BaseConfig config) {
         configSet.add(config);
         return this;
