@@ -21,7 +21,11 @@ import java.util.stream.Collectors;
 
 public abstract class BaseConfig {
     private transient Plugin plugin;
-    private transient String entryName;
+    private transient String entryName = "";
+    protected transient boolean enableGet = true;
+    protected transient boolean enableList = true;
+    protected transient boolean enableModify = true;
+    protected transient boolean enableReload = true;
     private static final transient Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .excludeFieldsWithModifiers(Modifier.TRANSIENT)
@@ -41,25 +45,40 @@ public abstract class BaseConfig {
         return config;
     }
 
-    public BaseConfig(@NotNull Plugin plugin, @NotNull String entryName) {
+    public BaseConfig(@NotNull Plugin plugin) {
         setPlugin(plugin);
-        this.entryName = entryName;
     }
 
-    protected void setPlugin(Plugin plugin) {
+    public boolean isEnableGet() {
+        return enableGet;
+    }
+
+    public boolean isEnableList() {
+        return enableList;
+    }
+
+    public boolean isEnableModify() {
+        return enableModify;
+    }
+
+    public boolean isEnableReload() {
+        return enableReload;
+    }
+
+    protected void setPlugin(@NotNull Plugin plugin) {
         this.plugin = plugin;
         plugin.getDataFolder().mkdir();
     }
 
-    protected void setEntryName(String entryName) {
+    protected void setEntryName(@NotNull String entryName) {
         this.entryName = entryName;
     }
 
     public File getConfigFile() {
-        return new File(plugin.getDataFolder(), entryName() + ".json");
+        return new File(plugin.getDataFolder(), setEntryName() + ".json");
     }
 
-    public String entryName() {
+    public String setEntryName() {
         if (entryName.equals("")) {
             String n = getClass().getSimpleName();
             return n.substring(0, 1).toLowerCase() + n.substring(1);

@@ -24,7 +24,7 @@ public class ConfigGetCommand extends AccessibleCommand {
         }
 
         for (BaseConfig config : configSet) {
-            children(new AccessibleCommand(config.entryName()) {
+            children(new AccessibleCommand(config.setEntryName()) {
                 {
                     init(config, this);
                 }

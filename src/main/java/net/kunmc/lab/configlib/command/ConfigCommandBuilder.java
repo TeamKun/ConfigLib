@@ -62,6 +62,7 @@ public class ConfigCommandBuilder {
         for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeEnabledMap.entrySet()) {
             SubCommandType type = entry.getKey();
             Set<BaseConfig> usedConfigs = type.hasEntryFor(configSet).entrySet().stream()
+                    .peek(e -> e.setValue(e.getValue() && type.isEnableFor(e.getKey())))
                     .filter(Map.Entry::getValue)
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toSet());
