@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -33,21 +34,25 @@ public final class BooleanValue implements SingleValue<Boolean> {
     }
 
     @Override
+    @Internal
     public void onSetValue(Boolean newValue) {
         consumer.accept(newValue);
     }
 
     @Override
+    @Internal
     public boolean validateOnSet(Boolean newValue) {
         return true;
     }
 
     @Override
+    @Internal
     public boolean listable() {
         return listable;
     }
 
     @Override
+    @Internal
     public void appendArgument(UsageBuilder builder) {
         builder.booleanArgument("BooleanArgument", sb -> {
             sb.suggest("true").suggest("false");
@@ -55,11 +60,13 @@ public final class BooleanValue implements SingleValue<Boolean> {
     }
 
     @Override
+    @Internal
     public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
+    @Internal
     public Boolean argumentToValue(List<Object> argument, CommandSender sender) {
         return ((Boolean) argument.get(0));
     }
@@ -70,6 +77,7 @@ public final class BooleanValue implements SingleValue<Boolean> {
     }
 
     @Override
+    @Internal
     public boolean writableByCommand() {
         return writable;
     }

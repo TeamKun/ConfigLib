@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Scoreboard;
@@ -51,11 +52,13 @@ public class TeamValue implements SingleValue<Team> {
     }
 
     @Override
+    @Internal
     public boolean validateOnSet(Team newValue) {
         return !value.getName().equals(newValue.getName());
     }
 
     @Override
+    @Internal
     public void onSetValue(Team newValue) {
         consumer.accept(newValue);
     }
@@ -66,11 +69,13 @@ public class TeamValue implements SingleValue<Team> {
     }
 
     @Override
+    @Internal
     public boolean writableByCommand() {
         return writable;
     }
 
     @Override
+    @Internal
     public void appendArgument(UsageBuilder builder) {
         builder.textArgument("TeamName", suggestionBuilder -> {
             scoreboard.getTeams().stream()
@@ -81,6 +86,7 @@ public class TeamValue implements SingleValue<Team> {
     }
 
     @Override
+    @Internal
     public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return scoreboard.getTeams().stream()
                 .map(Team::getName)
@@ -88,6 +94,7 @@ public class TeamValue implements SingleValue<Team> {
     }
 
     @Override
+    @Internal
     public Team argumentToValue(List<Object> argument, CommandSender sender) {
         return scoreboard.getTeam(argument.get(0).toString());
     }
@@ -108,26 +115,31 @@ public class TeamValue implements SingleValue<Team> {
     }
 
     @Override
+    @Internal
     public boolean listable() {
         return listable;
     }
 
     @Override
+    @Internal
     public String incorrectArgumentMessage(List<Object> argument) {
         return argument.get(0) + "は存在しないチームです.";
     }
 
     @Override
+    @Internal
     public String invalidValueMessage(String entryName, Team newValue) {
         return newValue.getName() + "はすでに設定されているチームです.";
     }
 
     @Override
+    @Internal
     public String succeedSetMessage(String entryName) {
         return entryName + "の値を" + value.getName() + "に設定しました.";
     }
 
     @Override
+    @Internal
     public void sendListMessage(CommandContext ctx, String entryName) {
         if (value == null) {
             ctx.success(entryName + ": null");

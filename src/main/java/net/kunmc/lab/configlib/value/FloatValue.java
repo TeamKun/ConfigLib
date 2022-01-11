@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -36,21 +37,25 @@ public final class FloatValue implements NumericValue<Float> {
     }
 
     @Override
+    @Internal
     public boolean listable() {
         return listable;
     }
 
     @Override
+    @Internal
     public void appendArgument(UsageBuilder builder) {
         builder.floatArgument("FloatArgument", min(), max());
     }
 
     @Override
+    @Internal
     public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
+    @Internal
     public Float argumentToValue(List<Object> argument, CommandSender sender) {
         return ((Float) argument.get(0));
     }
@@ -61,6 +66,7 @@ public final class FloatValue implements NumericValue<Float> {
     }
 
     @Override
+    @Internal
     public boolean writableByCommand() {
         return writable;
     }
@@ -71,11 +77,13 @@ public final class FloatValue implements NumericValue<Float> {
     }
 
     @Override
+    @Internal
     public Float min() {
         return min;
     }
 
     @Override
+    @Internal
     public Float max() {
         return max;
     }
@@ -91,6 +99,7 @@ public final class FloatValue implements NumericValue<Float> {
     }
 
     @Override
+    @Internal
     public void onSetValue(Float newValue) {
         consumer.accept(newValue);
     }

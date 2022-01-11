@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -36,21 +37,25 @@ public final class DoubleValue implements NumericValue<Double> {
     }
 
     @Override
+    @Internal
     public boolean listable() {
         return listable;
     }
 
     @Override
+    @Internal
     public void appendArgument(UsageBuilder builder) {
         builder.doubleArgument("DoubleArgument", min(), max());
     }
 
     @Override
+    @Internal
     public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
+    @Internal
     public Double argumentToValue(List<Object> argument, CommandSender sender) {
         return ((Double) argument.get(0));
     }
@@ -61,6 +66,7 @@ public final class DoubleValue implements NumericValue<Double> {
     }
 
     @Override
+    @Internal
     public boolean writableByCommand() {
         return writable;
     }
@@ -71,11 +77,13 @@ public final class DoubleValue implements NumericValue<Double> {
     }
 
     @Override
+    @Internal
     public Double min() {
         return min;
     }
 
     @Override
+    @Internal
     public Double max() {
         return max;
     }
@@ -91,6 +99,7 @@ public final class DoubleValue implements NumericValue<Double> {
     }
 
     @Override
+    @Internal
     public void onSetValue(Double newValue) {
         consumer.accept(newValue);
     }

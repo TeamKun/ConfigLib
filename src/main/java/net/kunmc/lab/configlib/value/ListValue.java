@@ -1,5 +1,6 @@
 package net.kunmc.lab.configlib.value;
 
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -27,16 +28,19 @@ public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Itera
     }
 
     @Override
+    @Internal
     public boolean validateForAdd(List<E> element) {
         return true;
     }
 
     @Override
+    @Internal
     public boolean validateForRemove(List<E> element) {
         return value.contains(element);
     }
 
     @Override
+    @Internal
     public boolean listable() {
         return listable;
     }
@@ -47,6 +51,7 @@ public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Itera
     }
 
     @Override
+    @Internal
     public boolean addableByCommand() {
         return addable;
     }
@@ -57,6 +62,7 @@ public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Itera
     }
 
     @Override
+    @Internal
     public boolean removableByCommand() {
         return removable;
     }
@@ -67,6 +73,7 @@ public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Itera
     }
 
     @Override
+    @Internal
     public boolean clearableByCommand() {
         return clearable;
     }

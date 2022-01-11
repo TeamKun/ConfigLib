@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -58,16 +59,19 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     @Override
+    @Internal
     public void onSetValue(UUID newValue) {
         consumer.accept(newValue);
     }
 
     @Override
+    @Internal
     public boolean validateOnSet(UUID newValue) {
         return true;
     }
 
     @Override
+    @Internal
     public boolean listable() {
         return listable;
     }
@@ -78,6 +82,7 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     @Override
+    @Internal
     public boolean writableByCommand() {
         return writable;
     }
@@ -117,16 +122,19 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     @Override
+    @Internal
     public String succeedSetMessage(String entryName) {
         return entryName + "の値を" + playerName() + "に設定しました.";
     }
 
     @Override
+    @Internal
     public void sendListMessage(CommandContext ctx, String entryName) {
         ctx.success(entryName + ": " + playerName());
     }
 
     @Override
+    @Internal
     public void appendArgument(UsageBuilder builder) {
         builder.entityArgument("target", true, false, sb -> {
             Bukkit.getOnlinePlayers().stream()
@@ -138,6 +146,7 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     @Override
+    @Internal
     public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         List<Player> list = ((List<Player>) argument.get(0));
 
@@ -149,11 +158,13 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     @Override
+    @Internal
     public UUID argumentToValue(List<Object> argument, CommandSender sender) {
         return ((List<Player>) argument.get(0)).get(0).getUniqueId();
     }
 
     @Override
+    @Internal
     public String incorrectArgumentMessage(List<Object> argument) {
         List<Player> list = ((List<Player>) argument.get(0));
 

@@ -3,10 +3,12 @@ package net.kunmc.lab.configlib.util;
 import dev.kotx.flylib.command.Argument;
 import dev.kotx.flylib.command.Command;
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.annotation.Internal;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
+@Internal
 public class CommandUtil {
     public static String getName(Command command) {
         try {

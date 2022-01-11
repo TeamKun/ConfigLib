@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
@@ -37,16 +38,19 @@ public final class BlockDataValue implements SingleValue<BlockData> {
     }
 
     @Override
+    @Internal
     public void onSetValue(BlockData newValue) {
         consumer.accept(newValue);
     }
 
     @Override
+    @Internal
     public boolean validateOnSet(BlockData newValue) {
         return true;
     }
 
     @Override
+    @Internal
     public boolean listable() {
         return listable;
     }
@@ -57,6 +61,7 @@ public final class BlockDataValue implements SingleValue<BlockData> {
     }
 
     @Override
+    @Internal
     public boolean writableByCommand() {
         return writable;
     }
@@ -72,11 +77,13 @@ public final class BlockDataValue implements SingleValue<BlockData> {
     }
 
     @Override
+    @Internal
     public void sendListMessage(CommandContext ctx, String entryName) {
         ctx.success(entryName + ": " + value.getMaterial().name());
     }
 
     @Override
+    @Internal
     public void appendArgument(UsageBuilder builder) {
         builder.textArgument("BlockName", sb -> {
             Arrays.stream(Material.values())
@@ -88,6 +95,7 @@ public final class BlockDataValue implements SingleValue<BlockData> {
     }
 
     @Override
+    @Internal
     public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(Material::isBlock)
@@ -95,6 +103,7 @@ public final class BlockDataValue implements SingleValue<BlockData> {
     }
 
     @Override
+    @Internal
     public BlockData argumentToValue(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
@@ -104,6 +113,7 @@ public final class BlockDataValue implements SingleValue<BlockData> {
     }
 
     @Override
+    @Internal
     public String succeedSetMessage(String entryName) {
         return entryName + "の値を" + value.getMaterial().name() + "に設定しました.";
     }

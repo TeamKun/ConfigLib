@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.value;
 import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,40 +29,47 @@ public class LocationSetValue extends SetValue<Location> {
     }
 
     @Override
+    @Internal
     public String invalidValueMessageForAdd(String entryName, Set<Location> element) {
         Location l = element.toArray(new Location[0])[0];
         return locationToString(l) + "はすでに" + entryName + "に追加されている座標です.";
     }
 
     @Override
+    @Internal
     public String succeedMessageForAdd(String entryName, Set<Location> element) {
         Location l = element.toArray(new Location[0])[0];
         return entryName + "に" + locationToString(l) + "を追加しました.";
     }
 
     @Override
+    @Internal
     public String invalidValueMessageForRemove(String entryName, Set<Location> element) {
         Location l = element.toArray(new Location[0])[0];
         return locationToString(l) + "は" + entryName + "に追加されていませんでした.";
     }
 
     @Override
+    @Internal
     public String succeedMessageForRemove(String entryName, Set<Location> element) {
         Location l = element.toArray(new Location[0])[0];
         return entryName + "から" + locationToString(l) + "を削除しました.";
     }
 
     @Override
+    @Internal
     public String clearMessage(String entryName) {
         return entryName + "からすべての座標を削除しました.";
     }
 
     @Override
+    @Internal
     public void appendArgumentForAdd(UsageBuilder builder) {
         builder.locationArgument("location");
     }
 
     @Override
+    @Internal
     public void appendArgumentForRemove(UsageBuilder builder) {
         builder.doubleArgument("x", suggestionBuilder -> {
                     suggestionBuilder.suggestAll(value.stream()
@@ -89,16 +97,19 @@ public class LocationSetValue extends SetValue<Location> {
     }
 
     @Override
+    @Internal
     public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
+    @Internal
     public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
+    @Internal
     public Set<Location> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         Location l = ((Location) argument.get(0));
 
@@ -122,6 +133,7 @@ public class LocationSetValue extends SetValue<Location> {
     }
 
     @Override
+    @Internal
     public Set<Location> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
         double x = ((Double) argument.get(0));
         double y = ((Double) argument.get(1));
@@ -135,6 +147,7 @@ public class LocationSetValue extends SetValue<Location> {
     }
 
     @Override
+    @Internal
     public void sendListMessage(CommandContext ctx, String entryName) {
         String header = "-----" + entryName + "-----";
         ctx.message(ChatColor.YELLOW + header);

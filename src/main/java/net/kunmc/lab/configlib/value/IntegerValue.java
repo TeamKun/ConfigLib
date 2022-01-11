@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -36,21 +37,25 @@ public final class IntegerValue implements NumericValue<Integer> {
     }
 
     @Override
+    @Internal
     public boolean listable() {
         return listable;
     }
 
     @Override
+    @Internal
     public void appendArgument(UsageBuilder builder) {
         builder.integerArgument("IntegerArgument", min(), max());
     }
 
     @Override
+    @Internal
     public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
+    @Internal
     public Integer argumentToValue(List<Object> argument, CommandSender sender) {
         return ((Integer) argument.get(0));
     }
@@ -61,6 +66,7 @@ public final class IntegerValue implements NumericValue<Integer> {
     }
 
     @Override
+    @Internal
     public boolean writableByCommand() {
         return writable;
     }
@@ -81,16 +87,19 @@ public final class IntegerValue implements NumericValue<Integer> {
     }
 
     @Override
+    @Internal
     public void onSetValue(Integer newValue) {
         consumer.accept(newValue);
     }
 
     @Override
+    @Internal
     public Integer min() {
         return min;
     }
 
     @Override
+    @Internal
     public Integer max() {
         return max;
     }

@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.config;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.kunmc.lab.configlib.annotation.Internal;
 import net.kunmc.lab.configlib.value.Value;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
@@ -49,18 +50,22 @@ public abstract class BaseConfig {
         setPlugin(plugin);
     }
 
+    @Internal
     public boolean isGetEnabled() {
         return enableGet;
     }
 
+    @Internal
     public boolean isListEnabled() {
         return enableList;
     }
 
+    @Internal
     public boolean isModifyEnabled() {
         return enableModify;
     }
 
+    @Internal
     public boolean isReloadEnabled() {
         return enableReload;
     }
@@ -74,10 +79,12 @@ public abstract class BaseConfig {
         this.entryName = entryName;
     }
 
+    @Internal
     public File getConfigFile() {
         return new File(plugin.getDataFolder(), entryName() + ".json");
     }
 
+    @Internal
     public String entryName() {
         if (entryName.equals("")) {
             String n = getClass().getSimpleName();

@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.value;
 import dev.kotx.flylib.command.SuggestionAction;
 import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.TextArgument;
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,31 +69,37 @@ public class StringValue implements SingleValue<String> {
     }
 
     @Override
+    @Internal
     public void onSetValue(String newValue) {
         consumer.accept(newValue);
     }
 
     @Override
+    @Internal
     public boolean validateOnSet(String newValue) {
         return newValue.length() >= min && newValue.length() <= max;
     }
 
     @Override
+    @Internal
     public boolean listable() {
         return listable;
     }
 
     @Override
+    @Internal
     public void appendArgument(UsageBuilder builder) {
         builder.textArgument(name, type, suggestionAction);
     }
 
     @Override
+    @Internal
     public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
+    @Internal
     public String argumentToValue(List<Object> argument, CommandSender sender) {
         return argument.get(0).toString();
     }
@@ -103,6 +110,7 @@ public class StringValue implements SingleValue<String> {
     }
 
     @Override
+    @Internal
     public boolean writableByCommand() {
         return writable;
     }
@@ -113,6 +121,7 @@ public class StringValue implements SingleValue<String> {
     }
 
     @Override
+    @Internal
     public String invalidValueMessage(String entryName, String argument) {
         return entryName + "は" + min + "以上" + max + "以下の文字数で入力してください";
     }

@@ -1,5 +1,6 @@
 package net.kunmc.lab.configlib.value;
 
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -28,16 +29,19 @@ public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterabl
     }
 
     @Override
+    @Internal
     public boolean validateForAdd(Set<E> element) {
         return !value.containsAll(element);
     }
 
     @Override
+    @Internal
     public boolean validateForRemove(Set<E> element) {
         return value.containsAll(element);
     }
 
     @Override
+    @Internal
     public boolean listable() {
         return listable;
     }
@@ -48,6 +52,7 @@ public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterabl
     }
 
     @Override
+    @Internal
     public boolean addableByCommand() {
         return addable;
     }
@@ -58,6 +63,7 @@ public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterabl
     }
 
     @Override
+    @Internal
     public boolean removableByCommand() {
         return removable;
     }
@@ -68,6 +74,7 @@ public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterabl
     }
 
     @Override
+    @Internal
     public boolean clearableByCommand() {
         return clearable;
     }

@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -56,11 +57,13 @@ public class LocationValue implements SingleValue<Location> {
     }
 
     @Override
+    @Internal
     public boolean validateOnSet(Location newValue) {
         return !newValue.equals(value);
     }
 
     @Override
+    @Internal
     public void onSetValue(Location newValue) {
         consumer.accept(newValue);
     }
@@ -71,21 +74,25 @@ public class LocationValue implements SingleValue<Location> {
     }
 
     @Override
+    @Internal
     public boolean writableByCommand() {
         return writable;
     }
 
     @Override
+    @Internal
     public void appendArgument(UsageBuilder builder) {
         builder.locationArgument("location");
     }
 
     @Override
+    @Internal
     public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
+    @Internal
     public Location argumentToValue(List<Object> argument, CommandSender sender) {
         Location l = ((Location) argument.get(0));
 
@@ -124,16 +131,19 @@ public class LocationValue implements SingleValue<Location> {
     }
 
     @Override
+    @Internal
     public boolean listable() {
         return listable;
     }
 
     @Override
+    @Internal
     public String succeedSetMessage(String entryName) {
         return entryName + "の値を" + locationToString() + "に設定しました.";
     }
 
     @Override
+    @Internal
     public void sendListMessage(CommandContext ctx, String entryName) {
         if (value == null) {
             ctx.success(entryName + ": null");
