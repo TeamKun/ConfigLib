@@ -14,6 +14,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,25 +30,25 @@ public class LocationSetValue extends SetValue<Location> {
     @Override
     public String invalidValueMessageForAdd(String entryName, Set<Location> element) {
         Location l = element.toArray(new Location[0])[0];
-        return l + "はすでに" + entryName + "に追加されている座標です.";
+        return locationToString(l) + "はすでに" + entryName + "に追加されている座標です.";
     }
 
     @Override
     public String succeedMessageForAdd(String entryName, Set<Location> element) {
         Location l = element.toArray(new Location[0])[0];
-        return entryName + "に" + l + "を追加しました.";
+        return entryName + "に" + locationToString(l) + "を追加しました.";
     }
 
     @Override
     public String invalidValueMessageForRemove(String entryName, Set<Location> element) {
         Location l = element.toArray(new Location[0])[0];
-        return l + "は" + entryName + "に追加されていませんでした.";
+        return locationToString(l) + "は" + entryName + "に追加されていませんでした.";
     }
 
     @Override
     public String succeedMessageForRemove(String entryName, Set<Location> element) {
         Location l = element.toArray(new Location[0])[0];
-        return entryName + "から" + l + "を削除しました.";
+        return entryName + "から" + locationToString(l) + "を削除しました.";
     }
 
     @Override
@@ -88,18 +89,18 @@ public class LocationSetValue extends SetValue<Location> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(Object argument, CommandSender sender) {
+    public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    public boolean isCorrectArgumentForRemove(Object argument, CommandSender sender) {
+    public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    public Set<Location> argumentToValueForAdd(Object argument, CommandSender sender) {
-        Location l = ((Location) argument);
+    public Set<Location> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+        Location l = ((Location) argument.get(0));
 
         if (sender instanceof ConsoleCommandSender) {
             l.setWorld(Bukkit.getWorlds().get(0));
@@ -121,26 +122,16 @@ public class LocationSetValue extends SetValue<Location> {
     }
 
     @Override
-    public Set<Location> argumentToValueForRemove(Object argument, CommandSender sender) {
-        Location l = ((Location) argument);
+    public Set<Location> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+        double x = ((Double) argument.get(0));
+        double y = ((Double) argument.get(1));
+        double z = ((Double) argument.get(2));
 
-        if (sender instanceof ConsoleCommandSender) {
-            l.setWorld(Bukkit.getWorlds().get(0));
-        }
-
-        if (sender instanceof Player) {
-            Player p = ((Player) sender);
-            l.setWorld(p.getWorld());
-            l.setPitch(p.getLocation().getPitch());
-            l.setYaw(p.getLocation().getYaw());
-        }
-
-        if (sender instanceof BlockCommandSender) {
-            World w = ((BlockCommandSender) sender).getBlock().getWorld();
-            l.setWorld(w);
-        }
-
-        return Sets.newHashSet(l);
+        return value.stream()
+                .filter(l -> l.getX() == x)
+                .filter(l -> l.getY() == y)
+                .filter(l -> l.getZ() == z)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -149,10 +140,14 @@ public class LocationSetValue extends SetValue<Location> {
         ctx.message(ChatColor.YELLOW + header);
 
         ctx.success(this.stream()
-                .map(l -> String.format("{world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f}",
-                        l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getPitch(), l.getYaw()))
+                .map(this::locationToString)
                 .collect(Collectors.joining(", ")));
 
         ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
+    }
+
+    private String locationToString(Location l) {
+        return String.format("{world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f}",
+                l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getPitch(), l.getYaw());
     }
 }
