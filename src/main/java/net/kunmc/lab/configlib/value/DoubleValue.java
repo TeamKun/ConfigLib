@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.value;
 import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public final class DoubleValue implements NumericValue<Double> {
@@ -45,13 +46,13 @@ public final class DoubleValue implements NumericValue<Double> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument, CommandSender sender) {
-        return argument instanceof Double;
+    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+        return true;
     }
 
     @Override
-    public Double argumentToValue(Object argument, CommandSender sender) {
-        return ((Double) argument);
+    public Double argumentToValue(List<Object> argument, CommandSender sender) {
+        return ((Double) argument.get(0));
     }
 
     public DoubleValue listable(boolean listable) {

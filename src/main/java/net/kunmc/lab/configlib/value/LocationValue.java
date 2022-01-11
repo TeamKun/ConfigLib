@@ -11,6 +11,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class LocationValue implements SingleValue<Location> {
@@ -79,13 +80,13 @@ public class LocationValue implements SingleValue<Location> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument, CommandSender sender) {
+    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    public Location argumentToValue(Object argument, CommandSender sender) {
-        Location l = ((Location) argument);
+    public Location argumentToValue(List<Object> argument, CommandSender sender) {
+        Location l = ((Location) argument.get(0));
 
         if (sender instanceof ConsoleCommandSender) {
             l.setWorld(Bukkit.getWorlds().get(0));

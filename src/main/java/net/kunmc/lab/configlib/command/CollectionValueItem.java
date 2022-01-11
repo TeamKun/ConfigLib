@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.List;
 
 abstract class CollectionValueItem extends AccessibleCommand {
     protected final Field field;
@@ -27,7 +28,7 @@ abstract class CollectionValueItem extends AccessibleCommand {
             appendArgument(builder);
 
             builder.executes(ctx -> {
-                Object argument = ctx.getTypedArgs().get(0);
+                List<Object> argument = ctx.getTypedArgs();
                 CommandSender sender = ctx.getSender();
                 if (!isCorrectArgument(argument, sender)) {
                     ctx.fail(incorrectArgumentMessage(argument));
@@ -49,11 +50,11 @@ abstract class CollectionValueItem extends AccessibleCommand {
 
     abstract void appendArgument(UsageBuilder builder);
 
-    abstract boolean isCorrectArgument(Object argument, CommandSender sender);
+    abstract boolean isCorrectArgument(List<Object> argument, CommandSender sender);
 
-    abstract String incorrectArgumentMessage(Object argument);
+    abstract String incorrectArgumentMessage(List<Object> argument);
 
-    abstract Collection argumentToValue(Object argument, CommandSender sender);
+    abstract Collection argumentToValue(List<Object> argument, CommandSender sender);
 
     abstract boolean validate(Collection value);
 

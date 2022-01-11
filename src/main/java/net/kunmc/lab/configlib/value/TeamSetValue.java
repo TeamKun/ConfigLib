@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -88,29 +89,31 @@ public class TeamSetValue extends SetValue<Team> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(Object argument, CommandSender sender) {
+    public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+        String name = argument.get(0).toString();
         return scoreboard.getTeams().stream()
                 .filter(t -> !value.contains(t))
                 .map(Team::getName)
-                .anyMatch(s -> s.equals(argument));
+                .anyMatch(s -> s.equals(name));
     }
 
     @Override
-    public boolean isCorrectArgumentForRemove(Object argument, CommandSender sender) {
+    public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+        String name = argument.get(0).toString();
         return value.stream()
                 .map(Team::getName)
-                .anyMatch(s -> s.equals(argument));
+                .anyMatch(s -> s.equals(name));
     }
 
     @Override
-    public Set<Team> argumentToValueForAdd(Object argument, CommandSender sender) {
-        Team t = scoreboard.getTeam(argument.toString());
+    public Set<Team> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+        Team t = scoreboard.getTeam(argument.get(0).toString());
         return Sets.newHashSet(t);
     }
 
     @Override
-    public Set<Team> argumentToValueForRemove(Object argument, CommandSender sender) {
-        Team t = scoreboard.getTeam(argument.toString());
+    public Set<Team> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+        Team t = scoreboard.getTeam(argument.get(0).toString());
         return Sets.newHashSet(t);
     }
 

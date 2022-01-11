@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,22 +65,26 @@ public class StringListValue extends ListValue<String> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(Object argument, CommandSender sender) {
+    public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    public boolean isCorrectArgumentForRemove(Object argument, CommandSender sender) {
+    public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    public List<String> argumentToValueForAdd(Object argument, CommandSender sender) {
-        return Collections.singletonList(argument.toString());
+    public List<String> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+        return argument.stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<String> argumentToValueForRemove(Object argument, CommandSender sender) {
-        return Collections.singletonList(argument.toString());
+    public List<String> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+        return argument.stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
     }
 }

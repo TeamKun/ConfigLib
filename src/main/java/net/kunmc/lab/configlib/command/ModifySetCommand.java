@@ -7,6 +7,7 @@ import net.kunmc.lab.configlib.value.SingleValue;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 class ModifySetCommand extends AccessibleCommand {
     public static void register(BaseConfig config, AccessibleCommand parent) {
@@ -44,7 +45,7 @@ class ModifySetCommand extends AccessibleCommand {
     public void execute(CommandContext ctx) {
         String entryName = field.getName();
 
-        Object argument = ctx.getTypedArgs().get(0);
+        List<Object> argument = ctx.getTypedArgs();
         CommandSender sender = ctx.getSender();
         if (!value.isCorrectArgument(argument, sender)) {
             ctx.fail(value.incorrectArgumentMessage(argument));

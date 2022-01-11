@@ -7,6 +7,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 public final class BlockDataValue implements SingleValue<BlockData> {
@@ -87,16 +88,16 @@ public final class BlockDataValue implements SingleValue<BlockData> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument, CommandSender sender) {
+    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(Material::isBlock)
-                .anyMatch(m -> m.name().equals(argument.toString().toUpperCase()));
+                .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
     }
 
     @Override
-    public BlockData argumentToValue(Object argument, CommandSender sender) {
+    public BlockData argumentToValue(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
-                .filter(m -> m.name().equals(argument.toString().toUpperCase()))
+                .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
                 .map(Material::createBlockData)
                 .findFirst()
                 .get();

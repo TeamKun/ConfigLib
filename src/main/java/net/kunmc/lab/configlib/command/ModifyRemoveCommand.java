@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.List;
 
 class ModifyRemoveCommand extends CollectionValueItem {
     public ModifyRemoveCommand(Field field, CollectionValue value, BaseConfig config) {
@@ -20,17 +21,17 @@ class ModifyRemoveCommand extends CollectionValueItem {
     }
 
     @Override
-    boolean isCorrectArgument(Object argument, CommandSender sender) {
+    boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return value.isCorrectArgumentForRemove(argument, sender);
     }
 
     @Override
-    String incorrectArgumentMessage(Object argument) {
+    String incorrectArgumentMessage(List<Object> argument) {
         return value.incorrectArgumentMessageForRemove(argument);
     }
 
     @Override
-    Collection argumentToValue(Object argument, CommandSender sender) {
+    Collection argumentToValue(List<Object> argument, CommandSender sender) {
         return value.argumentToValueForRemove(argument, sender);
     }
 

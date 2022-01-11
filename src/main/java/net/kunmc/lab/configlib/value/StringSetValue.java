@@ -7,10 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class StringSetValue extends SetValue<String> {
@@ -68,22 +65,22 @@ public class StringSetValue extends SetValue<String> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(Object argument, CommandSender sender) {
+    public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    public boolean isCorrectArgumentForRemove(Object argument, CommandSender sender) {
+    public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    public Set<String> argumentToValueForAdd(Object argument, CommandSender sender) {
+    public Set<String> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         return Collections.singleton(argument.toString());
     }
 
     @Override
-    public Set<String> argumentToValueForRemove(Object argument, CommandSender sender) {
+    public Set<String> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
         return Collections.singleton(argument.toString());
     }
 }

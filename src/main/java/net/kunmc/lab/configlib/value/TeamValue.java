@@ -8,6 +8,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -80,15 +81,15 @@ public class TeamValue implements SingleValue<Team> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument, CommandSender sender) {
+    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return scoreboard.getTeams().stream()
                 .map(Team::getName)
-                .anyMatch(s -> s.equals(argument));
+                .anyMatch(s -> s.equals(argument.get(0)));
     }
 
     @Override
-    public Team argumentToValue(Object argument, CommandSender sender) {
-        return scoreboard.getTeam(argument.toString());
+    public Team argumentToValue(List<Object> argument, CommandSender sender) {
+        return scoreboard.getTeam(argument.get(0).toString());
     }
 
     @Override
@@ -112,8 +113,8 @@ public class TeamValue implements SingleValue<Team> {
     }
 
     @Override
-    public String incorrectArgumentMessage(Object argument) {
-        return argument + "は存在しないチームです.";
+    public String incorrectArgumentMessage(List<Object> argument) {
+        return argument.get(0) + "は存在しないチームです.";
     }
 
     @Override

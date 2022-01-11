@@ -138,8 +138,8 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument, CommandSender sender) {
-        List<Player> list = ((List<Player>) argument);
+    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+        List<Player> list = ((List<Player>) argument.get(0));
 
         if (list.size() != 1) {
             return false;
@@ -149,13 +149,13 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     @Override
-    public UUID argumentToValue(Object argument, CommandSender sender) {
-        return ((List<Player>) argument).get(0).getUniqueId();
+    public UUID argumentToValue(List<Object> argument, CommandSender sender) {
+        return ((List<Player>) argument.get(0)).get(0).getUniqueId();
     }
 
     @Override
-    public String incorrectArgumentMessage(Object argument) {
-        List<Player> list = ((List<Player>) argument);
+    public String incorrectArgumentMessage(List<Object> argument) {
+        List<Player> list = ((List<Player>) argument.get(0));
 
         if (list.isEmpty()) {
             return "プレイヤーが見つかりませんでした.";

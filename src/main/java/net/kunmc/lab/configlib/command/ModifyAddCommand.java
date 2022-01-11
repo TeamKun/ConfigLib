@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.List;
 
 class ModifyAddCommand extends CollectionValueItem {
     public ModifyAddCommand(Field field, CollectionValue value, BaseConfig config) {
@@ -20,17 +21,17 @@ class ModifyAddCommand extends CollectionValueItem {
     }
 
     @Override
-    boolean isCorrectArgument(Object argument, CommandSender sender) {
+    boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return value.isCorrectArgumentForAdd(argument, sender);
     }
 
     @Override
-    String incorrectArgumentMessage(Object argument) {
+    String incorrectArgumentMessage(List<Object> argument) {
         return value.incorrectArgumentMessageForAdd(argument);
     }
 
     @Override
-    Collection argumentToValue(Object argument, CommandSender sender) {
+    Collection argumentToValue(List<Object> argument, CommandSender sender) {
         return value.argumentToValueForAdd(argument, sender);
     }
 

@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.value;
 import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public final class BooleanValue implements SingleValue<Boolean> {
@@ -54,13 +55,13 @@ public final class BooleanValue implements SingleValue<Boolean> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument, CommandSender sender) {
-        return argument instanceof Boolean;
+    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+        return true;
     }
 
     @Override
-    public Boolean argumentToValue(Object argument, CommandSender sender) {
-        return ((Boolean) argument);
+    public Boolean argumentToValue(List<Object> argument, CommandSender sender) {
+        return ((Boolean) argument.get(0));
     }
 
     public BooleanValue listable(boolean listable) {

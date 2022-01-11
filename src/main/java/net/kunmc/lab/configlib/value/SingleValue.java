@@ -4,6 +4,8 @@ import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
+
 public interface SingleValue<T> extends Value<T> {
     boolean validateOnSet(T newValue);
 
@@ -13,12 +15,12 @@ public interface SingleValue<T> extends Value<T> {
 
     void appendArgument(UsageBuilder builder);
 
-    boolean isCorrectArgument(Object argument, CommandSender sender);
+    boolean isCorrectArgument(List<Object> argument, CommandSender sender);
 
-    T argumentToValue(Object argument, CommandSender sender);
+    T argumentToValue(List<Object> argument, CommandSender sender);
 
-    default String incorrectArgumentMessage(Object argument) {
-        return argument + "は不正な引数です.";
+    default String incorrectArgumentMessage(List<Object> argument) {
+        return argument.get(0) + "は不正な引数です.";
     }
 
     default String invalidValueMessage(String entryName, T newValue) {

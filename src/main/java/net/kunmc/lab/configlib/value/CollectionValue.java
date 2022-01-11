@@ -4,6 +4,7 @@ import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface CollectionValue<T extends Collection<E>, E> extends Value<T> {
     boolean addableByCommand();
@@ -30,19 +31,19 @@ public interface CollectionValue<T extends Collection<E>, E> extends Value<T> {
 
     void appendArgumentForRemove(UsageBuilder builder);
 
-    boolean isCorrectArgumentForAdd(Object argument, CommandSender sender);
+    boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender);
 
-    boolean isCorrectArgumentForRemove(Object argument, CommandSender sender);
+    boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender);
 
-    T argumentToValueForAdd(Object argument, CommandSender sender);
+    T argumentToValueForAdd(List<Object> argument, CommandSender sender);
 
-    T argumentToValueForRemove(Object argument, CommandSender sender);
+    T argumentToValueForRemove(List<Object> argument, CommandSender sender);
 
-    default String incorrectArgumentMessageForAdd(Object argument) {
+    default String incorrectArgumentMessageForAdd(List<Object> argument) {
         return argument + "は不正な引数です.";
     }
 
-    default String incorrectArgumentMessageForRemove(Object argument) {
+    default String incorrectArgumentMessageForRemove(List<Object> argument) {
         return argument + "は不正な引数です.";
     }
 }

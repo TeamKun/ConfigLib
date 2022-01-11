@@ -88,27 +88,29 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(Object argument, CommandSender sender) {
-        return argument.equals("@a") ||
-                argument.equals("@r") ||
+    public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+        String sel = argument.get(0).toString();
+        return sel.equals("@a") ||
+                sel.equals("@r") ||
                 getPlayerStreamForAdd()
                         .map(OfflinePlayer::getName)
-                        .anyMatch(s -> s.equals(argument));
+                        .anyMatch(s -> s.equals(sel));
     }
 
     @Override
-    public boolean isCorrectArgumentForRemove(Object argument, CommandSender sender) {
-        return argument.equals("@a") ||
-                argument.equals("@r") ||
+    public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+        String sel = argument.get(0).toString();
+        return sel.equals("@a") ||
+                sel.equals("@r") ||
                 value.stream()
                         .map(Bukkit::getOfflinePlayer)
                         .map(OfflinePlayer::getName)
-                        .anyMatch(s -> s.equals(argument));
+                        .anyMatch(s -> s.equals(sel));
     }
 
     @Override
-    public String incorrectArgumentMessageForAdd(Object argument) {
-        String s = argument.toString();
+    public String incorrectArgumentMessageForAdd(List<Object> argument) {
+        String s = argument.get(0).toString();
 
         if (s.startsWith("@")) {
             return "セレクターは@aか@rのみを指定できます.";
@@ -118,8 +120,8 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public String incorrectArgumentMessageForRemove(Object argument) {
-        String s = argument.toString();
+    public String incorrectArgumentMessageForRemove(List<Object> argument) {
+        String s = argument.get(0).toString();
 
         if (s.startsWith("@")) {
             return "セレクターは@aか@rのみを指定できます.";
@@ -129,8 +131,8 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public Set<UUID> argumentToValueForAdd(Object argument, CommandSender sender) {
-        String s = argument.toString();
+    public Set<UUID> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+        String s = argument.get(0).toString();
 
         if (s.equals("@a")) {
             return getPlayerStreamForAdd()
@@ -150,8 +152,8 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public Set<UUID> argumentToValueForRemove(Object argument, CommandSender sender) {
-        String s = argument.toString();
+    public Set<UUID> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+        String s = argument.get(0).toString();
 
         if (s.equals("@a")) {
             return Sets.newHashSet(value);

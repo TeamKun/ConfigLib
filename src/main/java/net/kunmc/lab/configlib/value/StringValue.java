@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.value;
 import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class StringValue implements SingleValue<String> {
@@ -65,13 +66,13 @@ public class StringValue implements SingleValue<String> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument, CommandSender sender) {
-        return argument instanceof String;
+    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+        return true;
     }
 
     @Override
-    public String argumentToValue(Object argument, CommandSender sender) {
-        return argument.toString();
+    public String argumentToValue(List<Object> argument, CommandSender sender) {
+        return argument.get(0).toString();
     }
 
     public StringValue listable(boolean listable) {
