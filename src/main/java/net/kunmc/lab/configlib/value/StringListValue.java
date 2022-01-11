@@ -4,6 +4,7 @@ import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,22 +66,22 @@ public class StringListValue extends ListValue<String> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(Object argument) {
+    public boolean isCorrectArgumentForAdd(Object argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    public boolean isCorrectArgumentForRemove(Object argument) {
+    public boolean isCorrectArgumentForRemove(Object argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    public List<String> argumentToValueForAdd(Object argument) {
+    public List<String> argumentToValueForAdd(Object argument, CommandSender sender) {
         return Collections.singletonList(argument.toString());
     }
 
     @Override
-    public List<String> argumentToValueForRemove(Object argument) {
+    public List<String> argumentToValueForRemove(Object argument, CommandSender sender) {
         return Collections.singletonList(argument.toString());
     }
 }

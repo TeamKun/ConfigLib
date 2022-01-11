@@ -4,6 +4,7 @@ import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -137,7 +138,7 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument) {
+    public boolean isCorrectArgument(Object argument, CommandSender sender) {
         List<Player> list = ((List<Player>) argument);
 
         if (list.size() != 1) {
@@ -148,7 +149,7 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     @Override
-    public UUID argumentToValue(Object argument) {
+    public UUID argumentToValue(Object argument, CommandSender sender) {
         return ((List<Player>) argument).get(0).getUniqueId();
     }
 

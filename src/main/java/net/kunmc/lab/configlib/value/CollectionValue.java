@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
+import org.bukkit.command.CommandSender;
 
 import java.util.Collection;
 
@@ -29,13 +30,13 @@ public interface CollectionValue<T extends Collection<E>, E> extends Value<T> {
 
     void appendArgumentForRemove(UsageBuilder builder);
 
-    boolean isCorrectArgumentForAdd(Object argument);
+    boolean isCorrectArgumentForAdd(Object argument, CommandSender sender);
 
-    boolean isCorrectArgumentForRemove(Object argument);
+    boolean isCorrectArgumentForRemove(Object argument, CommandSender sender);
 
-    T argumentToValueForAdd(Object argument);
+    T argumentToValueForAdd(Object argument, CommandSender sender);
 
-    T argumentToValueForRemove(Object argument);
+    T argumentToValueForRemove(Object argument, CommandSender sender);
 
     default String incorrectArgumentMessageForAdd(Object argument) {
         return argument + "は不正な引数です.";

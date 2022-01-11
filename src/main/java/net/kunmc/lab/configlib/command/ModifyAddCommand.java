@@ -4,6 +4,7 @@ import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.config.BaseConfig;
 import net.kunmc.lab.configlib.value.CollectionValue;
+import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -19,8 +20,8 @@ class ModifyAddCommand extends CollectionValueItem {
     }
 
     @Override
-    boolean isCorrectArgument(Object argument) {
-        return value.isCorrectArgumentForAdd(argument);
+    boolean isCorrectArgument(Object argument, CommandSender sender) {
+        return value.isCorrectArgumentForAdd(argument, sender);
     }
 
     @Override
@@ -29,8 +30,8 @@ class ModifyAddCommand extends CollectionValueItem {
     }
 
     @Override
-    Collection argumentToValue(Object argument) {
-        return value.argumentToValueForAdd(argument);
+    Collection argumentToValue(Object argument, CommandSender sender) {
+        return value.argumentToValueForAdd(argument, sender);
     }
 
 

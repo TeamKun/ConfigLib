@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import org.bukkit.command.CommandSender;
 
 public interface SingleValue<T> extends Value<T> {
     boolean validateOnSet(T newValue);
@@ -12,9 +13,9 @@ public interface SingleValue<T> extends Value<T> {
 
     void appendArgument(UsageBuilder builder);
 
-    boolean isCorrectArgument(Object argument);
+    boolean isCorrectArgument(Object argument, CommandSender sender);
 
-    T argumentToValue(Object argument);
+    T argumentToValue(Object argument, CommandSender sender);
 
     default String incorrectArgumentMessage(Object argument) {
         return argument + "は不正な引数です.";

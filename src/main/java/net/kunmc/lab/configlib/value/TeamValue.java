@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.value;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -79,14 +80,14 @@ public class TeamValue implements SingleValue<Team> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument) {
+    public boolean isCorrectArgument(Object argument, CommandSender sender) {
         return scoreboard.getTeams().stream()
                 .map(Team::getName)
                 .anyMatch(s -> s.equals(argument));
     }
 
     @Override
-    public Team argumentToValue(Object argument) {
+    public Team argumentToValue(Object argument, CommandSender sender) {
         return scoreboard.getTeam(argument.toString());
     }
 

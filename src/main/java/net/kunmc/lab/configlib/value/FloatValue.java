@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
+import org.bukkit.command.CommandSender;
 
 import java.util.function.Consumer;
 
@@ -44,12 +45,12 @@ public final class FloatValue implements NumericValue<Float> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument) {
+    public boolean isCorrectArgument(Object argument, CommandSender sender) {
         return argument instanceof Float;
     }
 
     @Override
-    public Float argumentToValue(Object argument) {
+    public Float argumentToValue(Object argument, CommandSender sender) {
         return ((Float) argument);
     }
 

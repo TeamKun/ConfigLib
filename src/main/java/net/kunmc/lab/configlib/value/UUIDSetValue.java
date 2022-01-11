@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -87,7 +88,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(Object argument) {
+    public boolean isCorrectArgumentForAdd(Object argument, CommandSender sender) {
         return argument.equals("@a") ||
                 argument.equals("@r") ||
                 getPlayerStreamForAdd()
@@ -96,7 +97,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public boolean isCorrectArgumentForRemove(Object argument) {
+    public boolean isCorrectArgumentForRemove(Object argument, CommandSender sender) {
         return argument.equals("@a") ||
                 argument.equals("@r") ||
                 value.stream()
@@ -128,7 +129,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public Set<UUID> argumentToValueForAdd(Object argument) {
+    public Set<UUID> argumentToValueForAdd(Object argument, CommandSender sender) {
         String s = argument.toString();
 
         if (s.equals("@a")) {
@@ -149,7 +150,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    public Set<UUID> argumentToValueForRemove(Object argument) {
+    public Set<UUID> argumentToValueForRemove(Object argument, CommandSender sender) {
         String s = argument.toString();
 
         if (s.equals("@a")) {

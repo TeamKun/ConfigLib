@@ -4,6 +4,7 @@ import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.config.BaseConfig;
 import net.kunmc.lab.configlib.value.CollectionValue;
+import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -27,12 +28,13 @@ abstract class CollectionValueItem extends AccessibleCommand {
 
             builder.executes(ctx -> {
                 Object argument = ctx.getTypedArgs().get(0);
-                if (!isCorrectArgument(argument)) {
+                CommandSender sender = ctx.getSender();
+                if (!isCorrectArgument(argument, sender)) {
                     ctx.fail(incorrectArgumentMessage(argument));
                     return;
                 }
 
-                Collection newValue = argumentToValue(argument);
+                Collection newValue = argumentToValue(argument, sender);
                 if (!validate(newValue)) {
                     ctx.fail(invalidMessage(entryName, newValue));
                     return;
@@ -47,11 +49,11 @@ abstract class CollectionValueItem extends AccessibleCommand {
 
     abstract void appendArgument(UsageBuilder builder);
 
-    abstract boolean isCorrectArgument(Object argument);
+    abstract boolean isCorrectArgument(Object argument, CommandSender sender);
 
     abstract String incorrectArgumentMessage(Object argument);
 
-    abstract Collection argumentToValue(Object argument);
+    abstract Collection argumentToValue(Object argument, CommandSender sender);
 
     abstract boolean validate(Collection value);
 

@@ -4,6 +4,7 @@ import dev.kotx.flylib.command.Command;
 import dev.kotx.flylib.command.CommandContext;
 import net.kunmc.lab.configlib.config.BaseConfig;
 import net.kunmc.lab.configlib.value.SingleValue;
+import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 
@@ -44,12 +45,13 @@ class ModifySetCommand extends AccessibleCommand {
         String entryName = field.getName();
 
         Object argument = ctx.getTypedArgs().get(0);
-        if (!value.isCorrectArgument(argument)) {
+        CommandSender sender = ctx.getSender();
+        if (!value.isCorrectArgument(argument, sender)) {
             ctx.fail(value.incorrectArgumentMessage(argument));
             return;
         }
 
-        Object newValue = value.argumentToValue(argument);
+        Object newValue = value.argumentToValue(argument, sender);
         if (!value.validateOnSet(newValue)) {
             ctx.fail(value.invalidValueMessage(entryName, newValue));
             return;

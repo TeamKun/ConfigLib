@@ -4,6 +4,7 @@ import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -86,14 +87,14 @@ public final class BlockDataValue implements SingleValue<BlockData> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument) {
+    public boolean isCorrectArgument(Object argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(Material::isBlock)
                 .anyMatch(m -> m.name().equals(argument.toString().toUpperCase()));
     }
 
     @Override
-    public BlockData argumentToValue(Object argument) {
+    public BlockData argumentToValue(Object argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equals(argument.toString().toUpperCase()))
                 .map(Material::createBlockData)

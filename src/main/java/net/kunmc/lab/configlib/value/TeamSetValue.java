@@ -6,6 +6,7 @@ import dev.kotx.flylib.command.UsageBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -87,7 +88,7 @@ public class TeamSetValue extends SetValue<Team> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(Object argument) {
+    public boolean isCorrectArgumentForAdd(Object argument, CommandSender sender) {
         return scoreboard.getTeams().stream()
                 .filter(t -> !value.contains(t))
                 .map(Team::getName)
@@ -95,20 +96,20 @@ public class TeamSetValue extends SetValue<Team> {
     }
 
     @Override
-    public boolean isCorrectArgumentForRemove(Object argument) {
+    public boolean isCorrectArgumentForRemove(Object argument, CommandSender sender) {
         return value.stream()
                 .map(Team::getName)
                 .anyMatch(s -> s.equals(argument));
     }
 
     @Override
-    public Set<Team> argumentToValueForAdd(Object argument) {
+    public Set<Team> argumentToValueForAdd(Object argument, CommandSender sender) {
         Team t = scoreboard.getTeam(argument.toString());
         return Sets.newHashSet(t);
     }
 
     @Override
-    public Set<Team> argumentToValueForRemove(Object argument) {
+    public Set<Team> argumentToValueForRemove(Object argument, CommandSender sender) {
         Team t = scoreboard.getTeam(argument.toString());
         return Sets.newHashSet(t);
     }

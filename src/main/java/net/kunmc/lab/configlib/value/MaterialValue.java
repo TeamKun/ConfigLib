@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -58,13 +59,13 @@ public final class MaterialValue implements SingleValue<Material> {
     }
 
     @Override
-    public boolean isCorrectArgument(Object argument) {
+    public boolean isCorrectArgument(Object argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .anyMatch(m -> m.name().equals(argument.toString().toUpperCase()));
     }
 
     @Override
-    public Material argumentToValue(Object argument) {
+    public Material argumentToValue(Object argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equals(argument.toString().toUpperCase()))
                 .findFirst()
