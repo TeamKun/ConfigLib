@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public class ConfigCommandBuilder {
     private final Set<BaseConfig> configSet = new HashSet<>();
     private final Map<SubCommandType, Boolean> subCommandTypeEnabledMap = new HashMap<>();
+    private String name = "config";
 
     public ConfigCommandBuilder(@NotNull BaseConfig config) {
         configSet.add(config);
@@ -48,8 +49,13 @@ public class ConfigCommandBuilder {
         return this;
     }
 
+    public ConfigCommandBuilder name(@NotNull String name) {
+        this.name = name;
+        return this;
+    }
+
     public ConfigCommand build() {
-        ConfigCommand configCommand = new ConfigCommand();
+        ConfigCommand configCommand = new ConfigCommand(name);
         for (Command cmd : createSubCommands()) {
             configCommand.appendChild(cmd);
         }

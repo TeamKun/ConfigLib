@@ -1,7 +1,9 @@
 package net.kunmc.lab.configlib.command;
 
+import org.jetbrains.annotations.NotNull;
+
 public class ConfigCommand extends AccessibleCommand {
-    ConfigCommand() {
-        super("config");
+    ConfigCommand(@NotNull String name) {
+        super(name);
     }
 }
