@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.command;
 
 import dev.kotx.flylib.command.Command;
 import net.kunmc.lab.configlib.config.BaseConfig;
+import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.value.SingleValue;
 import net.kunmc.lab.configlib.value.Value;
 
@@ -14,16 +15,16 @@ import java.util.stream.Stream;
 
 enum SubCommandType {
     Reload("reload",
-            x -> !(x.getSingleValueFields().isEmpty() && x.getCollectionValueFields().isEmpty()),
+            x -> !(ConfigUtil.getSingleValueFields(x).isEmpty() && ConfigUtil.getCollectionValueFields(x).isEmpty()),
             ConfigReloadCommand::new,
             ConfigReloadCommand::new),
     List("list",
-            x -> Stream.concat(x.getSingleValues().stream(), x.getCollectionValues().stream()).anyMatch(Value::listable),
+            x -> Stream.concat(ConfigUtil.getSingleValues(x).stream(), ConfigUtil.getCollectionValues(x).stream()).anyMatch(Value::listable),
             ConfigListCommand::new,
             ConfigListCommand::new),
     Modify("modify",
-            x -> x.getCollectionValues().stream()
-                    .anyMatch(v -> v.addableByCommand() || v.removableByCommand() || v.clearableByCommand()) || x.getSingleValues().stream().anyMatch(SingleValue::writableByCommand),
+            x -> ConfigUtil.getCollectionValues(x).stream()
+                    .anyMatch(v -> v.addableByCommand() || v.removableByCommand() || v.clearableByCommand()) || ConfigUtil.getSingleValues(x).stream().anyMatch(SingleValue::writableByCommand),
             ConfigModifyCommand::new,
             ConfigModifyCommand::new);
 

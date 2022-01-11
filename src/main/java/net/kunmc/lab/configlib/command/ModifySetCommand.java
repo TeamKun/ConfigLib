@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.command;
 import dev.kotx.flylib.command.Command;
 import dev.kotx.flylib.command.CommandContext;
 import net.kunmc.lab.configlib.config.BaseConfig;
+import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.value.SingleValue;
 import org.bukkit.command.CommandSender;
 
@@ -11,7 +12,7 @@ import java.util.List;
 
 class ModifySetCommand extends AccessibleCommand {
     public static void register(BaseConfig config, AccessibleCommand parent) {
-        for (Field field : config.getSingleValueFields()) {
+        for (Field field : ConfigUtil.getSingleValueFields(config)) {
             parent.appendChild(new Command(field.getName()) {
                 {
                     try {

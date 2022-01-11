@@ -3,8 +3,6 @@ package net.kunmc.lab.configlib.config;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.kunmc.lab.configlib.value.CollectionValue;
-import net.kunmc.lab.configlib.value.SingleValue;
 import net.kunmc.lab.configlib.value.Value;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
@@ -19,8 +17,6 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class BaseConfig {
@@ -70,50 +66,6 @@ public abstract class BaseConfig {
         } else {
             return entryName;
         }
-    }
-
-    public List<Field> getSingleValueFields() {
-        return Arrays.stream(getClass().getDeclaredFields())
-                .filter(f -> !Modifier.isStatic(f.getModifiers()))
-                .filter(f -> SingleValue.class.isAssignableFrom(f.getType()))
-                .peek(f -> f.setAccessible(true))
-                .collect(Collectors.toList());
-    }
-
-    public List<Field> getCollectionValueFields() {
-        return Arrays.stream(getClass().getDeclaredFields())
-                .filter(f -> !Modifier.isStatic(f.getModifiers()))
-                .filter(f -> CollectionValue.class.isAssignableFrom(f.getType()))
-                .peek(f -> f.setAccessible(true))
-                .collect(Collectors.toList());
-    }
-
-    public List<SingleValue<?>> getSingleValues() {
-        return getSingleValueFields().stream()
-                .map(f -> {
-                    try {
-                        return f.get(this);
-                    } catch (IllegalAccessException exception) {
-                        exception.printStackTrace();
-                        return null;
-                    }
-                })
-                .map(x -> ((SingleValue<?>) x))
-                .collect(Collectors.toList());
-    }
-
-    public List<CollectionValue<?, ?>> getCollectionValues() {
-        return getCollectionValueFields().stream()
-                .map(f -> {
-                    try {
-                        return f.get(this);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                })
-                .map(x -> ((CollectionValue<?, ?>) x))
-                .collect(Collectors.toList());
     }
 
     private static String readJson(File jsonFile) {

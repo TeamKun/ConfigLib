@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.command;
 
 import dev.kotx.flylib.command.Command;
 import net.kunmc.lab.configlib.config.BaseConfig;
+import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.value.CollectionValue;
 
 import java.lang.reflect.Field;
@@ -33,7 +34,7 @@ class ConfigModifyCommand extends AccessibleCommand {
     private void init(BaseConfig config, AccessibleCommand command) {
         ModifySetCommand.register(config, command);
 
-        for (Field field : config.getCollectionValueFields()) {
+        for (Field field : ConfigUtil.getCollectionValueFields(config)) {
             command.appendChild(new Command(field.getName()) {
                 {
                     try {
