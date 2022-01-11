@@ -1,5 +1,6 @@
 package net.kunmc.lab.configlib.value;
 
+import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -125,5 +126,24 @@ public class LocationValue implements SingleValue<Location> {
     @Override
     public boolean listable() {
         return listable;
+    }
+
+    @Override
+    public String succeedSetMessage(String entryName) {
+        return entryName + "の値を" + locationToString() + "に設定しました.";
+    }
+
+    @Override
+    public void sendListMessage(CommandContext ctx, String entryName) {
+        if (value == null) {
+            ctx.success(entryName + ": null");
+        } else {
+            ctx.success(entryName + ": " + locationToString());
+        }
+    }
+
+    private String locationToString() {
+        return String.format("world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f",
+                value.getWorld().getName(), value.getX(), value.getY(), value.getZ(), value.getPitch(), value.getYaw());
     }
 }
