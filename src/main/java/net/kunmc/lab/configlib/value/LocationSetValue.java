@@ -68,7 +68,7 @@ public class LocationSetValue extends SetValue<Location> {
                             .map(Location::getX)
                             .map(Object::toString)
                             .collect(Collectors.toList()));
-                })
+                }, null)
                 .doubleArgument("y", suggestionBuilder -> {
                     double x = ((double) suggestionBuilder.getTypedArgs().get(0));
                     suggestionBuilder.suggestAll(value.stream()
@@ -76,7 +76,7 @@ public class LocationSetValue extends SetValue<Location> {
                             .map(Location::getY)
                             .map(Object::toString)
                             .collect(Collectors.toList()));
-                })
+                }, null)
                 .doubleArgument("z", suggestionBuilder -> {
                     double x = ((double) suggestionBuilder.getTypedArgs().get(0));
                     double y = ((double) suggestionBuilder.getTypedArgs().get(1));
@@ -85,7 +85,7 @@ public class LocationSetValue extends SetValue<Location> {
                             .map(Location::getZ)
                             .map(Object::toString)
                             .collect(Collectors.toList()));
-                });
+                }, null);
     }
 
     @Override

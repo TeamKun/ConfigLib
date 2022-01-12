@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.value;
 import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import dev.kotx.flylib.command.arguments.StringArgument;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -54,7 +55,7 @@ public class MaterialSetValue extends SetValue<Material> {
 
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.textArgument("MaterialName", sb -> {
+        builder.stringArgument("MaterialName", StringArgument.Type.WORD, sb -> {
             Arrays.stream(Material.values())
                     .filter(m -> !value.contains(m))
                     .map(Material::name)
@@ -65,7 +66,7 @@ public class MaterialSetValue extends SetValue<Material> {
 
     @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.textArgument("MaterialName", sb -> {
+        builder.stringArgument("MaterialName", StringArgument.Type.WORD, sb -> {
             value.stream()
                     .map(Material::name)
                     .map(String::toLowerCase)

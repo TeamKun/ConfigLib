@@ -56,12 +56,12 @@ public class StringSetValue extends SetValue<String> {
 
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.textArgument("StringArgument");
+        builder.stringArgument("StringArgument");
     }
 
     @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.textArgument("StringArgument");
+        builder.stringArgument("StringArgument");
     }
 
     @Override

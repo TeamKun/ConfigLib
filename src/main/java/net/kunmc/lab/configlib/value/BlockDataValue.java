@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import dev.kotx.flylib.command.arguments.StringArgument;
 import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
@@ -78,7 +79,7 @@ public class BlockDataValue extends SingleValue<BlockData> {
 
     @Override
     protected void appendArgument(UsageBuilder builder) {
-        builder.textArgument("BlockName", sb -> {
+        builder.stringArgument("test", StringArgument.Type.WORD, sb -> {
             Arrays.stream(Material.values())
                     .filter(Material::isBlock)
                     .map(Material::name)

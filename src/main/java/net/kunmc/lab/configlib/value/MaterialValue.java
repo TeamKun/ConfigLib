@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
+import dev.kotx.flylib.command.arguments.StringArgument;
 import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class MaterialValue extends SingleValue<Material> {
-    private Material value;
     private final transient Consumer<Material> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
@@ -52,7 +52,7 @@ public final class MaterialValue extends SingleValue<Material> {
 
     @Override
     protected void appendArgument(UsageBuilder builder) {
-        builder.textArgument("MaterialName", sb -> {
+        builder.stringArgument("MaterialName", StringArgument.Type.WORD, sb -> {
             Arrays.stream(Material.values())
                     .map(Material::name)
                     .map(String::toLowerCase)

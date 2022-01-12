@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.command.argument;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.kotx.flylib.command.Argument;
+import dev.kotx.flylib.command.ContextAction;
 import dev.kotx.flylib.command.SuggestionAction;
 import net.minecraft.server.v1_16_R3.ArgumentChat;
 import org.jetbrains.annotations.NotNull;
@@ -42,5 +43,11 @@ public class ChatArgument implements Argument<String> {
     @Override
     public SuggestionAction getSuggestion() {
         return suggestionAction;
+    }
+
+    @Nullable
+    @Override
+    public ContextAction getAction() {
+        return null;
     }
 }

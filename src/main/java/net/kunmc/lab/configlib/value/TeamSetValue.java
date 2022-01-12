@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.value;
 import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import dev.kotx.flylib.command.arguments.StringArgument;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -69,7 +70,7 @@ public class TeamSetValue extends SetValue<Team> {
 
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.textArgument("TeamName", suggestionBuilder -> {
+        builder.stringArgument("TeamName", StringArgument.Type.WORD, suggestionBuilder -> {
             scoreboard.getTeams().stream()
                     .map(Team::getName)
                     .filter(name -> value.stream()
@@ -81,7 +82,7 @@ public class TeamSetValue extends SetValue<Team> {
 
     @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.textArgument("TeamName", suggestionBuilder -> {
+        builder.stringArgument("TeamName", StringArgument.Type.WORD, suggestionBuilder -> {
             value.stream()
                     .map(Team::getName)
                     .forEach(suggestionBuilder::suggest);

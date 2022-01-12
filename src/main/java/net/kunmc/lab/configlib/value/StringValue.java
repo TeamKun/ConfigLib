@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.SuggestionAction;
 import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.TextArgument;
+import dev.kotx.flylib.command.arguments.StringArgument;
 import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +17,7 @@ public class StringValue extends SingleValue<String> {
     private transient Boolean listable = true;
     private transient Boolean writable = true;
     protected transient String name = "StringValue";
-    protected transient TextArgument.Type type = TextArgument.Type.WORD;
+    protected transient StringArgument.Type type = StringArgument.Type.WORD;
     protected transient SuggestionAction suggestionAction = builder -> {
     };
 
@@ -47,7 +47,7 @@ public class StringValue extends SingleValue<String> {
         return this;
     }
 
-    public StringValue type(@NotNull TextArgument.Type type) {
+    public StringValue type(@NotNull StringArgument.Type type) {
         this.type = type;
         return this;
     }
@@ -84,7 +84,7 @@ public class StringValue extends SingleValue<String> {
 
     @Override
     protected void appendArgument(UsageBuilder builder) {
-        builder.textArgument(name, type, suggestionAction);
+        builder.stringArgument(name, type, suggestionAction);
     }
 
     @Override
