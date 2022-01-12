@@ -79,7 +79,7 @@ public class BlockDataValue extends SingleValue<BlockData> {
 
     @Override
     protected void appendArgument(UsageBuilder builder) {
-        builder.stringArgument("test", StringArgument.Type.WORD, sb -> {
+        builder.stringArgument("BlockName", StringArgument.Type.WORD, sb -> {
             Arrays.stream(Material.values())
                     .filter(Material::isBlock)
                     .map(Material::name)

@@ -41,7 +41,7 @@ public class IntegerValue extends NumericValue<Integer> {
 
     @Override
     protected void appendArgument(UsageBuilder builder) {
-        builder.integerArgument("IntegerArgument", min(), max());
+        builder.integerArgument("Integer", min(), max());
     }
 
     @Override

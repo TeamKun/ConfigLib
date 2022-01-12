@@ -41,7 +41,7 @@ public class FloatValue extends NumericValue<Float> {
 
     @Override
     protected void appendArgument(UsageBuilder builder) {
-        builder.floatArgument("FloatArgument", min(), max());
+        builder.floatArgument("Float", min(), max());
     }
 
     @Override

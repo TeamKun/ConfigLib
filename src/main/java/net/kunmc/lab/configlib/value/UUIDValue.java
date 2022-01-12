@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class UUIDValue extends SingleValue<UUID> {
     private String playerName;
@@ -129,11 +130,14 @@ public class UUIDValue extends SingleValue<UUID> {
     @Override
     protected void appendArgument(UsageBuilder builder) {
         builder.entityArgument("target", true, false, sb -> {
-            Bukkit.getOnlinePlayers().stream()
+            List<String> list = Bukkit.getOnlinePlayers().stream()
                     .filter(p -> !p.getUniqueId().equals(value))
                     .map(Player::getName)
-                    .forEach(sb::suggest);
-            sb.suggest("@r");
+                    .collect(Collectors.toList());
+            if (!list.isEmpty()) {
+                list.forEach(sb::suggest);
+                sb.suggest("@r");
+            }
         });
     }
 

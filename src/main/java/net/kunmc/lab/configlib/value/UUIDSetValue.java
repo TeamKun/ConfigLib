@@ -56,7 +56,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     protected void appendArgumentForAdd(UsageBuilder builder) {
         List<Argument<?>> arguments = CommandUtil.getArguments(builder);
 
-        arguments.add(new UnparsedArgument("target", () -> {
+        arguments.add(new UnparsedArgument("targets", () -> {
             List<String> list = getPlayerStreamForAdd()
                     .map(OfflinePlayer::getName)
                     .collect(Collectors.toList());
@@ -73,7 +73,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     protected void appendArgumentForRemove(UsageBuilder builder) {
         List<Argument<?>> arguments = CommandUtil.getArguments(builder);
 
-        arguments.add(new UnparsedArgument("target", () -> {
+        arguments.add(new UnparsedArgument("targets", () -> {
             List<String> list = value.stream()
                     .map(Bukkit::getOfflinePlayer)
                     .map(OfflinePlayer::getName)

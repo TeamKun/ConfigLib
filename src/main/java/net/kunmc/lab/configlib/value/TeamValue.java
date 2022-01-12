@@ -73,7 +73,7 @@ public class TeamValue extends SingleValue<Team> {
 
     @Override
     protected void appendArgument(UsageBuilder builder) {
-        builder.stringArgument("TeamName", StringArgument.Type.WORD, suggestionBuilder -> {
+        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
             scoreboard.getTeams().stream()
                     .map(Team::getName)
                     .filter(s -> value == null || !s.equals(value.getName()))

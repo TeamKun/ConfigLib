@@ -41,7 +41,7 @@ public class DoubleValue extends NumericValue<Double> {
 
     @Override
     protected void appendArgument(UsageBuilder builder) {
-        builder.doubleArgument("DoubleArgument", min(), max());
+        builder.doubleArgument("Double", min(), max());
     }
 
     @Override

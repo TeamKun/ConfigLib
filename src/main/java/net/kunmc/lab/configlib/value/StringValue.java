@@ -16,7 +16,7 @@ public class StringValue extends SingleValue<String> {
     private transient final Consumer<String> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
-    protected transient String name = "StringValue";
+    protected transient String name = "String";
     protected transient StringArgument.Type type = StringArgument.Type.WORD;
     protected transient SuggestionAction suggestionAction = builder -> {
     };

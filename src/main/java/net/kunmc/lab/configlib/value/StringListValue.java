@@ -56,7 +56,7 @@ public class StringListValue extends ListValue<String> {
 
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("StringArgument");
+        builder.stringArgument("String");
     }
 
     @Override

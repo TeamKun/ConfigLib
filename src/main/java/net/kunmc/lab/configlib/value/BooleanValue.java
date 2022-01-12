@@ -39,7 +39,7 @@ public class BooleanValue extends SingleValue<Boolean> {
 
     @Override
     protected void appendArgument(UsageBuilder builder) {
-        builder.booleanArgument("BooleanArgument", sb -> {
+        builder.booleanArgument("Boolean", sb -> {
                     sb.suggest("true").suggest("false");
                 },
                 null);

@@ -70,7 +70,7 @@ public class TeamSetValue extends SetValue<Team> {
 
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("TeamName", StringArgument.Type.WORD, suggestionBuilder -> {
+        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
             scoreboard.getTeams().stream()
                     .map(Team::getName)
                     .filter(name -> value.stream()
@@ -82,7 +82,7 @@ public class TeamSetValue extends SetValue<Team> {
 
     @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("TeamName", StringArgument.Type.WORD, suggestionBuilder -> {
+        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
             value.stream()
                     .map(Team::getName)
                     .forEach(suggestionBuilder::suggest);
