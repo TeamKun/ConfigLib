@@ -1,7 +1,6 @@
 package net.kunmc.lab.configlib.command;
 
 import dev.kotx.flylib.command.Command;
-import dev.kotx.flylib.command.CommandContext;
 import net.kunmc.lab.configlib.config.BaseConfig;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.bukkit.command.CommandSender;
@@ -38,30 +37,31 @@ class ModifySetCommand extends AccessibleCommand {
         this.value = value;
         this.config = config;
 
-        usage(value::appendArgument);
-    }
+        usage(builder -> {
+            value.appendArgument(builder);
 
-    @Override
-    public void execute(CommandContext ctx) {
-        String entryName = field.getName();
+            builder.executes(ctx -> {
+                String entryName = field.getName();
 
-        List<Object> argument = ctx.getTypedArgs();
-        CommandSender sender = ctx.getSender();
-        if (!value.isCorrectArgument(argument, sender)) {
-            ctx.fail(value.incorrectArgumentMessage(argument));
-            return;
-        }
+                List<Object> argument = ctx.getTypedArgs();
+                CommandSender sender = ctx.getSender();
+                if (!value.isCorrectArgument(argument, sender)) {
+                    ctx.fail(value.incorrectArgumentMessage(argument));
+                    return;
+                }
 
-        Object newValue = value.argumentToValue(argument, sender);
-        if (!value.validateOnSet(newValue)) {
-            ctx.fail(value.invalidValueMessage(entryName, newValue));
-            return;
-        }
+                Object newValue = value.argumentToValue(argument, sender);
+                if (!value.validateOnSet(newValue)) {
+                    ctx.fail(value.invalidValueMessage(entryName, newValue));
+                    return;
+                }
 
-        value.onSetValue(newValue);
-        value.value(newValue);
-        ctx.success(value.succeedSetMessage(entryName));
+                value.onSetValue(newValue);
+                value.value(newValue);
+                ctx.success(value.succeedSetMessage(entryName));
 
-        config.saveConfigIfPresent();
+                config.saveConfigIfPresent();
+            });
+        });
     }
 }
