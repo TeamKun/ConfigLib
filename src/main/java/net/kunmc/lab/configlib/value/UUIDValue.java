@@ -44,11 +44,6 @@ public class UUIDValue extends SingleValue<UUID> {
     }
 
     @Override
-    public UUID value() {
-        return value;
-    }
-
-    @Override
     public void value(UUID value) {
         this.value = value;
         this.playerName = playerName();

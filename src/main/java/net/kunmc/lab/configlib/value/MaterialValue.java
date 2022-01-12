@@ -26,16 +26,6 @@ public final class MaterialValue extends SingleValue<Material> {
     }
 
     @Override
-    public Material value() {
-        return value;
-    }
-
-    @Override
-    public void value(Material value) {
-        this.value = value;
-    }
-
-    @Override
     protected void onSetValue(Material newValue) {
         consumer.accept(newValue);
     }

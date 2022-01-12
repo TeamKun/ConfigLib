@@ -15,16 +15,6 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> {
         super(value);
     }
 
-    @Override
-    public Map<K, V> value() {
-        return value;
-    }
-
-    @Override
-    public void value(Map<K, V> value) {
-        this.value = value;
-    }
-
     public int size() {
         return value.size();
     }

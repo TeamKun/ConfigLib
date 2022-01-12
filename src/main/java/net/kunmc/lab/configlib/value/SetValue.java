@@ -18,16 +18,6 @@ public abstract class SetValue<E> extends CollectionValue<Set<E>, E> implements 
     }
 
     @Override
-    public Set<E> value() {
-        return this.value;
-    }
-
-    @Override
-    public void value(Set<E> value) {
-        this.value = value;
-    }
-
-    @Override
     protected boolean validateForAdd(Set<E> element) {
         return !value.containsAll(element);
     }

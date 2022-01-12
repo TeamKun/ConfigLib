@@ -17,16 +17,6 @@ public abstract class ListValue<E> extends CollectionValue<List<E>, E> implement
     }
 
     @Override
-    public List<E> value() {
-        return this.value;
-    }
-
-    @Override
-    public void value(List<E> value) {
-        this.value = value;
-    }
-
-    @Override
     public boolean validateForAdd(List<E> element) {
         return true;
     }

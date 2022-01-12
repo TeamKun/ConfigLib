@@ -108,16 +108,6 @@ public class LocationValue extends SingleValue<Location> {
         return l;
     }
 
-    @Override
-    public Location value() {
-        return value;
-    }
-
-    @Override
-    public void value(Location value) {
-        this.value = value;
-    }
-
     public LocationValue listable(boolean listable) {
         this.listable = listable;
         return this;

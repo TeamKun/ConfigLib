@@ -70,16 +70,6 @@ public class IntegerValue extends NumericValue<Integer> {
     }
 
     @Override
-    public Integer value() {
-        return value;
-    }
-
-    @Override
-    public void value(Integer value) {
-        this.value = value;
-    }
-
-    @Override
     protected void onSetValue(Integer newValue) {
         consumer.accept(newValue);
     }

@@ -26,17 +26,7 @@ public class BlockDataValue extends SingleValue<BlockData> {
         super(value);
         this.consumer = onSet;
     }
-
-    @Override
-    public BlockData value() {
-        return value;
-    }
-
-    @Override
-    public void value(BlockData value) {
-        this.value = value;
-    }
-
+   
     @Override
     protected void onSetValue(BlockData newValue) {
         consumer.accept(newValue);

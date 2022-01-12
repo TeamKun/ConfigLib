@@ -80,16 +80,6 @@ public class DoubleValue extends NumericValue<Double> {
     }
 
     @Override
-    public Double value() {
-        return value;
-    }
-
-    @Override
-    public void value(Double value) {
-        this.value = value;
-    }
-
-    @Override
     protected void onSetValue(Double newValue) {
         consumer.accept(newValue);
     }

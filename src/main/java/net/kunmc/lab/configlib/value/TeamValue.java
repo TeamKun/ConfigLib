@@ -56,7 +56,7 @@ public class TeamValue extends SingleValue<Team> {
         if (value == null) {
             return true;
         }
-       
+
         return !value.getName().equals(newValue.getName());
     }
 
@@ -95,16 +95,6 @@ public class TeamValue extends SingleValue<Team> {
     @Override
     protected Team argumentToValue(List<Object> argument, CommandSender sender) {
         return scoreboard.getTeam(argument.get(0).toString());
-    }
-
-    @Override
-    public Team value() {
-        return value;
-    }
-
-    @Override
-    public void value(Team value) {
-        this.value = value;
     }
 
     public TeamValue listable(boolean listable) {

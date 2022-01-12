@@ -80,16 +80,6 @@ public class FloatValue extends NumericValue<Float> {
     }
 
     @Override
-    public Float value() {
-        return value;
-    }
-
-    @Override
-    public void value(Float value) {
-        this.value = value;
-    }
-
-    @Override
     protected void onSetValue(Float newValue) {
         consumer.accept(newValue);
     }

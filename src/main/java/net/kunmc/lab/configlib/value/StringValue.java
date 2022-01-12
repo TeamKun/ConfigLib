@@ -58,16 +58,6 @@ public class StringValue extends SingleValue<String> {
     }
 
     @Override
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public void value(String value) {
-        this.value = value;
-    }
-
-    @Override
     protected void onSetValue(String newValue) {
         consumer.accept(newValue);
     }
