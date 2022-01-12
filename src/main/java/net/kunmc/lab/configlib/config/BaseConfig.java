@@ -4,7 +4,6 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.kunmc.lab.configlib.annotation.Internal;
-import net.kunmc.lab.configlib.command.Value;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
@@ -18,8 +17,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class BaseConfig {
@@ -42,9 +43,16 @@ public abstract class BaseConfig {
         String filename = configJSON.getName();
         String json = readJson(configJSON);
 
-        T config = gson.fromJson(json, clazz);
-        config.setPlugin(plugin);
-        config.setEntryName(filename.substring(0, filename.lastIndexOf('.')));
+        T config = null;
+        try {
+            config = clazz.getConstructor(Plugin.class).newInstance(plugin);
+            config.setPlugin(plugin);
+            config.setEntryName(filename.substring(0, filename.lastIndexOf('.')));
+
+            config.replaceFields(clazz, gson.fromJson(json, clazz), config);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
         return config;
     }
@@ -149,9 +157,9 @@ public abstract class BaseConfig {
         return true;
     }
 
-    private void replaceFields(Class<?> clazz, Object src, Object dst) {
+    void replaceFields(Class<?> clazz, Object src, Object dst) {
         for (Field field : ReflectionUtils.getFieldsIncludingSuperclasses(clazz)) {
-            if (Modifier.isTransient(field.getModifiers())) {
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
             field.setAccessible(true);
@@ -165,18 +173,14 @@ public abstract class BaseConfig {
     }
 
     private void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
-        if (Value.class.isAssignableFrom(field.getType())) {
-            Value srcValue = ((Value) field.get(src));
-            Value dstValue = ((Value) field.get(dst));
-            replaceFields(field.getType(), srcValue, dstValue);
+        List<Field> fieldList = ReflectionUtils.getFieldsIncludingSuperclasses(field.getType());
+        Object srcObj = field.get(src);
+        Object dstObj = field.get(dst);
 
-            Class<?> fieldSuperClass = field.getType().getSuperclass();
-            if (!fieldSuperClass.equals(Object.class)) {
-                replaceFields(fieldSuperClass, srcValue, dstValue);
-            }
-        } else {
-            Object srcObj = field.get(src);
+        if (fieldList.isEmpty()) {
             field.set(dst, srcObj);
+        } else {
+            replaceFields(field.getType(), srcObj, dstObj);
         }
     }
 }
