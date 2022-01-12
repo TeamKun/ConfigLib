@@ -51,6 +51,7 @@ public class UUIDValue extends SingleValue<UUID> {
 
     public void value(Player player) {
         this.value = player.getUniqueId();
+        this.playerName = player.getName();
     }
 
     @Override
