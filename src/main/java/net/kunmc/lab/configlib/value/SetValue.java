@@ -1,21 +1,20 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.configlib.annotation.Internal;
+import net.kunmc.lab.configlib.command.CollectionValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterable<E> {
-    protected Set<E> value;
+public abstract class SetValue<E> extends CollectionValue<Set<E>, E> implements Iterable<E> {
     protected transient boolean listable = true;
     protected transient boolean addable = true;
     protected transient boolean removable = true;
     protected transient boolean clearable = true;
 
     public SetValue(@NotNull Set<E> value) {
-        this.value = value;
+        super(value);
     }
 
     @Override
@@ -29,20 +28,17 @@ public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterabl
     }
 
     @Override
-    @Internal
-    public boolean validateForAdd(Set<E> element) {
+    protected boolean validateForAdd(Set<E> element) {
         return !value.containsAll(element);
     }
 
     @Override
-    @Internal
-    public boolean validateForRemove(Set<E> element) {
+    protected boolean validateForRemove(Set<E> element) {
         return value.containsAll(element);
     }
 
     @Override
-    @Internal
-    public boolean listable() {
+    protected boolean listable() {
         return listable;
     }
 
@@ -52,8 +48,7 @@ public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterabl
     }
 
     @Override
-    @Internal
-    public boolean addableByCommand() {
+    protected boolean addableByCommand() {
         return addable;
     }
 
@@ -63,8 +58,7 @@ public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterabl
     }
 
     @Override
-    @Internal
-    public boolean removableByCommand() {
+    protected boolean removableByCommand() {
         return removable;
     }
 
@@ -74,8 +68,7 @@ public abstract class SetValue<E> implements CollectionValue<Set<E>, E>, Iterabl
     }
 
     @Override
-    @Internal
-    public boolean clearableByCommand() {
+    protected boolean clearableByCommand() {
         return clearable;
     }
 

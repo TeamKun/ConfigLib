@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.annotation.Internal;
+import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -13,9 +13,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class UUIDValue implements SingleValue<UUID> {
+public class UUIDValue extends SingleValue<UUID> {
     private String playerName;
-    private UUID uuid;
     private final transient Consumer<UUID> consumer;
     private transient boolean listable = true;
     private transient boolean writable = true;
@@ -38,41 +37,38 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     public UUIDValue(UUID value, Consumer<UUID> onSet) {
-        this.uuid = value;
+        super(value);
         this.playerName = playerName();
         this.consumer = onSet;
     }
 
     @Override
     public UUID value() {
-        return uuid;
+        return value;
     }
 
     @Override
     public void value(UUID value) {
-        this.uuid = value;
+        this.value = value;
         this.playerName = playerName();
     }
 
     public void value(Player player) {
-        this.uuid = player.getUniqueId();
+        this.value = player.getUniqueId();
     }
 
     @Override
-    @Internal
-    public void onSetValue(UUID newValue) {
+    protected void onSetValue(UUID newValue) {
         consumer.accept(newValue);
     }
 
     @Override
-    @Internal
-    public boolean validateOnSet(UUID newValue) {
+    protected boolean validateOnSet(UUID newValue) {
         return true;
     }
 
     @Override
-    @Internal
-    public boolean listable() {
+    protected boolean listable() {
         return listable;
     }
 
@@ -82,8 +78,7 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     @Override
-    @Internal
-    public boolean writableByCommand() {
+    protected boolean writableByCommand() {
         return writable;
     }
 
@@ -93,24 +88,24 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     public @Nullable OfflinePlayer toOfflinePlayer() {
-        if (uuid != null) {
-            return Bukkit.getOfflinePlayer(uuid);
+        if (value != null) {
+            return Bukkit.getOfflinePlayer(value);
         }
 
         return null;
     }
 
     public @Nullable Player toPlayer() {
-        if (uuid != null) {
-            return Bukkit.getPlayer(uuid);
+        if (value != null) {
+            return Bukkit.getPlayer(value);
         }
 
         return null;
     }
 
     public String playerName() {
-        if (uuid != null) {
-            return Bukkit.getOfflinePlayer(uuid).getName();
+        if (value != null) {
+            return Bukkit.getOfflinePlayer(value).getName();
         }
 
         return "";
@@ -118,27 +113,24 @@ public class UUIDValue implements SingleValue<UUID> {
 
     @Override
     public String toString() {
-        return String.format("UUIDValue{value=%s,playerName=%s,listable=%b,writable=%b}", uuid, playerName, listable, writable);
+        return String.format("UUIDValue{value=%s,playerName=%s,listable=%b,writable=%b}", value, playerName, listable, writable);
     }
 
     @Override
-    @Internal
-    public String succeedSetMessage(String entryName) {
+    protected String succeedSetMessage(String entryName) {
         return entryName + "の値を" + playerName() + "に設定しました.";
     }
 
     @Override
-    @Internal
-    public void sendListMessage(CommandContext ctx, String entryName) {
+    protected void sendListMessage(CommandContext ctx, String entryName) {
         ctx.success(entryName + ": " + playerName());
     }
 
     @Override
-    @Internal
-    public void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(UsageBuilder builder) {
         builder.entityArgument("target", true, false, sb -> {
             Bukkit.getOnlinePlayers().stream()
-                    .filter(p -> !p.getUniqueId().equals(uuid))
+                    .filter(p -> !p.getUniqueId().equals(value))
                     .map(Player::getName)
                     .forEach(sb::suggest);
             sb.suggest("@r");
@@ -146,26 +138,23 @@ public class UUIDValue implements SingleValue<UUID> {
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         List<Player> list = ((List<Player>) argument.get(0));
 
         if (list.size() != 1) {
             return false;
         }
 
-        return !list.get(0).getUniqueId().equals(uuid);
+        return !list.get(0).getUniqueId().equals(value);
     }
 
     @Override
-    @Internal
-    public UUID argumentToValue(List<Object> argument, CommandSender sender) {
+    protected UUID argumentToValue(List<Object> argument, CommandSender sender) {
         return ((List<Player>) argument.get(0)).get(0).getUniqueId();
     }
 
     @Override
-    @Internal
-    public String incorrectArgumentMessage(List<Object> argument) {
+    protected String incorrectArgumentMessage(List<Object> argument) {
         List<Player> list = ((List<Player>) argument.get(0));
 
         if (list.isEmpty()) {
@@ -177,7 +166,7 @@ public class UUIDValue implements SingleValue<UUID> {
         }
 
         Player p = list.get(0);
-        if (p.getUniqueId().equals(uuid)) {
+        if (p.getUniqueId().equals(value)) {
             return p.getName() + "はすでに設定されているプレイヤーです.";
         }
 

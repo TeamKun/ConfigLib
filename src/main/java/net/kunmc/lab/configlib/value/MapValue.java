@@ -1,5 +1,6 @@
 package net.kunmc.lab.configlib.value;
 
+import net.kunmc.lab.configlib.command.Value;
 import org.apache.poi.util.NotImplemented;
 
 import java.util.Collection;
@@ -7,11 +8,11 @@ import java.util.Map;
 import java.util.Set;
 
 @NotImplemented
-public abstract class MapValue<K, V> implements Value<Map<K, V>> {
+public abstract class MapValue<K, V> extends Value<Map<K, V>> {
     protected Map<K, V> value;
 
     public MapValue(Map<K, V> value) {
-        this.value = value;
+        super(value);
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.Argument;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.annotation.Internal;
 import net.kunmc.lab.configlib.command.argument.UnparsedArgument;
 import net.kunmc.lab.configlib.util.CommandUtil;
 import org.apache.commons.lang.StringUtils;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UUIDSetValue extends SetValue<UUID> {
-    private boolean onlyOnline = true;
+    private transient boolean onlyOnline = true;
 
     public UUIDSetValue(UUID... uuids) {
         this(Sets.newHashSet(uuids));
@@ -41,8 +40,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public void sendListMessage(CommandContext ctx, String entryName) {
+    protected void sendListMessage(CommandContext ctx, String entryName) {
         String header = "-----" + entryName + "-----";
         ctx.message(ChatColor.YELLOW + header);
 
@@ -55,8 +53,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public void appendArgumentForAdd(UsageBuilder builder) {
+    protected void appendArgumentForAdd(UsageBuilder builder) {
         List<Argument<?>> arguments = CommandUtil.getArguments(builder);
 
         arguments.add(new UnparsedArgument("target", () -> {
@@ -73,8 +70,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public void appendArgumentForRemove(UsageBuilder builder) {
+    protected void appendArgumentForRemove(UsageBuilder builder) {
         List<Argument<?>> arguments = CommandUtil.getArguments(builder);
 
         arguments.add(new UnparsedArgument("target", () -> {
@@ -92,8 +88,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         String sel = argument.get(0).toString();
         return sel.equals("@a") ||
                 sel.equals("@r") ||
@@ -103,8 +98,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         String sel = argument.get(0).toString();
         return sel.equals("@a") ||
                 sel.equals("@r") ||
@@ -115,8 +109,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public String incorrectArgumentMessageForAdd(List<Object> argument) {
+    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
         String s = argument.get(0).toString();
 
         if (s.startsWith("@")) {
@@ -127,8 +120,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public String incorrectArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
         String s = argument.get(0).toString();
 
         if (s.startsWith("@")) {
@@ -139,8 +131,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public Set<UUID> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    protected Set<UUID> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         String s = argument.get(0).toString();
 
         if (s.equals("@a")) {
@@ -161,8 +152,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public Set<UUID> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected Set<UUID> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
         String s = argument.get(0).toString();
 
         if (s.equals("@a")) {
@@ -185,21 +175,18 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public boolean validateForAdd(Set<UUID> element) {
+    protected boolean validateForAdd(Set<UUID> element) {
         return !value.containsAll(element);
     }
 
     @Override
-    @Internal
-    public boolean validateForRemove(Set<UUID> element) {
+    protected boolean validateForRemove(Set<UUID> element) {
         return element.stream()
                 .anyMatch(value::contains);
     }
 
     @Override
-    @Internal
-    public String invalidValueMessageForAdd(String entryName, Set<UUID> element) {
+    protected String invalidValueMessageForAdd(String entryName, Set<UUID> element) {
         if (element.size() == 1) {
             UUID uuid = element.toArray(new UUID[0])[0];
             OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
@@ -210,8 +197,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public String succeedMessageForAdd(String entryName, Set<UUID> element) {
+    protected String succeedMessageForAdd(String entryName, Set<UUID> element) {
         if (element.size() == 1) {
             UUID uuid = element.toArray(new UUID[0])[0];
             OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
@@ -222,8 +208,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public String invalidValueMessageForRemove(String entryName, Set<UUID> element) {
+    protected String invalidValueMessageForRemove(String entryName, Set<UUID> element) {
         if (element.size() == 1) {
             UUID uuid = element.toArray(new UUID[0])[0];
             OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
@@ -234,8 +219,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public String succeedMessageForRemove(String entryName, Set<UUID> element) {
+    protected String succeedMessageForRemove(String entryName, Set<UUID> element) {
         if (element.size() == 1) {
             UUID uuid = element.toArray(new UUID[0])[0];
             OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
@@ -246,8 +230,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    @Internal
-    public String clearMessage(String entryName) {
+    protected String clearMessage(String entryName) {
         return entryName + "からすべてのプレイヤーを削除しました.";
     }
 }

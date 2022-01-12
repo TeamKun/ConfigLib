@@ -1,21 +1,23 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.configlib.annotation.Internal;
+import net.kunmc.lab.configlib.command.SingleValue;
 
-public interface NumericValue<T extends Comparable<T>> extends SingleValue<T> {
-    T min();
+public abstract class NumericValue<T extends Comparable<T>> extends SingleValue<T> {
+    public NumericValue(T value) {
+        super(value);
+    }
 
-    T max();
+    protected abstract T min();
+
+    protected abstract T max();
 
     @Override
-    @Internal
-    default boolean validateOnSet(T newValue) {
+    protected boolean validateOnSet(T newValue) {
         return newValue.compareTo(min()) != -1 && newValue.compareTo(max()) != 1;
     }
 
     @Override
-    @Internal
-    default String invalidValueMessage(String entryName, T argument) {
+    protected String invalidValueMessage(String entryName, T argument) {
         return entryName + "は" + min() + "以上" + max() + "以下の値を入力してください.";
     }
 }

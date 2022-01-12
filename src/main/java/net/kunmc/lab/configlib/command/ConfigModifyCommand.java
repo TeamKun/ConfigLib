@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.command;
 import dev.kotx.flylib.command.Command;
 import net.kunmc.lab.configlib.config.BaseConfig;
 import net.kunmc.lab.configlib.util.ConfigUtil;
-import net.kunmc.lab.configlib.value.CollectionValue;
 
 import java.lang.reflect.Field;
 import java.util.Set;

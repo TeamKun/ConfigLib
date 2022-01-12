@@ -4,7 +4,7 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.kunmc.lab.configlib.annotation.Internal;
-import net.kunmc.lab.configlib.value.Value;
+import net.kunmc.lab.configlib.command.Value;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;

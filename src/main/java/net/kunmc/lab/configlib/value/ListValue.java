@@ -1,20 +1,19 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.configlib.annotation.Internal;
+import net.kunmc.lab.configlib.command.CollectionValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Stream;
 
-public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Iterable<E> {
-    protected List<E> value;
+public abstract class ListValue<E> extends CollectionValue<List<E>, E> implements Iterable<E> {
     protected transient boolean listable = true;
     protected transient boolean addable = true;
     protected transient boolean removable = true;
     protected transient boolean clearable = true;
 
     public ListValue(List<E> value) {
-        this.value = value;
+        super(value);
     }
 
     @Override
@@ -28,19 +27,16 @@ public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Itera
     }
 
     @Override
-    @Internal
     public boolean validateForAdd(List<E> element) {
         return true;
     }
 
     @Override
-    @Internal
     public boolean validateForRemove(List<E> element) {
         return value.contains(element);
     }
 
     @Override
-    @Internal
     public boolean listable() {
         return listable;
     }
@@ -51,7 +47,6 @@ public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Itera
     }
 
     @Override
-    @Internal
     public boolean addableByCommand() {
         return addable;
     }
@@ -62,7 +57,6 @@ public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Itera
     }
 
     @Override
-    @Internal
     public boolean removableByCommand() {
         return removable;
     }
@@ -73,7 +67,6 @@ public abstract class ListValue<E> implements CollectionValue<List<E>, E>, Itera
     }
 
     @Override
-    @Internal
     public boolean clearableByCommand() {
         return clearable;
     }

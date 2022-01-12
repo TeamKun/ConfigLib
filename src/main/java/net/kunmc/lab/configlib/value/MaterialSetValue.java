@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value;
 import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.annotation.Internal;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,42 +24,36 @@ public class MaterialSetValue extends SetValue<Material> {
     }
 
     @Override
-    @Internal
-    public String invalidValueMessageForAdd(String entryName, Set<Material> element) {
+    protected String invalidValueMessageForAdd(String entryName, Set<Material> element) {
         Material m = element.toArray(new Material[0])[0];
         return m.name() + "はすでに" + entryName + "に追加されています.";
     }
 
     @Override
-    @Internal
-    public String succeedMessageForAdd(String entryName, Set<Material> element) {
+    protected String succeedMessageForAdd(String entryName, Set<Material> element) {
         Material m = element.toArray(new Material[0])[0];
         return entryName + "に" + m.name() + "を追加しました.";
     }
 
     @Override
-    @Internal
-    public String invalidValueMessageForRemove(String entryName, Set<Material> element) {
+    protected String invalidValueMessageForRemove(String entryName, Set<Material> element) {
         Material m = element.toArray(new Material[0])[0];
         return m.name() + "は" + entryName + "に追加されていませんでした.";
     }
 
     @Override
-    @Internal
-    public String succeedMessageForRemove(String entryName, Set<Material> element) {
+    protected String succeedMessageForRemove(String entryName, Set<Material> element) {
         Material m = element.toArray(new Material[0])[0];
         return entryName + "から" + m.name() + "を削除しました.";
     }
 
     @Override
-    @Internal
-    public String clearMessage(String entryName) {
+    protected String clearMessage(String entryName) {
         return entryName + "をクリアしました.";
     }
 
     @Override
-    @Internal
-    public void appendArgumentForAdd(UsageBuilder builder) {
+    protected void appendArgumentForAdd(UsageBuilder builder) {
         builder.textArgument("MaterialName", sb -> {
             Arrays.stream(Material.values())
                     .filter(m -> !value.contains(m))
@@ -71,8 +64,7 @@ public class MaterialSetValue extends SetValue<Material> {
     }
 
     @Override
-    @Internal
-    public void appendArgumentForRemove(UsageBuilder builder) {
+    protected void appendArgumentForRemove(UsageBuilder builder) {
         builder.textArgument("MaterialName", sb -> {
             value.stream()
                     .map(Material::name)
@@ -82,38 +74,33 @@ public class MaterialSetValue extends SetValue<Material> {
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
     }
 
     @Override
-    @Internal
-    public Set<Material> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    protected Set<Material> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
                 .collect(Collectors.toSet());
     }
 
     @Override
-    @Internal
-    public Set<Material> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected Set<Material> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
                 .collect(Collectors.toSet());
     }
 
     @Override
-    @Internal
-    public void sendListMessage(CommandContext ctx, String entryName) {
+    protected void sendListMessage(CommandContext ctx, String entryName) {
         String header = "-----" + entryName + "-----";
         ctx.message(ChatColor.YELLOW + header);
 

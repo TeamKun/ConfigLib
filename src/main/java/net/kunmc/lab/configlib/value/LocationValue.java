@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.annotation.Internal;
+import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -16,8 +16,7 @@ import org.bukkit.util.Vector;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class LocationValue implements SingleValue<Location> {
-    private Location value;
+public class LocationValue extends SingleValue<Location> {
     private transient final Consumer<Location> consumer;
     private transient boolean listable = true;
     private transient boolean writable = true;
@@ -26,8 +25,8 @@ public class LocationValue implements SingleValue<Location> {
         this((Location) null);
     }
 
-    public LocationValue(Location location) {
-        this(location, x -> {
+    public LocationValue(Location value) {
+        this(value, x -> {
         });
     }
 
@@ -35,8 +34,8 @@ public class LocationValue implements SingleValue<Location> {
         this(null, onSet);
     }
 
-    public LocationValue(Location location, Consumer<Location> onSet) {
-        value = location;
+    public LocationValue(Location value, Consumer<Location> onSet) {
+        super(value);
         consumer = onSet;
     }
 
@@ -57,14 +56,12 @@ public class LocationValue implements SingleValue<Location> {
     }
 
     @Override
-    @Internal
-    public boolean validateOnSet(Location newValue) {
+    protected boolean validateOnSet(Location newValue) {
         return !newValue.equals(value);
     }
 
     @Override
-    @Internal
-    public void onSetValue(Location newValue) {
+    protected void onSetValue(Location newValue) {
         consumer.accept(newValue);
     }
 
@@ -74,26 +71,22 @@ public class LocationValue implements SingleValue<Location> {
     }
 
     @Override
-    @Internal
-    public boolean writableByCommand() {
+    protected boolean writableByCommand() {
         return writable;
     }
 
     @Override
-    @Internal
-    public void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(UsageBuilder builder) {
         builder.locationArgument("location");
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    @Internal
-    public Location argumentToValue(List<Object> argument, CommandSender sender) {
+    protected Location argumentToValue(List<Object> argument, CommandSender sender) {
         Location l = ((Location) argument.get(0));
 
         if (sender instanceof ConsoleCommandSender) {
@@ -131,20 +124,17 @@ public class LocationValue implements SingleValue<Location> {
     }
 
     @Override
-    @Internal
-    public boolean listable() {
+    protected boolean listable() {
         return listable;
     }
 
     @Override
-    @Internal
-    public String succeedSetMessage(String entryName) {
+    protected String succeedSetMessage(String entryName) {
         return entryName + "の値を" + locationToString() + "に設定しました.";
     }
 
     @Override
-    @Internal
-    public void sendListMessage(CommandContext ctx, String entryName) {
+    protected void sendListMessage(CommandContext ctx, String entryName) {
         if (value == null) {
             ctx.success(entryName + ": null");
         } else {

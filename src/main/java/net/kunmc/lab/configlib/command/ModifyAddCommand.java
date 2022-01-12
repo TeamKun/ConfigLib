@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.command;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.config.BaseConfig;
-import net.kunmc.lab.configlib.value.CollectionValue;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;

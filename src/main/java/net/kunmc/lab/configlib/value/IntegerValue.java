@@ -1,14 +1,12 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-public final class IntegerValue implements NumericValue<Integer> {
-    private Integer value;
+public class IntegerValue extends NumericValue<Integer> {
     private final Integer min;
     private final Integer max;
     private final transient Consumer<Integer> consumer;
@@ -30,33 +28,29 @@ public final class IntegerValue implements NumericValue<Integer> {
     }
 
     public IntegerValue(Integer value, Integer min, Integer max, Consumer<Integer> onSet) {
-        this.value = value;
+        super(value);
         this.min = min;
         this.max = max;
         this.consumer = onSet;
     }
 
     @Override
-    @Internal
-    public boolean listable() {
+    protected boolean listable() {
         return listable;
     }
 
     @Override
-    @Internal
-    public void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(UsageBuilder builder) {
         builder.integerArgument("IntegerArgument", min(), max());
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    @Internal
-    public Integer argumentToValue(List<Object> argument, CommandSender sender) {
+    protected Integer argumentToValue(List<Object> argument, CommandSender sender) {
         return ((Integer) argument.get(0));
     }
 
@@ -66,8 +60,7 @@ public final class IntegerValue implements NumericValue<Integer> {
     }
 
     @Override
-    @Internal
-    public boolean writableByCommand() {
+    protected boolean writableByCommand() {
         return writable;
     }
 
@@ -87,20 +80,17 @@ public final class IntegerValue implements NumericValue<Integer> {
     }
 
     @Override
-    @Internal
-    public void onSetValue(Integer newValue) {
+    protected void onSetValue(Integer newValue) {
         consumer.accept(newValue);
     }
 
     @Override
-    @Internal
-    public Integer min() {
+    protected Integer min() {
         return min;
     }
 
     @Override
-    @Internal
-    public Integer max() {
+    protected Integer max() {
         return max;
     }
 

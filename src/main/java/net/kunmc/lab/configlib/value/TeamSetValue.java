@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value;
 import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.annotation.Internal;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -44,38 +43,32 @@ public class TeamSetValue extends SetValue<Team> {
     }
 
     @Override
-    @Internal
-    public String invalidValueMessageForAdd(String entryName, Set<Team> element) {
+    protected String invalidValueMessageForAdd(String entryName, Set<Team> element) {
         return element.toArray(new Team[0])[0].getName() + "はすでに" + entryName + "に追加されています.";
     }
 
     @Override
-    @Internal
-    public String succeedMessageForAdd(String entryName, Set<Team> element) {
+    protected String succeedMessageForAdd(String entryName, Set<Team> element) {
         return entryName + "に" + element.toArray(new Team[0])[0].getName() + "を追加しました.";
     }
 
     @Override
-    @Internal
-    public String invalidValueMessageForRemove(String entryName, Set<Team> element) {
+    protected String invalidValueMessageForRemove(String entryName, Set<Team> element) {
         return element.toArray(new Team[0])[0].getName() + "は" + entryName + "に追加されていませんでした.";
     }
 
     @Override
-    @Internal
-    public String succeedMessageForRemove(String entryName, Set<Team> element) {
+    protected String succeedMessageForRemove(String entryName, Set<Team> element) {
         return entryName + "から" + element.toArray(new Team[0])[0].getName() + "を削除しました.";
     }
 
     @Override
-    @Internal
-    public String clearMessage(String entryName) {
+    protected String clearMessage(String entryName) {
         return entryName + "をクリアしました.";
     }
 
     @Override
-    @Internal
-    public void appendArgumentForAdd(UsageBuilder builder) {
+    protected void appendArgumentForAdd(UsageBuilder builder) {
         builder.textArgument("TeamName", suggestionBuilder -> {
             scoreboard.getTeams().stream()
                     .map(Team::getName)
@@ -87,8 +80,7 @@ public class TeamSetValue extends SetValue<Team> {
     }
 
     @Override
-    @Internal
-    public void appendArgumentForRemove(UsageBuilder builder) {
+    protected void appendArgumentForRemove(UsageBuilder builder) {
         builder.textArgument("TeamName", suggestionBuilder -> {
             value.stream()
                     .map(Team::getName)
@@ -97,8 +89,7 @@ public class TeamSetValue extends SetValue<Team> {
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         String name = argument.get(0).toString();
         return scoreboard.getTeams().stream()
                 .filter(t -> !value.contains(t))
@@ -107,8 +98,7 @@ public class TeamSetValue extends SetValue<Team> {
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         String name = argument.get(0).toString();
         return value.stream()
                 .map(Team::getName)
@@ -116,22 +106,19 @@ public class TeamSetValue extends SetValue<Team> {
     }
 
     @Override
-    @Internal
-    public Set<Team> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    protected Set<Team> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         Team t = scoreboard.getTeam(argument.get(0).toString());
         return Sets.newHashSet(t);
     }
 
     @Override
-    @Internal
-    public Set<Team> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected Set<Team> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
         Team t = scoreboard.getTeam(argument.get(0).toString());
         return Sets.newHashSet(t);
     }
 
     @Override
-    @Internal
-    public void sendListMessage(CommandContext ctx, String entryName) {
+    protected void sendListMessage(CommandContext ctx, String entryName) {
         String header = "-----" + entryName + "-----";
         ctx.message(ChatColor.YELLOW + header);
 

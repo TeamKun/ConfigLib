@@ -3,16 +3,15 @@ package net.kunmc.lab.configlib.value;
 import dev.kotx.flylib.command.SuggestionAction;
 import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.TextArgument;
-import net.kunmc.lab.configlib.annotation.Internal;
+import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-public class StringValue implements SingleValue<String> {
-    private String value;
-    private int min;
+public class StringValue extends SingleValue<String> {
+    private final int min;
     private final int max;
     private transient final Consumer<String> consumer;
     private transient Boolean listable = true;
@@ -37,7 +36,7 @@ public class StringValue implements SingleValue<String> {
     }
 
     public StringValue(String value, int min, int max, Consumer<String> onSet) {
-        this.value = value;
+        super(value);
         this.min = min;
         this.max = max;
         this.consumer = onSet;
@@ -69,38 +68,32 @@ public class StringValue implements SingleValue<String> {
     }
 
     @Override
-    @Internal
-    public void onSetValue(String newValue) {
+    protected void onSetValue(String newValue) {
         consumer.accept(newValue);
     }
 
     @Override
-    @Internal
-    public boolean validateOnSet(String newValue) {
+    protected boolean validateOnSet(String newValue) {
         return newValue.length() >= min && newValue.length() <= max;
     }
 
     @Override
-    @Internal
-    public boolean listable() {
+    protected boolean listable() {
         return listable;
     }
 
     @Override
-    @Internal
-    public void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(UsageBuilder builder) {
         builder.textArgument(name, type, suggestionAction);
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    @Internal
-    public String argumentToValue(List<Object> argument, CommandSender sender) {
+    protected String argumentToValue(List<Object> argument, CommandSender sender) {
         return argument.get(0).toString();
     }
 
@@ -110,8 +103,7 @@ public class StringValue implements SingleValue<String> {
     }
 
     @Override
-    @Internal
-    public boolean writableByCommand() {
+    protected boolean writableByCommand() {
         return writable;
     }
 
@@ -121,8 +113,7 @@ public class StringValue implements SingleValue<String> {
     }
 
     @Override
-    @Internal
-    public String invalidValueMessage(String entryName, String argument) {
+    protected String invalidValueMessage(String entryName, String argument) {
         return entryName + "は" + min + "以上" + max + "以下の文字数で入力してください";
     }
 

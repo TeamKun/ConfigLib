@@ -1,14 +1,12 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-public final class FloatValue implements NumericValue<Float> {
-    private Float value;
+public class FloatValue extends NumericValue<Float> {
     private final Float min;
     private final Float max;
     private final transient Consumer<Float> consumer;
@@ -30,33 +28,29 @@ public final class FloatValue implements NumericValue<Float> {
     }
 
     public FloatValue(Float value, Float min, Float max, Consumer<Float> onSet) {
-        this.value = value;
+        super(value);
         this.min = min;
         this.max = max;
         this.consumer = onSet;
     }
 
     @Override
-    @Internal
-    public boolean listable() {
+    protected boolean listable() {
         return listable;
     }
 
     @Override
-    @Internal
-    public void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(UsageBuilder builder) {
         builder.floatArgument("FloatArgument", min(), max());
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    @Internal
-    public Float argumentToValue(List<Object> argument, CommandSender sender) {
+    protected Float argumentToValue(List<Object> argument, CommandSender sender) {
         return ((Float) argument.get(0));
     }
 
@@ -66,8 +60,7 @@ public final class FloatValue implements NumericValue<Float> {
     }
 
     @Override
-    @Internal
-    public boolean writableByCommand() {
+    protected boolean writableByCommand() {
         return writable;
     }
 
@@ -77,14 +70,12 @@ public final class FloatValue implements NumericValue<Float> {
     }
 
     @Override
-    @Internal
-    public Float min() {
+    protected Float min() {
         return min;
     }
 
     @Override
-    @Internal
-    public Float max() {
+    protected Float max() {
         return max;
     }
 
@@ -99,8 +90,7 @@ public final class FloatValue implements NumericValue<Float> {
     }
 
     @Override
-    @Internal
-    public void onSetValue(Float newValue) {
+    protected void onSetValue(Float newValue) {
         consumer.accept(newValue);
     }
 

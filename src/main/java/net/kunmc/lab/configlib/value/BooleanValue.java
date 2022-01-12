@@ -1,14 +1,13 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.annotation.Internal;
+import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-public final class BooleanValue implements SingleValue<Boolean> {
-    private Boolean value;
+public class BooleanValue extends SingleValue<Boolean> {
     private final transient Consumer<Boolean> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
@@ -19,55 +18,39 @@ public final class BooleanValue implements SingleValue<Boolean> {
     }
 
     public BooleanValue(Boolean value, Consumer<Boolean> onSet) {
-        this.value = value;
+        super(value);
         this.consumer = onSet;
     }
 
     @Override
-    public Boolean value() {
-        return value;
-    }
-
-    @Override
-    public void value(Boolean value) {
-        this.value = value;
-    }
-
-    @Override
-    @Internal
-    public void onSetValue(Boolean newValue) {
+    protected void onSetValue(Boolean newValue) {
         consumer.accept(newValue);
     }
 
     @Override
-    @Internal
-    public boolean validateOnSet(Boolean newValue) {
+    protected boolean validateOnSet(Boolean newValue) {
         return true;
     }
 
     @Override
-    @Internal
-    public boolean listable() {
+    protected boolean listable() {
         return listable;
     }
 
     @Override
-    @Internal
-    public void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(UsageBuilder builder) {
         builder.booleanArgument("BooleanArgument", sb -> {
             sb.suggest("true").suggest("false");
         });
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    @Internal
-    public Boolean argumentToValue(List<Object> argument, CommandSender sender) {
+    protected Boolean argumentToValue(List<Object> argument, CommandSender sender) {
         return ((Boolean) argument.get(0));
     }
 
@@ -77,8 +60,7 @@ public final class BooleanValue implements SingleValue<Boolean> {
     }
 
     @Override
-    @Internal
-    public boolean writableByCommand() {
+    protected boolean writableByCommand() {
         return writable;
     }
 

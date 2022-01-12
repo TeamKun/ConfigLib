@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.annotation.Internal;
+import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 
@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public final class MaterialValue implements SingleValue<Material> {
+public final class MaterialValue extends SingleValue<Material> {
     private Material value;
     private final transient Consumer<Material> consumer;
     private transient Boolean listable = true;
@@ -21,7 +21,7 @@ public final class MaterialValue implements SingleValue<Material> {
     }
 
     public MaterialValue(Material value, Consumer<Material> onSet) {
-        this.value = value;
+        super(value);
         this.consumer = onSet;
     }
 
@@ -36,26 +36,22 @@ public final class MaterialValue implements SingleValue<Material> {
     }
 
     @Override
-    @Internal
-    public void onSetValue(Material newValue) {
+    protected void onSetValue(Material newValue) {
         consumer.accept(newValue);
     }
 
     @Override
-    @Internal
-    public boolean validateOnSet(Material newValue) {
+    protected boolean validateOnSet(Material newValue) {
         return true;
     }
 
     @Override
-    @Internal
-    public boolean listable() {
+    protected boolean listable() {
         return listable;
     }
 
     @Override
-    @Internal
-    public void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(UsageBuilder builder) {
         builder.textArgument("MaterialName", sb -> {
             Arrays.stream(Material.values())
                     .map(Material::name)
@@ -65,15 +61,13 @@ public final class MaterialValue implements SingleValue<Material> {
     }
 
     @Override
-    @Internal
-    public boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
     }
 
     @Override
-    @Internal
-    public Material argumentToValue(List<Object> argument, CommandSender sender) {
+    protected Material argumentToValue(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
                 .findFirst()
@@ -86,8 +80,7 @@ public final class MaterialValue implements SingleValue<Material> {
     }
 
     @Override
-    @Internal
-    public boolean writableByCommand() {
+    protected boolean writableByCommand() {
         return writable;
     }
 
