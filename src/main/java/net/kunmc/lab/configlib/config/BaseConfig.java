@@ -8,6 +8,7 @@ import net.kunmc.lab.configlib.command.Value;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.craftbukkit.libs.org.codehaus.plexus.util.ReflectionUtils;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -149,7 +150,7 @@ public abstract class BaseConfig {
     }
 
     private void replaceFields(Class<?> clazz, Object src, Object dst) {
-        for (Field field : clazz.getDeclaredFields()) {
+        for (Field field : ReflectionUtils.getFieldsIncludingSuperclasses(clazz)) {
             if (Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
