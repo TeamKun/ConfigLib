@@ -53,6 +53,10 @@ public class TeamValue extends SingleValue<Team> {
 
     @Override
     protected boolean validateOnSet(Team newValue) {
+        if (value == null) {
+            return true;
+        }
+       
         return !value.getName().equals(newValue.getName());
     }
 
