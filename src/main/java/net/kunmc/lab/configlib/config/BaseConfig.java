@@ -173,14 +173,18 @@ public abstract class BaseConfig {
     }
 
     private void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
-        List<Field> fieldList = ReflectionUtils.getFieldsIncludingSuperclasses(field.getType());
-        Object srcObj = field.get(src);
-        Object dstObj = field.get(dst);
+        try {
+            List<Field> fieldList = ReflectionUtils.getFieldsIncludingSuperclasses(field.getType());
+            Object srcObj = field.get(src);
+            Object dstObj = field.get(dst);
 
-        if (fieldList.isEmpty()) {
-            field.set(dst, srcObj);
-        } else {
-            replaceFields(field.getType(), srcObj, dstObj);
+            if (fieldList.isEmpty()) {
+                field.set(dst, srcObj);
+            } else {
+                replaceFields(field.getType(), srcObj, dstObj);
+            }
+        } catch (NullPointerException ignored) {
+            // 新しいValueが追加された時のためにNullPointerExceptionを回避する
         }
     }
 }

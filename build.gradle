@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id "com.github.johnrengelman.shadow" version "6.1.0"
     id "maven-publish"
+    id "idea"
 }
 
 group 'net.kunmc.lab'
@@ -40,6 +41,13 @@ java {
     }
 }
 
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
@@ -47,6 +55,7 @@ tasks.withType(JavaCompile) {
 shadowJar {
     archiveFileName = "${rootProject.name}-${version}.jar"
     exclude "net/minecraft"
+    exclude "org/bukkit"
 }
 tasks.build.dependsOn tasks.shadowJar
 
