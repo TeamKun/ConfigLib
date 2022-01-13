@@ -21,6 +21,10 @@ class ModifyClearCommand extends AccessibleCommand {
 
     @Override
     public void execute(CommandContext ctx) {
+        if (configValue.onClearValue(ctx)) {
+            return;
+        }
+       
         ((Collection) configValue.value()).clear();
         ctx.success(configValue.clearMessage(field.getName()));
 

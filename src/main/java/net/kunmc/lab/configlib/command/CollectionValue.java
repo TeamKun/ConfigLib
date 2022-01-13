@@ -9,10 +9,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class CollectionValue<T extends Collection<E>, E> extends Value<T> {
     private final transient List<BiFunction<T, CommandContext, Boolean>> addListeners = new ArrayList<>();
     private final transient List<BiFunction<T, CommandContext, Boolean>> removeListeners = new ArrayList<>();
+    private final transient List<Function<CommandContext, Boolean>> clearListeners = new ArrayList<>();
 
     public CollectionValue(T value) {
         super(value);
@@ -93,6 +96,28 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
     protected abstract String succeedMessageForRemove(String entryName, T value);
 
     protected abstract boolean clearableByCommand();
+
+
+    public <U extends CollectionValue<T, E>> U onClear(Consumer<CommandContext> listener) {
+        return onClear(ctx -> {
+            listener.accept(ctx);
+            return false;
+        });
+    }
+
+    /**
+     * @return true if you want to cancel event, otherwise false
+     */
+    public <U extends CollectionValue<T, E>> U onClear(Function<CommandContext, Boolean> listener) {
+        clearListeners.add(listener);
+        return ((U) this);
+    }
+
+    protected boolean onClearValue(CommandContext ctx) {
+        return clearListeners.stream()
+                .map(x -> x.apply(ctx))
+                .reduce(false, (a, b) -> a || b);
+    }
 
     protected abstract String clearMessage(String entryName);
 }
