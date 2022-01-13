@@ -46,6 +46,10 @@ class ModifyRemoveCommand extends CollectionValueItem {
 
     @Override
     void writeProcess(CommandContext ctx, String entryName, Collection value) {
+        if (this.value.onRemoveValue(value, ctx)) {
+            return;
+        }
+       
         ((Collection) this.value.value()).removeAll(value);
         ctx.success(this.value.succeedMessageForRemove(entryName, value));
     }

@@ -12,6 +12,7 @@ import java.util.function.BiFunction;
 
 public abstract class CollectionValue<T extends Collection<E>, E> extends Value<T> {
     private final transient List<BiFunction<T, CommandContext, Boolean>> addListeners = new ArrayList<>();
+    private final transient List<BiFunction<T, CommandContext, Boolean>> removeListeners = new ArrayList<>();
 
     public CollectionValue(T value) {
         super(value);
@@ -67,6 +68,27 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
     protected abstract boolean validateForRemove(T value);
 
     protected abstract String invalidValueMessageForRemove(String entryName, T value);
+
+    public <U extends CollectionValue<T, E>> U onRemove(BiConsumer<T, CommandContext> listener) {
+        return onRemove((v, ctx) -> {
+            listener.accept(v, ctx);
+            return false;
+        });
+    }
+
+    /**
+     * @return true if you want to cancel event, otherwise false
+     */
+    public <U extends CollectionValue<T, E>> U onRemove(BiFunction<T, CommandContext, Boolean> listener) {
+        removeListeners.add(listener);
+        return ((U) this);
+    }
+
+    protected boolean onRemoveValue(T newValue, CommandContext ctx) {
+        return removeListeners.stream()
+                .map(x -> x.apply(newValue, ctx))
+                .reduce(false, (a, b) -> a || b);
+    }
 
     protected abstract String succeedMessageForRemove(String entryName, T value);
 
