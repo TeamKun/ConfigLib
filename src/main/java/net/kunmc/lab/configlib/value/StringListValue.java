@@ -5,12 +5,16 @@ import dev.kotx.flylib.command.UsageBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class StringListValue extends ListValue<String> {
+    private final transient List<String> allowStringList = new ArrayList<>();
+
     public StringListValue(String... strings) {
         this(Arrays.stream(strings).collect(Collectors.toList()));
     }
@@ -19,14 +23,25 @@ public class StringListValue extends ListValue<String> {
         super(value);
     }
 
+    public StringListValue addAllowString(@NotNull String s) {
+        allowStringList.add(s);
+        return this;
+    }
+
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("String");
+        builder.stringArgument("String", sb -> {
+            sb.suggestAll(allowStringList);
+        }, null);
     }
 
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        return true;
+        if (allowStringList.isEmpty()) {
+            return true;
+        }
+
+        return allowStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
     }
 
     @Override
@@ -42,8 +57,17 @@ public class StringListValue extends ListValue<String> {
     }
 
     @Override
+    protected boolean validateForAdd(List<String> newValue) {
+        if (allowStringList.isEmpty()) {
+            return true;
+        }
+
+        return !value.containsAll(newValue);
+    }
+
+    @Override
     protected String invalidValueMessageForAdd(String entryName, List<String> element) {
-        return "";
+        return element.toArray(new String[0])[0] + "はすでに" + entryName + "に追加されています.";
     }
 
     @Override
@@ -53,7 +77,9 @@ public class StringListValue extends ListValue<String> {
 
     @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("String");
+        builder.stringArgument("String", sb -> {
+            sb.suggestAll(new ArrayList<>(value));
+        }, null);
     }
 
     @Override

@@ -27,11 +27,6 @@ public abstract class ListValue<E> extends CollectionValue<List<E>, E> implement
     }
 
     @Override
-    public boolean validateForAdd(List<E> element) {
-        return true;
-    }
-
-    @Override
     public boolean removableByCommand() {
         return removable;
     }
@@ -43,7 +38,7 @@ public abstract class ListValue<E> extends CollectionValue<List<E>, E> implement
 
     @Override
     public boolean validateForRemove(List<E> element) {
-        return value.contains(element);
+        return value.containsAll(element);
     }
 
     @Override
