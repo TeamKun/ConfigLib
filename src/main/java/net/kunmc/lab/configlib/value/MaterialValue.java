@@ -26,18 +26,13 @@ public final class MaterialValue extends SingleValue<Material> {
     }
 
     @Override
-    protected void onSetValue(Material newValue) {
-        consumer.accept(newValue);
+    protected boolean writableByCommand() {
+        return writable;
     }
 
-    @Override
-    protected boolean validateOnSet(Material newValue) {
-        return true;
-    }
-
-    @Override
-    protected boolean listable() {
-        return listable;
+    public MaterialValue writableByCommand(boolean writable) {
+        this.writable = writable;
+        return this;
     }
 
     @Override
@@ -64,18 +59,23 @@ public final class MaterialValue extends SingleValue<Material> {
                 .get();
     }
 
-    public MaterialValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
+    @Override
+    protected boolean validateOnSet(Material newValue) {
+        return true;
     }
 
     @Override
-    protected boolean writableByCommand() {
-        return writable;
+    protected void onSetValue(Material newValue) {
+        consumer.accept(newValue);
     }
 
-    public MaterialValue writableByCommand(boolean writable) {
-        this.writable = writable;
+    @Override
+    protected boolean listable() {
+        return listable;
+    }
+
+    public MaterialValue listable(boolean listable) {
+        this.listable = listable;
         return this;
     }
 

@@ -13,12 +13,6 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
 
     protected abstract boolean addableByCommand();
 
-    protected abstract boolean removableByCommand();
-
-    protected abstract boolean clearableByCommand();
-
-    protected abstract boolean validateForAdd(T value);
-
     protected abstract void appendArgumentForAdd(UsageBuilder builder);
 
     protected abstract boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender);
@@ -27,11 +21,15 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
         return argument + "は不正な引数です.";
     }
 
-    protected abstract String invalidValueMessageForAdd(String entryName, T value);
-
     protected abstract T argumentToValueForAdd(List<Object> argument, CommandSender sender);
 
+    protected abstract boolean validateForAdd(T value);
+
+    protected abstract String invalidValueMessageForAdd(String entryName, T value);
+
     protected abstract String succeedMessageForAdd(String entryName, T value);
+
+    protected abstract boolean removableByCommand();
 
     protected abstract void appendArgumentForRemove(UsageBuilder builder);
 
@@ -48,6 +46,8 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
     protected abstract String invalidValueMessageForRemove(String entryName, T value);
 
     protected abstract String succeedMessageForRemove(String entryName, T value);
+
+    protected abstract boolean clearableByCommand();
 
     protected abstract String clearMessage(String entryName);
 }

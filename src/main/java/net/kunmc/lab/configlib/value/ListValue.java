@@ -17,26 +17,6 @@ public abstract class ListValue<E> extends CollectionValue<List<E>, E> implement
     }
 
     @Override
-    public boolean validateForAdd(List<E> element) {
-        return true;
-    }
-
-    @Override
-    public boolean validateForRemove(List<E> element) {
-        return value.contains(element);
-    }
-
-    @Override
-    public boolean listable() {
-        return listable;
-    }
-
-    public <T extends ListValue<E>> T listable(boolean listable) {
-        this.listable = listable;
-        return (T) this;
-    }
-
-    @Override
     public boolean addableByCommand() {
         return addable;
     }
@@ -44,6 +24,11 @@ public abstract class ListValue<E> extends CollectionValue<List<E>, E> implement
     public <T extends ListValue<E>> T addableByCommand(boolean addable) {
         this.addable = addable;
         return (T) this;
+    }
+
+    @Override
+    public boolean validateForAdd(List<E> element) {
+        return true;
     }
 
     @Override
@@ -57,12 +42,27 @@ public abstract class ListValue<E> extends CollectionValue<List<E>, E> implement
     }
 
     @Override
+    public boolean validateForRemove(List<E> element) {
+        return value.contains(element);
+    }
+
+    @Override
     public boolean clearableByCommand() {
         return clearable;
     }
 
     public <T extends ListValue<E>> T clearableByCommand(boolean clearable) {
         this.clearable = clearable;
+        return (T) this;
+    }
+
+    @Override
+    public boolean listable() {
+        return listable;
+    }
+
+    public <T extends ListValue<E>> T listable(boolean listable) {
+        this.listable = listable;
         return (T) this;
     }
 

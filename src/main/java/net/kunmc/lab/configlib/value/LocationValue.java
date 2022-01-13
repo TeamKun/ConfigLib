@@ -56,23 +56,13 @@ public class LocationValue extends SingleValue<Location> {
     }
 
     @Override
-    protected boolean validateOnSet(Location newValue) {
-        return !newValue.equals(value);
-    }
-
-    @Override
-    protected void onSetValue(Location newValue) {
-        consumer.accept(newValue);
+    protected boolean writableByCommand() {
+        return writable;
     }
 
     public LocationValue writableByCommand(boolean writable) {
         this.writable = writable;
         return this;
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
     }
 
     @Override
@@ -108,9 +98,19 @@ public class LocationValue extends SingleValue<Location> {
         return l;
     }
 
-    public LocationValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
+    @Override
+    protected boolean validateOnSet(Location newValue) {
+        return !newValue.equals(value);
+    }
+
+    @Override
+    protected void onSetValue(Location newValue) {
+        consumer.accept(newValue);
+    }
+
+    @Override
+    protected String succeedSetMessage(String entryName) {
+        return entryName + "の値を" + locationToString() + "に設定しました.";
     }
 
     @Override
@@ -118,9 +118,9 @@ public class LocationValue extends SingleValue<Location> {
         return listable;
     }
 
-    @Override
-    protected String succeedSetMessage(String entryName) {
-        return entryName + "の値を" + locationToString() + "に設定しました.";
+    public LocationValue listable(boolean listable) {
+        this.listable = listable;
+        return this;
     }
 
     @Override

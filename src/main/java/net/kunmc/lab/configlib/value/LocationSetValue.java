@@ -28,6 +28,39 @@ public class LocationSetValue extends SetValue<Location> {
     }
 
     @Override
+    public void appendArgumentForAdd(UsageBuilder builder) {
+        builder.locationArgument("location");
+    }
+
+    @Override
+    public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+        return true;
+    }
+
+    @Override
+    public Set<Location> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+        Location l = ((Location) argument.get(0));
+
+        if (sender instanceof ConsoleCommandSender) {
+            l.setWorld(Bukkit.getWorlds().get(0));
+        }
+
+        if (sender instanceof Player) {
+            Player p = ((Player) sender);
+            l.setWorld(p.getWorld());
+            l.setPitch(p.getLocation().getPitch());
+            l.setYaw(p.getLocation().getYaw());
+        }
+
+        if (sender instanceof BlockCommandSender) {
+            World w = ((BlockCommandSender) sender).getBlock().getWorld();
+            l.setWorld(w);
+        }
+
+        return Sets.newHashSet(l);
+    }
+
+    @Override
     public String invalidValueMessageForAdd(String entryName, Set<Location> element) {
         Location l = element.toArray(new Location[0])[0];
         return locationToString(l) + "はすでに" + entryName + "に追加されている座標です.";
@@ -37,28 +70,6 @@ public class LocationSetValue extends SetValue<Location> {
     public String succeedMessageForAdd(String entryName, Set<Location> element) {
         Location l = element.toArray(new Location[0])[0];
         return entryName + "に" + locationToString(l) + "を追加しました.";
-    }
-
-    @Override
-    public String invalidValueMessageForRemove(String entryName, Set<Location> element) {
-        Location l = element.toArray(new Location[0])[0];
-        return locationToString(l) + "は" + entryName + "に追加されていませんでした.";
-    }
-
-    @Override
-    public String succeedMessageForRemove(String entryName, Set<Location> element) {
-        Location l = element.toArray(new Location[0])[0];
-        return entryName + "から" + locationToString(l) + "を削除しました.";
-    }
-
-    @Override
-    public String clearMessage(String entryName) {
-        return entryName + "からすべての座標を削除しました.";
-    }
-
-    @Override
-    public void appendArgumentForAdd(UsageBuilder builder) {
-        builder.locationArgument("location");
     }
 
     @Override
@@ -89,36 +100,8 @@ public class LocationSetValue extends SetValue<Location> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        return true;
-    }
-
-    @Override
     public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         return true;
-    }
-
-    @Override
-    public Set<Location> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        Location l = ((Location) argument.get(0));
-
-        if (sender instanceof ConsoleCommandSender) {
-            l.setWorld(Bukkit.getWorlds().get(0));
-        }
-
-        if (sender instanceof Player) {
-            Player p = ((Player) sender);
-            l.setWorld(p.getWorld());
-            l.setPitch(p.getLocation().getPitch());
-            l.setYaw(p.getLocation().getYaw());
-        }
-
-        if (sender instanceof BlockCommandSender) {
-            World w = ((BlockCommandSender) sender).getBlock().getWorld();
-            l.setWorld(w);
-        }
-
-        return Sets.newHashSet(l);
     }
 
     @Override
@@ -132,6 +115,23 @@ public class LocationSetValue extends SetValue<Location> {
                 .filter(l -> l.getY() == y)
                 .filter(l -> l.getZ() == z)
                 .collect(Collectors.toSet());
+    }
+   
+    @Override
+    public String invalidValueMessageForRemove(String entryName, Set<Location> element) {
+        Location l = element.toArray(new Location[0])[0];
+        return locationToString(l) + "は" + entryName + "に追加されていませんでした.";
+    }
+
+    @Override
+    public String succeedMessageForRemove(String entryName, Set<Location> element) {
+        Location l = element.toArray(new Location[0])[0];
+        return entryName + "から" + locationToString(l) + "を削除しました.";
+    }
+
+    @Override
+    public String clearMessage(String entryName) {
+        return entryName + "からすべての座標を削除しました.";
     }
 
     @Override

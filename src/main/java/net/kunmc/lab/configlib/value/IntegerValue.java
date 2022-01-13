@@ -35,8 +35,23 @@ public class IntegerValue extends NumericValue<Integer> {
     }
 
     @Override
-    protected boolean listable() {
-        return listable;
+    protected Integer min() {
+        return min;
+    }
+
+    @Override
+    protected Integer max() {
+        return max;
+    }
+
+    @Override
+    protected boolean writableByCommand() {
+        return writable;
+    }
+
+    public IntegerValue writableByCommand(boolean writable) {
+        this.writable = writable;
+        return this;
     }
 
     @Override
@@ -54,34 +69,19 @@ public class IntegerValue extends NumericValue<Integer> {
         return ((Integer) argument.get(0));
     }
 
-    public IntegerValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public IntegerValue writableByCommand(boolean writable) {
-        this.writable = writable;
-        return this;
-    }
-
     @Override
     protected void onSetValue(Integer newValue) {
         consumer.accept(newValue);
     }
 
     @Override
-    protected Integer min() {
-        return min;
+    protected boolean listable() {
+        return listable;
     }
 
-    @Override
-    protected Integer max() {
-        return max;
+    public IntegerValue listable(boolean listable) {
+        this.listable = listable;
+        return this;
     }
 
     public String toString() {

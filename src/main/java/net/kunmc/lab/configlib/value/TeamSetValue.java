@@ -44,6 +44,33 @@ public class TeamSetValue extends SetValue<Team> {
     }
 
     @Override
+    protected void appendArgumentForAdd(UsageBuilder builder) {
+        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
+            scoreboard.getTeams().stream()
+                    .map(Team::getName)
+                    .filter(name -> value.stream()
+                            .map(Team::getName)
+                            .noneMatch(s -> s.equals(name)))
+                    .forEach(suggestionBuilder::suggest);
+        });
+    }
+
+    @Override
+    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+        String name = argument.get(0).toString();
+        return scoreboard.getTeams().stream()
+                .filter(t -> !value.contains(t))
+                .map(Team::getName)
+                .anyMatch(s -> s.equals(name));
+    }
+
+    @Override
+    protected Set<Team> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+        Team t = scoreboard.getTeam(argument.get(0).toString());
+        return Sets.newHashSet(t);
+    }
+
+    @Override
     protected String invalidValueMessageForAdd(String entryName, Set<Team> element) {
         return element.toArray(new Team[0])[0].getName() + "はすでに" + entryName + "に追加されています.";
     }
@@ -51,6 +78,29 @@ public class TeamSetValue extends SetValue<Team> {
     @Override
     protected String succeedMessageForAdd(String entryName, Set<Team> element) {
         return entryName + "に" + element.toArray(new Team[0])[0].getName() + "を追加しました.";
+    }
+
+    @Override
+    protected void appendArgumentForRemove(UsageBuilder builder) {
+        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
+            value.stream()
+                    .map(Team::getName)
+                    .forEach(suggestionBuilder::suggest);
+        });
+    }
+
+    @Override
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+        String name = argument.get(0).toString();
+        return value.stream()
+                .map(Team::getName)
+                .anyMatch(s -> s.equals(name));
+    }
+
+    @Override
+    protected Set<Team> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+        Team t = scoreboard.getTeam(argument.get(0).toString());
+        return Sets.newHashSet(t);
     }
 
     @Override
@@ -66,56 +116,6 @@ public class TeamSetValue extends SetValue<Team> {
     @Override
     protected String clearMessage(String entryName) {
         return entryName + "をクリアしました.";
-    }
-
-    @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
-            scoreboard.getTeams().stream()
-                    .map(Team::getName)
-                    .filter(name -> value.stream()
-                            .map(Team::getName)
-                            .noneMatch(s -> s.equals(name)))
-                    .forEach(suggestionBuilder::suggest);
-        });
-    }
-
-    @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
-            value.stream()
-                    .map(Team::getName)
-                    .forEach(suggestionBuilder::suggest);
-        });
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        String name = argument.get(0).toString();
-        return scoreboard.getTeams().stream()
-                .filter(t -> !value.contains(t))
-                .map(Team::getName)
-                .anyMatch(s -> s.equals(name));
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
-        String name = argument.get(0).toString();
-        return value.stream()
-                .map(Team::getName)
-                .anyMatch(s -> s.equals(name));
-    }
-
-    @Override
-    protected Set<Team> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        Team t = scoreboard.getTeam(argument.get(0).toString());
-        return Sets.newHashSet(t);
-    }
-
-    @Override
-    protected Set<Team> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
-        Team t = scoreboard.getTeam(argument.get(0).toString());
-        return Sets.newHashSet(t);
     }
 
     @Override

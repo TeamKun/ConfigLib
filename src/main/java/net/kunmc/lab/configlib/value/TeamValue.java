@@ -52,27 +52,13 @@ public class TeamValue extends SingleValue<Team> {
     }
 
     @Override
-    protected boolean validateOnSet(Team newValue) {
-        if (value == null) {
-            return true;
-        }
-
-        return !value.getName().equals(newValue.getName());
-    }
-
-    @Override
-    protected void onSetValue(Team newValue) {
-        consumer.accept(newValue);
+    protected boolean writableByCommand() {
+        return writable;
     }
 
     public TeamValue writableByCommand(boolean writable) {
         this.writable = writable;
         return this;
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
     }
 
     @Override
@@ -93,23 +79,22 @@ public class TeamValue extends SingleValue<Team> {
     }
 
     @Override
+    protected String incorrectArgumentMessage(List<Object> argument) {
+        return argument.get(0) + "は存在しないチームです.";
+    }
+
+    @Override
     protected Team argumentToValue(List<Object> argument, CommandSender sender) {
         return scoreboard.getTeam(argument.get(0).toString());
     }
 
-    public TeamValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
-
     @Override
-    protected boolean listable() {
-        return listable;
-    }
+    protected boolean validateOnSet(Team newValue) {
+        if (value == null) {
+            return true;
+        }
 
-    @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
-        return argument.get(0) + "は存在しないチームです.";
+        return !value.getName().equals(newValue.getName());
     }
 
     @Override
@@ -118,8 +103,23 @@ public class TeamValue extends SingleValue<Team> {
     }
 
     @Override
+    protected void onSetValue(Team newValue) {
+        consumer.accept(newValue);
+    }
+
+    @Override
     protected String succeedSetMessage(String entryName) {
         return entryName + "の値を" + value.getName() + "に設定しました.";
+    }
+
+    @Override
+    protected boolean listable() {
+        return listable;
+    }
+
+    public TeamValue listable(boolean listable) {
+        this.listable = listable;
+        return this;
     }
 
     @Override

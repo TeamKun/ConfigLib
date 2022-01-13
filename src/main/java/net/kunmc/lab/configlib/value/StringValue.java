@@ -57,19 +57,15 @@ public class StringValue extends SingleValue<String> {
         return this;
     }
 
-    @Override
-    protected void onSetValue(String newValue) {
-        consumer.accept(newValue);
-    }
 
     @Override
-    protected boolean validateOnSet(String newValue) {
-        return newValue.length() >= min && newValue.length() <= max;
+    protected boolean writableByCommand() {
+        return writable;
     }
 
-    @Override
-    protected boolean listable() {
-        return listable;
+    public StringValue writableByCommand(boolean writable) {
+        this.writable = writable;
+        return this;
     }
 
     @Override
@@ -87,24 +83,30 @@ public class StringValue extends SingleValue<String> {
         return argument.get(0).toString();
     }
 
-    public StringValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
+    @Override
+    protected void onSetValue(String newValue) {
+        consumer.accept(newValue);
     }
 
     @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public StringValue writableByCommand(boolean writable) {
-        this.writable = writable;
-        return this;
+    protected boolean validateOnSet(String newValue) {
+        return newValue.length() >= min && newValue.length() <= max;
     }
 
     @Override
     protected String invalidValueMessage(String entryName, String argument) {
         return entryName + "は" + min + "以上" + max + "以下の文字数で入力してください";
+    }
+
+    @Override
+    protected boolean listable() {
+        return listable;
+    }
+
+
+    public StringValue listable(boolean listable) {
+        this.listable = listable;
+        return this;
     }
 
     @Override

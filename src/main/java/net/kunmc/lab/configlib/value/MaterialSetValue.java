@@ -25,6 +25,30 @@ public class MaterialSetValue extends SetValue<Material> {
     }
 
     @Override
+    protected void appendArgumentForAdd(UsageBuilder builder) {
+        builder.stringArgument("MaterialName", StringArgument.Type.WORD, sb -> {
+            Arrays.stream(Material.values())
+                    .filter(m -> !value.contains(m))
+                    .map(Material::name)
+                    .map(String::toLowerCase)
+                    .forEach(sb::suggest);
+        });
+    }
+
+    @Override
+    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+        return Arrays.stream(Material.values())
+                .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
+    }
+
+    @Override
+    protected Set<Material> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+        return Arrays.stream(Material.values())
+                .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
     protected String invalidValueMessageForAdd(String entryName, Set<Material> element) {
         Material m = element.toArray(new Material[0])[0];
         return m.name() + "はすでに" + entryName + "に追加されています.";
@@ -34,6 +58,29 @@ public class MaterialSetValue extends SetValue<Material> {
     protected String succeedMessageForAdd(String entryName, Set<Material> element) {
         Material m = element.toArray(new Material[0])[0];
         return entryName + "に" + m.name() + "を追加しました.";
+    }
+
+    @Override
+    protected void appendArgumentForRemove(UsageBuilder builder) {
+        builder.stringArgument("MaterialName", StringArgument.Type.WORD, sb -> {
+            value.stream()
+                    .map(Material::name)
+                    .map(String::toLowerCase)
+                    .forEach(sb::suggest);
+        });
+    }
+
+    @Override
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+        return Arrays.stream(Material.values())
+                .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
+    }
+
+    @Override
+    protected Set<Material> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+        return Arrays.stream(Material.values())
+                .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -51,53 +98,6 @@ public class MaterialSetValue extends SetValue<Material> {
     @Override
     protected String clearMessage(String entryName) {
         return entryName + "をクリアしました.";
-    }
-
-    @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("MaterialName", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(Material.values())
-                    .filter(m -> !value.contains(m))
-                    .map(Material::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
-    }
-
-    @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("MaterialName", StringArgument.Type.WORD, sb -> {
-            value.stream()
-                    .map(Material::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(Material.values())
-                .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(Material.values())
-                .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
-    }
-
-    @Override
-    protected Set<Material> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(Material.values())
-                .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
-                .collect(Collectors.toSet());
-    }
-
-    @Override
-    protected Set<Material> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(Material.values())
-                .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
-                .collect(Collectors.toSet());
     }
 
     @Override

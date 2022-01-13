@@ -35,8 +35,23 @@ public class DoubleValue extends NumericValue<Double> {
     }
 
     @Override
-    protected boolean listable() {
-        return listable;
+    protected Double min() {
+        return min;
+    }
+
+    @Override
+    protected Double max() {
+        return max;
+    }
+
+    @Override
+    protected boolean writableByCommand() {
+        return writable;
+    }
+
+    public DoubleValue writableByCommand(boolean writable) {
+        this.writable = writable;
+        return this;
     }
 
     @Override
@@ -54,34 +69,19 @@ public class DoubleValue extends NumericValue<Double> {
         return ((Double) argument.get(0));
     }
 
-    public DoubleValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public DoubleValue writableByCommand(boolean writable) {
-        this.writable = writable;
-        return this;
-    }
-
-    @Override
-    protected Double min() {
-        return min;
-    }
-
-    @Override
-    protected Double max() {
-        return max;
-    }
-
     @Override
     protected void onSetValue(Double newValue) {
         consumer.accept(newValue);
+    }
+
+    @Override
+    protected boolean listable() {
+        return listable;
+    }
+
+    public DoubleValue listable(boolean listable) {
+        this.listable = listable;
+        return this;
     }
 
     @Override

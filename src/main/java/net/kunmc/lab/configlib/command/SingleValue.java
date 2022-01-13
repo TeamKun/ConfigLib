@@ -11,10 +11,6 @@ public abstract class SingleValue<T> extends Value<T> {
         super(value);
     }
 
-    protected abstract void onSetValue(T newValue);
-
-    protected abstract boolean validateOnSet(T newValue);
-
     protected abstract boolean writableByCommand();
 
     protected abstract void appendArgument(UsageBuilder builder);
@@ -27,9 +23,13 @@ public abstract class SingleValue<T> extends Value<T> {
 
     protected abstract T argumentToValue(List<Object> argument, CommandSender sender);
 
+    protected abstract boolean validateOnSet(T newValue);
+
     protected String invalidValueMessage(String entryName, T newValue) {
         return "引数の値が不正です.";
     }
+
+    protected abstract void onSetValue(T newValue);
 
     protected String succeedSetMessage(String entryName) {
         return entryName + "の値を" + value() + "に設定しました.";

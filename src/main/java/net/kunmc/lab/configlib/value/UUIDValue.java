@@ -43,47 +43,6 @@ public class UUIDValue extends SingleValue<UUID> {
         this.consumer = onSet;
     }
 
-    @Override
-    public void value(UUID value) {
-        this.value = value;
-        this.playerName = playerName();
-    }
-
-    public void value(Player player) {
-        this.value = player.getUniqueId();
-        this.playerName = player.getName();
-    }
-
-    @Override
-    protected void onSetValue(UUID newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
-    protected boolean validateOnSet(UUID newValue) {
-        return true;
-    }
-
-    @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public UUIDValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public UUIDValue writableByCommand(boolean writable) {
-        this.writable = writable;
-        return this;
-    }
-
     public @Nullable OfflinePlayer toOfflinePlayer() {
         if (value != null) {
             return Bukkit.getOfflinePlayer(value);
@@ -109,18 +68,13 @@ public class UUIDValue extends SingleValue<UUID> {
     }
 
     @Override
-    public String toString() {
-        return String.format("UUIDValue{value=%s,playerName=%s,listable=%b,writable=%b}", value, playerName, listable, writable);
+    protected boolean writableByCommand() {
+        return writable;
     }
 
-    @Override
-    protected String succeedSetMessage(String entryName) {
-        return entryName + "の値を" + playerName() + "に設定しました.";
-    }
-
-    @Override
-    protected void sendListMessage(CommandContext ctx, String entryName) {
-        ctx.success(entryName + ": " + playerName());
+    public UUIDValue writableByCommand(boolean writable) {
+        this.writable = writable;
+        return this;
     }
 
     @Override
@@ -171,5 +125,51 @@ public class UUIDValue extends SingleValue<UUID> {
         }
 
         return "could not reach";
+    }
+
+    @Override
+    protected boolean validateOnSet(UUID newValue) {
+        return true;
+    }
+
+    @Override
+    protected void onSetValue(UUID newValue) {
+        consumer.accept(newValue);
+    }
+
+    @Override
+    protected String succeedSetMessage(String entryName) {
+        return entryName + "の値を" + playerName() + "に設定しました.";
+    }
+
+    @Override
+    public void value(UUID value) {
+        this.value = value;
+        this.playerName = playerName();
+    }
+
+    public void value(Player player) {
+        this.value = player.getUniqueId();
+        this.playerName = player.getName();
+    }
+
+    @Override
+    protected boolean listable() {
+        return listable;
+    }
+
+    public UUIDValue listable(boolean listable) {
+        this.listable = listable;
+        return this;
+    }
+
+    @Override
+    protected void sendListMessage(CommandContext ctx, String entryName) {
+        ctx.success(entryName + ": " + playerName());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("UUIDValue{value=%s,playerName=%s,listable=%b,writable=%b}", value, playerName, listable, writable);
     }
 }

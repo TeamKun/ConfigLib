@@ -26,26 +26,6 @@ public class BlockDataValue extends SingleValue<BlockData> {
         super(value);
         this.consumer = onSet;
     }
-   
-    @Override
-    protected void onSetValue(BlockData newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
-    protected boolean validateOnSet(BlockData newValue) {
-        return true;
-    }
-
-    @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public BlockDataValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
 
     @Override
     protected boolean writableByCommand() {
@@ -55,16 +35,6 @@ public class BlockDataValue extends SingleValue<BlockData> {
     protected BlockDataValue writableByCommand(boolean writable) {
         this.writable = writable;
         return this;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}", value(), listable, writable);
-    }
-
-    @Override
-    protected void sendListMessage(CommandContext ctx, String entryName) {
-        ctx.success(entryName + ": " + value.getMaterial().name());
     }
 
     @Override
@@ -95,7 +65,37 @@ public class BlockDataValue extends SingleValue<BlockData> {
     }
 
     @Override
+    protected boolean validateOnSet(BlockData newValue) {
+        return true;
+    }
+
+    @Override
+    protected void onSetValue(BlockData newValue) {
+        consumer.accept(newValue);
+    }
+
+    @Override
     protected String succeedSetMessage(String entryName) {
         return entryName + "の値を" + value.getMaterial().name() + "に設定しました.";
+    }
+
+    @Override
+    protected boolean listable() {
+        return listable;
+    }
+
+    public BlockDataValue listable(boolean listable) {
+        this.listable = listable;
+        return this;
+    }
+
+    @Override
+    protected void sendListMessage(CommandContext ctx, String entryName) {
+        ctx.success(entryName + ": " + value.getMaterial().name());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}", value(), listable, writable);
     }
 }

@@ -18,26 +18,6 @@ public abstract class SetValue<E> extends CollectionValue<Set<E>, E> implements 
     }
 
     @Override
-    protected boolean validateForAdd(Set<E> element) {
-        return !value.containsAll(element);
-    }
-
-    @Override
-    protected boolean validateForRemove(Set<E> element) {
-        return value.containsAll(element);
-    }
-
-    @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public <T extends SetValue<E>> T listable(boolean listable) {
-        this.listable = listable;
-        return (T) this;
-    }
-
-    @Override
     protected boolean addableByCommand() {
         return addable;
     }
@@ -45,6 +25,11 @@ public abstract class SetValue<E> extends CollectionValue<Set<E>, E> implements 
     public <T extends SetValue<E>> T addableByCommand(boolean addable) {
         this.addable = addable;
         return (T) this;
+    }
+
+    @Override
+    protected boolean validateForAdd(Set<E> element) {
+        return !value.containsAll(element);
     }
 
     @Override
@@ -58,12 +43,27 @@ public abstract class SetValue<E> extends CollectionValue<Set<E>, E> implements 
     }
 
     @Override
+    protected boolean validateForRemove(Set<E> element) {
+        return value.containsAll(element);
+    }
+
+    @Override
     protected boolean clearableByCommand() {
         return clearable;
     }
 
     public <T extends SetValue<E>> T clearableByCommand(boolean clearable) {
         this.clearable = clearable;
+        return (T) this;
+    }
+   
+    @Override
+    protected boolean listable() {
+        return listable;
+    }
+
+    public <T extends SetValue<E>> T listable(boolean listable) {
+        this.listable = listable;
         return (T) this;
     }
 

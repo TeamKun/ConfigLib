@@ -23,18 +23,13 @@ public class BooleanValue extends SingleValue<Boolean> {
     }
 
     @Override
-    protected void onSetValue(Boolean newValue) {
-        consumer.accept(newValue);
+    protected boolean writableByCommand() {
+        return writable;
     }
 
-    @Override
-    protected boolean validateOnSet(Boolean newValue) {
-        return true;
-    }
-
-    @Override
-    protected boolean listable() {
-        return listable;
+    public BooleanValue writableByCommand(boolean writable) {
+        this.writable = writable;
+        return this;
     }
 
     @Override
@@ -55,18 +50,23 @@ public class BooleanValue extends SingleValue<Boolean> {
         return ((Boolean) argument.get(0));
     }
 
-    public BooleanValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
+    @Override
+    protected boolean validateOnSet(Boolean newValue) {
+        return true;
+    }
+   
+    @Override
+    protected void onSetValue(Boolean newValue) {
+        consumer.accept(newValue);
     }
 
     @Override
-    protected boolean writableByCommand() {
-        return writable;
+    protected boolean listable() {
+        return listable;
     }
 
-    public BooleanValue writableByCommand(boolean writable) {
-        this.writable = writable;
+    public BooleanValue listable(boolean listable) {
+        this.listable = listable;
         return this;
     }
 

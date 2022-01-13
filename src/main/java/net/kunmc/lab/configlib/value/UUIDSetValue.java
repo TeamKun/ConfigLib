@@ -39,17 +39,10 @@ public class UUIDSetValue extends SetValue<UUID> {
         return this;
     }
 
-    @Override
-    protected void sendListMessage(CommandContext ctx, String entryName) {
-        String header = "-----" + entryName + "-----";
-        ctx.message(ChatColor.YELLOW + header);
-
-        ctx.success(this.stream()
-                .map(Bukkit::getOfflinePlayer)
-                .map(OfflinePlayer::getName)
-                .collect(Collectors.joining(",")));
-
-        ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
+    private Stream<OfflinePlayer> getPlayerStreamForAdd() {
+        return Arrays.stream(Bukkit.getOfflinePlayers())
+                .filter(p -> !value.contains(p.getUniqueId()))
+                .filter(p -> !onlyOnline || p.isOnline());
     }
 
     @Override
@@ -69,23 +62,6 @@ public class UUIDSetValue extends SetValue<UUID> {
         }));
     }
 
-    @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
-        List<Argument<?>> arguments = CommandUtil.getArguments(builder);
-
-        arguments.add(new UnparsedArgument("targets", () -> {
-            List<String> list = value.stream()
-                    .map(Bukkit::getOfflinePlayer)
-                    .map(OfflinePlayer::getName)
-                    .collect(Collectors.toList());
-            if (!list.isEmpty()) {
-                list.add("@a");
-                list.add("@r");
-            }
-
-            return list;
-        }));
-    }
 
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
@@ -97,16 +73,6 @@ public class UUIDSetValue extends SetValue<UUID> {
                         .anyMatch(s -> s.equals(sel));
     }
 
-    @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
-        String sel = argument.get(0).toString();
-        return sel.equals("@a") ||
-                sel.equals("@r") ||
-                value.stream()
-                        .map(Bukkit::getOfflinePlayer)
-                        .map(OfflinePlayer::getName)
-                        .anyMatch(s -> s.equals(sel));
-    }
 
     @Override
     protected String incorrectArgumentMessageForAdd(List<Object> argument) {
@@ -119,16 +85,6 @@ public class UUIDSetValue extends SetValue<UUID> {
         return "プレイヤーが見つかりませんでした.";
     }
 
-    @Override
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
-        String s = argument.get(0).toString();
-
-        if (s.startsWith("@")) {
-            return "セレクターは@aか@rのみを指定できます.";
-        }
-
-        return s + "は追加されていません.";
-    }
 
     @Override
     protected Set<UUID> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
@@ -152,37 +108,8 @@ public class UUIDSetValue extends SetValue<UUID> {
     }
 
     @Override
-    protected Set<UUID> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
-        String s = argument.get(0).toString();
-
-        if (s.equals("@a")) {
-            return Sets.newHashSet(value);
-        }
-
-        if (s.equals("@r")) {
-            List<UUID> list = value.stream().collect(Collectors.toList());
-            Collections.shuffle(list);
-            return Sets.newHashSet(list.get(0));
-        }
-
-        return Sets.newHashSet(Bukkit.getOfflinePlayerIfCached(s).getUniqueId());
-    }
-
-    private Stream<OfflinePlayer> getPlayerStreamForAdd() {
-        return Arrays.stream(Bukkit.getOfflinePlayers())
-                .filter(p -> !value.contains(p.getUniqueId()))
-                .filter(p -> !onlyOnline || p.isOnline());
-    }
-
-    @Override
     protected boolean validateForAdd(Set<UUID> element) {
         return !value.containsAll(element);
-    }
-
-    @Override
-    protected boolean validateForRemove(Set<UUID> element) {
-        return element.stream()
-                .anyMatch(value::contains);
     }
 
     @Override
@@ -205,6 +132,69 @@ public class UUIDSetValue extends SetValue<UUID> {
         }
 
         return entryName + "に" + element.size() + "人のプレイヤーを追加しました";
+    }
+
+    @Override
+    protected void appendArgumentForRemove(UsageBuilder builder) {
+        List<Argument<?>> arguments = CommandUtil.getArguments(builder);
+
+        arguments.add(new UnparsedArgument("targets", () -> {
+            List<String> list = value.stream()
+                    .map(Bukkit::getOfflinePlayer)
+                    .map(OfflinePlayer::getName)
+                    .collect(Collectors.toList());
+            if (!list.isEmpty()) {
+                list.add("@a");
+                list.add("@r");
+            }
+
+            return list;
+        }));
+    }
+
+    @Override
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+        String sel = argument.get(0).toString();
+        return sel.equals("@a") ||
+                sel.equals("@r") ||
+                value.stream()
+                        .map(Bukkit::getOfflinePlayer)
+                        .map(OfflinePlayer::getName)
+                        .anyMatch(s -> s.equals(sel));
+    }
+
+    @Override
+    protected Set<UUID> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+        String s = argument.get(0).toString();
+
+        if (s.equals("@a")) {
+            return Sets.newHashSet(value);
+        }
+
+        if (s.equals("@r")) {
+            List<UUID> list = value.stream().collect(Collectors.toList());
+            Collections.shuffle(list);
+            return Sets.newHashSet(list.get(0));
+        }
+
+        return Sets.newHashSet(Bukkit.getOfflinePlayerIfCached(s).getUniqueId());
+    }
+
+    @Override
+    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+        String s = argument.get(0).toString();
+
+        if (s.startsWith("@")) {
+            return "セレクターは@aか@rのみを指定できます.";
+        }
+
+        return s + "は追加されていません.";
+    }
+
+    @Override
+    protected boolean validateForRemove(Set<UUID> element) {
+        return element.stream()
+                .anyMatch(value::contains);
     }
 
     @Override
@@ -232,5 +222,18 @@ public class UUIDSetValue extends SetValue<UUID> {
     @Override
     protected String clearMessage(String entryName) {
         return entryName + "からすべてのプレイヤーを削除しました.";
+    }
+
+    @Override
+    protected void sendListMessage(CommandContext ctx, String entryName) {
+        String header = "-----" + entryName + "-----";
+        ctx.message(ChatColor.YELLOW + header);
+
+        ctx.success(this.stream()
+                .map(Bukkit::getOfflinePlayer)
+                .map(OfflinePlayer::getName)
+                .collect(Collectors.joining(",")));
+
+        ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
     }
 }

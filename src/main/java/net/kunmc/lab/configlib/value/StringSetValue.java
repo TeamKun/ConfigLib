@@ -20,6 +20,21 @@ public class StringSetValue extends SetValue<String> {
     }
 
     @Override
+    protected void appendArgumentForAdd(UsageBuilder builder) {
+        builder.stringArgument("String");
+    }
+
+    @Override
+    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+        return true;
+    }
+
+    @Override
+    protected Set<String> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+        return Collections.singleton(argument.get(0).toString());
+    }
+
+    @Override
     protected String invalidValueMessageForAdd(String entryName, Set<String> element) {
         return element.toArray(new String[0])[0] + "はすでに" + entryName + "に追加されています.";
     }
@@ -27,6 +42,21 @@ public class StringSetValue extends SetValue<String> {
     @Override
     protected String succeedMessageForAdd(String entryName, Set<String> element) {
         return entryName + "に" + element.toArray(new String[0])[0] + "を追加しました.";
+    }
+
+    @Override
+    protected void appendArgumentForRemove(UsageBuilder builder) {
+        builder.stringArgument("String");
+    }
+
+    @Override
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+        return true;
+    }
+
+    @Override
+    protected Set<String> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+        return Collections.singleton(argument.get(0).toString());
     }
 
     @Override
@@ -52,35 +82,5 @@ public class StringSetValue extends SetValue<String> {
         ctx.success(this.stream().collect(Collectors.joining(",")));
 
         ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
-    }
-
-    @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("String");
-    }
-
-    @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("String");
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        return true;
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
-        return true;
-    }
-
-    @Override
-    protected Set<String> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        return Collections.singleton(argument.get(0).toString());
-    }
-
-    @Override
-    protected Set<String> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
-        return Collections.singleton(argument.get(0).toString());
     }
 }

@@ -35,8 +35,23 @@ public class FloatValue extends NumericValue<Float> {
     }
 
     @Override
-    protected boolean listable() {
-        return listable;
+    protected Float min() {
+        return min;
+    }
+
+    @Override
+    protected Float max() {
+        return max;
+    }
+
+    @Override
+    protected boolean writableByCommand() {
+        return writable;
+    }
+
+    public FloatValue writableByCommand(boolean writable) {
+        this.writable = writable;
+        return this;
     }
 
     @Override
@@ -54,34 +69,19 @@ public class FloatValue extends NumericValue<Float> {
         return ((Float) argument.get(0));
     }
 
-    public FloatValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public FloatValue writableByCommand(boolean writable) {
-        this.writable = writable;
-        return this;
-    }
-
-    @Override
-    protected Float min() {
-        return min;
-    }
-
-    @Override
-    protected Float max() {
-        return max;
-    }
-
     @Override
     protected void onSetValue(Float newValue) {
         consumer.accept(newValue);
+    }
+
+    @Override
+    protected boolean listable() {
+        return listable;
+    }
+
+    public FloatValue listable(boolean listable) {
+        this.listable = listable;
+        return this;
     }
 
     @Override
