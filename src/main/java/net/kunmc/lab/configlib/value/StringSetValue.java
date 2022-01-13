@@ -11,6 +11,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class StringSetValue extends SetValue<String> {
+    private final transient List<String> allowStringList = new ArrayList<>();
+
     public StringSetValue(String... strings) {
         this(new HashSet<>(Arrays.asList(strings)));
     }
@@ -19,14 +21,27 @@ public class StringSetValue extends SetValue<String> {
         super(value);
     }
 
+    public StringSetValue addAllowString(@NotNull String s) {
+        allowStringList.add(s);
+        return this;
+    }
+
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("String");
+        builder.stringArgument("String", sb -> {
+            sb.suggestAll(allowStringList.stream()
+                    .filter(s -> !value.contains(s))
+                    .collect(Collectors.toList()));
+        }, null);
     }
 
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        return true;
+        if (allowStringList.isEmpty()) {
+            return true;
+        }
+
+        return allowStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
     }
 
     @Override
@@ -51,7 +66,9 @@ public class StringSetValue extends SetValue<String> {
 
     @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("String");
+        builder.stringArgument("String", sb -> {
+            sb.suggestAll(new ArrayList<>(value));
+        }, null);
     }
 
     @Override
