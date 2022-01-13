@@ -8,13 +8,26 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class EnumValue<T extends Enum<T>> extends SingleValue<T> {
+public class EnumValue<T extends Enum<T>> extends SingleValue<T> {
+    private transient Boolean listable = true;
+    private transient Boolean writable = true;
+
     public EnumValue(T value) {
         super(value);
     }
 
     private T[] constants() {
         return ((T[]) value.getClass().getEnumConstants());
+    }
+
+    @Override
+    protected boolean writableByCommand() {
+        return writable;
+    }
+
+    public EnumValue<T> writableByCommand(boolean writable) {
+        this.writable = writable;
+        return this;
     }
 
     @Override
@@ -54,5 +67,15 @@ public abstract class EnumValue<T extends Enum<T>> extends SingleValue<T> {
     @Override
     protected String invalidValueMessage(String entryName, T newValue) {
         return newValue.name() + "は不正な値です.";
+    }
+
+    @Override
+    protected boolean listable() {
+        return listable;
+    }
+
+    public EnumValue<T> listable(boolean listable) {
+        this.listable = listable;
+        return this;
     }
 }
