@@ -69,3 +69,8 @@ publishing {
 jar {
     exclude "net/minecraft"
 }
+
+javadoc {
+    options.charSet = 'UTF-8'
+    options.encoding = 'UTF-8'
+}
