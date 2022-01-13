@@ -68,9 +68,12 @@ publishing {
 
 jar {
     exclude "net/minecraft"
+    exclude "org/bukkit"
 }
 
 javadoc {
+    exclude "net/minecraft"
+    exclude "org/bukkit"
     options.charSet = 'UTF-8'
     options.encoding = 'UTF-8'
 }
