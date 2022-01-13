@@ -49,7 +49,7 @@ public class StringListValue extends ListValue<String> {
 
     @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("StringArgument");
+        builder.stringArgument("String");
     }
 
     @Override
