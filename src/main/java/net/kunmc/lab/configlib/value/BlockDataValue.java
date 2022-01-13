@@ -32,7 +32,7 @@ public class BlockDataValue extends SingleValue<BlockData> {
         return writable;
     }
 
-    protected BlockDataValue writableByCommand(boolean writable) {
+    public BlockDataValue writableByCommand(boolean writable) {
         this.writable = writable;
         return this;
     }
