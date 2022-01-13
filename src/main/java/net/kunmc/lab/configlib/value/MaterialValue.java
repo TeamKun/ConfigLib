@@ -1,15 +1,8 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
-import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
 
-import java.util.Arrays;
-import java.util.List;
-
-public final class MaterialValue extends SingleValue<Material> {
+public final class MaterialValue extends EnumValue<Material> {
     private transient Boolean listable = true;
     private transient Boolean writable = true;
 
@@ -25,45 +18,6 @@ public final class MaterialValue extends SingleValue<Material> {
     public MaterialValue writableByCommand(boolean writable) {
         this.writable = writable;
         return this;
-    }
-
-    @Override
-    protected void appendArgument(UsageBuilder builder) {
-        builder.stringArgument("MaterialName", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(Material.values())
-                    .map(Material::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
-    }
-
-    @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(Material.values())
-                .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
-        return argument.get(0) + "は不明なMaterialです.";
-    }
-
-    @Override
-    protected Material argumentToValue(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(Material.values())
-                .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
-                .findFirst()
-                .get();
-    }
-
-    @Override
-    protected boolean validateOnSet(Material newValue) {
-        return true;
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, Material newValue) {
-        return newValue.name() + "は不正な値です.";
     }
 
     @Override
