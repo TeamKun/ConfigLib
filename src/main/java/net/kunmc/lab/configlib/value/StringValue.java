@@ -7,6 +7,7 @@ import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StringValue extends SingleValue<String> {
@@ -16,7 +17,9 @@ public class StringValue extends SingleValue<String> {
     private transient Boolean writable = true;
     protected transient String name = "String";
     protected transient StringArgument.Type type = StringArgument.Type.WORD;
+    protected final transient List<String> allowStringList = new ArrayList<>();
     protected transient SuggestionAction suggestionAction = builder -> {
+        builder.suggestAll(allowStringList);
     };
 
     public StringValue(String value) {
@@ -36,6 +39,11 @@ public class StringValue extends SingleValue<String> {
 
     public StringValue type(@NotNull StringArgument.Type type) {
         this.type = type;
+        return this;
+    }
+
+    public StringValue addAllowString(@NotNull String s) {
+        allowStringList.add(s);
         return this;
     }
 
@@ -61,7 +69,11 @@ public class StringValue extends SingleValue<String> {
 
     @Override
     protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
-        return true;
+        if (allowStringList.isEmpty()) {
+            return true;
+        }
+
+        return allowStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
     }
 
     @Override
