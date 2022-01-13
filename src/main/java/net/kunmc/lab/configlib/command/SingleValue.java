@@ -46,7 +46,9 @@ public abstract class SingleValue<T> extends Value<T> {
     }
 
     protected boolean onSetValue(T newValue, CommandContext ctx) {
-        return listeners.stream().anyMatch(x -> x.apply(newValue, ctx));
+        return listeners.stream()
+                .map(x -> x.apply(newValue, ctx))
+                .reduce(false, (a, b) -> a || b);
     }
 
     protected String succeedSetMessage(String entryName) {
