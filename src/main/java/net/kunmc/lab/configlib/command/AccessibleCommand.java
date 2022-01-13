@@ -22,7 +22,7 @@ class AccessibleCommand extends Command {
         example(example);
     }
 
-    public void setUsage(UsageAction action) {
+    public void addUsage(UsageAction action) {
         usage(action);
     }
 
