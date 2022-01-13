@@ -76,6 +76,11 @@ public class LocationValue extends SingleValue<Location> {
     }
 
     @Override
+    protected String incorrectArgumentMessage(List<Object> argument) {
+        return argument.get(0) + "は不正な引数です.";
+    }
+
+    @Override
     protected Location argumentToValue(List<Object> argument, CommandSender sender) {
         Location l = ((Location) argument.get(0));
 
@@ -104,13 +109,18 @@ public class LocationValue extends SingleValue<Location> {
     }
 
     @Override
+    protected String invalidValueMessage(String entryName, Location newValue) {
+        return locationToString(newValue) + "はすでに設定されている値です.";
+    }
+
+    @Override
     protected void onSetValue(Location newValue) {
         consumer.accept(newValue);
     }
 
     @Override
     protected String succeedSetMessage(String entryName) {
-        return entryName + "の値を" + locationToString() + "に設定しました.";
+        return entryName + "の値を" + locationToString(value) + "に設定しました.";
     }
 
     @Override
@@ -128,12 +138,12 @@ public class LocationValue extends SingleValue<Location> {
         if (value == null) {
             ctx.success(entryName + ": null");
         } else {
-            ctx.success(entryName + ": " + locationToString());
+            ctx.success(entryName + ": " + locationToString(value));
         }
     }
 
-    private String locationToString() {
+    private String locationToString(Location location) {
         return String.format("world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f",
-                value.getWorld().getName(), value.getX(), value.getY(), value.getZ(), value.getPitch(), value.getYaw());
+                location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
     }
 }

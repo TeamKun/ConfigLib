@@ -17,17 +17,13 @@ public abstract class SingleValue<T> extends Value<T> {
 
     protected abstract boolean isCorrectArgument(List<Object> argument, CommandSender sender);
 
-    protected String incorrectArgumentMessage(List<Object> argument) {
-        return argument.get(0) + "は不正な引数です.";
-    }
+    protected abstract String incorrectArgumentMessage(List<Object> argument);
 
     protected abstract T argumentToValue(List<Object> argument, CommandSender sender);
 
     protected abstract boolean validateOnSet(T newValue);
 
-    protected String invalidValueMessage(String entryName, T newValue) {
-        return "引数の値が不正です.";
-    }
+    protected abstract String invalidValueMessage(String entryName, T newValue);
 
     protected abstract void onSetValue(T newValue);
 

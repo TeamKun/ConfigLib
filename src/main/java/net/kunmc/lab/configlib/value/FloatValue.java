@@ -65,6 +65,11 @@ public class FloatValue extends NumericValue<Float> {
     }
 
     @Override
+    protected String incorrectArgumentMessage(List<Object> argument) {
+        return argument.get(0) + "は不正な引数です.";
+    }
+
+    @Override
     protected Float argumentToValue(List<Object> argument, CommandSender sender) {
         return ((Float) argument.get(0));
     }

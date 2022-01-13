@@ -18,6 +18,6 @@ public abstract class NumericValue<T extends Comparable<T>> extends SingleValue<
 
     @Override
     protected String invalidValueMessage(String entryName, T argument) {
-        return entryName + "は" + min() + "以上" + max() + "以下の値を入力してください.";
+        return min() + "以上" + max() + "以下の値を入力してください.";
     }
 }

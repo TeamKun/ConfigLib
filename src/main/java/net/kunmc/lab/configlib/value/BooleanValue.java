@@ -46,6 +46,11 @@ public class BooleanValue extends SingleValue<Boolean> {
     }
 
     @Override
+    protected String incorrectArgumentMessage(List<Object> argument) {
+        return argument.get(0) + "は不正な引数です.";
+    }
+
+    @Override
     protected Boolean argumentToValue(List<Object> argument, CommandSender sender) {
         return ((Boolean) argument.get(0));
     }
@@ -54,7 +59,12 @@ public class BooleanValue extends SingleValue<Boolean> {
     protected boolean validateOnSet(Boolean newValue) {
         return true;
     }
-   
+
+    @Override
+    protected String invalidValueMessage(String entryName, Boolean newValue) {
+        return newValue + "は不正な値です.";
+    }
+
     @Override
     protected void onSetValue(Boolean newValue) {
         consumer.accept(newValue);

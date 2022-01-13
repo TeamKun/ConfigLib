@@ -133,6 +133,11 @@ public class UUIDValue extends SingleValue<UUID> {
     }
 
     @Override
+    protected String invalidValueMessage(String entryName, UUID newValue) {
+        return newValue + "は不正な値です.";
+    }
+
+    @Override
     protected void onSetValue(UUID newValue) {
         consumer.accept(newValue);
     }

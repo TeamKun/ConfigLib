@@ -65,6 +65,11 @@ public class IntegerValue extends NumericValue<Integer> {
     }
 
     @Override
+    protected String incorrectArgumentMessage(List<Object> argument) {
+        return argument.get(0) + "は不正な引数です.";
+    }
+
+    @Override
     protected Integer argumentToValue(List<Object> argument, CommandSender sender) {
         return ((Integer) argument.get(0));
     }

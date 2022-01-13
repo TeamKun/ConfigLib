@@ -65,6 +65,11 @@ public class DoubleValue extends NumericValue<Double> {
     }
 
     @Override
+    protected String incorrectArgumentMessage(List<Object> argument) {
+        return argument.get(0) + "は不正な引数です.";
+    }
+
+    @Override
     protected Double argumentToValue(List<Object> argument, CommandSender sender) {
         return ((Double) argument.get(0));
     }

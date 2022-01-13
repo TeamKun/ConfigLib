@@ -79,6 +79,11 @@ public class StringValue extends SingleValue<String> {
     }
 
     @Override
+    protected String incorrectArgumentMessage(List<Object> argument) {
+        return argument.get(0) + "は不正な引数です.";
+    }
+
+    @Override
     protected String argumentToValue(List<Object> argument, CommandSender sender) {
         return argument.get(0).toString();
     }

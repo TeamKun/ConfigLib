@@ -56,6 +56,11 @@ public class BlockDataValue extends SingleValue<BlockData> {
     }
 
     @Override
+    protected String incorrectArgumentMessage(List<Object> argument) {
+        return argument.get(0) + "はブロック化出来ない値です.";
+    }
+
+    @Override
     protected BlockData argumentToValue(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
@@ -67,6 +72,11 @@ public class BlockDataValue extends SingleValue<BlockData> {
     @Override
     protected boolean validateOnSet(BlockData newValue) {
         return true;
+    }
+
+    @Override
+    protected String invalidValueMessage(String entryName, BlockData newValue) {
+        return newValue.getMaterial().name() + "は不正な値です.";
     }
 
     @Override

@@ -52,6 +52,11 @@ public final class MaterialValue extends SingleValue<Material> {
     }
 
     @Override
+    protected String incorrectArgumentMessage(List<Object> argument) {
+        return argument.get(0) + "は不明なMaterialです.";
+    }
+
+    @Override
     protected Material argumentToValue(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
@@ -62,6 +67,11 @@ public final class MaterialValue extends SingleValue<Material> {
     @Override
     protected boolean validateOnSet(Material newValue) {
         return true;
+    }
+
+    @Override
+    protected String invalidValueMessage(String entryName, Material newValue) {
+        return newValue.name() + "は不正な値です.";
     }
 
     @Override
