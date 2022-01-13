@@ -8,21 +8,13 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 public final class MaterialValue extends SingleValue<Material> {
-    private final transient Consumer<Material> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
 
     public MaterialValue(Material value) {
-        this(value, x -> {
-        });
-    }
-
-    public MaterialValue(Material value, Consumer<Material> onSet) {
         super(value);
-        this.consumer = onSet;
     }
 
     @Override

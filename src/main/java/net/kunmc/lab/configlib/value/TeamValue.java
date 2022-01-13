@@ -11,14 +11,12 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * If you need completions with NewScoreboard, you should register it with scoreboard(Scoreboard) method.
  * When you use NewScoreboard, this class can't be deserialized. Therefore, a field must be qualified as transient at that time.
  */
 public class TeamValue extends SingleValue<Team> {
-    private transient final Consumer<Team> consumer;
     private transient Scoreboard scoreboard;
     private transient boolean listable = true;
     private transient boolean writable = true;
@@ -28,17 +26,7 @@ public class TeamValue extends SingleValue<Team> {
     }
 
     public TeamValue(Team value) {
-        this(value, t -> {
-        });
-    }
-
-    public TeamValue(Consumer<Team> onSet) {
-        this(null, onSet);
-    }
-
-    public TeamValue(Team value, Consumer<Team> onSet) {
         super(value);
-        consumer = onSet;
         scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
     }
 

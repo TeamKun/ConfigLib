@@ -4,34 +4,21 @@ import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class DoubleValue extends NumericValue<Double> {
     private final Double min;
     private final Double max;
-    private final transient Consumer<Double> consumer;
     private transient boolean listable = true;
     private transient boolean writable = true;
 
     public DoubleValue(Double value) {
-        this(value, x -> {
-        });
-    }
-
-    public DoubleValue(Double value, Consumer<Double> onSet) {
-        this(value, Double.MIN_VALUE, Double.MAX_VALUE, onSet);
+        this(value, Double.MIN_VALUE, Double.MAX_VALUE);
     }
 
     public DoubleValue(Double value, Double min, Double max) {
-        this(value, min, max, x -> {
-        });
-    }
-
-    public DoubleValue(Double value, Double min, Double max, Consumer<Double> onSet) {
         super(value);
         this.min = min;
         this.max = max;
-        this.consumer = onSet;
     }
 
     @Override

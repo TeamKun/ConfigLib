@@ -10,21 +10,13 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class BlockDataValue extends SingleValue<BlockData> {
-    private final transient Consumer<BlockData> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
 
     public BlockDataValue(BlockData value) {
-        this(value, x -> {
-        });
-    }
-
-    public BlockDataValue(BlockData value, Consumer<BlockData> onSet) {
         super(value);
-        this.consumer = onSet;
     }
 
     @Override

@@ -5,21 +5,13 @@ import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class BooleanValue extends SingleValue<Boolean> {
-    private final transient Consumer<Boolean> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
 
     public BooleanValue(Boolean value) {
-        this(value, x -> {
-        });
-    }
-
-    public BooleanValue(Boolean value, Consumer<Boolean> onSet) {
         super(value);
-        this.consumer = onSet;
     }
 
     @Override

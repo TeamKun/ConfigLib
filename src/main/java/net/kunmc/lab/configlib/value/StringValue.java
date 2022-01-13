@@ -8,12 +8,10 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class StringValue extends SingleValue<String> {
     private final int min;
     private final int max;
-    private transient final Consumer<String> consumer;
     private transient Boolean listable = true;
     private transient Boolean writable = true;
     protected transient String name = "String";
@@ -22,24 +20,13 @@ public class StringValue extends SingleValue<String> {
     };
 
     public StringValue(String value) {
-        this(value, x -> {
-        });
-    }
-
-    public StringValue(String value, Consumer<String> onSet) {
-        this(value, 0, 256, onSet);
+        this(value, 0, 256);
     }
 
     public StringValue(String value, int min, int max) {
-        this(value, min, max, x -> {
-        });
-    }
-
-    public StringValue(String value, int min, int max, Consumer<String> onSet) {
         super(value);
         this.min = min;
         this.max = max;
-        this.consumer = onSet;
     }
 
     public StringValue name(@NotNull String name) {

@@ -4,36 +4,23 @@ import dev.kotx.flylib.command.UsageBuilder;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class IntegerValue extends NumericValue<Integer> {
     private final Integer min;
     private final Integer max;
-    private final transient Consumer<Integer> consumer;
     private transient boolean listable = true;
     private transient boolean writable = true;
 
     public IntegerValue(Integer value) {
-        this(value, x -> {
-        });
-    }
-
-    public IntegerValue(Integer value, Consumer<Integer> onSet) {
-        this(value, Integer.MIN_VALUE, Integer.MAX_VALUE, onSet);
+        this(value, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     public IntegerValue(Integer value, Integer min, Integer max) {
-        this(value, min, max, x -> {
-        });
-    }
-
-    public IntegerValue(Integer value, Integer min, Integer max, Consumer<Integer> onSet) {
         super(value);
         this.min = min;
         this.max = max;
-        this.consumer = onSet;
     }
-
+   
     @Override
     protected Integer min() {
         return min;

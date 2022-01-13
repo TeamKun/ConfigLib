@@ -14,10 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class LocationValue extends SingleValue<Location> {
-    private transient final Consumer<Location> consumer;
     private transient boolean listable = true;
     private transient boolean writable = true;
 
@@ -26,19 +24,9 @@ public class LocationValue extends SingleValue<Location> {
     }
 
     public LocationValue(Location value) {
-        this(value, x -> {
-        });
-    }
-
-    public LocationValue(Consumer<Location> onSet) {
-        this(null, onSet);
-    }
-
-    public LocationValue(Location value, Consumer<Location> onSet) {
         super(value);
-        consumer = onSet;
     }
-
+   
     public Block getBlock() {
         if (value == null) {
             return null;

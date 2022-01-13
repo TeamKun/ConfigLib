@@ -11,12 +11,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class UUIDValue extends SingleValue<UUID> {
     private String playerName;
-    private final transient Consumer<UUID> consumer;
     private transient boolean listable = true;
     private transient boolean writable = true;
 
@@ -29,18 +27,8 @@ public class UUIDValue extends SingleValue<UUID> {
     }
 
     public UUIDValue(UUID value) {
-        this(value, x -> {
-        });
-    }
-
-    public UUIDValue(Player player, Consumer<UUID> onSet) {
-        this(player.getUniqueId(), onSet);
-    }
-
-    public UUIDValue(UUID value, Consumer<UUID> onSet) {
         super(value);
         this.playerName = playerName();
-        this.consumer = onSet;
     }
 
     public @Nullable OfflinePlayer toOfflinePlayer() {
