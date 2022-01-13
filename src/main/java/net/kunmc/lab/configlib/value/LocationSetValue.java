@@ -38,6 +38,11 @@ public class LocationSetValue extends SetValue<Location> {
     }
 
     @Override
+    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+        return argument.get(0) + "は不正な引数です.";
+    }
+
+    @Override
     public Set<Location> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         Location l = ((Location) argument.get(0));
 
@@ -101,14 +106,12 @@ public class LocationSetValue extends SetValue<Location> {
 
     @Override
     public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
-        double x = ((Double) argument.get(0));
-        double y = ((Double) argument.get(1));
-        double z = ((Double) argument.get(2));
+        return true;
+    }
 
-        return value.stream()
-                .filter(l -> l.getX() == x)
-                .filter(l -> l.getY() == y)
-                .anyMatch(l -> l.getZ() == z);
+    @Override
+    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+        return argument + "は不正な引数です.";
     }
 
     @Override

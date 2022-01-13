@@ -42,6 +42,11 @@ public class MaterialSetValue extends SetValue<Material> {
     }
 
     @Override
+    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+        return argument.get(0) + "は存在してないMaterialです.";
+    }
+
+    @Override
     protected Set<Material> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
@@ -74,6 +79,11 @@ public class MaterialSetValue extends SetValue<Material> {
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         return Arrays.stream(Material.values())
                 .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
+    }
+
+    @Override
+    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+        return argument.get(0) + "は存在しないMaterialです.";
     }
 
     @Override

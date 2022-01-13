@@ -30,6 +30,11 @@ public class StringSetValue extends SetValue<String> {
     }
 
     @Override
+    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+        return argument + "は不正な引数です";
+    }
+
+    @Override
     protected Set<String> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         return Collections.singleton(argument.get(0).toString());
     }
@@ -52,6 +57,11 @@ public class StringSetValue extends SetValue<String> {
     @Override
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         return true;
+    }
+
+    @Override
+    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+        return argument + "は不正な引数です";
     }
 
     @Override

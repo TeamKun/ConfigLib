@@ -30,6 +30,11 @@ public class StringListValue extends ListValue<String> {
     }
 
     @Override
+    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+        return argument + "は不正な引数です.";
+    }
+
+    @Override
     protected List<String> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         return argument.stream()
                 .map(Object::toString)
@@ -54,6 +59,11 @@ public class StringListValue extends ListValue<String> {
     @Override
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         return true;
+    }
+
+    @Override
+    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+        return argument + "は不正な引数です.";
     }
 
     @Override

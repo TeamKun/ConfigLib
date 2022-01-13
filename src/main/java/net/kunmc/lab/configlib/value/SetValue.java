@@ -56,7 +56,7 @@ public abstract class SetValue<E> extends CollectionValue<Set<E>, E> implements 
         this.clearable = clearable;
         return (T) this;
     }
-   
+
     @Override
     protected boolean listable() {
         return listable;

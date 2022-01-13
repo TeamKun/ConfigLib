@@ -17,9 +17,7 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
 
     protected abstract boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender);
 
-    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
-        return argument + "は不正な引数です.";
-    }
+    protected abstract String incorrectArgumentMessageForAdd(List<Object> argument);
 
     protected abstract T argumentToValueForAdd(List<Object> argument, CommandSender sender);
 
@@ -35,9 +33,7 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
 
     protected abstract boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender);
 
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
-        return argument + "は不正な引数です.";
-    }
+    protected abstract String incorrectArgumentMessageForRemove(List<Object> argument);
 
     protected abstract T argumentToValueForRemove(List<Object> argument, CommandSender sender);
 

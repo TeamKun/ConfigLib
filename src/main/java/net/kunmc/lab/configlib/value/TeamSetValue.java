@@ -59,9 +59,13 @@ public class TeamSetValue extends SetValue<Team> {
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         String name = argument.get(0).toString();
         return scoreboard.getTeams().stream()
-                .filter(t -> !value.contains(t))
                 .map(Team::getName)
                 .anyMatch(s -> s.equals(name));
+    }
+
+    @Override
+    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+        return argument.get(0) + "は存在しないチームです";
     }
 
     @Override
@@ -95,6 +99,11 @@ public class TeamSetValue extends SetValue<Team> {
         return value.stream()
                 .map(Team::getName)
                 .anyMatch(s -> s.equals(name));
+    }
+
+    @Override
+    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+        return argument.get(0) + "は存在しないチームです.";
     }
 
     @Override
