@@ -62,7 +62,6 @@ public class UUIDSetValue extends SetValue<UUID> {
         }));
     }
 
-
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         String sel = argument.get(0).toString();
@@ -72,7 +71,6 @@ public class UUIDSetValue extends SetValue<UUID> {
                         .map(OfflinePlayer::getName)
                         .anyMatch(s -> s.equals(sel));
     }
-
 
     @Override
     protected String incorrectArgumentMessageForAdd(List<Object> argument) {

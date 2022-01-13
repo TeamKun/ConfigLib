@@ -36,7 +36,6 @@ public class StringListValue extends ListValue<String> {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     protected String invalidValueMessageForAdd(String entryName, List<String> element) {
         return "";
