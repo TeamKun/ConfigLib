@@ -101,7 +101,14 @@ public class LocationSetValue extends SetValue<Location> {
 
     @Override
     public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
-        return true;
+        double x = ((Double) argument.get(0));
+        double y = ((Double) argument.get(1));
+        double z = ((Double) argument.get(2));
+
+        return value.stream()
+                .filter(l -> l.getX() == x)
+                .filter(l -> l.getY() == y)
+                .anyMatch(l -> l.getZ() == z);
     }
 
     @Override
@@ -116,7 +123,7 @@ public class LocationSetValue extends SetValue<Location> {
                 .filter(l -> l.getZ() == z)
                 .collect(Collectors.toSet());
     }
-   
+
     @Override
     public String invalidValueMessageForRemove(String entryName, Set<Location> element) {
         Location l = element.toArray(new Location[0])[0];
