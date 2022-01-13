@@ -66,11 +66,6 @@ public class BooleanValue extends SingleValue<Boolean> {
     }
 
     @Override
-    protected void onSetValue(Boolean newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
     protected boolean listable() {
         return listable;
     }

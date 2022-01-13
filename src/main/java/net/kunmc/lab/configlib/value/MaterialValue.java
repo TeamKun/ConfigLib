@@ -75,11 +75,6 @@ public final class MaterialValue extends SingleValue<Material> {
     }
 
     @Override
-    protected void onSetValue(Material newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
     protected boolean listable() {
         return listable;
     }

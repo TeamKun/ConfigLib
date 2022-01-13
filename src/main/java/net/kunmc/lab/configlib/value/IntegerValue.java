@@ -75,11 +75,6 @@ public class IntegerValue extends NumericValue<Integer> {
     }
 
     @Override
-    protected void onSetValue(Integer newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
     protected boolean listable() {
         return listable;
     }

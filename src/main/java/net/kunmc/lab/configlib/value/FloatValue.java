@@ -75,11 +75,6 @@ public class FloatValue extends NumericValue<Float> {
     }
 
     @Override
-    protected void onSetValue(Float newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
     protected boolean listable() {
         return listable;
     }

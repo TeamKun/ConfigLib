@@ -89,11 +89,6 @@ public class StringValue extends SingleValue<String> {
     }
 
     @Override
-    protected void onSetValue(String newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
     protected boolean validateOnSet(String newValue) {
         return newValue.length() >= min && newValue.length() <= max;
     }

@@ -114,11 +114,6 @@ public class LocationValue extends SingleValue<Location> {
     }
 
     @Override
-    protected void onSetValue(Location newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
     protected String succeedSetMessage(String entryName) {
         return entryName + "の値を" + locationToString(value) + "に設定しました.";
     }

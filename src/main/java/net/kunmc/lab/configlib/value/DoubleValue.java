@@ -75,11 +75,6 @@ public class DoubleValue extends NumericValue<Double> {
     }
 
     @Override
-    protected void onSetValue(Double newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
     protected boolean listable() {
         return listable;
     }

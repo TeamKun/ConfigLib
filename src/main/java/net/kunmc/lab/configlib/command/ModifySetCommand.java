@@ -56,7 +56,10 @@ class ModifySetCommand extends AccessibleCommand {
                     return;
                 }
 
-                value.onSetValue(newValue);
+                if (value.onSetValue(newValue, ctx)) {
+                    return;
+                }
+
                 value.value(newValue);
                 ctx.success(value.succeedSetMessage(entryName));
 

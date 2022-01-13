@@ -80,11 +80,6 @@ public class BlockDataValue extends SingleValue<BlockData> {
     }
 
     @Override
-    protected void onSetValue(BlockData newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
     protected String succeedSetMessage(String entryName) {
         return entryName + "の値を" + value.getMaterial().name() + "に設定しました.";
     }

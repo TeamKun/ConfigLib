@@ -103,11 +103,6 @@ public class TeamValue extends SingleValue<Team> {
     }
 
     @Override
-    protected void onSetValue(Team newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
     protected String succeedSetMessage(String entryName) {
         return entryName + "の値を" + value.getName() + "に設定しました.";
     }

@@ -138,11 +138,6 @@ public class UUIDValue extends SingleValue<UUID> {
     }
 
     @Override
-    protected void onSetValue(UUID newValue) {
-        consumer.accept(newValue);
-    }
-
-    @Override
     protected String succeedSetMessage(String entryName) {
         return entryName + "の値を" + playerName() + "に設定しました.";
     }
