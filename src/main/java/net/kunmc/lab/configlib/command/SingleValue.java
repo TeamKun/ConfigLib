@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 public abstract class SingleValue<T> extends Value<T> {
     private final transient List<BiFunction<T, CommandContext, Boolean>> listeners = new ArrayList<>();
@@ -29,6 +30,12 @@ public abstract class SingleValue<T> extends Value<T> {
     protected abstract boolean validateOnSet(T newValue);
 
     protected abstract String invalidValueMessage(String entryName, T newValue);
+
+    public <U extends SingleValue<T>> U onSet(Consumer<T> listener) {
+        return onSet((v, ctx) -> {
+            listener.accept(v);
+        });
+    }
 
     public <U extends SingleValue<T>> U onSet(BiConsumer<T, CommandContext> listener) {
         return onSet((v, ctx) -> {

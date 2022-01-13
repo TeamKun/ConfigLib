@@ -35,6 +35,12 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
 
     protected abstract String invalidValueMessageForAdd(String entryName, T value);
 
+    public <U extends CollectionValue<T, E>> U onAdd(Consumer<T> listener) {
+        return onAdd((v, ctx) -> {
+            listener.accept(v);
+        });
+    }
+
     public <U extends CollectionValue<T, E>> U onAdd(BiConsumer<T, CommandContext> listener) {
         return onAdd((v, ctx) -> {
             listener.accept(v, ctx);
@@ -72,6 +78,12 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
 
     protected abstract String invalidValueMessageForRemove(String entryName, T value);
 
+    public <U extends CollectionValue<T, E>> U onRemove(Consumer<T> listener) {
+        return onRemove((v, ctx) -> {
+            listener.accept(v);
+        });
+    }
+
     public <U extends CollectionValue<T, E>> U onRemove(BiConsumer<T, CommandContext> listener) {
         return onRemove((v, ctx) -> {
             listener.accept(v, ctx);
@@ -97,6 +109,11 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
 
     protected abstract boolean clearableByCommand();
 
+    public <U extends CollectionValue<T, E>> U onClear(Runnable listener) {
+        return onClear(ctx -> {
+            listener.run();
+        });
+    }
 
     public <U extends CollectionValue<T, E>> U onClear(Consumer<CommandContext> listener) {
         return onClear(ctx -> {
