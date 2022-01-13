@@ -44,7 +44,6 @@ public class StringValue extends SingleValue<String> {
         return this;
     }
 
-
     @Override
     protected boolean writableByCommand() {
         return writable;
