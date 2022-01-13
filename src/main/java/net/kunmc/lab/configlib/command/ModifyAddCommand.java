@@ -47,6 +47,10 @@ class ModifyAddCommand extends CollectionValueItem {
 
     @Override
     void writeProcess(CommandContext ctx, String entryName, Collection value) {
+        if (this.value.onAddValue(value, ctx)) {
+            return;
+        }
+
         ((Collection) this.value.value()).addAll(value);
         ctx.success(this.value.succeedMessageForAdd(entryName, value));
     }
