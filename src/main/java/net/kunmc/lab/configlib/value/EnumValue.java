@@ -4,6 +4,7 @@ import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.StringArgument;
 import net.kunmc.lab.configlib.command.SingleValue;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +13,7 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T> {
     private transient Boolean listable = true;
     private transient Boolean writable = true;
 
-    public EnumValue(T value) {
+    public EnumValue(@NotNull T value) {
         super(value);
     }
 
