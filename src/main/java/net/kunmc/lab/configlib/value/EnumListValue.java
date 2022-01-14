@@ -1,31 +1,27 @@
 package net.kunmc.lab.configlib.value;
 
-import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.StringArgument;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-public class EnumSetValue<T extends Enum<T>> extends SetValue<T> {
+public class EnumListValue<T extends Enum<T>> extends ListValue<T> {
     private final transient Class<?> enumClass;
 
-
-    public EnumSetValue(T... values) {
-        this(new HashSet<>(), values);
+    public EnumListValue(T... values) {
+        this(new ArrayList<>(), values);
     }
 
-    public EnumSetValue(@NotNull Set<T> value, T... values) {
+    public EnumListValue(List<T> value, T... values) {
         super(value);
-        this.value.addAll(Sets.newHashSet(values));
+        this.value.addAll(Arrays.asList(values));
 
         enumClass = values.getClass().getComponentType();
     }
@@ -56,22 +52,25 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T> {
     }
 
     @Override
-    protected Set<T> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    protected List<T> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
                 .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     @Override
-    protected String invalidValueMessageForAdd(String entryName, Set<T> value) {
-        Enum<?> e = value.toArray(new Enum<?>[0])[0];
-        return e.name() + "はすでに" + entryName + "に追加されています.";
+    protected boolean validateForAdd(List<T> value) {
+        return true;
     }
 
     @Override
-    protected String succeedMessageForAdd(String entryName, Set<T> value) {
-        Enum<?> e = value.toArray(new Enum<?>[0])[0];
-        return entryName + "に" + e.name() + "を追加しました.";
+    protected String invalidValueMessageForAdd(String entryName, List<T> value) {
+        return "";
+    }
+
+    @Override
+    protected String succeedMessageForAdd(String entryName, List<T> value) {
+        return entryName + "に" + value.get(0).name() + "を追加しました.";
     }
 
     @Override
@@ -96,22 +95,20 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T> {
     }
 
     @Override
-    protected Set<T> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected List<T> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
                 .filter(x -> x.name().equals(argument.get(0).toString().toUpperCase()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     @Override
-    protected String invalidValueMessageForRemove(String entryName, Set<T> value) {
-        Enum<?> e = value.toArray(new Enum<?>[0])[0];
-        return e.name() + "は" + entryName + "に追加されていませんでした.";
+    protected String invalidValueMessageForRemove(String entryName, List<T> value) {
+        return value.get(0).name() + "は" + entryName + "に追加されていませんでした.";
     }
 
     @Override
-    protected String succeedMessageForRemove(String entryName, Set<T> value) {
-        Enum<?> e = value.toArray(new Enum<?>[0])[0];
-        return entryName + "から" + e.name() + "を削除しました.";
+    protected String succeedMessageForRemove(String entryName, List<T> value) {
+        return entryName + "から" + value.get(0).name() + "を削除しました.";
     }
 
     @Override
