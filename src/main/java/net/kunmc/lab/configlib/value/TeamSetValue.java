@@ -96,7 +96,7 @@ public class TeamSetValue extends SetValue<Team> {
     @Override
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         String name = argument.get(0).toString();
-        return value.stream()
+        return scoreboard.getTeams().stream()
                 .map(Team::getName)
                 .anyMatch(s -> s.equals(name));
     }
