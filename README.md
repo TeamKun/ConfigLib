@@ -60,13 +60,15 @@ You must add it in your project.
 First, implement a Config Class which extends BaseConfig Class.
 
 ```Java
-import net.kunmc.lab.configlib.adapter.BaseConfig;
+import net.kunmc.lab.configlib.BaseConfig;
 import net.kunmc.lab.configlib.value.*;
 import org.bukkit.plugin.Plugin;
 
 public class Config extends BaseConfig {
     // You must use wrapper class
     public IntegerValue intValue = new IntegerValue(10);
+    // If you want Value not to be serialized, mark it as transient
+    public transient IntegerValue intValue2 = new IntegerValue(10);
     public MaterialValue materialValue = new MaterialValue(Material.DIRT);
 
     public Config(Plugin plugin) {
@@ -78,8 +80,8 @@ public class Config extends BaseConfig {
 Then, build a ConfigCommand in JavaPlugin#onEnable and register it on your command.
 
 ```Java
-import net.kunmc.lab.configlib.command.ConfigCommand;
-import net.kunmc.lab.configlib.command.ConfigCommandBuilder;
+import net.kunmc.lab.configlib.ConfigCommand;
+import net.kunmc.lab.configlib.ConfigCommandBuilder;
 
 public class SamplePlugin extends JavaPlugin {
     @Override
@@ -114,10 +116,10 @@ With above, you will be able to use commands like below.
 // show list of current config values
 /test config list
 
-// show current value of intValue
+// show current value of intValue's value
 /test config get intValue
 
-// update intValue to 5
+// update intValue's value to 5
 /test config modify intValue set 5
 
 // reload config file
