@@ -129,7 +129,7 @@ public abstract class BaseConfig {
         }
     }
 
-    public void saveConfig() {
+    protected void saveConfig() {
         try {
             getConfigFile().createNewFile();
             writeJson(getConfigFile(), gson.toJson(this));
