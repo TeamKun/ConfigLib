@@ -1,7 +1,7 @@
-package net.kunmc.lab.configlib.command;
+package net.kunmc.lab.configlib;
 
 import dev.kotx.flylib.command.Command;
-import net.kunmc.lab.configlib.config.BaseConfig;
+import net.kunmc.lab.configlib.command.AccessibleCommand;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 
 import java.lang.reflect.Field;

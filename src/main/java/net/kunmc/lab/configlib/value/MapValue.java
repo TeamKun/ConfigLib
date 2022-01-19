@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.configlib.command.Value;
+import net.kunmc.lab.configlib.Value;
 import org.apache.poi.util.NotImplemented;
 
 import java.util.Collection;

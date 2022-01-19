@@ -1,8 +1,8 @@
-package net.kunmc.lab.configlib.command;
+package net.kunmc.lab.configlib;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.config.BaseConfig;
+import net.kunmc.lab.configlib.command.AccessibleCommand;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;

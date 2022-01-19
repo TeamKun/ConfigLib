@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.command.SingleValue;
+import net.kunmc.lab.configlib.SingleValue;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,7 +26,7 @@ public class LocationValue extends SingleValue<Location> {
     public LocationValue(Location value) {
         super(value);
     }
-   
+
     public Block getBlock() {
         if (value == null) {
             return null;

@@ -1,8 +1,12 @@
-package net.kunmc.lab.configlib.config;
+package net.kunmc.lab.configlib;
 
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.kunmc.lab.configlib.adapter.BlockDataTypeAdapter;
+import net.kunmc.lab.configlib.adapter.LocationTypeAdapter;
+import net.kunmc.lab.configlib.adapter.MaterialTypeAdapter;
+import net.kunmc.lab.configlib.adapter.TeamTypeAdapter;
 import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.Location;
 import org.bukkit.Material;

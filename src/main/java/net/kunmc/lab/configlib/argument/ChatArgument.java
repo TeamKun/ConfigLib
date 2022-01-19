@@ -1,4 +1,4 @@
-package net.kunmc.lab.configlib.command.argument;
+package net.kunmc.lab.configlib.argument;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.kotx.flylib.command.Argument;

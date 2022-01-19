@@ -1,9 +1,9 @@
 package net.kunmc.lab.configlib.util;
 
+import net.kunmc.lab.configlib.BaseConfig;
+import net.kunmc.lab.configlib.CollectionValue;
+import net.kunmc.lab.configlib.SingleValue;
 import net.kunmc.lab.configlib.annotation.Internal;
-import net.kunmc.lab.configlib.command.CollectionValue;
-import net.kunmc.lab.configlib.command.SingleValue;
-import net.kunmc.lab.configlib.config.BaseConfig;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

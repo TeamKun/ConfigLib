@@ -3,7 +3,7 @@ package net.kunmc.lab.configlib.value;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.StringArgument;
-import net.kunmc.lab.configlib.command.SingleValue;
+import net.kunmc.lab.configlib.SingleValue;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Scoreboard;

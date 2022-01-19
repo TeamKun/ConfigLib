@@ -60,7 +60,7 @@ You must add it in your project.
 First, implement a Config Class which extends BaseConfig Class.
 
 ```Java
-import net.kunmc.lab.configlib.config.BaseConfig;
+import net.kunmc.lab.configlib.adapter.BaseConfig;
 import net.kunmc.lab.configlib.value.*;
 import org.bukkit.plugin.Plugin;
 

@@ -4,7 +4,7 @@ import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.Argument;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.command.argument.UnparsedArgument;
+import net.kunmc.lab.configlib.argument.UnparsedArgument;
 import net.kunmc.lab.configlib.util.CommandUtil;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;

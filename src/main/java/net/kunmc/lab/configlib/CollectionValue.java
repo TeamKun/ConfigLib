@@ -1,4 +1,4 @@
-package net.kunmc.lab.configlib.command;
+package net.kunmc.lab.configlib;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;

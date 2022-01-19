@@ -1,8 +1,7 @@
-package net.kunmc.lab.configlib.command;
+package net.kunmc.lab.configlib;
 
 import dev.kotx.flylib.command.Command;
 import dev.kotx.flylib.command.CommandContext;
-import net.kunmc.lab.configlib.config.BaseConfig;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;

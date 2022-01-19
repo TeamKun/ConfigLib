@@ -1,4 +1,4 @@
-package net.kunmc.lab.configlib.config;
+package net.kunmc.lab.configlib.adapter;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

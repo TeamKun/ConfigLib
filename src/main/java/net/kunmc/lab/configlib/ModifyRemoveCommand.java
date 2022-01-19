@@ -1,8 +1,7 @@
-package net.kunmc.lab.configlib.command;
+package net.kunmc.lab.configlib;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.config.BaseConfig;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
@@ -49,7 +48,7 @@ class ModifyRemoveCommand extends CollectionValueItem {
         if (this.value.onRemoveValue(value, ctx)) {
             return;
         }
-       
+
         ((Collection) this.value.value()).removeAll(value);
         ctx.success(this.value.succeedMessageForRemove(entryName, value));
     }

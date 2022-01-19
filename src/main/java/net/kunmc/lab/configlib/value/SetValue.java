@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.configlib.command.CollectionValue;
+import net.kunmc.lab.configlib.CollectionValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
