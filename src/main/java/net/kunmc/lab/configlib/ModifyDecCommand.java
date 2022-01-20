@@ -5,7 +5,7 @@ import net.kunmc.lab.configlib.command.AccessibleCommand;
 
 import java.lang.reflect.Field;
 
-public class ModifyDecCommand extends AccessibleCommand {
+class ModifyDecCommand extends AccessibleCommand {
     private final Field field;
     private final NumericValue value;
     private final BaseConfig config;
