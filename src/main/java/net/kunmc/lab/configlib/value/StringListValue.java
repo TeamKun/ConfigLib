@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class StringListValue extends ListValue<String> {
     protected transient String name = "String";
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
-    private final transient List<String> allowStringList = new ArrayList<>();
+    private final transient List<String> allowableStringList = new ArrayList<>();
 
     public StringListValue(String... strings) {
         this(Arrays.stream(strings).collect(Collectors.toList()));
@@ -36,25 +36,25 @@ public class StringListValue extends ListValue<String> {
         return this;
     }
 
-    public StringListValue addAllowString(@NotNull String s) {
-        allowStringList.add(s);
+    public StringListValue addAllowableString(@NotNull String s) {
+        allowableStringList.add(s);
         return this;
     }
 
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
         builder.stringArgument(name, type, sb -> {
-            sb.suggestAll(allowStringList);
+            sb.suggestAll(allowableStringList);
         }, null);
     }
 
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        if (allowStringList.isEmpty()) {
+        if (allowableStringList.isEmpty()) {
             return true;
         }
 
-        return allowStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
+        return allowableStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class StringListValue extends ListValue<String> {
 
     @Override
     protected boolean validateForAdd(List<String> newValue) {
-        if (allowStringList.isEmpty()) {
+        if (allowableStringList.isEmpty()) {
             return true;
         }
 

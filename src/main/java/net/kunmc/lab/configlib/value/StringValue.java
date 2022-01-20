@@ -17,9 +17,9 @@ public class StringValue extends SingleValue<String> {
     private transient Boolean writable = true;
     protected transient String name = "String";
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
-    protected final transient List<String> allowStringList = new ArrayList<>();
+    protected final transient List<String> allowableStringList = new ArrayList<>();
     protected transient SuggestionAction suggestionAction = builder -> {
-        builder.suggestAll(allowStringList);
+        builder.suggestAll(allowableStringList);
     };
 
     public StringValue(String value) {
@@ -42,8 +42,8 @@ public class StringValue extends SingleValue<String> {
         return this;
     }
 
-    public StringValue addAllowString(@NotNull String s) {
-        allowStringList.add(s);
+    public StringValue addAllowableString(@NotNull String s) {
+        allowableStringList.add(s);
         return this;
     }
 
@@ -69,11 +69,11 @@ public class StringValue extends SingleValue<String> {
 
     @Override
     protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
-        if (allowStringList.isEmpty()) {
+        if (allowableStringList.isEmpty()) {
             return true;
         }
 
-        return allowStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
+        return allowableStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
     }
 
     @Override

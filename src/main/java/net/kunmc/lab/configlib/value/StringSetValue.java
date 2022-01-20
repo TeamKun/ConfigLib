@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class StringSetValue extends SetValue<String> {
     protected transient String name = "String";
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
-    private final transient List<String> allowStringList = new ArrayList<>();
+    private final transient List<String> allowableStringList = new ArrayList<>();
 
     public StringSetValue(String... strings) {
         this(new HashSet<>(Arrays.asList(strings)));
@@ -24,8 +24,8 @@ public class StringSetValue extends SetValue<String> {
         super(value);
     }
 
-    public StringSetValue addAllowString(@NotNull String s) {
-        allowStringList.add(s);
+    public StringSetValue addAllowableString(@NotNull String s) {
+        allowableStringList.add(s);
         return this;
     }
 
@@ -42,7 +42,7 @@ public class StringSetValue extends SetValue<String> {
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
         builder.stringArgument(name, type, sb -> {
-            sb.suggestAll(allowStringList.stream()
+            sb.suggestAll(allowableStringList.stream()
                     .filter(s -> !value.contains(s))
                     .collect(Collectors.toList()));
         }, null);
@@ -50,11 +50,11 @@ public class StringSetValue extends SetValue<String> {
 
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        if (allowStringList.isEmpty()) {
+        if (allowableStringList.isEmpty()) {
             return true;
         }
 
-        return allowStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
+        return allowableStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
     }
 
     @Override
