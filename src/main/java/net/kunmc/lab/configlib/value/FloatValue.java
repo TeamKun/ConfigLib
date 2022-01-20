@@ -13,7 +13,7 @@ public class FloatValue extends NumericValue<Float> {
     private transient boolean writable = true;
 
     public FloatValue(Float value) {
-        this(value, Float.MIN_VALUE, Float.MAX_VALUE);
+        this(value, -Float.MAX_VALUE, Float.MAX_VALUE);
     }
 
     public FloatValue(Float value, Float min, Float max) {

@@ -13,7 +13,7 @@ public class DoubleValue extends NumericValue<Double> {
     private transient boolean writable = true;
 
     public DoubleValue(Double value) {
-        this(value, Double.MIN_VALUE, Double.MAX_VALUE);
+        this(value, -Double.MAX_VALUE, Double.MAX_VALUE);
     }
 
     public DoubleValue(Double value, Double min, Double max) {
