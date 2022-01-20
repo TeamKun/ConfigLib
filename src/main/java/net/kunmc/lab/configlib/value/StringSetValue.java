@@ -12,6 +12,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class StringSetValue extends SetValue<String> {
+    protected transient String name = "String";
+    protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
     private final transient List<String> allowStringList = new ArrayList<>();
 
     public StringSetValue(String... strings) {
@@ -27,9 +29,19 @@ public class StringSetValue extends SetValue<String> {
         return this;
     }
 
+    public StringSetValue name(@NotNull String name) {
+        this.name = name;
+        return this;
+    }
+
+    public StringSetValue type(@NotNull StringArgument.Type type) {
+        this.type = type;
+        return this;
+    }
+
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("String", StringArgument.Type.PHRASE, sb -> {
+        builder.stringArgument(name, type, sb -> {
             sb.suggestAll(allowStringList.stream()
                     .filter(s -> !value.contains(s))
                     .collect(Collectors.toList()));
