@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import dev.kotx.flylib.command.arguments.StringArgument;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -28,7 +29,7 @@ public class StringSetValue extends SetValue<String> {
 
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("String", sb -> {
+        builder.stringArgument("String", StringArgument.Type.PHRASE, sb -> {
             sb.suggestAll(allowStringList.stream()
                     .filter(s -> !value.contains(s))
                     .collect(Collectors.toList()));

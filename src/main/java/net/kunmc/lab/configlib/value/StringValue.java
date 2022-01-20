@@ -16,7 +16,7 @@ public class StringValue extends SingleValue<String> {
     private transient Boolean listable = true;
     private transient Boolean writable = true;
     protected transient String name = "String";
-    protected transient StringArgument.Type type = StringArgument.Type.WORD;
+    protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
     protected final transient List<String> allowStringList = new ArrayList<>();
     protected transient SuggestionAction suggestionAction = builder -> {
         builder.suggestAll(allowStringList);
