@@ -1,6 +1,4 @@
-package net.kunmc.lab.configlib.value;
-
-import net.kunmc.lab.configlib.SingleValue;
+package net.kunmc.lab.configlib;
 
 public abstract class NumericValue<T extends Comparable<T>> extends SingleValue<T> {
     public NumericValue(T value) {

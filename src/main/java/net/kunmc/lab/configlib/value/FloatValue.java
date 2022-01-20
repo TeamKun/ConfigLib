@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.NumericValue;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;

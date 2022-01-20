@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.NumericValue;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class IntegerValue extends NumericValue<Integer> {
         this.min = min;
         this.max = max;
     }
-   
+
     @Override
     protected Integer min() {
         return min;
