@@ -43,6 +43,11 @@ public class IntegerValue extends NumericValue<Integer> {
     }
 
     @Override
+    protected int compareTo(Number n) {
+        return value.compareTo(n.intValue());
+    }
+
+    @Override
     protected boolean writableByCommand() {
         return writable;
     }

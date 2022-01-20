@@ -43,6 +43,11 @@ public class FloatValue extends NumericValue<Float> {
     }
 
     @Override
+    protected int compareTo(Number n) {
+        return value.compareTo(n.floatValue());
+    }
+
+    @Override
     protected boolean writableByCommand() {
         return writable;
     }

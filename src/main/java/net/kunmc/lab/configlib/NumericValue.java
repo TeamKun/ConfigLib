@@ -13,6 +13,8 @@ public abstract class NumericValue<T extends Number & Comparable<T>> extends Sin
 
     protected abstract void sub(Number amount);
 
+    protected abstract int compareTo(Number n);
+
     @Override
     protected boolean validateOnSet(T newValue) {
         return newValue.compareTo(min()) != -1 && newValue.compareTo(max()) != 1;

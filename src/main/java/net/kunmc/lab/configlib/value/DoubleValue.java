@@ -43,6 +43,11 @@ public class DoubleValue extends NumericValue<Double> {
     }
 
     @Override
+    protected int compareTo(Number n) {
+        return value.compareTo(n.doubleValue());
+    }
+
+    @Override
     protected boolean writableByCommand() {
         return writable;
     }
