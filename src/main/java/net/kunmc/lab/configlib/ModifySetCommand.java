@@ -1,41 +1,14 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.Command;
 import net.kunmc.lab.configlib.command.AccessibleCommand;
-import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 class ModifySetCommand extends AccessibleCommand {
-    public static void register(BaseConfig config, AccessibleCommand parent) {
-        for (Field field : ConfigUtil.getSingleValueFields(config)) {
-            parent.appendChild(new Command(field.getName()) {
-                {
-                    try {
-                        SingleValue<?> v = ((SingleValue<?>) field.get(config));
-                        if (v.writableByCommand()) {
-                            children(new ModifySetCommand(field, v, config));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        }
-    }
-
-    private final Field field;
-    private final SingleValue value;
-    private final BaseConfig config;
-
-    private ModifySetCommand(Field field, SingleValue value, BaseConfig config) {
+    public ModifySetCommand(Field field, SingleValue value, BaseConfig config) {
         super("set");
-
-        this.field = field;
-        this.value = value;
-        this.config = config;
 
         usage(builder -> {
             value.appendArgument(builder);

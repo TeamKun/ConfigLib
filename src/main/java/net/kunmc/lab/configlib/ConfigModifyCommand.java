@@ -31,7 +31,24 @@ class ConfigModifyCommand extends AccessibleCommand {
     }
 
     private void init(BaseConfig config, AccessibleCommand command) {
-        ModifySetCommand.register(config, command);
+        for (Field field : ConfigUtil.getSingleValueFields(config)) {
+            command.appendChild(new Command(field.getName()) {
+                {
+                    try {
+                        SingleValue<?> v = ((SingleValue<?>) field.get(config));
+                        if (v.writableByCommand()) {
+                            children(new ModifySetCommand(field, v, config));
+
+                            if (v instanceof NumericValue) {
+                                children(new ModifyIncCommand(field, ((NumericValue<?>) v), config));
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
 
         for (Field field : ConfigUtil.getCollectionValueFields(config)) {
             command.appendChild(new Command(field.getName()) {
