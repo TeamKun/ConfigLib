@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class StringListValue extends ListValue<String> {
+    protected transient String name = "String";
+    protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
     private final transient List<String> allowStringList = new ArrayList<>();
 
     public StringListValue(String... strings) {
@@ -24,6 +26,16 @@ public class StringListValue extends ListValue<String> {
         super(value);
     }
 
+    public StringListValue name(@NotNull String name) {
+        this.name = name;
+        return this;
+    }
+
+    public StringListValue type(@NotNull StringArgument.Type type) {
+        this.type = type;
+        return this;
+    }
+
     public StringListValue addAllowString(@NotNull String s) {
         allowStringList.add(s);
         return this;
@@ -31,7 +43,7 @@ public class StringListValue extends ListValue<String> {
 
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("String", StringArgument.Type.PHRASE, sb -> {
+        builder.stringArgument(name, type, sb -> {
             sb.suggestAll(allowStringList);
         }, null);
     }
