@@ -33,6 +33,16 @@ public class DoubleValue extends NumericValue<Double> {
     }
 
     @Override
+    protected void add(Number amount) {
+        value += amount.doubleValue();
+    }
+
+    @Override
+    protected void sub(Number amount) {
+        value -= amount.doubleValue();
+    }
+
+    @Override
     protected boolean writableByCommand() {
         return writable;
     }

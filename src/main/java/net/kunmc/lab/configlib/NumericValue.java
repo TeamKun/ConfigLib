@@ -9,6 +9,10 @@ public abstract class NumericValue<T extends Comparable<T>> extends SingleValue<
 
     protected abstract T max();
 
+    protected abstract void add(Number amount);
+
+    protected abstract void sub(Number amount);
+
     @Override
     protected boolean validateOnSet(T newValue) {
         return newValue.compareTo(min()) != -1 && newValue.compareTo(max()) != 1;

@@ -33,6 +33,16 @@ public class FloatValue extends NumericValue<Float> {
     }
 
     @Override
+    protected void add(Number amount) {
+        value += amount.floatValue();
+    }
+
+    @Override
+    protected void sub(Number amount) {
+        value -= amount.floatValue();
+    }
+
+    @Override
     protected boolean writableByCommand() {
         return writable;
     }

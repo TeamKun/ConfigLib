@@ -33,6 +33,16 @@ public class IntegerValue extends NumericValue<Integer> {
     }
 
     @Override
+    protected void add(Number amount) {
+        value += amount.intValue();
+    }
+
+    @Override
+    protected void sub(Number amount) {
+        value -= amount.intValue();
+    }
+
+    @Override
     protected boolean writableByCommand() {
         return writable;
     }
