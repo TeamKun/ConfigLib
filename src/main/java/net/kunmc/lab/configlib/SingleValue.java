@@ -31,14 +31,14 @@ public abstract class SingleValue<T> extends Value<T> {
 
     protected abstract String invalidValueMessage(String entryName, T newValue);
 
-    public <U extends SingleValue<T>> U onSet(Consumer<T> listener) {
-        return onSet((v, ctx) -> {
+    public <U extends SingleValue<T>> U onModify(Consumer<T> listener) {
+        return onModify((v, ctx) -> {
             listener.accept(v);
         });
     }
 
-    public <U extends SingleValue<T>> U onSet(BiConsumer<T, CommandContext> listener) {
-        return onSet((v, ctx) -> {
+    public <U extends SingleValue<T>> U onModify(BiConsumer<T, CommandContext> listener) {
+        return onModify((v, ctx) -> {
             listener.accept(v, ctx);
             return false;
         });
@@ -47,12 +47,12 @@ public abstract class SingleValue<T> extends Value<T> {
     /**
      * @return true if you want to cancel event, otherwise false
      */
-    public <U extends SingleValue<T>> U onSet(BiFunction<T, CommandContext, Boolean> listener) {
+    public <U extends SingleValue<T>> U onModify(BiFunction<T, CommandContext, Boolean> listener) {
         listeners.add(listener);
         return ((U) this);
     }
 
-    protected boolean onSetValue(T newValue, CommandContext ctx) {
+    protected boolean onModifyValue(T newValue, CommandContext ctx) {
         return listeners.stream()
                 .map(x -> x.apply(newValue, ctx))
                 .reduce(false, (a, b) -> a || b);

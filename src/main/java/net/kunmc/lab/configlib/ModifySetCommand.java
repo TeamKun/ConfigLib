@@ -29,7 +29,7 @@ class ModifySetCommand extends AccessibleCommand {
                     return;
                 }
 
-                if (value.onSetValue(newValue, ctx)) {
+                if (value.onModifyValue(newValue, ctx)) {
                     return;
                 }
 

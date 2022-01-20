@@ -28,7 +28,7 @@ public class ModifyIncCommand extends AccessibleCommand {
         }
 
         value.add(amount);
-        if (value.onSetValue(value.value, ctx)) {
+        if (value.onModifyValue(value.value, ctx)) {
             value.sub(amount);
             return;
         }
