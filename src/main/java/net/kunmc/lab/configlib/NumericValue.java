@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib;
 
-public abstract class NumericValue<T extends Comparable<T>> extends SingleValue<T> {
+public abstract class NumericValue<T extends Number & Comparable<T>> extends SingleValue<T> {
     public NumericValue(T value) {
         super(value);
     }
