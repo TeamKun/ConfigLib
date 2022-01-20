@@ -72,7 +72,7 @@ public class BlockDataValue extends SingleValue<BlockData> {
     }
 
     @Override
-    protected String succeedSetMessage(String entryName) {
+    protected String succeedModifyMessage(String entryName) {
         return entryName + "の値を" + value.getMaterial().name() + "に設定しました.";
     }
 

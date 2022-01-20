@@ -58,7 +58,7 @@ public abstract class SingleValue<T> extends Value<T> {
                 .reduce(false, (a, b) -> a || b);
     }
 
-    protected String succeedSetMessage(String entryName) {
+    protected String succeedModifyMessage(String entryName) {
         return entryName + "の値を" + value() + "に設定しました.";
     }
 

@@ -33,7 +33,7 @@ public class ModifyIncCommand extends AccessibleCommand {
             return;
         }
 
-        ctx.success(value.succeedSetMessage(entryName));
+        ctx.success(value.succeedModifyMessage(entryName));
 
         config.saveConfigIfPresent();
     }

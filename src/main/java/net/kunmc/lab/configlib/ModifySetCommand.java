@@ -34,7 +34,7 @@ class ModifySetCommand extends AccessibleCommand {
                 }
 
                 value.value(newValue);
-                ctx.success(value.succeedSetMessage(entryName));
+                ctx.success(value.succeedModifyMessage(entryName));
 
                 config.saveConfigIfPresent();
             });

@@ -126,7 +126,7 @@ public class UUIDValue extends SingleValue<UUID> {
     }
 
     @Override
-    protected String succeedSetMessage(String entryName) {
+    protected String succeedModifyMessage(String entryName) {
         return entryName + "の値を" + playerName() + "に設定しました.";
     }
 

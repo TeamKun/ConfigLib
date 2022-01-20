@@ -91,7 +91,7 @@ public class TeamValue extends SingleValue<Team> {
     }
 
     @Override
-    protected String succeedSetMessage(String entryName) {
+    protected String succeedModifyMessage(String entryName) {
         return entryName + "の値を" + value.getName() + "に設定しました.";
     }
 
