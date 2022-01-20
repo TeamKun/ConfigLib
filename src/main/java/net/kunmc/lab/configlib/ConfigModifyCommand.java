@@ -41,6 +41,7 @@ class ConfigModifyCommand extends AccessibleCommand {
 
                             if (v instanceof NumericValue) {
                                 children(new ModifyIncCommand(field, ((NumericValue<?>) v), config));
+                                children(new ModifyDecCommand(field, ((NumericValue<?>) v), config));
                             }
                         }
                     } catch (Exception e) {

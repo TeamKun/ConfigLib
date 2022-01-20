@@ -5,13 +5,13 @@ import net.kunmc.lab.configlib.command.AccessibleCommand;
 
 import java.lang.reflect.Field;
 
-public class ModifyIncCommand extends AccessibleCommand {
+public class ModifyDecCommand extends AccessibleCommand {
     private final Field field;
     private final NumericValue value;
     private final BaseConfig config;
 
-    public ModifyIncCommand(Field field, NumericValue value, BaseConfig config) {
-        super("inc");
+    public ModifyDecCommand(Field field, NumericValue value, BaseConfig config) {
+        super("dec");
 
         this.field = field;
         this.value = value;
@@ -23,13 +23,13 @@ public class ModifyIncCommand extends AccessibleCommand {
         String entryName = field.getName();
 
         double amount = 1.0;
-        if (value.compareTo(value.max().doubleValue() - amount) > 0) {
-            amount = value.max().doubleValue() - ((Number) value.value).doubleValue();
+        if (value.compareTo(value.min().doubleValue() + amount) < 0) {
+            amount = ((Number) value.value).doubleValue() - value.min().doubleValue();
         }
 
-        value.add(amount);
+        value.sub(amount);
         if (value.onModifyValue(value.value, ctx)) {
-            value.sub(amount);
+            value.add(amount);
             return;
         }
 
@@ -37,4 +37,5 @@ public class ModifyIncCommand extends AccessibleCommand {
 
         config.saveConfigIfPresent();
     }
+
 }
