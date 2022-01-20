@@ -59,7 +59,7 @@ public abstract class SingleValue<T> extends Value<T> {
     }
 
     protected String succeedModifyMessage(String entryName) {
-        return entryName + "の値を" + value() + "に設定しました.";
+        return entryName + "の値を" + value() + "に変更しました.";
     }
 
     @Override
