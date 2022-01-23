@@ -65,27 +65,23 @@ public abstract class BaseConfig {
         setPlugin(plugin);
     }
 
-    @Internal
-    public boolean isGetEnabled() {
+    boolean isGetEnabled() {
         return enableGet;
     }
 
-    @Internal
-    public boolean isListEnabled() {
+    boolean isListEnabled() {
         return enableList;
     }
 
-    @Internal
-    public boolean isModifyEnabled() {
+    boolean isModifyEnabled() {
         return enableModify;
     }
 
-    @Internal
-    public boolean isReloadEnabled() {
+    boolean isReloadEnabled() {
         return enableReload;
     }
 
-    protected void setPlugin(@NotNull Plugin plugin) {
+    void setPlugin(@NotNull Plugin plugin) {
         this.plugin = plugin;
         plugin.getDataFolder().mkdir();
     }
