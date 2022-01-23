@@ -27,12 +27,12 @@ class ModifyIncCommand extends AccessibleCommand {
             amount = value.max().doubleValue() - ((Number) value.value).doubleValue();
         }
 
-        value.add(amount);
-        if (value.onModifyValue(value.value, ctx)) {
-            value.sub(amount);
+        Number newValue = value.copyAdd(amount);
+        if (value.onModifyValue(newValue, ctx)) {
             return;
         }
 
+        value.value(newValue);
         ctx.success(value.succeedModifyMessage(entryName));
 
         config.saveConfigIfPresent();

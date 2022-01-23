@@ -33,13 +33,13 @@ public class FloatValue extends NumericValue<Float> {
     }
 
     @Override
-    protected void add(Number amount) {
-        value += amount.floatValue();
+    protected Float copyAdd(Number amount) {
+        return value + amount.floatValue();
     }
 
     @Override
-    protected void sub(Number amount) {
-        value -= amount.floatValue();
+    protected Float copySub(Number amount) {
+        return value - amount.floatValue();
     }
 
     @Override

@@ -33,13 +33,13 @@ public class DoubleValue extends NumericValue<Double> {
     }
 
     @Override
-    protected void add(Number amount) {
-        value += amount.doubleValue();
+    protected Double copyAdd(Number amount) {
+        return value + amount.doubleValue();
     }
 
     @Override
-    protected void sub(Number amount) {
-        value -= amount.doubleValue();
+    protected Double copySub(Number amount) {
+        return value - amount.doubleValue();
     }
 
     @Override

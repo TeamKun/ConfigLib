@@ -9,9 +9,9 @@ public abstract class NumericValue<T extends Number & Comparable<T>> extends Sin
 
     protected abstract T max();
 
-    protected abstract void add(Number amount);
+    protected abstract T copyAdd(Number amount);
 
-    protected abstract void sub(Number amount);
+    protected abstract T copySub(Number amount);
 
     protected abstract int compareTo(Number n);
 

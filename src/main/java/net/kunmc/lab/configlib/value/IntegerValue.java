@@ -33,13 +33,13 @@ public class IntegerValue extends NumericValue<Integer> {
     }
 
     @Override
-    protected void add(Number amount) {
-        value += amount.intValue();
+    protected Integer copyAdd(Number amount) {
+        return value + amount.intValue();
     }
 
     @Override
-    protected void sub(Number amount) {
-        value -= amount.intValue();
+    protected Integer copySub(Number amount) {
+        return value + amount.intValue();
     }
 
     @Override

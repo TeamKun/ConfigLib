@@ -27,12 +27,12 @@ class ModifyDecCommand extends AccessibleCommand {
             amount = ((Number) value.value).doubleValue() - value.min().doubleValue();
         }
 
-        value.sub(amount);
-        if (value.onModifyValue(value.value, ctx)) {
-            value.add(amount);
+        Number newValue = value.copySub(amount);
+        if (value.onModifyValue(newValue, ctx)) {
             return;
         }
 
+        value.value(newValue);
         ctx.success(value.succeedModifyMessage(entryName));
 
         config.saveConfigIfPresent();
