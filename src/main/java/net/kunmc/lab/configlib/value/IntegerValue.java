@@ -39,7 +39,7 @@ public class IntegerValue extends NumericValue<Integer> {
 
     @Override
     protected Integer copySub(Number amount) {
-        return value + amount.intValue();
+        return value - amount.intValue();
     }
 
     @Override
