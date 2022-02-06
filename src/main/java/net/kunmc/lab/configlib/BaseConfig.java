@@ -159,7 +159,13 @@ public abstract class BaseConfig {
             if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
-            field.setAccessible(true);
+
+            try {
+                field.setAccessible(true);
+            } catch (Exception e) {
+                // InaccessibleObjectExceptionが発生した場合スルーする
+                continue;
+            }
 
             try {
                 replaceField(field, src, dst);
