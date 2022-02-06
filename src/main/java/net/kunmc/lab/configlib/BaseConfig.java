@@ -7,7 +7,6 @@ import net.kunmc.lab.configlib.adapter.BlockDataTypeAdapter;
 import net.kunmc.lab.configlib.adapter.LocationTypeAdapter;
 import net.kunmc.lab.configlib.adapter.MaterialTypeAdapter;
 import net.kunmc.lab.configlib.adapter.TeamTypeAdapter;
-import net.kunmc.lab.configlib.annotation.Internal;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
@@ -90,12 +89,10 @@ public abstract class BaseConfig {
         this.entryName = entryName;
     }
 
-    @Internal
     public File getConfigFile() {
         return new File(plugin.getDataFolder(), entryName() + ".json");
     }
 
-    @Internal
     public String entryName() {
         if (entryName.equals("")) {
             String n = getClass().getSimpleName();

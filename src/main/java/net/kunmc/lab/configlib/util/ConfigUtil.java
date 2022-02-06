@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.util;
 import net.kunmc.lab.configlib.BaseConfig;
 import net.kunmc.lab.configlib.CollectionValue;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.annotation.Internal;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -11,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Internal
 public class ConfigUtil {
     public static List<Field> getSingleValueFields(BaseConfig config) {
         return Arrays.stream(config.getClass().getDeclaredFields())
