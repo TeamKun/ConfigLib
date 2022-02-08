@@ -13,18 +13,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Team2ObjectMap<V> extends MapValue<Team, V> {
+public abstract class Team2ObjectMapValue<V> extends MapValue<Team, V> {
     private transient Scoreboard scoreboard;
     private transient boolean puttable = true;
     private transient boolean removable = true;
     private transient boolean clearable = true;
     private transient boolean listable = true;
 
-    public Team2ObjectMap() {
+    public Team2ObjectMapValue() {
         this(new HashMap<>());
     }
 
-    public Team2ObjectMap(Map<Team, V> map) {
+    public Team2ObjectMapValue(Map<Team, V> map) {
         super(map);
 
         scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -34,7 +34,7 @@ public abstract class Team2ObjectMap<V> extends MapValue<Team, V> {
         return scoreboard;
     }
 
-    public <U extends Team2ObjectMap<V>> U scoreboard(@NotNull Scoreboard scoreboard) {
+    public <U extends Team2ObjectMapValue<V>> U scoreboard(@NotNull Scoreboard scoreboard) {
         this.scoreboard = scoreboard;
         return ((U) this);
     }
@@ -44,7 +44,7 @@ public abstract class Team2ObjectMap<V> extends MapValue<Team, V> {
         return puttable;
     }
 
-    public <U extends Team2ObjectMap<V>> U puttableByCommand(boolean puttable) {
+    public <U extends Team2ObjectMapValue<V>> U puttableByCommand(boolean puttable) {
         this.puttable = puttable;
         return ((U) this);
     }
@@ -90,7 +90,7 @@ public abstract class Team2ObjectMap<V> extends MapValue<Team, V> {
         return removable;
     }
 
-    public <U extends Team2ObjectMap<V>> U removableByCommand(boolean removable) {
+    public <U extends Team2ObjectMapValue<V>> U removableByCommand(boolean removable) {
         this.removable = removable;
         return ((U) this);
     }
@@ -126,7 +126,7 @@ public abstract class Team2ObjectMap<V> extends MapValue<Team, V> {
         return clearable;
     }
 
-    public <U extends Team2ObjectMap<V>> U clearableByCommand(boolean clearable) {
+    public <U extends Team2ObjectMapValue<V>> U clearableByCommand(boolean clearable) {
         this.clearable = clearable;
         return ((U) this);
     }
@@ -141,7 +141,7 @@ public abstract class Team2ObjectMap<V> extends MapValue<Team, V> {
         return listable;
     }
 
-    public <U extends Team2ObjectMap<V>> U listable(boolean listable) {
+    public <U extends Team2ObjectMapValue<V>> U listable(boolean listable) {
         this.listable = listable;
         return ((U) this);
     }
