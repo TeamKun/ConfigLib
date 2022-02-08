@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class MapValue<K, V> extends Value<Map<K, V>> implements Map<K, V> {
+public abstract class MapValue<K, V> extends Value<Map<K, V>> {
     private final transient List<Function3<K, V, CommandContext, Boolean>> putListeners = new ArrayList<>();
     private final transient List<BiFunction<K, CommandContext, Boolean>> removeListeners = new ArrayList<>();
     private final transient List<Function<CommandContext, Boolean>> clearListeners = new ArrayList<>();
