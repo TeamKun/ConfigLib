@@ -35,6 +35,7 @@ public abstract class BaseConfig {
     protected transient boolean enableReload = true;
     private static final transient Gson gson = new GsonBuilder()
             .setPrettyPrinting()
+            .enableComplexMapKeySerialization()
             .excludeFieldsWithModifiers(Modifier.TRANSIENT)
             .registerTypeHierarchyAdapter(Team.class, new TeamTypeAdapter())
             .registerTypeHierarchyAdapter(BlockData.class, new BlockDataTypeAdapter())
