@@ -12,13 +12,16 @@ import java.util.List;
 public class EnumValue<T extends Enum<T>> extends SingleValue<T> {
     private transient Boolean listable = true;
     private transient Boolean writable = true;
+    private final transient Class<T> clazz;
 
     public EnumValue(@NotNull T value) {
         super(value);
+
+        clazz = (Class<T>) value.getClass();
     }
 
     private T[] constants() {
-        return ((T[]) value.getClass().getEnumConstants());
+        return clazz.getEnumConstants();
     }
 
     @Override
@@ -35,6 +38,7 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T> {
     protected void appendArgument(UsageBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             Arrays.stream(constants())
+                    .filter(x -> x != value)
                     .map(Enum::name)
                     .map(String::toLowerCase)
                     .forEach(sb::suggest);
@@ -44,7 +48,7 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T> {
     @Override
     protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
-                .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
+                .anyMatch(m -> m.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
@@ -55,7 +59,7 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T> {
     @Override
     protected T argumentToValue(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
-                .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
+                .filter(m -> m.name().equalsIgnoreCase(argument.get(0).toString()))
                 .findFirst()
                 .get();
     }
