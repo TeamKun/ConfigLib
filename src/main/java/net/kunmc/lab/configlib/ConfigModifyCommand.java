@@ -72,5 +72,21 @@ class ConfigModifyCommand extends AccessibleCommand {
                 }
             });
         }
+
+        for (Field field : ConfigUtil.getMapValueFields(config)) {
+            command.appendChild(new Command(field.getName()) {
+                {
+                    try {
+                        MapValue value = ((MapValue) field.get(config));
+
+                        if (value.puttableByCommand()) {
+                            children(new ModifyMapPutCommand(field, value, config));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 }

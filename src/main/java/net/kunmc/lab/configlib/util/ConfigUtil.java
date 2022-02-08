@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.util;
 
 import net.kunmc.lab.configlib.BaseConfig;
 import net.kunmc.lab.configlib.CollectionValue;
+import net.kunmc.lab.configlib.MapValue;
 import net.kunmc.lab.configlib.SingleValue;
 
 import java.lang.reflect.Field;
@@ -23,6 +24,14 @@ public class ConfigUtil {
         return Arrays.stream(config.getClass().getDeclaredFields())
                 .filter(f -> !Modifier.isStatic(f.getModifiers()))
                 .filter(f -> CollectionValue.class.isAssignableFrom(f.getType()))
+                .peek(f -> f.setAccessible(true))
+                .collect(Collectors.toList());
+    }
+
+    public static List<Field> getMapValueFields(BaseConfig cOnfig) {
+        return Arrays.stream(cOnfig.getClass().getDeclaredFields())
+                .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                .filter(f -> MapValue.class.isAssignableFrom(f.getType()))
                 .peek(f -> f.setAccessible(true))
                 .collect(Collectors.toList());
     }
@@ -52,6 +61,20 @@ public class ConfigUtil {
                     }
                 })
                 .map(x -> ((CollectionValue<?, ?>) x))
+                .collect(Collectors.toList());
+    }
+
+    public static List<MapValue<?, ?>> getMapValues(BaseConfig config) {
+        return getMapValueFields(config).stream()
+                .map(f -> {
+                    try {
+                        return f.get(config);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .map(x -> ((MapValue<?, ?>) x))
                 .collect(Collectors.toList());
     }
 }
