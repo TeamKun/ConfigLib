@@ -11,12 +11,15 @@ import org.bukkit.command.CommandSender;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class MapValue<K, V> extends Value<Map<K, V>> implements Map<K, V> {
     private final transient List<Function3<K, V, CommandContext, Boolean>> putListeners = new ArrayList<>();
-    private final transient List<Function3<K, V, CommandContext, Boolean>> removeListeners = new ArrayList<>();
-    private final transient List<Function3<K, V, CommandContext, Boolean>> clearListeners = new ArrayList<>();
+    private final transient List<BiFunction<K, CommandContext, Boolean>> removeListeners = new ArrayList<>();
+    private final transient List<Function<CommandContext, Boolean>> clearListeners = new ArrayList<>();
 
     public MapValue(Map<K, V> value) {
         super(value);
@@ -81,35 +84,25 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> implements Map<K, 
 
     protected abstract void appendKeyArgumentForRemove(UsageBuilder builder);
 
-    protected abstract void appendValueArgumentForRemove(UsageBuilder builder);
-
     protected abstract boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSender sender);
 
     protected abstract String incorrectKeyArgumentMessageForRemove(List<Object> argument);
 
-    protected abstract boolean isCorrectValueArgumentForRemove(List<Object> argument, CommandSender sender);
-
-    protected abstract String incorrectValueArgumentMessageForRemove(List<Object> argument);
-
-    protected abstract Pair<K, V> argumentToValueForRemove(List<Object> argument, CommandSender sender);
+    protected abstract K argumentToKeyForRemove(List<Object> argument, CommandSender sender);
 
     protected abstract boolean validateKeyForRemove(K k);
 
     protected abstract String invalidKeyMessageForRemove(String entryName, K k);
 
-    protected abstract boolean validateValueForRemove(V v);
-
-    protected abstract String invalidValueMessageForRemove(String entryName, V v);
-
-    public <U extends MapValue<K, V>> U onRemove(BiConsumer<K, V> listener) {
-        return onRemove((k, v, ctx) -> {
-            listener.accept(k, v);
+    public <U extends MapValue<K, V>> U onRemove(Consumer<K> listener) {
+        return onRemove((k, ctx) -> {
+            listener.accept(k);
         });
     }
 
-    public <U extends MapValue<K, V>> U onRemove(TriConsumer<K, V, CommandContext> listener) {
-        return onRemove((k, v, ctx) -> {
-            listener.accept(k, v, ctx);
+    public <U extends MapValue<K, V>> U onRemove(BiConsumer<K, CommandContext> listener) {
+        return onRemove((k, ctx) -> {
+            listener.accept(k, ctx);
             return false;
         });
     }
@@ -117,14 +110,14 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> implements Map<K, 
     /**
      * @return true if you want to cancel event, otherwise false
      */
-    public <U extends MapValue<K, V>> U onRemove(Function3<K, V, CommandContext, Boolean> listener) {
+    public <U extends MapValue<K, V>> U onRemove(BiFunction<K, CommandContext, Boolean> listener) {
         removeListeners.add(listener);
         return ((U) this);
     }
 
-    protected boolean onRemoveValue(K k, V v, CommandContext ctx) {
+    protected boolean onRemoveKey(K k, CommandContext ctx) {
         return removeListeners.stream()
-                .map(x -> x.apply(k, v, ctx))
+                .map(x -> x.apply(k, ctx))
                 .reduce(false, (a, b) -> a || b);
     }
 
@@ -134,15 +127,15 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> implements Map<K, 
 
     protected abstract boolean clearableByCommand();
 
-    public <U extends MapValue<K, V>> U onClear(BiConsumer<K, V> listener) {
-        return onClear((k, v, ctx) -> {
-            listener.accept(k, v);
+    public <U extends MapValue<K, V>> U onClear(Runnable listener) {
+        return onClear(ctx -> {
+            listener.run();
         });
     }
 
-    public <U extends MapValue<K, V>> U onClear(TriConsumer<K, V, CommandContext> listener) {
-        return onClear((k, v, ctx) -> {
-            listener.accept(k, v, ctx);
+    public <U extends MapValue<K, V>> U onClear(Consumer<CommandContext> listener) {
+        return onClear(ctx -> {
+            listener.accept(ctx);
             return false;
         });
     }
@@ -150,14 +143,14 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> implements Map<K, 
     /**
      * @return true if you want to cancel event, otherwise false
      */
-    public <U extends MapValue<K, V>> U onClear(Function3<K, V, CommandContext, Boolean> listener) {
+    public <U extends MapValue<K, V>> U onClear(Function<CommandContext, Boolean> listener) {
         clearListeners.add(listener);
         return ((U) this);
     }
 
-    protected boolean onClearMap(K k, V v, CommandContext ctx) {
+    protected boolean onClearMap(CommandContext ctx) {
         return clearListeners.stream()
-                .map(x -> x.apply(k, v, ctx))
+                .map(x -> x.apply(ctx))
                 .reduce(false, (a, b) -> a || b);
     }
 
