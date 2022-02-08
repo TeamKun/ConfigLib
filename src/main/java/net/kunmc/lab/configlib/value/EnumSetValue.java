@@ -38,6 +38,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T> {
     protected void appendArgumentForAdd(UsageBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             Arrays.stream(constants())
+                    .filter(x -> value.stream().noneMatch(e -> x == e))
                     .map(Enum::name)
                     .map(String::toLowerCase)
                     .forEach(sb::suggest);
@@ -47,7 +48,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T> {
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
-                .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
+                .anyMatch(m -> m.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
@@ -58,7 +59,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T> {
     @Override
     protected Set<T> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
-                .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
+                .filter(m -> m.name().equalsIgnoreCase(argument.get(0).toString()))
                 .collect(Collectors.toSet());
     }
 
@@ -87,7 +88,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T> {
     @Override
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
-                .anyMatch(x -> x.name().equals(argument.get(0).toString().toUpperCase()));
+                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
@@ -98,7 +99,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T> {
     @Override
     protected Set<T> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
-                .filter(x -> x.name().equals(argument.get(0).toString().toUpperCase()))
+                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
                 .collect(Collectors.toSet());
     }
 
