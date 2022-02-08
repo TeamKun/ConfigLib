@@ -13,23 +13,30 @@ import java.util.stream.Stream;
 enum SubCommandType {
     Reload("reload",
             BaseConfig::isReloadEnabled,
-            x -> !(ConfigUtil.getSingleValueFields(x).isEmpty() && ConfigUtil.getCollectionValueFields(x).isEmpty()),
+            x -> !(ConfigUtil.getSingleValueFields(x).isEmpty() && ConfigUtil.getCollectionValueFields(x).isEmpty() && ConfigUtil.getMapValueFields(x).isEmpty()),
             ConfigReloadCommand::new,
             ConfigReloadCommand::new),
     List("list",
             BaseConfig::isListEnabled,
-            x -> Stream.concat(ConfigUtil.getSingleValues(x).stream(), ConfigUtil.getCollectionValues(x).stream()).anyMatch(Value::listable),
+            x -> Stream.of(ConfigUtil.getSingleValues(x).stream(), ConfigUtil.getCollectionValues(x).stream(), ConfigUtil.getMapValues(x).stream())
+                    .reduce(Stream::concat)
+                    .orElseGet(Stream::empty)
+                    .anyMatch(Value::listable),
             ConfigListCommand::new,
             ConfigListCommand::new),
     Modify("modify",
             BaseConfig::isModifyEnabled,
-            x -> ConfigUtil.getCollectionValues(x).stream()
-                    .anyMatch(v -> v.addableByCommand() || v.removableByCommand() || v.clearableByCommand()) || ConfigUtil.getSingleValues(x).stream().anyMatch(SingleValue::writableByCommand),
+            x -> ConfigUtil.getSingleValues(x).stream().anyMatch(SingleValue::writableByCommand) ||
+                    ConfigUtil.getCollectionValues(x).stream().anyMatch(v -> v.addableByCommand() || v.removableByCommand() || v.clearableByCommand()) ||
+                    ConfigUtil.getMapValues(x).stream().anyMatch(v -> v.puttableByCommand() || v.removableByCommand() || v.clearableByCommand()),
             ConfigModifyCommand::new,
             ConfigModifyCommand::new),
     Get("get",
             BaseConfig::isGetEnabled,
-            x -> Stream.concat(ConfigUtil.getSingleValues(x).stream(), ConfigUtil.getCollectionValues(x).stream()).anyMatch(Value::listable),
+            x -> Stream.of(ConfigUtil.getSingleValues(x).stream(), ConfigUtil.getCollectionValues(x).stream(), ConfigUtil.getMapValues(x).stream())
+                    .reduce(Stream::concat)
+                    .orElseGet(Stream::empty)
+                    .anyMatch(Value::listable),
             ConfigGetCommand::new,
             ConfigGetCommand::new);
 
