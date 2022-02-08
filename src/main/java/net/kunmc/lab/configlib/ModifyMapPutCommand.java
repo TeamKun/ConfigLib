@@ -1,6 +1,5 @@
 package net.kunmc.lab.configlib;
 
-import com.mojang.datafixers.util.Pair;
 import net.kunmc.lab.configlib.command.AccessibleCommand;
 import org.bukkit.command.CommandSender;
 
@@ -29,9 +28,8 @@ public class ModifyMapPutCommand extends AccessibleCommand {
                     return;
                 }
 
-                Pair pair = value.argumentToValueForPut(argument, sender);
-                Object k = pair.getFirst();
-                Object v = pair.getSecond();
+                Object k = value.argumentToKeyForPut(argument, sender);
+                Object v = value.argumentToValueForPut(argument, sender);
                 if (!value.validateKeyForPut(k)) {
                     ctx.fail(value.invalidKeyMessageForPut(entryName, k));
                     return;

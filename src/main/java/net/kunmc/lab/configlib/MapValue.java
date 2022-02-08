@@ -1,7 +1,6 @@
 package net.kunmc.lab.configlib;
 
 import com.mojang.datafixers.util.Function3;
-import com.mojang.datafixers.util.Pair;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import org.apache.commons.lang.StringUtils;
@@ -39,15 +38,25 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> implements Map<K, 
 
     protected abstract String incorrectValueArgumentMessageForPut(List<Object> argument);
 
-    protected abstract Pair<K, V> argumentToValueForPut(List<Object> argument, CommandSender sender);
+    protected abstract K argumentToKeyForPut(List<Object> argument, CommandSender sender);
 
-    protected abstract boolean validateKeyForPut(K k);
+    protected abstract V argumentToValueForPut(List<Object> argument, CommandSender sender);
 
-    protected abstract String invalidKeyMessageForPut(String entryName, K k);
+    protected boolean validateKeyForPut(K k) {
+        return true;
+    }
 
-    protected abstract boolean validateValueForPut(V v);
+    protected String invalidKeyMessageForPut(String entryName, K k) {
+        return "";
+    }
 
-    protected abstract String invalidValueMessageForPut(String entryName, V v);
+    protected boolean validateValueForPut(V v) {
+        return true;
+    }
+
+    protected String invalidValueMessageForPut(String entryName, V v) {
+        return "";
+    }
 
     public <U extends MapValue<K, V>> U onPut(BiConsumer<K, V> listener) {
         return onPut((k, v, ctx) -> {
@@ -90,9 +99,13 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> implements Map<K, 
 
     protected abstract K argumentToKeyForRemove(List<Object> argument, CommandSender sender);
 
-    protected abstract boolean validateKeyForRemove(K k);
+    protected boolean validateKeyForRemove(K k) {
+        return value.containsKey(k);
+    }
 
-    protected abstract String invalidKeyMessageForRemove(String entryName, K k);
+    protected String invalidKeyMessageForRemove(String entryName, K k) {
+        return String.format("%sは%sに追加されていませんでした.", keyToString(k), entryName);
+    }
 
     public <U extends MapValue<K, V>> U onRemove(Consumer<K> listener) {
         return onRemove((k, ctx) -> {
