@@ -43,7 +43,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T> {
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
-                .anyMatch(m -> m.name().equals(argument.get(0).toString().toUpperCase()));
+                .anyMatch(m -> m.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T> {
     @Override
     protected List<T> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
-                .filter(m -> m.name().equals(argument.get(0).toString().toUpperCase()))
+                .filter(m -> m.name().equalsIgnoreCase(argument.get(0).toString()))
                 .collect(Collectors.toList());
     }
 
@@ -65,7 +65,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T> {
 
     @Override
     protected String invalidValueMessageForAdd(String entryName, List<T> value) {
-        return "";
+        return "This message can't be shown.";
     }
 
     @Override
@@ -86,7 +86,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T> {
     @Override
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
-                .anyMatch(x -> x.name().equals(argument.get(0).toString().toUpperCase()));
+                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
@@ -97,7 +97,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T> {
     @Override
     protected List<T> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
-                .filter(x -> x.name().equals(argument.get(0).toString().toUpperCase()))
+                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
                 .collect(Collectors.toList());
     }
 
