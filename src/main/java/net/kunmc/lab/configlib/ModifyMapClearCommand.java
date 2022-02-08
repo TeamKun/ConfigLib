@@ -5,7 +5,7 @@ import net.kunmc.lab.configlib.command.AccessibleCommand;
 
 import java.lang.reflect.Field;
 
-public class ModifyMapClearCommand extends AccessibleCommand {
+class ModifyMapClearCommand extends AccessibleCommand {
     private final Field field;
     private final MapValue value;
     private final BaseConfig config;

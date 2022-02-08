@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public class ModifyMapPutCommand extends AccessibleCommand {
+class ModifyMapPutCommand extends AccessibleCommand {
     public ModifyMapPutCommand(Field field, MapValue value, BaseConfig config) {
         super("put");
 

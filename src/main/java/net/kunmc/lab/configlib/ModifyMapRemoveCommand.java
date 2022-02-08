@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public class ModifyMapRemoveCommand extends AccessibleCommand {
+class ModifyMapRemoveCommand extends AccessibleCommand {
     public ModifyMapRemoveCommand(Field field, MapValue value, BaseConfig config) {
         super("remove");
 
