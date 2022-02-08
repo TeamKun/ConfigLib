@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib;
 
-import com.mojang.datafixers.util.Function3;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.function.TriFunction;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.ChatColor;
@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class MapValue<K, V> extends Value<Map<K, V>> {
-    private final transient List<Function3<K, V, CommandContext, Boolean>> putListeners = new ArrayList<>();
+    private final transient List<TriFunction<K, V, CommandContext, Boolean>> putListeners = new ArrayList<>();
     private final transient List<BiFunction<K, CommandContext, Boolean>> removeListeners = new ArrayList<>();
     private final transient List<Function<CommandContext, Boolean>> clearListeners = new ArrayList<>();
 
@@ -74,7 +74,7 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> {
     /**
      * @return true if you want to cancel event, otherwise false
      */
-    public <U extends MapValue<K, V>> U onPut(Function3<K, V, CommandContext, Boolean> listener) {
+    public <U extends MapValue<K, V>> U onPut(TriFunction<K, V, CommandContext, Boolean> listener) {
         putListeners.add(listener);
         return ((U) this);
     }
