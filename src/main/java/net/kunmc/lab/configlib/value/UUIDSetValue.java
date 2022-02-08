@@ -65,8 +65,7 @@ public class UUIDSetValue extends SetValue<UUID> {
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
         String sel = argument.get(0).toString();
-        return sel.equals("@a") ||
-                sel.equals("@r") ||
+        return ((sel.equals("@a") || sel.equals("@r")) && getPlayerStreamForAdd().findAny().isPresent()) ||
                 getPlayerStreamForAdd()
                         .map(OfflinePlayer::getName)
                         .anyMatch(s -> s.equals(sel));
@@ -75,6 +74,10 @@ public class UUIDSetValue extends SetValue<UUID> {
     @Override
     protected String incorrectArgumentMessageForAdd(List<Object> argument) {
         String s = argument.get(0).toString();
+
+        if (s.equals("@a") || s.equals("@r")) {
+            return "プレイヤーが見つかりませんでした.";
+        }
 
         if (s.startsWith("@")) {
             return "セレクターは@aか@rのみを指定できます.";
