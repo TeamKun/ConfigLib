@@ -6,7 +6,6 @@ import net.kunmc.lab.configlib.MapValue;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +15,6 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V> extends MapValue
     private transient boolean removable = true;
     private transient boolean clearable = true;
     private transient boolean listable = true;
-
-    public Enum2ObjectMapValue(T... t) {
-        this(new HashMap<>(), t);
-    }
 
     public Enum2ObjectMapValue(Map<T, V> value, T... t) {
         super(value);
