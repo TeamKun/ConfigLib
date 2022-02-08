@@ -82,6 +82,10 @@ class ConfigModifyCommand extends AccessibleCommand {
                         if (value.puttableByCommand()) {
                             children(new ModifyMapPutCommand(field, value, config));
                         }
+
+                        if (value.removableByCommand()) {
+                            children(new ModifyMapRemoveCommand(field, value, config));
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
