@@ -66,13 +66,13 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
 
     @Override
     public void appendArgumentForRemove(UsageBuilder builder) {
-        builder.doubleArgument("x", suggestionBuilder -> {
+        builder.doubleArgument("x", -Double.MAX_VALUE, Double.MAX_VALUE, suggestionBuilder -> {
                     suggestionBuilder.suggestAll(value.stream()
                             .map(Location::getX)
                             .map(Object::toString)
                             .collect(Collectors.toList()));
                 }, null)
-                .doubleArgument("y", suggestionBuilder -> {
+                .doubleArgument("y", -Double.MAX_VALUE, Double.MAX_VALUE, suggestionBuilder -> {
                     double x = ((double) suggestionBuilder.getTypedArgs().get(0));
                     suggestionBuilder.suggestAll(value.stream()
                             .filter(l -> l.getX() == x)
@@ -80,7 +80,7 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
                             .map(Object::toString)
                             .collect(Collectors.toList()));
                 }, null)
-                .doubleArgument("z", suggestionBuilder -> {
+                .doubleArgument("z", -Double.MAX_VALUE, Double.MAX_VALUE, suggestionBuilder -> {
                     double x = ((double) suggestionBuilder.getTypedArgs().get(0));
                     double y = ((double) suggestionBuilder.getTypedArgs().get(1));
                     suggestionBuilder.suggestAll(value.stream()
