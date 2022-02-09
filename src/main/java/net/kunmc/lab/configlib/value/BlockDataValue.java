@@ -11,22 +11,9 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.List;
 
-public class BlockDataValue extends SingleValue<BlockData> {
-    private transient Boolean listable = true;
-    private transient Boolean writable = true;
-
+public class BlockDataValue extends SingleValue<BlockData, BlockDataValue> {
     public BlockDataValue(BlockData value) {
         super(value);
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public BlockDataValue writableByCommand(boolean writable) {
-        this.writable = writable;
-        return this;
     }
 
     @Override
@@ -77,22 +64,12 @@ public class BlockDataValue extends SingleValue<BlockData> {
     }
 
     @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public BlockDataValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
-
-    @Override
     protected void sendListMessage(CommandContext ctx, String entryName) {
         ctx.success(entryName + ": " + value.getMaterial().name());
     }
 
     @Override
     public String toString() {
-        return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}", value(), listable, writable);
+        return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}", value(), listable(), writableByCommand());
     }
 }

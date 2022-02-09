@@ -15,7 +15,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class MapValue<K, V> extends Value<Map<K, V>> {
+public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<Map<K, V>, T> {
+    private transient boolean puttable = true;
+    private transient boolean removable = true;
+    private transient boolean clearable = true;
     private final transient List<TriFunction<K, V, CommandContext, Boolean>> putListeners = new ArrayList<>();
     private final transient List<BiFunction<K, CommandContext, Boolean>> removeListeners = new ArrayList<>();
     private final transient List<Function<CommandContext, Boolean>> clearListeners = new ArrayList<>();
@@ -24,7 +27,14 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> {
         super(value);
     }
 
-    protected abstract boolean puttableByCommand();
+    protected boolean puttableByCommand() {
+        return puttable;
+    }
+
+    public T puttableByCommand(boolean puttable) {
+        this.puttable = puttable;
+        return ((T) this);
+    }
 
     protected abstract void appendKeyArgumentForPut(UsageBuilder builder);
 
@@ -58,13 +68,13 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> {
         return "";
     }
 
-    public <U extends MapValue<K, V>> U onPut(BiConsumer<K, V> listener) {
+    public T onPut(BiConsumer<K, V> listener) {
         return onPut((k, v, ctx) -> {
             listener.accept(k, v);
         });
     }
 
-    public <U extends MapValue<K, V>> U onPut(TriConsumer<K, V, CommandContext> listener) {
+    public T onPut(TriConsumer<K, V, CommandContext> listener) {
         return onPut((k, v, ctx) -> {
             listener.accept(k, v, ctx);
             return false;
@@ -74,9 +84,9 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> {
     /**
      * @return true if you want to cancel event, otherwise false
      */
-    public <U extends MapValue<K, V>> U onPut(TriFunction<K, V, CommandContext, Boolean> listener) {
+    public T onPut(TriFunction<K, V, CommandContext, Boolean> listener) {
         putListeners.add(listener);
-        return ((U) this);
+        return ((T) this);
     }
 
     protected boolean onPutValue(K k, V v, CommandContext ctx) {
@@ -89,7 +99,14 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> {
         return String.format("%sに{%s:%s}を追加しました.", entryName, keyToString(k), valueToString(v));
     }
 
-    protected abstract boolean removableByCommand();
+    protected boolean removableByCommand() {
+        return removable;
+    }
+
+    public T removableByCommand(boolean removable) {
+        this.removable = removable;
+        return ((T) this);
+    }
 
     protected abstract void appendKeyArgumentForRemove(UsageBuilder builder);
 
@@ -107,13 +124,13 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> {
         return String.format("%sは%sに追加されていませんでした.", keyToString(k), entryName);
     }
 
-    public <U extends MapValue<K, V>> U onRemove(Consumer<K> listener) {
+    public T onRemove(Consumer<K> listener) {
         return onRemove((k, ctx) -> {
             listener.accept(k);
         });
     }
 
-    public <U extends MapValue<K, V>> U onRemove(BiConsumer<K, CommandContext> listener) {
+    public T onRemove(BiConsumer<K, CommandContext> listener) {
         return onRemove((k, ctx) -> {
             listener.accept(k, ctx);
             return false;
@@ -123,9 +140,9 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> {
     /**
      * @return true if you want to cancel event, otherwise false
      */
-    public <U extends MapValue<K, V>> U onRemove(BiFunction<K, CommandContext, Boolean> listener) {
+    public T onRemove(BiFunction<K, CommandContext, Boolean> listener) {
         removeListeners.add(listener);
-        return ((U) this);
+        return ((T) this);
     }
 
     protected boolean onRemoveKey(K k, CommandContext ctx) {
@@ -138,15 +155,22 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> {
         return String.format("%sから{%s:%s}を削除しました.", entryName, keyToString(k), valueToString(v));
     }
 
-    protected abstract boolean clearableByCommand();
+    protected boolean clearableByCommand() {
+        return clearable;
+    }
 
-    public <U extends MapValue<K, V>> U onClear(Runnable listener) {
+    public T clearableByCommand(boolean clearable) {
+        this.clearable = clearable;
+        return ((T) this);
+    }
+
+    public T onClear(Runnable listener) {
         return onClear(ctx -> {
             listener.run();
         });
     }
 
-    public <U extends MapValue<K, V>> U onClear(Consumer<CommandContext> listener) {
+    public T onClear(Consumer<CommandContext> listener) {
         return onClear(ctx -> {
             listener.accept(ctx);
             return false;
@@ -156,9 +180,9 @@ public abstract class MapValue<K, V> extends Value<Map<K, V>> {
     /**
      * @return true if you want to cancel event, otherwise false
      */
-    public <U extends MapValue<K, V>> U onClear(Function<CommandContext, Boolean> listener) {
+    public T onClear(Function<CommandContext, Boolean> listener) {
         clearListeners.add(listener);
-        return ((U) this);
+        return ((T) this);
     }
 
     protected boolean onClearMap(CommandContext ctx) {

@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class Team2IntegerMapValue extends Team2ObjectMapValue<Integer> {
+public class Team2IntegerMapValue extends Team2ObjectMapValue<Integer, Team2IntegerMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
         builder.integerArgument("integer");

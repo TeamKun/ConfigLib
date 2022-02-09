@@ -13,10 +13,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class UUIDValue extends SingleValue<UUID> {
+public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     private String playerName;
-    private transient boolean listable = true;
-    private transient boolean writable = true;
 
     public UUIDValue() {
         this(((UUID) null));
@@ -53,16 +51,6 @@ public class UUIDValue extends SingleValue<UUID> {
         }
 
         return "";
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public UUIDValue writableByCommand(boolean writable) {
-        this.writable = writable;
-        return this;
     }
 
     @Override
@@ -142,22 +130,12 @@ public class UUIDValue extends SingleValue<UUID> {
     }
 
     @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public UUIDValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
-
-    @Override
     protected void sendListMessage(CommandContext ctx, String entryName) {
         ctx.success(entryName + ": " + playerName());
     }
 
     @Override
     public String toString() {
-        return String.format("UUIDValue{value=%s,playerName=%s,listable=%b,writable=%b}", value, playerName, listable, writable);
+        return String.format("UUIDValue{value=%s,playerName=%s,listable=%b,writable=%b}", value, playerName, listable(), writableByCommand());
     }
 }

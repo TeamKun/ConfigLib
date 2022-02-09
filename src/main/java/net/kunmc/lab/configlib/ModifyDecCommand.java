@@ -23,8 +23,8 @@ class ModifyDecCommand extends AccessibleCommand {
         String entryName = field.getName();
 
         double amount = 1.0;
-        if (value.compareTo(value.min().doubleValue() + amount) < 0) {
-            amount = ((Number) value.value).doubleValue() - value.min().doubleValue();
+        if (value.compareTo(value.min.doubleValue() + amount) < 0) {
+            amount = ((Number) value.value).doubleValue() - value.min.doubleValue();
         }
 
         Number newValue = value.copySub(amount);

@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class Team2StringMapValue extends Team2ObjectMapValue<String> {
+public class Team2StringMapValue extends Team2ObjectMapValue<String, Team2StringMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
         builder.stringArgument("string", StringArgument.Type.PHRASE);

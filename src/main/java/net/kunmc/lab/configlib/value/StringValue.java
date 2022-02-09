@@ -10,12 +10,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StringValue extends SingleValue<String> {
+public class StringValue extends SingleValue<String, StringValue> {
     private final int min;
     private final int max;
-    private transient Boolean listable = true;
-    private transient Boolean writable = true;
-    protected transient String name = "String";
+    protected transient String name = "string";
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
     protected final transient List<String> allowableStringList = new ArrayList<>();
     protected transient SuggestionAction suggestionAction = builder -> {
@@ -49,16 +47,6 @@ public class StringValue extends SingleValue<String> {
 
     public StringValue suggestionAction(@NotNull SuggestionAction action) {
         this.suggestionAction = action;
-        return this;
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public StringValue writableByCommand(boolean writable) {
-        this.writable = writable;
         return this;
     }
 
@@ -97,18 +85,7 @@ public class StringValue extends SingleValue<String> {
     }
 
     @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-
-    public StringValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
-
-    @Override
     public String toString() {
-        return String.format("StringValue{value=%s,min=%d,max=%d,listable=%b,writable=%b}", value, min, max, listable, writable);
+        return String.format("StringValue{value=%s,min=%d,max=%d,listable=%b,writable=%b}", value, min, max, listable(), writableByCommand());
     }
 }

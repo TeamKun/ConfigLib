@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class UUID2FloatMapValue extends UUID2ObjectMapValue<Float> {
+public class UUID2FloatMapValue extends UUID2ObjectMapValue<Float, UUID2FloatMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
         builder.floatArgument("float");

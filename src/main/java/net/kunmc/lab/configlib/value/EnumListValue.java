@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EnumListValue<T extends Enum<T>> extends ListValue<T> {
+public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue<T>> {
     private final transient Class<?> enumClass;
 
     public EnumListValue(T... values) {

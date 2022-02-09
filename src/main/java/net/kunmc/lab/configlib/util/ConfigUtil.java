@@ -36,7 +36,7 @@ public class ConfigUtil {
                 .collect(Collectors.toList());
     }
 
-    public static List<SingleValue<?>> getSingleValues(BaseConfig config) {
+    public static List<SingleValue<?, ?>> getSingleValues(BaseConfig config) {
         return getSingleValueFields(config).stream()
                 .map(f -> {
                     try {
@@ -46,11 +46,11 @@ public class ConfigUtil {
                         return null;
                     }
                 })
-                .map(x -> ((SingleValue<?>) x))
+                .map(x -> ((SingleValue<?, ?>) x))
                 .collect(Collectors.toList());
     }
 
-    public static List<CollectionValue<?, ?>> getCollectionValues(BaseConfig config) {
+    public static List<CollectionValue<?, ?, ?>> getCollectionValues(BaseConfig config) {
         return getCollectionValueFields(config).stream()
                 .map(f -> {
                     try {
@@ -60,11 +60,11 @@ public class ConfigUtil {
                         return null;
                     }
                 })
-                .map(x -> ((CollectionValue<?, ?>) x))
+                .map(x -> ((CollectionValue<?, ?, ?>) x))
                 .collect(Collectors.toList());
     }
 
-    public static List<MapValue<?, ?>> getMapValues(BaseConfig config) {
+    public static List<MapValue<?, ?, ?>> getMapValues(BaseConfig config) {
         return getMapValueFields(config).stream()
                 .map(f -> {
                     try {
@@ -74,7 +74,7 @@ public class ConfigUtil {
                         return null;
                     }
                 })
-                .map(x -> ((MapValue<?, ?>) x))
+                .map(x -> ((MapValue<?, ?, ?>) x))
                 .collect(Collectors.toList());
     }
 }

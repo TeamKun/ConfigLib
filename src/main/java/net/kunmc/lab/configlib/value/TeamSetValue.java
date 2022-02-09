@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * If you need completions on "add" with NewScoreboard, you should register it with scoreboard(Scoreboard) method.
  * When you use NewScoreboard, this class can't be deserialized. Therefore, a field must be qualified as transient at that time.
  */
-public class TeamSetValue extends SetValue<Team> {
+public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     private transient Scoreboard scoreboard;
 
     public TeamSetValue(Team... teams) {

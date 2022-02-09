@@ -16,13 +16,11 @@ import java.util.List;
  * If you need completions with NewScoreboard, you should register it with scoreboard(Scoreboard) method.
  * When you use NewScoreboard, this class can't be deserialized. Therefore, a field must be qualified as transient at that time.
  */
-public class TeamValue extends SingleValue<Team> {
+public class TeamValue extends SingleValue<Team, TeamValue> {
     private transient Scoreboard scoreboard;
-    private transient boolean listable = true;
-    private transient boolean writable = true;
 
     public TeamValue() {
-        this((Team) null);
+        this(null);
     }
 
     public TeamValue(Team value) {
@@ -36,16 +34,6 @@ public class TeamValue extends SingleValue<Team> {
 
     public TeamValue scoreboard(@NotNull Scoreboard scoreboard) {
         this.scoreboard = scoreboard;
-        return this;
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public TeamValue writableByCommand(boolean writable) {
-        this.writable = writable;
         return this;
     }
 
@@ -93,16 +81,6 @@ public class TeamValue extends SingleValue<Team> {
     @Override
     protected String succeedModifyMessage(String entryName) {
         return entryName + "の値を" + value.getName() + "に設定しました.";
-    }
-
-    @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public TeamValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
     }
 
     @Override

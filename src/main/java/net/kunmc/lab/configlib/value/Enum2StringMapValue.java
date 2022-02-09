@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Enum2StringMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T, String> {
+public class Enum2StringMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T, String, Enum2StringMapValue<T>> {
     public Enum2StringMapValue(T... t) {
         this(new HashMap<>(), t);
     }

@@ -35,13 +35,13 @@ class ConfigModifyCommand extends AccessibleCommand {
             command.appendChild(new Command(field.getName()) {
                 {
                     try {
-                        SingleValue<?> v = ((SingleValue<?>) field.get(config));
+                        SingleValue<?, ?> v = ((SingleValue<?, ?>) field.get(config));
                         if (v.writableByCommand()) {
                             children(new ModifySetCommand(field, v, config));
 
                             if (v instanceof NumericValue) {
-                                children(new ModifyIncCommand(field, ((NumericValue<?>) v), config));
-                                children(new ModifyDecCommand(field, ((NumericValue<?>) v), config));
+                                children(new ModifyIncCommand(field, ((NumericValue<?, ?>) v), config));
+                                children(new ModifyDecCommand(field, ((NumericValue<?, ?>) v), config));
                             }
                         }
                     } catch (Exception e) {

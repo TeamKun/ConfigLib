@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class Team2LocationMapValue extends Team2ObjectMapValue<Location> {
+public class Team2LocationMapValue extends Team2ObjectMapValue<Location, Team2LocationMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
         builder.locationArgument("location");

@@ -6,30 +6,13 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class DoubleValue extends NumericValue<Double> {
-    private final Double min;
-    private final Double max;
-    private transient boolean listable = true;
-    private transient boolean writable = true;
-
+public class DoubleValue extends NumericValue<Double, DoubleValue> {
     public DoubleValue(Double value) {
         this(value, -Double.MAX_VALUE, Double.MAX_VALUE);
     }
 
     public DoubleValue(Double value, Double min, Double max) {
-        super(value);
-        this.min = min;
-        this.max = max;
-    }
-
-    @Override
-    protected Double min() {
-        return min;
-    }
-
-    @Override
-    protected Double max() {
-        return max;
+        super(value, min, max);
     }
 
     @Override
@@ -48,18 +31,8 @@ public class DoubleValue extends NumericValue<Double> {
     }
 
     @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public DoubleValue writableByCommand(boolean writable) {
-        this.writable = writable;
-        return this;
-    }
-
-    @Override
     protected void appendArgument(UsageBuilder builder) {
-        builder.doubleArgument("Double", min(), max());
+        builder.doubleArgument("Double", min, max);
     }
 
     @Override
@@ -78,17 +51,7 @@ public class DoubleValue extends NumericValue<Double> {
     }
 
     @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public DoubleValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
-
-    @Override
     public String toString() {
-        return String.format("DoubleValue{value=%f,min=%f,max=%f,listable=%b,writable=%b}", value, min, max, listable, writable);
+        return String.format("DoubleValue{value=%f,min=%f,max=%f,listable=%b,writable=%b}", value, min, max, listable(), writableByCommand());
     }
 }

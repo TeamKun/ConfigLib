@@ -6,22 +6,9 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class BooleanValue extends SingleValue<Boolean> {
-    private transient Boolean listable = true;
-    private transient Boolean writable = true;
-
+public class BooleanValue extends SingleValue<Boolean, BooleanValue> {
     public BooleanValue(Boolean value) {
         super(value);
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public BooleanValue writableByCommand(boolean writable) {
-        this.writable = writable;
-        return this;
     }
 
     @Override
@@ -58,17 +45,7 @@ public class BooleanValue extends SingleValue<Boolean> {
     }
 
     @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public BooleanValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
-    }
-
-    @Override
     public String toString() {
-        return String.format("BooleanValue{value=%b,listable=%b,writable=%b}", value, listable, writable);
+        return String.format("BooleanValue{value=%b,listable=%b,writable=%b}", value, listable(), writableByCommand());
     }
 }

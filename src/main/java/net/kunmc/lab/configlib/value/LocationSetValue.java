@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class LocationSetValue extends SetValue<Location> {
+public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     public LocationSetValue(Location... locations) {
         this(Sets.newHashSet(locations));
     }

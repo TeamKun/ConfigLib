@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class UUID2DoubleMapValue extends UUID2ObjectMapValue<Double> {
+public class UUID2DoubleMapValue extends UUID2ObjectMapValue<Double, UUID2DoubleMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
         builder.doubleArgument("double");

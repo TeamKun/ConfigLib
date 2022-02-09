@@ -7,24 +7,9 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public abstract class SetValue<E> extends CollectionValue<Set<E>, E> implements Iterable<E> {
-    protected transient boolean listable = true;
-    protected transient boolean addable = true;
-    protected transient boolean removable = true;
-    protected transient boolean clearable = true;
-
+public abstract class SetValue<E, U extends SetValue<E, U>> extends CollectionValue<Set<E>, E, U> implements Iterable<E> {
     public SetValue(@NotNull Set<E> value) {
         super(value);
-    }
-
-    @Override
-    protected boolean addableByCommand() {
-        return addable;
-    }
-
-    public <T extends SetValue<E>> T addableByCommand(boolean addable) {
-        this.addable = addable;
-        return (T) this;
     }
 
     @Override
@@ -33,38 +18,8 @@ public abstract class SetValue<E> extends CollectionValue<Set<E>, E> implements 
     }
 
     @Override
-    protected boolean removableByCommand() {
-        return removable;
-    }
-
-    public <T extends SetValue<E>> T removableByCommand(boolean removable) {
-        this.removable = removable;
-        return (T) this;
-    }
-
-    @Override
     protected boolean validateForRemove(Set<E> element) {
         return value.containsAll(element);
-    }
-
-    @Override
-    protected boolean clearableByCommand() {
-        return clearable;
-    }
-
-    public <T extends SetValue<E>> T clearableByCommand(boolean clearable) {
-        this.clearable = clearable;
-        return (T) this;
-    }
-
-    @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public <T extends SetValue<E>> T listable(boolean listable) {
-        this.listable = listable;
-        return (T) this;
     }
 
     public int size() {

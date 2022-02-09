@@ -15,10 +15,7 @@ import org.bukkit.util.Vector;
 
 import java.util.List;
 
-public class LocationValue extends SingleValue<Location> {
-    private transient boolean listable = true;
-    private transient boolean writable = true;
-
+public class LocationValue extends SingleValue<Location, LocationValue> {
     public LocationValue() {
         this((Location) null);
     }
@@ -41,16 +38,6 @@ public class LocationValue extends SingleValue<Location> {
         }
 
         return value.toVector();
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public LocationValue writableByCommand(boolean writable) {
-        this.writable = writable;
-        return this;
     }
 
     @Override
@@ -104,16 +91,6 @@ public class LocationValue extends SingleValue<Location> {
     @Override
     protected String succeedModifyMessage(String entryName) {
         return entryName + "の値を" + locationToString(value) + "に設定しました.";
-    }
-
-    @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public LocationValue listable(boolean listable) {
-        this.listable = listable;
-        return this;
     }
 
     @Override

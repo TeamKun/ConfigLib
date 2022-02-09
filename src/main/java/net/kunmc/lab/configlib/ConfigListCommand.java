@@ -53,7 +53,7 @@ class ConfigListCommand extends Command {
             }
 
             if (value instanceof Value) {
-                Value<?> v = ((Value<?>) value);
+                Value<?, ?> v = ((Value<?, ?>) value);
                 if (v.listable()) {
                     v.sendListMessage(ctx, field.getName());
                 }

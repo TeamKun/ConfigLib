@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class UUID2LocationMapValue extends UUID2ObjectMapValue<Location> {
+public class UUID2LocationMapValue extends UUID2ObjectMapValue<Location, UUID2LocationMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
         builder.locationArgument("location");

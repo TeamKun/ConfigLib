@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Enum2DoubleMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T, Double> {
+public class Enum2DoubleMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T, Double, Enum2DoubleMapValue<T>> {
     public Enum2DoubleMapValue(T... t) {
         this(new HashMap<>(), t);
     }

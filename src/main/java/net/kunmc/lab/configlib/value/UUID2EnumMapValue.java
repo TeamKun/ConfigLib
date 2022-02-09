@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.*;
 
-public class UUID2EnumMapValue<T extends Enum<T>> extends UUID2ObjectMapValue<T> {
+public class UUID2EnumMapValue<T extends Enum<T>> extends UUID2ObjectMapValue<T, UUID2EnumMapValue<T>> {
     private transient final Class<T> clazz;
 
     public UUID2EnumMapValue(T... t) {

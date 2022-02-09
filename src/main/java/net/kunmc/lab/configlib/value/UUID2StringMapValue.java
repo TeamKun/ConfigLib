@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class UUID2StringMapValue extends UUID2ObjectMapValue<String> {
+public class UUID2StringMapValue extends UUID2ObjectMapValue<String, UUID2StringMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
         builder.stringArgument("string", StringArgument.Type.PHRASE);

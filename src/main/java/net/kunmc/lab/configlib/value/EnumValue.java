@@ -9,9 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
-public class EnumValue<T extends Enum<T>> extends SingleValue<T> {
-    private transient Boolean listable = true;
-    private transient Boolean writable = true;
+public class EnumValue<T extends Enum<T>> extends SingleValue<T, EnumValue<T>> {
     private final transient Class<T> clazz;
 
     public EnumValue(@NotNull T value) {
@@ -22,16 +20,6 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T> {
 
     private T[] constants() {
         return clazz.getEnumConstants();
-    }
-
-    @Override
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public EnumValue<T> writableByCommand(boolean writable) {
-        this.writable = writable;
-        return this;
     }
 
     @Override
@@ -72,15 +60,5 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T> {
     @Override
     protected String invalidValueMessage(String entryName, T newValue) {
         return newValue.name() + "は不正な値です.";
-    }
-
-    @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public EnumValue<T> listable(boolean listable) {
-        this.listable = listable;
-        return this;
     }
 }

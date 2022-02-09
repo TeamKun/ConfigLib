@@ -12,7 +12,10 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class CollectionValue<T extends Collection<E>, E> extends Value<T> {
+public abstract class CollectionValue<T extends Collection<E>, E, U extends CollectionValue<T, E, U>> extends Value<T, U> {
+    private transient boolean addable = true;
+    private transient boolean removable = true;
+    private transient boolean clearable = true;
     private final transient List<BiFunction<T, CommandContext, Boolean>> addListeners = new ArrayList<>();
     private final transient List<BiFunction<T, CommandContext, Boolean>> removeListeners = new ArrayList<>();
     private final transient List<Function<CommandContext, Boolean>> clearListeners = new ArrayList<>();
@@ -21,7 +24,14 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
         super(value);
     }
 
-    protected abstract boolean addableByCommand();
+    protected boolean addableByCommand() {
+        return addable;
+    }
+
+    public U addableByCommand(boolean addable) {
+        this.addable = addable;
+        return ((U) this);
+    }
 
     protected abstract void appendArgumentForAdd(UsageBuilder builder);
 
@@ -35,13 +45,13 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
 
     protected abstract String invalidValueMessageForAdd(String entryName, T value);
 
-    public <U extends CollectionValue<T, E>> U onAdd(Consumer<T> listener) {
+    public U onAdd(Consumer<T> listener) {
         return onAdd((v, ctx) -> {
             listener.accept(v);
         });
     }
 
-    public <U extends CollectionValue<T, E>> U onAdd(BiConsumer<T, CommandContext> listener) {
+    public U onAdd(BiConsumer<T, CommandContext> listener) {
         return onAdd((v, ctx) -> {
             listener.accept(v, ctx);
             return false;
@@ -51,7 +61,7 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
     /**
      * @return true if you want to cancel event, otherwise false
      */
-    public <U extends CollectionValue<T, E>> U onAdd(BiFunction<T, CommandContext, Boolean> listener) {
+    public U onAdd(BiFunction<T, CommandContext, Boolean> listener) {
         addListeners.add(listener);
         return ((U) this);
     }
@@ -64,7 +74,14 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
 
     protected abstract String succeedMessageForAdd(String entryName, T value);
 
-    protected abstract boolean removableByCommand();
+    protected boolean removableByCommand() {
+        return removable;
+    }
+
+    public U removableByCommand(boolean removable) {
+        this.removable = removable;
+        return ((U) this);
+    }
 
     protected abstract void appendArgumentForRemove(UsageBuilder builder);
 
@@ -78,13 +95,13 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
 
     protected abstract String invalidValueMessageForRemove(String entryName, T value);
 
-    public <U extends CollectionValue<T, E>> U onRemove(Consumer<T> listener) {
+    public U onRemove(Consumer<T> listener) {
         return onRemove((v, ctx) -> {
             listener.accept(v);
         });
     }
 
-    public <U extends CollectionValue<T, E>> U onRemove(BiConsumer<T, CommandContext> listener) {
+    public U onRemove(BiConsumer<T, CommandContext> listener) {
         return onRemove((v, ctx) -> {
             listener.accept(v, ctx);
             return false;
@@ -94,7 +111,7 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
     /**
      * @return true if you want to cancel event, otherwise false
      */
-    public <U extends CollectionValue<T, E>> U onRemove(BiFunction<T, CommandContext, Boolean> listener) {
+    public U onRemove(BiFunction<T, CommandContext, Boolean> listener) {
         removeListeners.add(listener);
         return ((U) this);
     }
@@ -107,15 +124,22 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
 
     protected abstract String succeedMessageForRemove(String entryName, T value);
 
-    protected abstract boolean clearableByCommand();
+    protected boolean clearableByCommand() {
+        return clearable;
+    }
 
-    public <U extends CollectionValue<T, E>> U onClear(Runnable listener) {
+    public U clearableByCommand(boolean clearable) {
+        this.clearable = clearable;
+        return ((U) this);
+    }
+
+    public U onClear(Runnable listener) {
         return onClear(ctx -> {
             listener.run();
         });
     }
 
-    public <U extends CollectionValue<T, E>> U onClear(Consumer<CommandContext> listener) {
+    public U onClear(Consumer<CommandContext> listener) {
         return onClear(ctx -> {
             listener.accept(ctx);
             return false;
@@ -125,7 +149,7 @@ public abstract class CollectionValue<T extends Collection<E>, E> extends Value<
     /**
      * @return true if you want to cancel event, otherwise false
      */
-    public <U extends CollectionValue<T, E>> U onClear(Function<CommandContext, Boolean> listener) {
+    public U onClear(Function<CommandContext, Boolean> listener) {
         clearListeners.add(listener);
         return ((U) this);
     }

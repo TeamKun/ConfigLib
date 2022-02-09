@@ -8,17 +8,12 @@ import net.kunmc.lab.configlib.util.CommandUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class UUID2ObjectMapValue<V> extends MapValue<UUID, V> {
-    private transient boolean puttable = true;
-    private transient boolean removable = true;
-    private transient boolean clearable = true;
-    private transient boolean listable = true;
+public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>> extends MapValue<UUID, V, T> {
     private transient boolean onlyOnline = true;
 
     public UUID2ObjectMapValue() {
@@ -29,19 +24,14 @@ public abstract class UUID2ObjectMapValue<V> extends MapValue<UUID, V> {
         super(value);
     }
 
+    public T suggestOfflines() {
+        onlyOnline = false;
+        return ((T) this);
+    }
+
     private Stream<OfflinePlayer> getPlayerStreamForPut() {
         return Arrays.stream(Bukkit.getOfflinePlayers())
                 .filter(p -> !onlyOnline || p.isOnline());
-    }
-
-    @Override
-    protected boolean puttableByCommand() {
-        return puttable;
-    }
-
-    public <U extends UUID2ObjectMapValue<V>> U puttableByCommand(boolean puttable) {
-        this.puttable = puttable;
-        return ((U) this);
     }
 
     @Override
@@ -97,16 +87,6 @@ public abstract class UUID2ObjectMapValue<V> extends MapValue<UUID, V> {
     }
 
     @Override
-    protected boolean removableByCommand() {
-        return removable;
-    }
-
-    public <U extends UUID2ObjectMapValue<V>> U removableByCommand(boolean removable) {
-        this.removable = removable;
-        return ((U) this);
-    }
-
-    @Override
     protected void appendKeyArgumentForRemove(UsageBuilder builder) {
         List<Argument<?>> arguments = CommandUtil.getArguments(builder);
 
@@ -158,30 +138,9 @@ public abstract class UUID2ObjectMapValue<V> extends MapValue<UUID, V> {
     }
 
     @Override
-    protected boolean clearableByCommand() {
-        return clearable;
-    }
-
-    public <U extends UUID2ObjectMapValue<V>> U clearableByCommand(boolean clearable) {
-        this.clearable = clearable;
-        return ((U) this);
-    }
-
-    @Override
     protected String keyToString(UUID uuid) {
-        return Optional.ofNullable(Bukkit.getEntity(uuid))
-                .map(Entity::getName)
+        return Optional.of(Bukkit.getOfflinePlayer(uuid))
+                .map(OfflinePlayer::getName)
                 .orElse("null");
     }
-
-    @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public <U extends UUID2ObjectMapValue<V>> U listable(boolean listable) {
-        this.listable = listable;
-        return ((U) this);
-    }
-
 }

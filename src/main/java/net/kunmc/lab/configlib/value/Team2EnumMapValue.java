@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T> {
+public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T, Team2EnumMapValue<T>> {
     private final transient Class<T> clazz;
 
     public Team2EnumMapValue(T... e) {

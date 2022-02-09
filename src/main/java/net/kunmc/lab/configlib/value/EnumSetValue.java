@@ -15,9 +15,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class EnumSetValue<T extends Enum<T>> extends SetValue<T> {
+public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>> {
     private final transient Class<?> enumClass;
-
 
     public EnumSetValue(T... values) {
         this(new HashSet<>(), values);

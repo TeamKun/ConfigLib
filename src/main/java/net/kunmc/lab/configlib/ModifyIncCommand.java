@@ -23,8 +23,8 @@ class ModifyIncCommand extends AccessibleCommand {
         String entryName = field.getName();
 
         double amount = 1.0;
-        if (value.compareTo(value.max().doubleValue() - amount) > 0) {
-            amount = value.max().doubleValue() - ((Number) value.value).doubleValue();
+        if (value.compareTo(value.max.doubleValue() - amount) > 0) {
+            amount = value.max.doubleValue() - ((Number) value.value).doubleValue();
         }
 
         Number newValue = value.copyAdd(amount);

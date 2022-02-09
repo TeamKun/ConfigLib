@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class Team2BooleanMapValue extends Team2ObjectMapValue<Boolean> {
+public class Team2BooleanMapValue extends Team2ObjectMapValue<Boolean, Team2BooleanMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
         builder.booleanArgument("bool", null, null);

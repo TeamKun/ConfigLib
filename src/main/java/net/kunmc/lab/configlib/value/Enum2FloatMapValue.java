@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Enum2FloatMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T, Float> {
+public class Enum2FloatMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T, Float, Enum2FloatMapValue<T>> {
     public Enum2FloatMapValue(T... t) {
         this(new HashMap<>(), t);
     }

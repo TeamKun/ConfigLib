@@ -1,27 +1,29 @@
 package net.kunmc.lab.configlib;
 
-public abstract class NumericValue<T extends Number & Comparable<T>> extends SingleValue<T> {
-    public NumericValue(T value) {
+public abstract class NumericValue<E extends Number & Comparable<E>, T extends NumericValue<E, T>> extends SingleValue<E, T> {
+    protected final E min;
+    protected final E max;
+
+    public NumericValue(E value, E min, E max) {
         super(value);
+
+        this.min = min;
+        this.max = max;
     }
 
-    protected abstract T min();
+    protected abstract E copyAdd(Number amount);
 
-    protected abstract T max();
-
-    protected abstract T copyAdd(Number amount);
-
-    protected abstract T copySub(Number amount);
+    protected abstract E copySub(Number amount);
 
     protected abstract int compareTo(Number n);
 
     @Override
-    protected boolean validateOnSet(T newValue) {
-        return newValue.compareTo(min()) != -1 && newValue.compareTo(max()) != 1;
+    protected boolean validateOnSet(E newValue) {
+        return newValue.compareTo(min) != -1 && newValue.compareTo(max) != 1;
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, T argument) {
-        return min() + "以上" + max() + "以下の値を入力してください.";
+    protected String invalidValueMessage(String entryName, E argument) {
+        return min + "以上" + max + "以下の値を入力してください.";
     }
 }

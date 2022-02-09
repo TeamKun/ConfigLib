@@ -11,8 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class StringSetValue extends SetValue<String> {
-    protected transient String name = "String";
+public class StringSetValue extends SetValue<String, StringSetValue> {
+    protected transient String name = "string";
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
     private final transient List<String> allowableStringList = new ArrayList<>();
 

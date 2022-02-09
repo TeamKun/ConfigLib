@@ -43,7 +43,7 @@ class ConfigGetCommand extends AccessibleCommand {
             }
 
             if (o instanceof Value) {
-                Value<?> v = ((Value<?>) o);
+                Value<?, ?> v = ((Value<?, ?>) o);
                 if (v.listable()) {
                     command.appendChild(new Command(field.getName()) {
                         @Override

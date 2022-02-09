@@ -13,8 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class StringListValue extends ListValue<String> {
-    protected transient String name = "String";
+public class StringListValue extends ListValue<String, StringListValue> {
+    protected transient String name = "string";
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
     private final transient List<String> allowableStringList = new ArrayList<>();
 

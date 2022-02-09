@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class Team2FloatMapValue extends Team2ObjectMapValue<Float> {
+public class Team2FloatMapValue extends Team2ObjectMapValue<Float, Team2FloatMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
         builder.floatArgument("float");

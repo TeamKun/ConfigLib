@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class UUIDSetValue extends SetValue<UUID> {
+public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     private transient boolean onlyOnline = true;
 
     public UUIDSetValue(UUID... uuids) {

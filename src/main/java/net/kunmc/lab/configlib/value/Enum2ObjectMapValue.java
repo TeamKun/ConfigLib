@@ -9,12 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Enum2ObjectMapValue<T extends Enum<T>, V> extends MapValue<T, V> {
+public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2ObjectMapValue<T, V, U>> extends MapValue<T, V, U> {
     private transient final Class<T> clazz;
-    private transient boolean puttable = true;
-    private transient boolean removable = true;
-    private transient boolean clearable = true;
-    private transient boolean listable = true;
 
     public Enum2ObjectMapValue(Map<T, V> value, T... t) {
         super(value);
@@ -24,16 +20,6 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V> extends MapValue
 
     private T[] constants() {
         return clazz.getEnumConstants();
-    }
-
-    @Override
-    protected boolean puttableByCommand() {
-        return puttable;
-    }
-
-    public <U extends Enum2ObjectMapValue<T, V>> U puttableByCommand(boolean puttable) {
-        this.puttable = puttable;
-        return ((U) this);
     }
 
     @Override
@@ -66,16 +52,6 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V> extends MapValue
     }
 
     @Override
-    protected boolean removableByCommand() {
-        return removable;
-    }
-
-    public <U extends Enum2ObjectMapValue<T, V>> U removableByCommand(boolean removable) {
-        this.removable = removable;
-        return ((U) this);
-    }
-
-    @Override
     protected void appendKeyArgumentForRemove(UsageBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             value.keySet().stream()
@@ -105,27 +81,7 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V> extends MapValue
     }
 
     @Override
-    protected boolean clearableByCommand() {
-        return clearable;
-    }
-
-    public <U extends Enum2ObjectMapValue<T, V>> U clearableByCommand(boolean clearable) {
-        this.clearable = clearable;
-        return ((U) this);
-    }
-
-    @Override
     protected String keyToString(T t) {
         return t.name();
-    }
-
-    @Override
-    protected boolean listable() {
-        return listable;
-    }
-
-    public <U extends Enum2ObjectMapValue<T, V>> U listable(boolean listable) {
-        this.listable = listable;
-        return ((U) this);
     }
 }

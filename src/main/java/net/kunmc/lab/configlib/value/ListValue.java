@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.stream.Stream;
 
-public abstract class ListValue<E> extends CollectionValue<List<E>, E> implements Iterable<E> {
+public abstract class ListValue<E, U extends ListValue<E, U>> extends CollectionValue<List<E>, E, U> implements Iterable<E> {
     protected transient boolean listable = true;
     protected transient boolean addable = true;
     protected transient boolean removable = true;
@@ -21,9 +21,9 @@ public abstract class ListValue<E> extends CollectionValue<List<E>, E> implement
         return addable;
     }
 
-    public <T extends ListValue<E>> T addableByCommand(boolean addable) {
+    public U addableByCommand(boolean addable) {
         this.addable = addable;
-        return (T) this;
+        return (U) this;
     }
 
     @Override
@@ -31,9 +31,9 @@ public abstract class ListValue<E> extends CollectionValue<List<E>, E> implement
         return removable;
     }
 
-    public <T extends ListValue<E>> T removableByCommand(boolean removable) {
+    public U removableByCommand(boolean removable) {
         this.removable = removable;
-        return (T) this;
+        return (U) this;
     }
 
     @Override
@@ -46,9 +46,9 @@ public abstract class ListValue<E> extends CollectionValue<List<E>, E> implement
         return clearable;
     }
 
-    public <T extends ListValue<E>> T clearableByCommand(boolean clearable) {
+    public U clearableByCommand(boolean clearable) {
         this.clearable = clearable;
-        return (T) this;
+        return (U) this;
     }
 
     @Override
@@ -56,9 +56,9 @@ public abstract class ListValue<E> extends CollectionValue<List<E>, E> implement
         return listable;
     }
 
-    public <T extends ListValue<E>> T listable(boolean listable) {
+    public U listable(boolean listable) {
         this.listable = listable;
-        return (T) this;
+        return (U) this;
     }
 
     public int size() {

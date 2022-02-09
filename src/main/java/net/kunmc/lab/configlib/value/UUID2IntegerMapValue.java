@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class UUID2IntegerMapValue extends UUID2ObjectMapValue<Integer> {
+public class UUID2IntegerMapValue extends UUID2ObjectMapValue<Integer, UUID2IntegerMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
         builder.integerArgument("integer");
