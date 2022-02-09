@@ -66,7 +66,7 @@ public class UnparsedArgument implements Argument<String> {
         if (argument == null) {
             return "";
         }
-       
+
         StringRange range = argument.getRange();
         return range.get(input);
     }

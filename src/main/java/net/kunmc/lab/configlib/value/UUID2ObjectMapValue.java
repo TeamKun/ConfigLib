@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>> extends MapValue<UUID, V, T> {
-    private transient boolean onlyOnline = true;
+    protected transient boolean onlyOnline = true;
 
     public UUID2ObjectMapValue() {
         this(new HashMap<>());
