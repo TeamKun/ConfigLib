@@ -18,7 +18,7 @@ public class Enum2DoubleMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<
 
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.doubleArgument("double");
+        builder.doubleArgument("double", -Double.MAX_VALUE, Double.MAX_VALUE);
     }
 
     @Override
