@@ -2,6 +2,8 @@ package net.kunmc.lab.configlib;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class CollectionValue<T extends Collection<E>, E, U extends CollectionValue<T, E, U>> extends Value<T, U> {
     private transient boolean addable = true;
@@ -72,7 +75,9 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
                 .reduce(false, (a, b) -> a || b);
     }
 
-    protected abstract String succeedMessageForAdd(String entryName, T value);
+    protected String succeedMessageForAdd(String entryName, T value) {
+        return String.format("%sに%sを追加しました.", entryName, elementToString(((E[]) value.toArray())[0]));
+    }
 
     protected boolean removableByCommand() {
         return removable;
@@ -122,7 +127,9 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
                 .reduce(false, (a, b) -> a || b);
     }
 
-    protected abstract String succeedMessageForRemove(String entryName, T value);
+    protected String succeedMessageForRemove(String entryName, T value) {
+        return String.format("%sから%sを削除しました.", entryName, elementToString(((E[]) value.toArray())[0]));
+    }
 
     protected boolean clearableByCommand() {
         return clearable;
@@ -160,5 +167,21 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
                 .reduce(false, (a, b) -> a || b);
     }
 
-    protected abstract String clearMessage(String entryName);
+    protected final String clearMessage(String entryName) {
+        return entryName + "をクリアしました.";
+    }
+
+    protected abstract String elementToString(E e);
+
+    @Override
+    protected final void sendListMessage(CommandContext ctx, String entryName) {
+        String header = "-----" + entryName + "-----";
+        ctx.message(ChatColor.YELLOW + header);
+
+        ctx.success(value.stream()
+                .map(this::elementToString)
+                .collect(Collectors.joining(", ")));
+
+        ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
+    }
 }

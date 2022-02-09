@@ -27,6 +27,16 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
     }
 
     @Override
+    protected boolean validateForAdd(List<E> value) {
+        return true;
+    }
+
+    @Override
+    protected String invalidValueMessageForAdd(String entryName, List<E> value) {
+        return "This message can't be shown.";
+    }
+
+    @Override
     public boolean removableByCommand() {
         return removable;
     }
@@ -39,6 +49,11 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
     @Override
     public boolean validateForRemove(List<E> element) {
         return value.containsAll(element);
+    }
+
+    @Override
+    protected final String invalidValueMessageForRemove(String entryName, List<E> value) {
+        return String.format("%sは%sに追加されていませんでした.", elementToString(value.get(0)), entryName);
     }
 
     @Override

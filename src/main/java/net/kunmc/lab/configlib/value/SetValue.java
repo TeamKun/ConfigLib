@@ -18,8 +18,18 @@ public abstract class SetValue<E, U extends SetValue<E, U>> extends CollectionVa
     }
 
     @Override
+    protected String invalidValueMessageForAdd(String entryName, Set<E> element) {
+        return String.format("%sはすでに%sに追加されています.", elementToString(((E[]) element.toArray())[0]), entryName);
+    }
+
+    @Override
     protected boolean validateForRemove(Set<E> element) {
         return value.containsAll(element);
+    }
+
+    @Override
+    protected String invalidValueMessageForRemove(String entryName, Set<E> element) {
+        return String.format("%sは%sに追加されていませんでした.", elementToString(((E[]) element.toArray())[0]), entryName);
     }
 
     public int size() {

@@ -2,13 +2,10 @@ package net.kunmc.lab.configlib.value;
 
 import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.Argument;
-import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.argument.UnparsedArgument;
 import net.kunmc.lab.configlib.util.CommandUtil;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -189,7 +186,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
             return "セレクターは@aか@rのみを指定できます.";
         }
 
-        return s + "は追加されていません.";
+        return s + "は追加されていませんでした.";
     }
 
     @Override
@@ -201,9 +198,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     @Override
     protected String invalidValueMessageForRemove(String entryName, Set<UUID> element) {
         if (element.size() == 1) {
-            UUID uuid = element.toArray(new UUID[0])[0];
-            OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
-            return p.getName() + "は" + entryName + "に追加されていませんでした.";
+            return elementToString(element.toArray(new UUID[0])[0]) + "は" + entryName + "に追加されていませんでした.";
         }
 
         return element.size() + "人のプレイヤーは" + entryName + "に追加されていませんでした.";
@@ -212,29 +207,14 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     @Override
     protected String succeedMessageForRemove(String entryName, Set<UUID> element) {
         if (element.size() == 1) {
-            UUID uuid = element.toArray(new UUID[0])[0];
-            OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
-            return entryName + "から" + p.getName() + "を削除しました.";
+            return entryName + "から" + elementToString(element.toArray(new UUID[0])[0]) + "を削除しました.";
         }
 
         return entryName + "から" + element.size() + "人のプレイヤーを削除しました.";
     }
 
     @Override
-    protected String clearMessage(String entryName) {
-        return entryName + "からすべてのプレイヤーを削除しました.";
-    }
-
-    @Override
-    protected void sendListMessage(CommandContext ctx, String entryName) {
-        String header = "-----" + entryName + "-----";
-        ctx.message(ChatColor.YELLOW + header);
-
-        ctx.success(this.stream()
-                .map(Bukkit::getOfflinePlayer)
-                .map(OfflinePlayer::getName)
-                .collect(Collectors.joining(",")));
-
-        ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
+    protected String elementToString(UUID uuid) {
+        return Bukkit.getOfflinePlayer(uuid).getName();
     }
 }

@@ -1,11 +1,8 @@
 package net.kunmc.lab.configlib.value;
 
 import com.google.common.collect.Sets;
-import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.StringArgument;
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,18 +60,6 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
     }
 
     @Override
-    protected String invalidValueMessageForAdd(String entryName, Set<T> value) {
-        Enum<?> e = value.toArray(new Enum<?>[0])[0];
-        return e.name() + "はすでに" + entryName + "に追加されています.";
-    }
-
-    @Override
-    protected String succeedMessageForAdd(String entryName, Set<T> value) {
-        Enum<?> e = value.toArray(new Enum<?>[0])[0];
-        return entryName + "に" + e.name() + "を追加しました.";
-    }
-
-    @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             value.stream()
@@ -103,31 +88,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
     }
 
     @Override
-    protected String invalidValueMessageForRemove(String entryName, Set<T> value) {
-        Enum<?> e = value.toArray(new Enum<?>[0])[0];
-        return e.name() + "は" + entryName + "に追加されていませんでした.";
-    }
-
-    @Override
-    protected String succeedMessageForRemove(String entryName, Set<T> value) {
-        Enum<?> e = value.toArray(new Enum<?>[0])[0];
-        return entryName + "から" + e.name() + "を削除しました.";
-    }
-
-    @Override
-    protected String clearMessage(String entryName) {
-        return entryName + "をクリアしました.";
-    }
-
-    @Override
-    protected void sendListMessage(CommandContext ctx, String entryName) {
-        String header = "-----" + entryName + "-----";
-        ctx.message(ChatColor.YELLOW + header);
-
-        ctx.success(value.stream()
-                .map(Enum::name)
-                .collect(Collectors.joining(",")));
-
-        ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
+    protected String elementToString(T t) {
+        return t.name();
     }
 }

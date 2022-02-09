@@ -1,10 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.StringArgument;
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,16 +65,6 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected String invalidValueMessageForAdd(String entryName, Set<String> element) {
-        return element.toArray(new String[0])[0] + "はすでに" + entryName + "に追加されています.";
-    }
-
-    @Override
-    protected String succeedMessageForAdd(String entryName, Set<String> element) {
-        return entryName + "に" + element.toArray(new String[0])[0] + "を追加しました.";
-    }
-
-    @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
         builder.stringArgument("String", sb -> {
             sb.suggestAll(new ArrayList<>(value));
@@ -100,27 +87,7 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected String invalidValueMessageForRemove(String entryName, Set<String> element) {
-        return element.toArray(new String[0])[0] + "は" + entryName + "に追加されていませんでした.";
-    }
-
-    @Override
-    protected String succeedMessageForRemove(String entryName, Set<String> element) {
-        return entryName + "から" + element.toArray(new String[0])[0] + "を削除しました.";
-    }
-
-    @Override
-    protected String clearMessage(String entryName) {
-        return entryName + "をクリアしました.";
-    }
-
-    @Override
-    protected void sendListMessage(CommandContext ctx, String entryName) {
-        String header = "-----" + entryName + "-----";
-        ctx.message(ChatColor.YELLOW + header);
-
-        ctx.success(this.stream().collect(Collectors.joining(",")));
-
-        ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
+    protected String elementToString(String s) {
+        return s;
     }
 }

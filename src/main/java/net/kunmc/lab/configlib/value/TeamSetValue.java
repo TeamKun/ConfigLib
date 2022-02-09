@@ -1,12 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
 import com.google.common.collect.Sets;
-import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.StringArgument;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -16,7 +13,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * If you need completions on "add" with NewScoreboard, you should register it with scoreboard(Scoreboard) method.
@@ -75,16 +71,6 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     }
 
     @Override
-    protected String invalidValueMessageForAdd(String entryName, Set<Team> element) {
-        return element.toArray(new Team[0])[0].getName() + "はすでに" + entryName + "に追加されています.";
-    }
-
-    @Override
-    protected String succeedMessageForAdd(String entryName, Set<Team> element) {
-        return entryName + "に" + element.toArray(new Team[0])[0].getName() + "を追加しました.";
-    }
-
-    @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
         builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
             value.stream()
@@ -113,29 +99,7 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     }
 
     @Override
-    protected String invalidValueMessageForRemove(String entryName, Set<Team> element) {
-        return element.toArray(new Team[0])[0].getName() + "は" + entryName + "に追加されていませんでした.";
-    }
-
-    @Override
-    protected String succeedMessageForRemove(String entryName, Set<Team> element) {
-        return entryName + "から" + element.toArray(new Team[0])[0].getName() + "を削除しました.";
-    }
-
-    @Override
-    protected String clearMessage(String entryName) {
-        return entryName + "をクリアしました.";
-    }
-
-    @Override
-    protected void sendListMessage(CommandContext ctx, String entryName) {
-        String header = "-----" + entryName + "-----";
-        ctx.message(ChatColor.YELLOW + header);
-
-        ctx.success(this.stream()
-                .map(Team::getName)
-                .collect(Collectors.joining(",")));
-
-        ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
+    protected String elementToString(Team team) {
+        return team.getName();
     }
 }
