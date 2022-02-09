@@ -76,16 +76,6 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected String invalidValueMessageForAdd(String entryName, List<String> element) {
-        return element.toArray(new String[0])[0] + "はすでに" + entryName + "に追加されています.";
-    }
-
-    @Override
-    protected String succeedMessageForAdd(String entryName, List<String> element) {
-        return entryName + "に" + element.toArray(new String[0])[0] + "を追加しました.";
-    }
-
-    @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
         builder.stringArgument("String", sb -> {
             sb.suggestAll(new ArrayList<>(value));
