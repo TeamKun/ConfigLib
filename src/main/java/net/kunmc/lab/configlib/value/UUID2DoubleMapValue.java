@@ -8,7 +8,7 @@ import java.util.List;
 public class UUID2DoubleMapValue extends UUID2ObjectMapValue<Double, UUID2DoubleMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.doubleArgument("double");
+        builder.doubleArgument("double", -Double.MAX_VALUE, Double.MAX_VALUE);
     }
 
     @Override
