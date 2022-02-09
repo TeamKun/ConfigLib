@@ -8,7 +8,7 @@ import java.util.List;
 public class Team2FloatMapValue extends Team2ObjectMapValue<Float, Team2FloatMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.floatArgument("float");
+        builder.floatArgument("float", -Float.MAX_VALUE, Float.MAX_VALUE);
     }
 
     @Override
