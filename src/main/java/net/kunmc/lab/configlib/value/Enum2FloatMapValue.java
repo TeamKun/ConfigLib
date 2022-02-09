@@ -18,7 +18,7 @@ public class Enum2FloatMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T
 
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.floatArgument("float");
+        builder.floatArgument("float", -Float.MAX_VALUE, Float.MAX_VALUE);
     }
 
     @Override
