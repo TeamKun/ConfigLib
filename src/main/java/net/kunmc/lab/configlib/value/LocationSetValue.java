@@ -2,6 +2,8 @@ package net.kunmc.lab.configlib.value;
 
 import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.argument.LocationArgument;
+import net.kunmc.lab.configlib.util.CommandUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,7 +28,7 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
 
     @Override
     public void appendArgumentForAdd(UsageBuilder builder) {
-        builder.locationArgument("location");
+        CommandUtil.getArguments(builder).add(new LocationArgument("location"));
     }
 
     @Override

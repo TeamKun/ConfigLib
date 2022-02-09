@@ -1,6 +1,8 @@
 package net.kunmc.lab.configlib.value;
 
 import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.configlib.argument.LocationArgument;
+import net.kunmc.lab.configlib.util.CommandUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -14,7 +16,7 @@ import java.util.List;
 public class UUID2LocationMapValue extends UUID2ObjectMapValue<Location, UUID2LocationMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.locationArgument("location");
+        CommandUtil.getArguments(builder).add(new LocationArgument("location"));
     }
 
     @Override
