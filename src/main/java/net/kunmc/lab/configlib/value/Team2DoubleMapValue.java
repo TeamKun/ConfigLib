@@ -8,7 +8,7 @@ import java.util.List;
 public class Team2DoubleMapValue extends Team2ObjectMapValue<Double, Team2DoubleMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.doubleArgument("double");
+        builder.doubleArgument("double", -Double.MAX_VALUE, Double.MAX_VALUE);
     }
 
     @Override
