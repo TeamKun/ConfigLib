@@ -1,6 +1,5 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.StringArgument;
 import net.kunmc.lab.configlib.SingleValue;
@@ -79,16 +78,7 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
     }
 
     @Override
-    protected String succeedModifyMessage(String entryName) {
-        return entryName + "の値を" + value.getName() + "に設定しました.";
-    }
-
-    @Override
-    protected void sendListMessage(CommandContext ctx, String entryName) {
-        if (value == null) {
-            ctx.success(entryName + ": null");
-        } else {
-            ctx.success(entryName + ": " + value.getName());
-        }
+    protected String valueToString(Team team) {
+        return team.getName();
     }
 }

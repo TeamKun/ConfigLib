@@ -67,11 +67,17 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
     }
 
     protected String succeedModifyMessage(String entryName) {
-        return entryName + "の値を" + value() + "に変更しました.";
+        return entryName + "の値を" + valueToString(value()) + "に変更しました.";
     }
 
     @Override
     protected void sendListMessage(CommandContext ctx, String entryName) {
-        ctx.success(entryName + ": " + value());
+        if (value() == null) {
+            ctx.success(entryName + ": null");
+        } else {
+            ctx.success(entryName + ": " + valueToString(value()));
+        }
     }
+
+    protected abstract String valueToString(E e);
 }

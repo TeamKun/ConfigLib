@@ -1,6 +1,5 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.SingleValue;
 import org.bukkit.Bukkit;
@@ -14,8 +13,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class UUIDValue extends SingleValue<UUID, UUIDValue> {
-    private String playerName;
-
     public UUIDValue() {
         this(((UUID) null));
     }
@@ -26,7 +23,6 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
 
     public UUIDValue(UUID value) {
         super(value);
-        this.playerName = playerName();
     }
 
     public @Nullable OfflinePlayer toOfflinePlayer() {
@@ -46,11 +42,11 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     public String playerName() {
-        if (value != null) {
-            return Bukkit.getOfflinePlayer(value).getName();
+        if (value == null) {
+            return "";
         }
 
-        return "";
+        return valueToString(value);
     }
 
     @Override
@@ -114,28 +110,12 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected String succeedModifyMessage(String entryName) {
-        return entryName + "の値を" + playerName() + "に設定しました.";
-    }
-
-    @Override
-    public void value(UUID value) {
-        this.value = value;
-        this.playerName = playerName();
-    }
-
-    public void value(Player player) {
-        this.value = player.getUniqueId();
-        this.playerName = player.getName();
-    }
-
-    @Override
-    protected void sendListMessage(CommandContext ctx, String entryName) {
-        ctx.success(entryName + ": " + playerName());
+    protected String valueToString(UUID uuid) {
+        return Bukkit.getOfflinePlayer(uuid).getName();
     }
 
     @Override
     public String toString() {
-        return String.format("UUIDValue{value=%s,playerName=%s,listable=%b,writable=%b}", value, playerName, listable(), writableByCommand());
+        return String.format("UUIDValue{value=%s,listable=%b,writable=%b}", value, listable(), writableByCommand());
     }
 }

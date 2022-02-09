@@ -61,4 +61,9 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T, EnumValue<T>> {
     protected String invalidValueMessage(String entryName, T newValue) {
         return newValue.name() + "は不正な値です.";
     }
+
+    @Override
+    protected String valueToString(T t) {
+        return t.name();
+    }
 }

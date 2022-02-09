@@ -50,6 +50,11 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
         return ((Integer) argument.get(0));
     }
 
+    @Override
+    protected String valueToString(Integer integer) {
+        return integer.toString();
+    }
+
     public String toString() {
         return String.format("IntegerValue{value=%d,min=%d,max=%d,listable=%b,writable=%b}", value, min, max, listable(), writableByCommand());
     }

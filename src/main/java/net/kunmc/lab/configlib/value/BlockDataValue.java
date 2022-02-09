@@ -1,6 +1,5 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.StringArgument;
 import net.kunmc.lab.configlib.SingleValue;
@@ -59,13 +58,8 @@ public class BlockDataValue extends SingleValue<BlockData, BlockDataValue> {
     }
 
     @Override
-    protected String succeedModifyMessage(String entryName) {
-        return entryName + "の値を" + value.getMaterial().name() + "に設定しました.";
-    }
-
-    @Override
-    protected void sendListMessage(CommandContext ctx, String entryName) {
-        ctx.success(entryName + ": " + value.getMaterial().name());
+    protected String valueToString(BlockData blockData) {
+        return blockData.getMaterial().name();
     }
 
     @Override

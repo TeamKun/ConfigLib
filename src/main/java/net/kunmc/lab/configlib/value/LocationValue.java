@@ -1,6 +1,5 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.SingleValue;
 import org.bukkit.Bukkit;
@@ -85,24 +84,11 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
 
     @Override
     protected String invalidValueMessage(String entryName, Location newValue) {
-        return locationToString(newValue) + "はすでに設定されている値です.";
+        return valueToString(newValue) + "はすでに設定されている値です.";
     }
 
     @Override
-    protected String succeedModifyMessage(String entryName) {
-        return entryName + "の値を" + locationToString(value) + "に設定しました.";
-    }
-
-    @Override
-    protected void sendListMessage(CommandContext ctx, String entryName) {
-        if (value == null) {
-            ctx.success(entryName + ": null");
-        } else {
-            ctx.success(entryName + ": " + locationToString(value));
-        }
-    }
-
-    private String locationToString(Location location) {
+    protected String valueToString(Location location) {
         return String.format("world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f",
                 location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
     }

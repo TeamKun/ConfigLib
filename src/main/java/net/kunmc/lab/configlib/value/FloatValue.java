@@ -51,6 +51,11 @@ public class FloatValue extends NumericValue<Float, FloatValue> {
     }
 
     @Override
+    protected String valueToString(Float f) {
+        return f.toString();
+    }
+
+    @Override
     public String toString() {
         return String.format("FloatValue{value=%f,min=%f,max=%f,listable=%b,writable=%b}", value, min, max, listable(), writableByCommand());
     }

@@ -51,6 +51,11 @@ public class DoubleValue extends NumericValue<Double, DoubleValue> {
     }
 
     @Override
+    protected String valueToString(Double d) {
+        return d.toString();
+    }
+
+    @Override
     public String toString() {
         return String.format("DoubleValue{value=%f,min=%f,max=%f,listable=%b,writable=%b}", value, min, max, listable(), writableByCommand());
     }
