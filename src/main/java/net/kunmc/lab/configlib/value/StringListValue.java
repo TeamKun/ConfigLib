@@ -77,7 +77,7 @@ public class StringListValue extends ListValue<String, StringListValue> {
 
     @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("String", sb -> {
+        builder.stringArgument(name, sb -> {
             sb.suggestAll(new ArrayList<>(value));
         }, null);
     }
