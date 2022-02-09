@@ -8,7 +8,7 @@ import java.util.List;
 public class UUID2FloatMapValue extends UUID2ObjectMapValue<Float, UUID2FloatMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.floatArgument("float");
+        builder.floatArgument("float", -Float.MAX_VALUE, Float.MAX_VALUE);
     }
 
     @Override
