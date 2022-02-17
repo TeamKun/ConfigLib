@@ -45,20 +45,21 @@ class ConfigListCommand extends Command {
         for (Field field : config.getClass().getDeclaredFields()) {
             field.setAccessible(true);
 
-            Object value = null;
+            Object o;
             try {
-                value = field.get(config);
+                o = field.get(config);
             } catch (Exception e) {
                 e.printStackTrace();
+                continue;
             }
 
-            if (value instanceof Value) {
-                Value<?, ?> v = ((Value<?, ?>) value);
+            if (o instanceof Value) {
+                Value<?, ?> v = ((Value<?, ?>) o);
                 if (v.listable()) {
                     v.sendListMessage(ctx, field.getName());
                 }
             } else {
-                ctx.success(field.getName() + ": " + value);
+                ctx.success(field.getName() + ": " + o);
             }
         }
     }
