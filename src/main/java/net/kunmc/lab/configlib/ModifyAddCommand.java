@@ -1,56 +1,44 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.CommandContext;
-import dev.kotx.flylib.command.UsageBuilder;
+import dev.kotx.flylib.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 
-class ModifyAddCommand extends CollectionValueItem {
+class ModifyAddCommand extends Command {
     public ModifyAddCommand(Field field, CollectionValue value, BaseConfig config) {
-        super("add", field, value, config);
-    }
+        super("add");
 
-    @Override
-    void appendArgument(UsageBuilder builder) {
-        value.appendArgumentForAdd(builder);
-    }
+        String entryName = field.getName();
 
-    @Override
-    boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
-        return value.isCorrectArgumentForAdd(argument, sender);
-    }
+        usage(builder -> {
+            value.appendArgumentForAdd(builder);
 
-    @Override
-    String incorrectArgumentMessage(List<Object> argument) {
-        return value.incorrectArgumentMessageForAdd(argument);
-    }
+            builder.executes(ctx -> {
+                List<Object> argument = ctx.getTypedArgs();
+                CommandSender sender = ctx.getSender();
+                if (!value.isCorrectArgumentForAdd(argument, sender)) {
+                    ctx.fail(value.incorrectArgumentMessageForAdd(argument));
+                    return;
+                }
 
-    @Override
-    Collection argumentToValue(List<Object> argument, CommandSender sender) {
-        return value.argumentToValueForAdd(argument, sender);
-    }
+                Collection newValue = value.argumentToValueForAdd(argument, sender);
+                if (!value.validateForAdd(newValue)) {
+                    ctx.fail(value.invalidValueMessageForAdd(entryName, newValue));
+                    return;
+                }
 
+                if (value.onAddValue(newValue, ctx)) {
+                    return;
+                }
 
-    @Override
-    boolean validate(Collection value) {
-        return this.value.validateForAdd(value);
-    }
+                ((Collection) value.value()).addAll(newValue);
+                ctx.success(value.succeedMessageForAdd(entryName, newValue));
 
-    @Override
-    String invalidMessage(String entryName, Collection value) {
-        return this.value.invalidValueMessageForAdd(entryName, value);
-    }
-
-    @Override
-    void writeProcess(CommandContext ctx, String entryName, Collection value) {
-        if (this.value.onAddValue(value, ctx)) {
-            return;
-        }
-
-        ((Collection) this.value.value()).addAll(value);
-        ctx.success(this.value.succeedMessageForAdd(entryName, value));
+                config.saveConfigIfPresent();
+            });
+        });
     }
 }

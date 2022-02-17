@@ -1,55 +1,44 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.CommandContext;
-import dev.kotx.flylib.command.UsageBuilder;
+import dev.kotx.flylib.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 
-class ModifyRemoveCommand extends CollectionValueItem {
+class ModifyRemoveCommand extends Command {
     public ModifyRemoveCommand(Field field, CollectionValue value, BaseConfig config) {
-        super("remove", field, value, config);
-    }
+        super("remove");
 
-    @Override
-    void appendArgument(UsageBuilder builder) {
-        value.appendArgumentForRemove(builder);
-    }
+        String entryName = field.getName();
 
-    @Override
-    boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
-        return value.isCorrectArgumentForRemove(argument, sender);
-    }
+        usage(builder -> {
+            value.appendArgumentForRemove(builder);
 
-    @Override
-    String incorrectArgumentMessage(List<Object> argument) {
-        return value.incorrectArgumentMessageForRemove(argument);
-    }
+            builder.executes(ctx -> {
+                List<Object> argument = ctx.getTypedArgs();
+                CommandSender sender = ctx.getSender();
+                if (!value.isCorrectArgumentForRemove(argument, sender)) {
+                    ctx.fail(value.incorrectArgumentMessageForRemove(argument));
+                    return;
+                }
 
-    @Override
-    Collection argumentToValue(List<Object> argument, CommandSender sender) {
-        return value.argumentToValueForRemove(argument, sender);
-    }
+                Collection newValue = value.argumentToValueForRemove(argument, sender);
+                if (!value.validateForRemove(newValue)) {
+                    ctx.fail(value.invalidValueMessageForRemove(entryName, newValue));
+                    return;
+                }
 
-    @Override
-    boolean validate(Collection value) {
-        return this.value.validateForRemove(value);
-    }
+                if (value.onRemoveValue(newValue, ctx)) {
+                    return;
+                }
 
-    @Override
-    String invalidMessage(String entryName, Collection value) {
-        return this.value.invalidValueMessageForRemove(entryName, value);
-    }
+                ((Collection) value.value()).removeAll(newValue);
+                ctx.success(value.succeedMessageForRemove(entryName, newValue));
 
-    @Override
-    void writeProcess(CommandContext ctx, String entryName, Collection value) {
-        if (this.value.onRemoveValue(value, ctx)) {
-            return;
-        }
-
-        ((Collection) this.value.value()).removeAll(value);
-        ctx.success(this.value.succeedMessageForRemove(entryName, value));
+                config.saveConfigIfPresent();
+            });
+        });
     }
 }
