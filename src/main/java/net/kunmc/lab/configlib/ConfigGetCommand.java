@@ -39,19 +39,29 @@ class ConfigGetCommand extends AccessibleCommand {
             try {
                 o = field.get(config);
             } catch (Exception e) {
+                e.printStackTrace();
                 continue;
             }
 
             if (o instanceof Value) {
                 Value<?, ?> v = ((Value<?, ?>) o);
-                if (v.listable()) {
-                    command.appendChild(new Command(field.getName()) {
-                        @Override
-                        public void execute(@NotNull CommandContext ctx) {
-                            v.sendListMessage(ctx, field.getName());
-                        }
-                    });
+                if (!v.listable()) {
+                    continue;
                 }
+               
+                command.appendChild(new Command(field.getName()) {
+                    @Override
+                    public void execute(@NotNull CommandContext ctx) {
+                        v.sendListMessage(ctx, field.getName());
+                    }
+                });
+            } else {
+                command.appendChild(new Command(field.getName()) {
+                    @Override
+                    public void execute(@NotNull CommandContext ctx) {
+                        ctx.success(field.getName() + ": " + o);
+                    }
+                });
             }
         }
     }
