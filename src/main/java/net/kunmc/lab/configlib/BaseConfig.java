@@ -188,7 +188,7 @@ public abstract class BaseConfig {
                 replaceFields(field.getType(), srcObj, dstObj);
             }
         } catch (NullPointerException ignored) {
-            // 新しいValueが追加された時のためにNullPointerExceptionを回避する
+            // 新しいフィールドが追加されるとNullPointerExceptionが発生するため握りつぶしている
         }
     }
 }
