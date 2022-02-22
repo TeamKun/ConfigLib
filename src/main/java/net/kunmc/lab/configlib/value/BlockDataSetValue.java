@@ -3,17 +3,20 @@ package net.kunmc.lab.configlib.value;
 import com.google.common.collect.Sets;
 import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.StringArgument;
-import org.bukkit.Material;
+import net.kunmc.lab.configlib.argument.TileArgument;
+import net.kunmc.lab.configlib.util.CommandUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
+    private transient boolean listOnlyBlockName = false;
+
     public BlockDataSetValue() {
         this(new HashSet<>());
     }
@@ -22,54 +25,48 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
         super(value);
     }
 
+    public BlockDataSetValue listOnlyBlockName(boolean listOnlyBlockName) {
+        this.listOnlyBlockName = listOnlyBlockName;
+        return this;
+    }
+
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(Material.values())
-                    .filter(Material::isBlock)
-                    .map(Material::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
+        CommandUtil.addArgument(builder, new TileArgument("name"));
     }
 
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(Material.values())
-                .filter(Material::isBlock)
-                .anyMatch(m -> m.name().equalsIgnoreCase(argument.get(0).toString()));
+        return true;
     }
 
     @Override
     protected String incorrectArgumentMessageForAdd(List<Object> argument) {
-        return argument.get(0) + "はブロック化出来ない値です.";
+        return "";
     }
 
     @Override
     protected Set<BlockData> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        return Sets.newHashSet(Arrays.stream(Material.values())
-                .filter(m -> m.name().equalsIgnoreCase(argument.get(0).toString()))
-                .map(Material::createBlockData)
-                .findFirst()
-                .get());
+        return Sets.newHashSet((BlockData) argument.get(0));
     }
 
     @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
+        builder.stringArgument("name", StringArgument.Type.PHRASE, sb -> {
             value().stream()
-                    .map(BlockData::getMaterial)
-                    .map(Material::name)
-                    .map(String::toLowerCase)
+                    .map(BlockData::getAsString)
                     .forEach(sb::suggest);
         });
     }
 
     @Override
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(Material.values())
-                .filter(Material::isBlock)
-                .anyMatch(m -> m.name().equalsIgnoreCase(argument.get(0).toString()));
+        try {
+            Bukkit.createBlockData(argument.get(0).toString());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     @Override
@@ -79,15 +76,15 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
 
     @Override
     protected Set<BlockData> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
-        return Sets.newHashSet(Arrays.stream(Material.values())
-                .filter(m -> m.name().equalsIgnoreCase(argument.get(0).toString()))
-                .map(Material::createBlockData)
-                .findFirst()
-                .get());
+        return Sets.newHashSet(Bukkit.createBlockData(argument.get(0).toString()));
     }
 
     @Override
     protected String elementToString(BlockData blockData) {
-        return blockData.getMaterial().name();
+        if (listOnlyBlockName) {
+            return blockData.getMaterial().name();
+        } else {
+            return blockData.getAsString();
+        }
     }
 }
