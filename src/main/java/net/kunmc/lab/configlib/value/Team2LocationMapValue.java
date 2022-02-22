@@ -16,7 +16,7 @@ import java.util.List;
 public class Team2LocationMapValue extends Team2ObjectMapValue<Location, Team2LocationMapValue> {
     @Override
     protected void appendValueArgumentForPut(UsageBuilder builder) {
-        CommandUtil.getArguments(builder).add(new LocationArgument("location"));
+        CommandUtil.addArgument(builder, new LocationArgument("location"));
     }
 
     @Override

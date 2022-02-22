@@ -1,7 +1,6 @@
 package net.kunmc.lab.configlib.value;
 
 import com.google.common.collect.Sets;
-import dev.kotx.flylib.command.Argument;
 import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.argument.UnparsedArgument;
 import net.kunmc.lab.configlib.util.CommandUtil;
@@ -44,9 +43,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
-        List<Argument<?>> arguments = CommandUtil.getArguments(builder);
-
-        arguments.add(new UnparsedArgument("targets", () -> {
+        UnparsedArgument argument = new UnparsedArgument("targets", () -> {
             List<String> list = getPlayerStreamForAdd()
                     .map(OfflinePlayer::getName)
                     .collect(Collectors.toList());
@@ -56,7 +53,9 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
             }
 
             return list;
-        }));
+        });
+
+        CommandUtil.addArgument(builder, argument);
     }
 
     @Override
@@ -134,9 +133,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
     @Override
     protected void appendArgumentForRemove(UsageBuilder builder) {
-        List<Argument<?>> arguments = CommandUtil.getArguments(builder);
-
-        arguments.add(new UnparsedArgument("targets", () -> {
+        UnparsedArgument argument = new UnparsedArgument("targets", () -> {
             List<String> list = value.stream()
                     .map(Bukkit::getOfflinePlayer)
                     .map(OfflinePlayer::getName)
@@ -147,7 +144,9 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
             }
 
             return list;
-        }));
+        });
+
+        CommandUtil.addArgument(builder, argument);
     }
 
     @Override

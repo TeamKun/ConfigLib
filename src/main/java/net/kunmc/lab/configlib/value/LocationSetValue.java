@@ -28,7 +28,7 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
 
     @Override
     public void appendArgumentForAdd(UsageBuilder builder) {
-        CommandUtil.getArguments(builder).add(new LocationArgument("location"));
+        CommandUtil.addArgument(builder, new LocationArgument("location"));
     }
 
     @Override

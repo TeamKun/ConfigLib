@@ -1,6 +1,5 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.Argument;
 import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.MapValue;
 import net.kunmc.lab.configlib.argument.UnparsedArgument;
@@ -36,9 +35,7 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected void appendKeyArgumentForPut(UsageBuilder builder) {
-        List<Argument<?>> arguments = CommandUtil.getArguments(builder);
-
-        arguments.add(new UnparsedArgument("target", () -> {
+        UnparsedArgument argument = new UnparsedArgument("target", () -> {
             List<String> list = getPlayerStreamForPut()
                     .map(OfflinePlayer::getName)
                     .collect(Collectors.toList());
@@ -47,7 +44,9 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
             }
 
             return list;
-        }));
+        });
+
+        CommandUtil.addArgument(builder, argument);
     }
 
     @Override
@@ -88,9 +87,7 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected void appendKeyArgumentForRemove(UsageBuilder builder) {
-        List<Argument<?>> arguments = CommandUtil.getArguments(builder);
-
-        arguments.add(new UnparsedArgument("target", () -> {
+        UnparsedArgument argument = new UnparsedArgument("target", () -> {
             List<String> list = value.keySet().stream()
                     .map(Bukkit::getOfflinePlayer)
                     .map(OfflinePlayer::getName)
@@ -100,7 +97,9 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
             }
 
             return list;
-        }));
+        });
+
+        CommandUtil.addArgument(builder, argument);
     }
 
     @Override

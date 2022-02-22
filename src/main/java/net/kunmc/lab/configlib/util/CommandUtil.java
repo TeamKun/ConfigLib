@@ -40,4 +40,8 @@ public class CommandUtil {
             return null;
         }
     }
+
+    public static void addArgument(UsageBuilder builder, Argument<?> argument) {
+        getArguments(builder).add(argument);
+    }
 }

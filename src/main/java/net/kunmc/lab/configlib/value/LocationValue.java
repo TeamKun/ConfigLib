@@ -43,7 +43,7 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
 
     @Override
     protected void appendArgument(UsageBuilder builder) {
-        CommandUtil.getArguments(builder).add(new LocationArgument("location"));
+        CommandUtil.addArgument(builder, new LocationArgument("location"));
     }
 
     @Override
