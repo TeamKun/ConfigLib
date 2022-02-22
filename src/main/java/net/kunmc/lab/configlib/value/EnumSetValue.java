@@ -13,27 +13,25 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>> {
-    private final transient Class<?> enumClass;
+    private final transient T[] constants;
 
     public EnumSetValue(T... values) {
-        this(new HashSet<>(), values);
+        super(new HashSet<>());
+
+        constants = ((T[]) values.getClass().getComponentType().getEnumConstants());
     }
 
-    public EnumSetValue(@NotNull Set<T> value, T... values) {
+    public EnumSetValue(@NotNull Set<T> value, @NotNull T[] constants, T... values) {
         super(value);
         this.value.addAll(Sets.newHashSet(values));
 
-        enumClass = values.getClass().getComponentType();
-    }
-
-    private T[] constants() {
-        return ((T[]) enumClass.getEnumConstants());
+        this.constants = ((T[]) values.getClass().getComponentType().getEnumConstants());
     }
 
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(constants())
+            Arrays.stream(constants)
                     .filter(x -> value.stream().noneMatch(e -> x == e))
                     .map(Enum::name)
                     .map(String::toLowerCase)
@@ -43,8 +41,8 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
 
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants())
-                .anyMatch(m -> m.name().equalsIgnoreCase(argument.get(0).toString()));
+        return Arrays.stream(constants)
+                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
@@ -54,8 +52,8 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
 
     @Override
     protected Set<T> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants())
-                .filter(m -> m.name().equalsIgnoreCase(argument.get(0).toString()))
+        return Arrays.stream(constants)
+                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
                 .collect(Collectors.toSet());
     }
 
@@ -71,7 +69,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
 
     @Override
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants())
+        return Arrays.stream(constants)
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
@@ -82,7 +80,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
 
     @Override
     protected Set<T> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants())
+        return Arrays.stream(constants)
                 .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
                 .collect(Collectors.toSet());
     }
