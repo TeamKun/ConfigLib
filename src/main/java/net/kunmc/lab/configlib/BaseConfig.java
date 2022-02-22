@@ -5,10 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.kunmc.lab.configlib.gson.BlockDataTypeAdapter;
 import net.kunmc.lab.configlib.gson.LocationTypeAdapter;
-import net.kunmc.lab.configlib.gson.MaterialTypeAdapter;
 import net.kunmc.lab.configlib.gson.TeamTypeAdapter;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.libs.org.codehaus.plexus.util.ReflectionUtils;
 import org.bukkit.plugin.Plugin;
@@ -40,7 +38,6 @@ public abstract class BaseConfig {
             .registerTypeHierarchyAdapter(Team.class, new TeamTypeAdapter())
             .registerTypeHierarchyAdapter(BlockData.class, new BlockDataTypeAdapter())
             .registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
-            .registerTypeHierarchyAdapter(Material.class, new MaterialTypeAdapter())
             .create();
 
     public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Class<T> clazz, @NotNull Plugin plugin) {
