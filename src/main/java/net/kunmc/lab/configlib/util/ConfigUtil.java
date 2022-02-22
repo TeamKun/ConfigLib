@@ -28,8 +28,8 @@ public class ConfigUtil {
                 .collect(Collectors.toList());
     }
 
-    public static List<Field> getMapValueFields(BaseConfig cOnfig) {
-        return Arrays.stream(cOnfig.getClass().getDeclaredFields())
+    public static List<Field> getMapValueFields(BaseConfig config) {
+        return Arrays.stream(config.getClass().getDeclaredFields())
                 .filter(f -> !Modifier.isStatic(f.getModifiers()))
                 .filter(f -> MapValue.class.isAssignableFrom(f.getType()))
                 .peek(f -> f.setAccessible(true))
