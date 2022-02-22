@@ -10,22 +10,24 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EnumValue<T extends Enum<T>> extends SingleValue<T, EnumValue<T>> {
-    private final transient Class<T> clazz;
+    private final transient T[] constants;
 
     public EnumValue(@NotNull T value) {
         super(value);
 
-        clazz = (Class<T>) value.getClass();
+        constants = value.getDeclaringClass().getEnumConstants();
     }
 
-    private T[] constants() {
-        return clazz.getEnumConstants();
+    public EnumValue(@NotNull T value, T[] constants) {
+        super(value);
+
+        this.constants = constants;
     }
 
     @Override
     protected void appendArgument(UsageBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(constants())
+            Arrays.stream(constants)
                     .filter(x -> x != value)
                     .map(Enum::name)
                     .map(String::toLowerCase)
@@ -35,8 +37,8 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T, EnumValue<T>> {
 
     @Override
     protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants())
-                .anyMatch(m -> m.name().equalsIgnoreCase(argument.get(0).toString()));
+        return Arrays.stream(constants)
+                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
@@ -46,8 +48,8 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T, EnumValue<T>> {
 
     @Override
     protected T argumentToValue(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants())
-                .filter(m -> m.name().equalsIgnoreCase(argument.get(0).toString()))
+        return Arrays.stream(constants)
+                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
                 .findFirst()
                 .get();
     }
