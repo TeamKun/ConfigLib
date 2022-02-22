@@ -3,7 +3,7 @@ package net.kunmc.lab.configlib.gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import org.bukkit.Material;
+import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class BlockDataTypeAdapter extends TypeAdapter<BlockData> {
         if (value == null) {
             out.nullValue();
         } else {
-            out.value(value.getMaterial().name());
+            out.value(value.getAsString());
         }
     }
 
@@ -22,17 +22,17 @@ public class BlockDataTypeAdapter extends TypeAdapter<BlockData> {
     public BlockData read(JsonReader in) throws IOException {
         String s = in.nextString();
 
-        Material m;
+        if (s.equals("null")) {
+            return null;
+        }
+
+        BlockData b;
         try {
-            m = Material.valueOf(s);
+            b = Bukkit.createBlockData(s);
         } catch (IllegalArgumentException e) {
-            throw new IOException(s + " is invalid Material name");
+            throw new IOException(e.getMessage());
         }
 
-        if (!m.isBlock()) {
-            throw new IOException("Could not create BlockData from" + s);
-        }
-
-        return m.createBlockData();
+        return b;
     }
 }
