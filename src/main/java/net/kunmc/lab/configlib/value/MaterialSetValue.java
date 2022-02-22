@@ -1,17 +1,20 @@
 package net.kunmc.lab.configlib.value;
 
-import com.google.common.collect.Sets;
 import org.bukkit.Material;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class MaterialSetValue extends EnumSetValue<Material> {
     public MaterialSetValue(Material... materials) {
-        this(Sets.newHashSet(materials));
+        super(materials);
     }
 
-    public MaterialSetValue(@NotNull Set<Material> value) {
-        super(value);
+    public MaterialSetValue(boolean onlyBlock, Material... materials) {
+        super(new HashSet<>(),
+                Arrays.stream(Material.values())
+                        .filter(x -> !onlyBlock || x.isBlock())
+                        .toArray(Material[]::new)
+                , materials);
     }
 }
