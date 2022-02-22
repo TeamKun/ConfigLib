@@ -23,7 +23,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
         super(value);
         this.value.addAll(Arrays.asList(values));
 
-        this.constants = ((T[]) values.getClass().getComponentType().getEnumConstants());
+        this.constants = constants;
     }
 
     @Override

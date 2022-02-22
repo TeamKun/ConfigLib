@@ -25,7 +25,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
         super(value);
         this.value.addAll(Sets.newHashSet(values));
 
-        this.constants = ((T[]) values.getClass().getComponentType().getEnumConstants());
+        this.constants = constants;
     }
 
     @Override
