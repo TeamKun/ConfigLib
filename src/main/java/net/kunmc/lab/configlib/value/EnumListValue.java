@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.value;
 import dev.kotx.flylib.command.UsageBuilder;
 import dev.kotx.flylib.command.arguments.StringArgument;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,27 +11,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue<T>> {
-    private final transient Class<?> enumClass;
+    private final transient T[] constants;
 
     public EnumListValue(T... values) {
-        this(new ArrayList<>(), values);
+        super(new ArrayList<>());
+
+        constants = ((T[]) values.getClass().getComponentType().getEnumConstants());
     }
 
-    public EnumListValue(List<T> value, T... values) {
+    public EnumListValue(@NotNull List<T> value, @NotNull T[] constants, T... values) {
         super(value);
         this.value.addAll(Arrays.asList(values));
 
-        enumClass = values.getClass().getComponentType();
-    }
-
-    private T[] constants() {
-        return ((T[]) enumClass.getEnumConstants());
+        this.constants = ((T[]) values.getClass().getComponentType().getEnumConstants());
     }
 
     @Override
     protected void appendArgumentForAdd(UsageBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(constants())
+            Arrays.stream(constants)
                     .map(Enum::name)
                     .map(String::toLowerCase)
                     .forEach(sb::suggest);
@@ -39,8 +38,8 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
 
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants())
-                .anyMatch(m -> m.name().equalsIgnoreCase(argument.get(0).toString()));
+        return Arrays.stream(constants)
+                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
@@ -50,8 +49,8 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
 
     @Override
     protected List<T> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants())
-                .filter(m -> m.name().equalsIgnoreCase(argument.get(0).toString()))
+        return Arrays.stream(constants)
+                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
                 .collect(Collectors.toList());
     }
 
@@ -67,7 +66,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
 
     @Override
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants())
+        return Arrays.stream(constants)
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
@@ -78,7 +77,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
 
     @Override
     protected List<T> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants())
+        return Arrays.stream(constants)
                 .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
                 .collect(Collectors.toList());
     }
