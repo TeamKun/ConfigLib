@@ -16,6 +16,10 @@ class ModifyDecCommand extends AccessibleCommand {
         this.field = field;
         this.value = value;
         this.config = config;
+
+        usage(builder -> {
+            builder.doubleArgument("decValue", -Double.MAX_VALUE, Double.MAX_VALUE);
+        });
     }
 
     @Override
@@ -23,6 +27,10 @@ class ModifyDecCommand extends AccessibleCommand {
         String entryName = field.getName();
 
         double amount = 1.0;
+        if (!ctx.getTypedArgs().isEmpty()) {
+            amount = ((Double) ctx.getTypedArgs().get(0));
+        }
+
         if (value.compareTo(value.min.doubleValue() + amount) < 0) {
             amount = ((Number) value.value).doubleValue() - value.min.doubleValue();
         }
