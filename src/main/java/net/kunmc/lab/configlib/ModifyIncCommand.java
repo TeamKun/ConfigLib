@@ -16,6 +16,10 @@ class ModifyIncCommand extends AccessibleCommand {
         this.field = field;
         this.value = value;
         this.config = config;
+
+        usage(builder -> {
+            builder.doubleArgument("incValue", -Double.MAX_VALUE, Double.MAX_VALUE);
+        });
     }
 
     @Override
@@ -23,6 +27,10 @@ class ModifyIncCommand extends AccessibleCommand {
         String entryName = field.getName();
 
         double amount = 1.0;
+        if (!ctx.getTypedArgs().isEmpty()) {
+            amount = ((Double) ctx.getTypedArgs().get(0));
+        }
+
         if (value.compareTo(value.max.doubleValue() - amount) > 0) {
             amount = value.max.doubleValue() - ((Number) value.value).doubleValue();
         }
