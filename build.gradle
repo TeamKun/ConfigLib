@@ -57,7 +57,10 @@ shadowJar {
     exclude "net/minecraft"
     exclude "org/bukkit"
 }
-tasks.build.dependsOn tasks.shadowJar
+
+build {
+    dependsOn shadowJar
+}
 
 test {
     useJUnitPlatform()
