@@ -2,8 +2,6 @@ package net.kunmc.lab.configlib;
 
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -175,13 +173,8 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     @Override
     protected final void sendListMessage(CommandContext ctx, String entryName) {
-        String header = "-----" + entryName + "-----";
-        ctx.message(ChatColor.YELLOW + header);
-
-        ctx.success(value.stream()
+        ctx.success(entryName + ": [" + value.stream()
                 .map(this::elementToString)
-                .collect(Collectors.joining(", ")));
-
-        ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
+                .collect(Collectors.joining(", ")) + "]");
     }
 }
