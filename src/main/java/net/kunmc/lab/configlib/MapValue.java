@@ -3,9 +3,7 @@ package net.kunmc.lab.configlib;
 import dev.kotx.flylib.command.CommandContext;
 import dev.kotx.flylib.command.UsageBuilder;
 import net.kunmc.lab.configlib.function.TriFunction;
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.util.TriConsumer;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.*;
@@ -201,14 +199,9 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     @Override
     protected void sendListMessage(CommandContext ctx, String entryName) {
-        String header = "-----" + entryName + "-----";
-        ctx.message(ChatColor.YELLOW + header);
-
-        ctx.success(value.entrySet().stream()
-                .map(entry -> String.format("{%s:%s}", keyToString(entry.getKey()), valueToString(entry.getValue())))
-                .collect(Collectors.joining(", ")));
-
-        ctx.message(ChatColor.YELLOW + StringUtils.repeat("-", header.length()));
+        ctx.success(entryName + ": {" + value.entrySet().stream()
+                .map(entry -> String.format("%s:%s", keyToString(entry.getKey()), valueToString(entry.getValue())))
+                .collect(Collectors.joining(", ")) + "}");
     }
 
     public int size() {
