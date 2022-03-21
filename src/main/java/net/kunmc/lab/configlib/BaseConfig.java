@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import net.kunmc.lab.configlib.gson.BlockDataTypeAdapter;
 import net.kunmc.lab.configlib.gson.LocationTypeAdapter;
 import net.kunmc.lab.configlib.gson.TeamTypeAdapter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.libs.org.codehaus.plexus.util.ReflectionUtils;
@@ -21,8 +22,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public abstract class BaseConfig {
     private transient Plugin plugin;
@@ -60,6 +64,24 @@ public abstract class BaseConfig {
 
     public BaseConfig(@NotNull Plugin plugin) {
         setPlugin(plugin);
+
+        try {
+            WatchService watcher = FileSystems.getDefault().newWatchService();
+            WatchKey watchKey = plugin.getDataFolder().toPath().register(watcher, ENTRY_MODIFY);
+
+            Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                for (WatchEvent<?> e : watchKey.pollEvents()) {
+                    Path filePath = plugin.getDataFolder().toPath().resolve((Path) e.context());
+                    if (filePath.equals(getConfigFile().toPath())) {
+                        loadConfig();
+                    }
+                }
+
+                watchKey.reset();
+            }, 0, 10);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     boolean isGetEnabled() {
