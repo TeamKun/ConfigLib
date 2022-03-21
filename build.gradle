@@ -1,91 +1,36 @@
-plugins {
-    id 'java'
-    id "com.github.johnrengelman.shadow" version "6.1.0"
-    id "maven-publish"
-    id "idea"
+allprojects {
+    group "net.kunmc.lab"
 }
 
-group 'net.kunmc.lab'
-version '0.8.4'
+subprojects {
+    apply plugin: "java"
+    apply plugin: "maven-publish"
+    apply plugin: "idea"
 
-repositories {
-    mavenCentral()
-    maven {
-        name = "papermc-repo"
-        url = "https://papermc.io/repo/repository/maven-public/"
-    }
-    maven {
-        url "https://libraries.minecraft.net"
-    }
-}
-
-dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
-    implementation group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
-    compileOnly 'dev.kotx:flylib-reloaded:0.5.0'
-    implementation 'com.google.code.gson:gson:2.8.9'
-    implementation group: 'org.apache.poi', name: 'poi', version: '5.1.0'
-    compileOnly fileTree(dir: "./libs/", include: "patched*.jar")
-    compileOnly 'com.mojang:brigadier:1.0.18'
-}
-
-def targetJavaVersion = 8
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-}
-
-idea {
-    module {
-        downloadJavadoc = true
-        downloadSources = true
-    }
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
-
-shadowJar {
-    archiveFileName = "${rootProject.name}-${version}.jar"
-    exclude "net/minecraft"
-    exclude "org/bukkit"
-}
-
-build {
-    dependsOn shadowJar
-}
-
-test {
-    useJUnitPlatform()
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId = group
-            artifactId = rootProject.name
-            version = version
-
-            from components.java
+    idea {
+        module {
+            downloadJavadoc = true
+            downloadSources = true
         }
     }
-}
 
-jar {
-    exclude "net/minecraft"
-    exclude "org/bukkit"
-}
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
 
-javadoc {
-    exclude "net/minecraft"
-    exclude "org/bukkit"
-    options.charSet = 'UTF-8'
-    options.encoding = 'UTF-8'
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId = project.group
+                artifactId = project.name
+
+                from components.java
+            }
+        }
+    }
+
+    javadoc {
+        options.charSet = "UTF-8"
+        options.encoding = "UTF-8"
+    }
 }
