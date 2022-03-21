@@ -1,5 +1,6 @@
 allprojects {
     group "net.kunmc.lab"
+    version = "0.8.4"
 }
 
 subprojects {
@@ -23,6 +24,7 @@ subprojects {
             mavenJava(MavenPublication) {
                 groupId = project.group
                 artifactId = project.name
+                version = project.version
 
                 from components.java
             }
