@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.CommandContext;
-import dev.kotx.flylib.command.UsageBuilder;
-import org.bukkit.command.CommandSender;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
+import net.minecraft.command.CommandSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +27,13 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
         return ((T) this);
     }
 
-    protected abstract void appendArgument(UsageBuilder builder);
+    protected abstract void appendArgument(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgument(List<Object> argument, CommandSender sender);
+    protected abstract boolean isCorrectArgument(List<Object> argument, CommandSource sender);
 
     protected abstract String incorrectArgumentMessage(List<Object> argument);
 
-    protected abstract E argumentToValue(List<Object> argument, CommandSender sender);
+    protected abstract E argumentToValue(List<Object> argument, CommandSource sender);
 
     protected abstract boolean validateOnSet(E newValue);
 
@@ -73,9 +73,9 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
     @Override
     protected void sendListMessage(CommandContext ctx, String entryName) {
         if (value() == null) {
-            ctx.success(entryName + ": null");
+            ctx.sendSuccess(entryName + ": null");
         } else {
-            ctx.success(entryName + ": " + valueToString(value()));
+            ctx.sendSuccess(entryName + ": " + valueToString(value()));
         }
     }
 

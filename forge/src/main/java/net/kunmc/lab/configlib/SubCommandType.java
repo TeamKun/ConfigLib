@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.Command;
+import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 
 import java.util.Map;

@@ -1,41 +1,32 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import com.mojang.authlib.GameProfile;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.SingleValue;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import net.minecraft.command.CommandSource;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     public UUIDValue() {
         this(((UUID) null));
     }
 
-    public UUIDValue(Player player) {
-        this(player.getUniqueId());
+    public UUIDValue(PlayerEntity player) {
+        this(player.getUniqueID());
     }
 
     public UUIDValue(UUID value) {
         super(value);
     }
 
-    public @Nullable OfflinePlayer toOfflinePlayer() {
+    public @Nullable PlayerEntity toPlayer() {
         if (value != null) {
-            return Bukkit.getOfflinePlayer(value);
-        }
-
-        return null;
-    }
-
-    public @Nullable Player toPlayer() {
-        if (value != null) {
-            return Bukkit.getPlayer(value);
+            return ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByUUID(value);
         }
 
         return null;
@@ -50,53 +41,23 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected void appendArgument(UsageBuilder builder) {
-        builder.entityArgument("target", true, false, sb -> {
-            List<String> list = Bukkit.getOnlinePlayers().stream()
-                    .filter(p -> !p.getUniqueId().equals(value))
-                    .map(Player::getName)
-                    .collect(Collectors.toList());
-            if (!list.isEmpty()) {
-                list.forEach(sb::suggest);
-                sb.suggest("@r");
-            }
-        });
+    protected void appendArgument(ArgumentBuilder builder) {
+        builder.entityArgument("target", false, true);
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
-        List<Player> list = ((List<Player>) argument.get(0));
-
-        if (list.size() != 1) {
-            return false;
-        }
-
-        return !list.get(0).getUniqueId().equals(value);
+    protected boolean isCorrectArgument(List<Object> argument, CommandSource sender) {
+        return !((List) argument.get(0)).isEmpty();
     }
 
     @Override
-    protected UUID argumentToValue(List<Object> argument, CommandSender sender) {
-        return ((List<Player>) argument.get(0)).get(0).getUniqueId();
+    protected UUID argumentToValue(List<Object> argument, CommandSource sender) {
+        return ((List<PlayerEntity>) argument.get(0)).get(0).getUniqueID();
     }
 
     @Override
     protected String incorrectArgumentMessage(List<Object> argument) {
-        List<Player> list = ((List<Player>) argument.get(0));
-
-        if (list.isEmpty()) {
-            return "プレイヤーが見つかりませんでした.";
-        }
-
-        if (list.size() > 1) {
-            return "複数人のプレイヤーを設定することはできません.";
-        }
-
-        Player p = list.get(0);
-        if (p.getUniqueId().equals(value)) {
-            return p.getName() + "はすでに設定されているプレイヤーです.";
-        }
-
-        return "could not reach";
+        return "指定されたプレイヤーは存在しないかオフラインです.";
     }
 
     @Override
@@ -111,7 +72,12 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
 
     @Override
     protected String valueToString(UUID uuid) {
-        return Bukkit.getOfflinePlayer(uuid).getName();
+        GameProfile profile = ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache().getProfileByUUID(uuid);
+        if (profile == null) {
+            return "null";
+        }
+
+        return profile.getName();
     }
 
     @Override

@@ -1,9 +1,9 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.configlib.MapValue;
-import org.bukkit.command.CommandSender;
+import net.minecraft.command.CommandSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
     }
 
     @Override
-    protected void appendKeyArgumentForPut(UsageBuilder builder) {
+    protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
         builder.stringArgument("string", StringArgument.Type.PHRASE_QUOTED, sb -> {
             if (allowableKeyStringList.isEmpty()) {
                 keySet().forEach(sb::suggest);
@@ -34,7 +34,7 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForPut(List<Object> argument, CommandSource sender) {
         if (allowableKeyStringList.isEmpty()) {
             return true;
         }
@@ -49,19 +49,19 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
     }
 
     @Override
-    protected String argumentToKeyForPut(List<Object> argument, CommandSender sender) {
+    protected String argumentToKeyForPut(List<Object> argument, CommandSource sender) {
         return argument.get(0).toString();
     }
 
     @Override
-    protected void appendKeyArgumentForRemove(UsageBuilder builder) {
+    protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
         builder.stringArgument("string", StringArgument.Type.PHRASE, sb -> {
             keySet().forEach(sb::suggest);
         });
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSource sender) {
         return keySet().contains(argument.get(0).toString());
     }
 
@@ -71,7 +71,7 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
     }
 
     @Override
-    protected String argumentToKeyForRemove(List<Object> argument, CommandSender sender) {
+    protected String argumentToKeyForRemove(List<Object> argument, CommandSource sender) {
         return argument.get(0).toString();
     }
 

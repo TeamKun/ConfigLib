@@ -3,11 +3,14 @@ package net.kunmc.lab.configlib.gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import org.bukkit.Location;
+import net.kunmc.lab.commandlib.util.Location;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class LocationTypeAdapter extends TypeAdapter<Location> {
     @Override
@@ -16,12 +19,18 @@ public class LocationTypeAdapter extends TypeAdapter<Location> {
             out.nullValue();
         } else {
             out.beginObject();
-            out.name("world").value(value.getWorld().getName());
+
+            String worldName = "null";
+            if (value.getWorld() != null) {
+                worldName = value.getWorld().getDimensionKey().getLocation().toString();
+            }
+            out.name("world").value(worldName);
             out.name("x").value(value.getX());
             out.name("y").value(value.getY());
             out.name("z").value(value.getZ());
             out.name("pitch").value(value.getPitch());
             out.name("yaw").value(value.getYaw());
+
             out.endObject();
         }
     }
@@ -30,16 +39,30 @@ public class LocationTypeAdapter extends TypeAdapter<Location> {
     public Location read(JsonReader in) throws IOException {
         in.beginObject();
 
-        Map<String, Object> map = new HashMap<>();
-        map.put(in.nextName(), in.nextString());
-        map.put(in.nextName(), in.nextDouble());
-        map.put(in.nextName(), in.nextDouble());
-        map.put(in.nextName(), in.nextDouble());
-        map.put(in.nextName(), in.nextDouble());
-        map.put(in.nextName(), in.nextDouble());
+        in.nextName();
+        String worldName = in.nextString();
+        World w = null;
+        if (ServerLifecycleHooks.getCurrentServer() != null) {
+            w = ServerLifecycleHooks.getCurrentServer().getWorld(RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(worldName)));
+        }
+
+        in.nextName();
+        double x = in.nextDouble();
+
+        in.nextName();
+        double y = in.nextDouble();
+
+        in.nextName();
+        double z = in.nextDouble();
+
+        in.nextName();
+        float pitch = ((float) in.nextDouble());
+
+        in.nextName();
+        float yaw = ((float) in.nextDouble());
 
         in.endObject();
 
-        return Location.deserialize(map);
+        return new Location(w, x, y, z, yaw, pitch);
     }
 }

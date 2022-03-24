@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import org.bukkit.command.CommandSender;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.minecraft.command.CommandSource;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,12 +17,12 @@ public class Enum2FloatMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T
     }
 
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
         builder.floatArgument("float", -Float.MAX_VALUE, Float.MAX_VALUE);
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSource sender) {
         return true;
     }
 
@@ -32,7 +32,7 @@ public class Enum2FloatMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T
     }
 
     @Override
-    protected Float argumentToValueForPut(List<Object> argument, CommandSender sender) {
+    protected Float argumentToValueForPut(List<Object> argument, CommandSource sender) {
         return ((Float) argument.get(1));
     }
 

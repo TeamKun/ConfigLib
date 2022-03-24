@@ -1,41 +1,41 @@
 package net.kunmc.lab.configlib;
 
-import net.kunmc.lab.configlib.command.AccessibleCommand;
-import org.bukkit.command.CommandSender;
+import net.kunmc.lab.commandlib.Command;
+import net.minecraft.command.CommandSource;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
-class ModifyMapPutCommand extends AccessibleCommand {
+class ModifyMapPutCommand extends Command {
     public ModifyMapPutCommand(Field field, MapValue value, BaseConfig config) {
         super("put");
 
         String entryName = field.getName();
 
-        usage(builder -> {
+        argument(builder -> {
             value.appendKeyArgumentForPut(builder);
             value.appendValueArgumentForPut(builder);
 
-            builder.executes(ctx -> {
-                List<Object> argument = ctx.getTypedArgs();
-                CommandSender sender = ctx.getSender();
+            builder.execute(ctx -> {
+                List<Object> argument = ctx.getParsedArgs();
+                CommandSource sender = ctx.getSender();
                 if (!value.isCorrectKeyArgumentForPut(argument, sender)) {
-                    ctx.fail(value.incorrectKeyArgumentMessageForPut(argument));
+                    ctx.sendFailure(value.incorrectKeyArgumentMessageForPut(argument));
                     return;
                 }
                 if (!value.isCorrectValueArgumentForPut(argument, sender)) {
-                    ctx.fail((value.incorrectValueArgumentMessageForPut(argument)));
+                    ctx.sendFailure((value.incorrectValueArgumentMessageForPut(argument)));
                     return;
                 }
 
                 Object k = value.argumentToKeyForPut(argument, sender);
                 Object v = value.argumentToValueForPut(argument, sender);
                 if (!value.validateKeyForPut(k)) {
-                    ctx.fail(value.invalidKeyMessageForPut(entryName, k));
+                    ctx.sendFailure(value.invalidKeyMessageForPut(entryName, k));
                     return;
                 }
                 if (!value.validateValueForPut(v)) {
-                    ctx.fail(value.invalidValueMessageForPut(entryName, v));
+                    ctx.sendFailure(value.invalidValueMessageForPut(entryName, v));
                     return;
                 }
 
@@ -44,7 +44,7 @@ class ModifyMapPutCommand extends AccessibleCommand {
                 }
 
                 value.put(k, v);
-                ctx.success(value.succeedMessageForPut(entryName, k, v));
+                ctx.sendSuccess(value.succeedMessageForPut(entryName, k, v));
 
                 config.saveConfigIfPresent();
             });

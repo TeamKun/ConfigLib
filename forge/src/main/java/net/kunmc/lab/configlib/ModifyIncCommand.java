@@ -1,11 +1,11 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.CommandContext;
-import net.kunmc.lab.configlib.command.AccessibleCommand;
+import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.commandlib.CommandContext;
 
 import java.lang.reflect.Field;
 
-class ModifyIncCommand extends AccessibleCommand {
+class ModifyIncCommand extends Command {
     private final Field field;
     private final NumericValue value;
     private final BaseConfig config;
@@ -17,7 +17,7 @@ class ModifyIncCommand extends AccessibleCommand {
         this.value = value;
         this.config = config;
 
-        usage(builder -> {
+        argument(builder -> {
             builder.doubleArgument("incValue", -Double.MAX_VALUE, Double.MAX_VALUE);
         });
     }
@@ -27,8 +27,8 @@ class ModifyIncCommand extends AccessibleCommand {
         String entryName = field.getName();
 
         double amount = 1.0;
-        if (!ctx.getTypedArgs().isEmpty()) {
-            amount = ((Double) ctx.getTypedArgs().get(0));
+        if (!ctx.getParsedArgs().isEmpty()) {
+            amount = ((Double) ctx.getParsedArgs().get(0));
         }
 
         if (value.compareTo(value.max.doubleValue() - amount) > 0) {
@@ -41,7 +41,7 @@ class ModifyIncCommand extends AccessibleCommand {
         }
 
         value.value(newValue);
-        ctx.success(value.succeedModifyMessage(entryName));
+        ctx.sendSuccess(value.succeedModifyMessage(entryName));
 
         config.saveConfigIfPresent();
     }

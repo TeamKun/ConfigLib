@@ -1,70 +1,43 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.SingleValue;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.command.CommandSource;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.List;
 
-/**
- * If you need completions with NewScoreboard, you should register it with scoreboard(Scoreboard) method.
- * When you use NewScoreboard, this class can't be deserialized. Therefore, a field must be qualified as transient at that time.
- */
-public class TeamValue extends SingleValue<Team, TeamValue> {
-    private transient Scoreboard scoreboard;
-
+public class TeamValue extends SingleValue<ScorePlayerTeam, TeamValue> {
     public TeamValue() {
         this(null);
     }
 
-    public TeamValue(Team value) {
+    public TeamValue(ScorePlayerTeam value) {
         super(value);
-        scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-    }
-
-    public @NotNull Scoreboard scoreboard() {
-        return scoreboard;
-    }
-
-    public TeamValue scoreboard(@NotNull Scoreboard scoreboard) {
-        this.scoreboard = scoreboard;
-        return this;
     }
 
     @Override
-    protected void appendArgument(UsageBuilder builder) {
-        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
-            scoreboard.getTeams().stream()
-                    .map(Team::getName)
-                    .filter(s -> value == null || !s.equals(value.getName()))
-                    .forEach(suggestionBuilder::suggest);
-        });
+    protected void appendArgument(ArgumentBuilder builder) {
+        builder.teamArgument("team");
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
-        return scoreboard.getTeams().stream()
-                .map(Team::getName)
-                .anyMatch(s -> s.equals(argument.get(0)));
+    protected boolean isCorrectArgument(List<Object> argument, CommandSource sender) {
+        return argument.get(0) != null;
     }
 
     @Override
     protected String incorrectArgumentMessage(List<Object> argument) {
-        return argument.get(0) + "は存在しないチームです.";
+        return "指定されたチームは存在しません.";
     }
 
     @Override
-    protected Team argumentToValue(List<Object> argument, CommandSender sender) {
-        return scoreboard.getTeam(argument.get(0).toString());
+    protected ScorePlayerTeam argumentToValue(List<Object> argument, CommandSource sender) {
+        return ((ScorePlayerTeam) argument.get(0));
     }
 
     @Override
-    protected boolean validateOnSet(Team newValue) {
+    protected boolean validateOnSet(ScorePlayerTeam newValue) {
         if (value == null) {
             return true;
         }
@@ -73,12 +46,16 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, Team newValue) {
+    protected String invalidValueMessage(String entryName, ScorePlayerTeam newValue) {
         return newValue.getName() + "はすでに設定されているチームです.";
     }
 
     @Override
-    protected String valueToString(Team team) {
+    protected String valueToString(ScorePlayerTeam team) {
+        if (team == null) {
+            return "null";
+        }
+
         return team.getName();
     }
 }

@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.SingleValue;
-import org.bukkit.command.CommandSender;
+import net.minecraft.command.CommandSource;
 
 import java.util.List;
 
@@ -12,15 +12,12 @@ public class BooleanValue extends SingleValue<Boolean, BooleanValue> {
     }
 
     @Override
-    protected void appendArgument(UsageBuilder builder) {
-        builder.booleanArgument("Boolean", sb -> {
-                    sb.suggest("true").suggest("false");
-                },
-                null);
+    protected void appendArgument(ArgumentBuilder builder) {
+        builder.boolArgument("bool");
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(List<Object> argument, CommandSource sender) {
         return true;
     }
 
@@ -30,7 +27,7 @@ public class BooleanValue extends SingleValue<Boolean, BooleanValue> {
     }
 
     @Override
-    protected Boolean argumentToValue(List<Object> argument, CommandSender sender) {
+    protected Boolean argumentToValue(List<Object> argument, CommandSource sender) {
         return ((Boolean) argument.get(0));
     }
 

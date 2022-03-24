@@ -1,13 +1,14 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.Command;
-import net.kunmc.lab.configlib.command.AccessibleCommand;
+import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.util.ConfigUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.Set;
 
-class ConfigModifyCommand extends AccessibleCommand {
+class ConfigModifyCommand extends Command {
     public ConfigModifyCommand(BaseConfig config) {
         super(SubCommandType.Modify.name);
 
@@ -22,7 +23,7 @@ class ConfigModifyCommand extends AccessibleCommand {
         }
 
         for (BaseConfig config : configSet) {
-            children(new AccessibleCommand(config.entryName()) {
+            addChildren(new Command(config.entryName()) {
                 {
                     init(config, this);
                 }
@@ -30,7 +31,7 @@ class ConfigModifyCommand extends AccessibleCommand {
         }
     }
 
-    private void init(BaseConfig config, AccessibleCommand command) {
+    private void init(BaseConfig config, Command command) {
         for (Field field : ConfigUtil.getSingleValueFields(config)) {
             SingleValue<?, ?> v;
             try {
@@ -44,13 +45,13 @@ class ConfigModifyCommand extends AccessibleCommand {
                 continue;
             }
 
-            command.appendChild(new Command(field.getName()) {
+            command.addChildren(new Command(field.getName()) {
                 {
-                    children(new ModifySetCommand(field, v, config));
+                    addChildren(new ModifySetCommand(field, v, config));
 
                     if (v instanceof NumericValue) {
-                        children(new ModifyIncCommand(field, ((NumericValue<?, ?>) v), config));
-                        children(new ModifyDecCommand(field, ((NumericValue<?, ?>) v), config));
+                        addChildren(new ModifyIncCommand(field, ((NumericValue<?, ?>) v), config));
+                        addChildren(new ModifyDecCommand(field, ((NumericValue<?, ?>) v), config));
                     }
                 }
             });
@@ -69,16 +70,16 @@ class ConfigModifyCommand extends AccessibleCommand {
                 continue;
             }
 
-            command.appendChild(new Command(field.getName()) {
+            command.addChildren(new Command(field.getName()) {
                 {
                     if (v.addableByCommand()) {
-                        children(new ModifyAddCommand(field, v, config));
+                        addChildren(new ModifyAddCommand(field, v, config));
                     }
                     if (v.removableByCommand()) {
-                        children(new ModifyRemoveCommand(field, v, config));
+                        addChildren(new ModifyRemoveCommand(field, v, config));
                     }
                     if (v.clearableByCommand()) {
-                        children(new ModifyClearCommand(field, v, config));
+                        addChildren(new ModifyClearCommand(field, v, config));
                     }
                 }
             });
@@ -97,17 +98,21 @@ class ConfigModifyCommand extends AccessibleCommand {
                 continue;
             }
 
-            command.appendChild(new Command(field.getName()) {
+            command.addChildren(new Command(field.getName()) {
                 {
                     if (v.puttableByCommand()) {
-                        children(new ModifyMapPutCommand(field, v, config));
+                        addChildren(new ModifyMapPutCommand(field, v, config));
                     }
                     if (v.removableByCommand()) {
-                        children(new ModifyMapRemoveCommand(field, v, config));
+                        addChildren(new ModifyMapRemoveCommand(field, v, config));
                     }
                     if (v.clearableByCommand()) {
-                        children(new ModifyMapClearCommand(field, v, config));
+                        addChildren(new ModifyMapClearCommand(field, v, config));
                     }
+                }
+
+                @Override
+                protected void execute(@NotNull CommandContext ctx) {
                 }
             });
         }

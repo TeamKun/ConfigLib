@@ -1,18 +1,18 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import org.bukkit.command.CommandSender;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.minecraft.command.CommandSource;
 
 import java.util.List;
 
 public class UUID2BooleanMapValue extends UUID2ObjectMapValue<Boolean, UUID2BooleanMapValue> {
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.booleanArgument("boolean", null, null);
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
+        builder.boolArgument("boolean", null, null);
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSource sender) {
         return true;
     }
 
@@ -22,7 +22,7 @@ public class UUID2BooleanMapValue extends UUID2ObjectMapValue<Boolean, UUID2Bool
     }
 
     @Override
-    protected Boolean argumentToValueForPut(List<Object> argument, CommandSender sender) {
+    protected Boolean argumentToValueForPut(List<Object> argument, CommandSource sender) {
         return ((Boolean) argument.get(1));
     }
 

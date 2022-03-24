@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
-import org.bukkit.command.CommandSender;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.minecraft.command.CommandSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
+    protected void appendArgumentForAdd(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             Arrays.stream(constants)
                     .map(Enum::name)
@@ -37,7 +37,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants)
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
@@ -48,14 +48,14 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected List<T> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    protected List<T> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants)
                 .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
+    protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             value.stream()
                     .map(Enum::name)
@@ -65,7 +65,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants)
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
@@ -76,7 +76,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected List<T> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected List<T> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants)
                 .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
                 .collect(Collectors.toList());

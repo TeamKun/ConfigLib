@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.NumericValue;
-import org.bukkit.command.CommandSender;
+import net.minecraft.command.CommandSource;
 
 import java.util.List;
 
@@ -31,12 +31,12 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
     }
 
     @Override
-    protected void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(ArgumentBuilder builder) {
         builder.integerArgument("Integer", min, max);
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(List<Object> argument, CommandSource sender) {
         return true;
     }
 
@@ -46,7 +46,7 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
     }
 
     @Override
-    protected Integer argumentToValue(List<Object> argument, CommandSender sender) {
+    protected Integer argumentToValue(List<Object> argument, CommandSource sender) {
         return ((Integer) argument.get(0));
     }
 

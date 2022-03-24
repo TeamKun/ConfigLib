@@ -1,28 +1,23 @@
 package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
-import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.argument.UnparsedArgument;
-import net.kunmc.lab.configlib.util.CommandUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.minecraft.command.CommandSource;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
-    private transient boolean onlyOnline = true;
-
     public UUIDSetValue(UUID... uuids) {
         this(Sets.newHashSet(uuids));
     }
 
-    public UUIDSetValue(Collection<Player> players) {
+    public UUIDSetValue(Collection<PlayerEntity> players) {
         this(players.stream()
-                .map(Player::getUniqueId)
+                .map(Entity::getUniqueID)
                 .collect(Collectors.toSet()));
     }
 
@@ -30,91 +25,34 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
         super(value);
     }
 
-    public UUIDSetValue suggestOfflines() {
-        this.onlyOnline = false;
-        return this;
-    }
-
-    private Stream<OfflinePlayer> getPlayerStreamForAdd() {
-        return Arrays.stream(Bukkit.getOfflinePlayers())
-                .filter(p -> !value.contains(p.getUniqueId()))
-                .filter(p -> !onlyOnline || p.isOnline());
+    @Override
+    protected void appendArgumentForAdd(ArgumentBuilder builder) {
+        builder.entityArgument("players", false, false);
     }
 
     @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
-        UnparsedArgument argument = new UnparsedArgument("targets", () -> {
-            List<String> list = getPlayerStreamForAdd()
-                    .map(OfflinePlayer::getName)
-                    .collect(Collectors.toList());
-            if (!list.isEmpty()) {
-                list.add("@a");
-                list.add("@r");
-            }
-
-            return list;
-        });
-
-        CommandUtil.addArgument(builder, argument);
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        String sel = argument.get(0).toString();
-        return ((sel.equals("@a") || sel.equals("@r")) && getPlayerStreamForAdd().findAny().isPresent()) ||
-                getPlayerStreamForAdd()
-                        .map(OfflinePlayer::getName)
-                        .anyMatch(s -> s.equals(sel));
+    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender) {
+        return !((List) argument.get(0)).isEmpty();
     }
 
     @Override
     protected String incorrectArgumentMessageForAdd(List<Object> argument) {
-        String s = argument.get(0).toString();
-
-        if (s.equals("@a") || s.equals("@r")) {
-            return "プレイヤーが見つかりませんでした.";
-        }
-
-        if (s.startsWith("@")) {
-            return "セレクターは@aか@rのみを指定できます.";
-        }
-
-        return "プレイヤーが見つかりませんでした.";
+        return "指定されたプレイヤーは存在しないかオフラインです.";
     }
 
 
     @Override
-    protected Set<UUID> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        String s = argument.get(0).toString();
-
-        if (s.equals("@a")) {
-            return getPlayerStreamForAdd()
-                    .map(OfflinePlayer::getUniqueId)
-                    .collect(Collectors.toSet());
-        }
-
-        if (s.startsWith("@r")) {
-            List<UUID> list = getPlayerStreamForAdd()
-                    .map(OfflinePlayer::getUniqueId)
-                    .collect(Collectors.toList());
-            Collections.shuffle(list);
-            return Sets.newHashSet(list.get(0));
-        }
-
-        return Sets.newHashSet(Bukkit.getOfflinePlayerIfCached(s).getUniqueId());
-    }
-
-    @Override
-    protected boolean validateForAdd(Set<UUID> element) {
-        return !value.containsAll(element);
+    protected Set<UUID> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
+        return ((List<Entity>) argument.get(0)).stream()
+                .map(Entity::getUniqueID).collect(Collectors.toSet());
     }
 
     @Override
     protected String invalidValueMessageForAdd(String entryName, Set<UUID> element) {
         if (element.size() == 1) {
             UUID uuid = element.toArray(new UUID[0])[0];
-            OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
-            return p.getName() + "はすでに" + entryName + "に追加されています.";
+            return ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache().getProfileByUUID(uuid).getName()
+                    + "はすでに" + entryName + "に追加されています.";
         }
 
         return element.size() + "人のプレイヤーはすでに" + entryName + "に追加されています";
@@ -124,44 +62,43 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     protected String succeedMessageForAdd(String entryName, Set<UUID> element) {
         if (element.size() == 1) {
             UUID uuid = element.toArray(new UUID[0])[0];
-            OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
-            return entryName + "に" + p.getName() + "を追加しました.";
+            String name = ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
+                    .getProfileByUUID(uuid).getName();
+            return entryName + "に" + name + "を追加しました.";
         }
 
         return entryName + "に" + element.size() + "人のプレイヤーを追加しました";
     }
 
     @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
-        UnparsedArgument argument = new UnparsedArgument("targets", () -> {
+    protected void appendArgumentForRemove(ArgumentBuilder builder) {
+        builder.unparsedArgument("targets", sb -> {
             List<String> list = value.stream()
-                    .map(Bukkit::getOfflinePlayer)
-                    .map(OfflinePlayer::getName)
+                    .map(uuid -> ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
+                            .getProfileByUUID(uuid).getName())
                     .collect(Collectors.toList());
             if (!list.isEmpty()) {
                 list.add("@a");
                 list.add("@r");
             }
 
-            return list;
+            list.forEach(sb::suggest);
         });
-
-        CommandUtil.addArgument(builder, argument);
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
         String sel = argument.get(0).toString();
         return sel.equals("@a") ||
                 sel.equals("@r") ||
                 value.stream()
-                        .map(Bukkit::getOfflinePlayer)
-                        .map(OfflinePlayer::getName)
+                        .map(uuid -> ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
+                                .getProfileByUUID(uuid).getName())
                         .anyMatch(s -> s.equals(sel));
     }
 
     @Override
-    protected Set<UUID> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected Set<UUID> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
         String s = argument.get(0).toString();
 
         if (s.equals("@a")) {
@@ -169,12 +106,13 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
         }
 
         if (s.equals("@r")) {
-            List<UUID> list = value.stream().collect(Collectors.toList());
+            List<UUID> list = new ArrayList<>(value);
             Collections.shuffle(list);
             return Sets.newHashSet(list.get(0));
         }
 
-        return Sets.newHashSet(Bukkit.getOfflinePlayerIfCached(s).getUniqueId());
+        return Sets.newHashSet(ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
+                .getGameProfileForUsername(s).getId());
     }
 
     @Override
@@ -214,6 +152,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
     @Override
     protected String elementToString(UUID uuid) {
-        return Bukkit.getOfflinePlayer(uuid).getName();
+        return ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
+                .getProfileByUUID(uuid).getName();
     }
 }

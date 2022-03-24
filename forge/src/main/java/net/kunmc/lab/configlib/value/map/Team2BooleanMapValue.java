@@ -1,18 +1,18 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import org.bukkit.command.CommandSender;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.minecraft.command.CommandSource;
 
 import java.util.List;
 
 public class Team2BooleanMapValue extends Team2ObjectMapValue<Boolean, Team2BooleanMapValue> {
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.booleanArgument("bool", null, null);
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
+        builder.boolArgument("bool");
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSource sender) {
         return true;
     }
 
@@ -22,7 +22,7 @@ public class Team2BooleanMapValue extends Team2ObjectMapValue<Boolean, Team2Bool
     }
 
     @Override
-    protected Boolean argumentToValueForPut(List<Object> argument, CommandSender sender) {
+    protected Boolean argumentToValueForPut(List<Object> argument, CommandSource sender) {
         return ((Boolean) argument.get(1));
     }
 

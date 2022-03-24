@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
-import org.bukkit.command.CommandSender;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.minecraft.command.CommandSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -39,14 +39,14 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
+    protected void appendArgumentForAdd(ArgumentBuilder builder) {
         builder.stringArgument(name, type, sb -> {
-            sb.suggestAll(allowableStringList);
+            allowableStringList.forEach(sb::suggest);
         }, null);
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender) {
         if (allowableStringList.isEmpty()) {
             return true;
         }
@@ -60,7 +60,7 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected List<String> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    protected List<String> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
         return argument.stream()
                 .map(Object::toString)
                 .collect(Collectors.toList());
@@ -76,14 +76,14 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
+    protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.stringArgument(name, sb -> {
-            sb.suggestAll(new ArrayList<>(value));
+            value.forEach(sb::suggest);
         }, null);
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
         return true;
     }
 
@@ -93,7 +93,7 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected List<String> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected List<String> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
         return argument.stream()
                 .map(Object::toString)
                 .collect(Collectors.toList());

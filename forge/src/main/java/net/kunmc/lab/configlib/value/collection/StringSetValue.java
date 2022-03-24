@@ -1,12 +1,11 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
-import org.bukkit.command.CommandSender;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.minecraft.command.CommandSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class StringSetValue extends SetValue<String, StringSetValue> {
     protected transient String name = "string";
@@ -37,16 +36,16 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
+    protected void appendArgumentForAdd(ArgumentBuilder builder) {
         builder.stringArgument(name, type, sb -> {
-            sb.suggestAll(allowableStringList.stream()
+            allowableStringList.stream()
                     .filter(s -> !value.contains(s))
-                    .collect(Collectors.toList()));
+                    .forEach(sb::suggest);
         }, null);
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender) {
         if (allowableStringList.isEmpty()) {
             return true;
         }
@@ -60,19 +59,19 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected Set<String> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    protected Set<String> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
         return Collections.singleton(argument.get(0).toString());
     }
 
     @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
+    protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.stringArgument(name, sb -> {
-            sb.suggestAll(new ArrayList<>(value));
+            value.forEach(sb::suggest);
         }, null);
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
         return true;
     }
 
@@ -82,7 +81,7 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected Set<String> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected Set<String> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
         return Collections.singleton(argument.get(0).toString());
     }
 

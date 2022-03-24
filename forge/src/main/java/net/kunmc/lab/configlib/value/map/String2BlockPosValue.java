@@ -2,23 +2,24 @@ package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class String2BooleanMapValue extends String2ObjectMapValue<Boolean, String2BooleanMapValue> {
-    public String2BooleanMapValue() {
+public class String2BlockPosValue extends String2ObjectMapValue<BlockPos, String2BlockPosValue> {
+    public String2BlockPosValue() {
         this(new HashMap<>());
     }
 
-    public String2BooleanMapValue(Map<String, Boolean> value) {
+    public String2BlockPosValue(Map<String, BlockPos> value) {
         super(value);
     }
 
     @Override
     protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.boolArgument("bool");
+        builder.blockPosArgument("pos");
     }
 
     @Override
@@ -32,12 +33,12 @@ public class String2BooleanMapValue extends String2ObjectMapValue<Boolean, Strin
     }
 
     @Override
-    protected Boolean argumentToValueForPut(List<Object> argument, CommandSource sender) {
-        return ((Boolean) argument.get(1));
+    protected BlockPos argumentToValueForPut(List<Object> argument, CommandSource sender) {
+        return ((BlockPos) argument.get(1));
     }
 
     @Override
-    protected String valueToString(Boolean aBoolean) {
-        return aBoolean.toString();
+    protected String valueToString(BlockPos blockPos) {
+        return String.format("{x:%d, y:%d, z:%d}", blockPos.getX(), blockPos.getY(), blockPos.getZ());
     }
 }

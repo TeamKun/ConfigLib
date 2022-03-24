@@ -1,9 +1,9 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
-import org.bukkit.command.CommandSender;
-import org.bukkit.scoreboard.Team;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.minecraft.command.CommandSource;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
         this(new HashMap<>(), e);
     }
 
-    public Team2EnumMapValue(Map<Team, T> map, T... e) {
+    public Team2EnumMapValue(Map<ScorePlayerTeam, T> map, T... e) {
         super(map);
 
         clazz = ((Class<T>) e.getClass().getComponentType());
@@ -28,7 +28,7 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
     }
 
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             Arrays.stream(constants())
                     .map(Enum::name)
@@ -38,7 +38,7 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants())
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(1).toString()));
     }
@@ -49,7 +49,7 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
     }
 
     @Override
-    protected T argumentToValueForPut(List<Object> argument, CommandSender sender) {
+    protected T argumentToValueForPut(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants())
                 .filter(x -> x.name().equalsIgnoreCase(argument.get(1).toString()))
                 .findFirst()

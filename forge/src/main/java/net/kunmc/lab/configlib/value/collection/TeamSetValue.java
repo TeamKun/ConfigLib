@@ -1,12 +1,11 @@
 package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.minecraft.command.CommandSource;
+import net.minecraft.scoreboard.ScorePlayerTeam;
+import net.minecraft.scoreboard.Team;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -18,61 +17,45 @@ import java.util.Set;
  * If you need completions on "add" with NewScoreboard, you should register it with scoreboard(Scoreboard) method.
  * When you use NewScoreboard, this class can't be deserialized. Therefore, a field must be qualified as transient at that time.
  */
-public class TeamSetValue extends SetValue<Team, TeamSetValue> {
-    private transient Scoreboard scoreboard;
-
-    public TeamSetValue(Team... teams) {
+public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
+    public TeamSetValue(ScorePlayerTeam... teams) {
         this(new HashSet<>(Arrays.asList(teams)));
     }
 
-    public TeamSetValue(@NotNull Set<Team> value) {
+    public TeamSetValue(@NotNull Set<ScorePlayerTeam> value) {
         super(value);
-        scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-    }
-
-    public @NotNull Scoreboard scoreboard() {
-        return scoreboard;
-    }
-
-    public TeamSetValue scoreboard(@NotNull Scoreboard scoreboard) {
-        this.scoreboard = scoreboard;
-        return this;
     }
 
     @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
-            scoreboard.getTeams().stream()
+    protected void appendArgumentForAdd(ArgumentBuilder builder) {
+        builder.teamArgument("name", sb -> {
+            ServerLifecycleHooks.getCurrentServer().getScoreboard().getTeams().stream()
                     .map(Team::getName)
                     .filter(name -> value.stream()
                             .map(Team::getName)
                             .noneMatch(s -> s.equals(name)))
-                    .forEach(suggestionBuilder::suggest);
+                    .forEach(sb::suggest);
         });
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        String name = argument.get(0).toString();
-        return scoreboard.getTeams().stream()
-                .map(Team::getName)
-                .anyMatch(s -> s.equals(name));
+    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender) {
+        return argument.get(0) != null;
     }
 
     @Override
     protected String incorrectArgumentMessageForAdd(List<Object> argument) {
-        return argument.get(0) + "は存在しないチームです";
+        return "指定されたチームは存在しません.";
     }
 
     @Override
-    protected Set<Team> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        Team t = scoreboard.getTeam(argument.get(0).toString());
-        return Sets.newHashSet(t);
+    protected Set<ScorePlayerTeam> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
+        return Sets.newHashSet(((ScorePlayerTeam) argument.get(0)));
     }
 
     @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
+    protected void appendArgumentForRemove(ArgumentBuilder builder) {
+        builder.teamArgument("team", suggestionBuilder -> {
             value.stream()
                     .map(Team::getName)
                     .forEach(suggestionBuilder::suggest);
@@ -80,26 +63,26 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
-        String name = argument.get(0).toString();
-        return scoreboard.getTeams().stream()
-                .map(Team::getName)
-                .anyMatch(s -> s.equals(name));
+    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
+        return argument.get(0) != null;
     }
 
     @Override
     protected String incorrectArgumentMessageForRemove(List<Object> argument) {
-        return argument.get(0) + "は存在しないチームです.";
+        return "指定されたチームは存在しません.";
     }
 
     @Override
-    protected Set<Team> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
-        Team t = scoreboard.getTeam(argument.get(0).toString());
-        return Sets.newHashSet(t);
+    protected Set<ScorePlayerTeam> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
+        return Sets.newHashSet(((ScorePlayerTeam) argument.get(0)));
     }
 
     @Override
-    protected String elementToString(Team team) {
+    protected String elementToString(ScorePlayerTeam team) {
+        if (team == null) {
+            return "null";
+        }
+       
         return team.getName();
     }
 }

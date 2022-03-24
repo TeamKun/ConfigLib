@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
-import org.bukkit.command.CommandSender;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.minecraft.command.CommandSource;
 
 import java.util.*;
 
@@ -24,7 +24,7 @@ public class UUID2EnumMapValue<T extends Enum<T>> extends UUID2ObjectMapValue<T,
     }
 
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             Arrays.stream(constants())
                     .map(Enum::name)
@@ -34,7 +34,7 @@ public class UUID2EnumMapValue<T extends Enum<T>> extends UUID2ObjectMapValue<T,
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants())
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(1).toString()));
     }
@@ -45,7 +45,7 @@ public class UUID2EnumMapValue<T extends Enum<T>> extends UUID2ObjectMapValue<T,
     }
 
     @Override
-    protected T argumentToValueForPut(List<Object> argument, CommandSender sender) {
+    protected T argumentToValueForPut(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants())
                 .filter(x -> x.name().equalsIgnoreCase(argument.get(1).toString()))
                 .findFirst()

@@ -1,9 +1,9 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.configlib.MapValue;
-import org.bukkit.command.CommandSender;
+import net.minecraft.command.CommandSource;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +23,7 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     }
 
     @Override
-    protected void appendKeyArgumentForPut(UsageBuilder builder) {
+    protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             Arrays.stream(constants())
                     .map(Enum::name)
@@ -33,7 +33,7 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForPut(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants())
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
@@ -44,7 +44,7 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     }
 
     @Override
-    protected T argumentToKeyForPut(List<Object> argument, CommandSender sender) {
+    protected T argumentToKeyForPut(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants())
                 .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
                 .findFirst()
@@ -52,7 +52,7 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     }
 
     @Override
-    protected void appendKeyArgumentForRemove(UsageBuilder builder) {
+    protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             value.keySet().stream()
                     .map(Enum::name)
@@ -62,7 +62,7 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants())
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
@@ -73,7 +73,7 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     }
 
     @Override
-    protected T argumentToKeyForRemove(List<Object> argument, CommandSender sender) {
+    protected T argumentToKeyForRemove(List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants())
                 .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
                 .findFirst()

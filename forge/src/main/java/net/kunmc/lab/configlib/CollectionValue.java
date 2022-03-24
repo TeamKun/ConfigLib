@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.CommandContext;
-import dev.kotx.flylib.command.UsageBuilder;
-import org.bukkit.command.CommandSender;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
+import net.minecraft.command.CommandSource;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,13 +34,13 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return ((U) this);
     }
 
-    protected abstract void appendArgumentForAdd(UsageBuilder builder);
+    protected abstract void appendArgumentForAdd(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender);
+    protected abstract boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender);
 
     protected abstract String incorrectArgumentMessageForAdd(List<Object> argument);
 
-    protected abstract T argumentToValueForAdd(List<Object> argument, CommandSender sender);
+    protected abstract T argumentToValueForAdd(List<Object> argument, CommandSource sender);
 
     protected abstract boolean validateForAdd(T value);
 
@@ -86,13 +86,13 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return ((U) this);
     }
 
-    protected abstract void appendArgumentForRemove(UsageBuilder builder);
+    protected abstract void appendArgumentForRemove(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender);
+    protected abstract boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender);
 
     protected abstract String incorrectArgumentMessageForRemove(List<Object> argument);
 
-    protected abstract T argumentToValueForRemove(List<Object> argument, CommandSender sender);
+    protected abstract T argumentToValueForRemove(List<Object> argument, CommandSource sender);
 
     protected abstract boolean validateForRemove(T value);
 
@@ -173,7 +173,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     @Override
     protected final void sendListMessage(CommandContext ctx, String entryName) {
-        ctx.success(entryName + ": [" + value.stream()
+        ctx.sendSuccess(entryName + ": [" + value.stream()
                 .map(this::elementToString)
                 .collect(Collectors.joining(", ")) + "]");
     }
