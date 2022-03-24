@@ -12,6 +12,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +34,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
@@ -41,6 +47,8 @@ public abstract class BaseConfig {
     protected transient boolean enableList = true;
     protected transient boolean enableModify = true;
     protected transient boolean enableReload = true;
+    private transient WatchService watchService;
+    private transient TimerTask watchTask;
     private static final transient Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .enableComplexMapKeySerialization()
@@ -71,13 +79,18 @@ public abstract class BaseConfig {
     public BaseConfig(@NotNull String modId, @NotNull Type type) {
         this.modId = modId;
         this.type = type;
+
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    @SubscribeEvent
+    public void onServerStarting(FMLServerStartingEvent e) {
         type.getConfigFolder(modId).mkdirs();
 
         try {
-            WatchService watcher = FileSystems.getDefault().newWatchService();
-            WatchKey watchKey = type.getConfigFolder(modId).toPath().register(watcher, ENTRY_MODIFY);
-
-            TimerTask task = new TimerTask() {
+            watchService = FileSystems.getDefault().newWatchService();
+            WatchKey watchKey = type.getConfigFolder(modId).toPath().register(watchService, ENTRY_MODIFY);
+            watchTask = new TimerTask() {
                 @Override
                 public void run() {
                     for (WatchEvent<?> e : watchKey.pollEvents()) {
@@ -90,9 +103,18 @@ public abstract class BaseConfig {
                     watchKey.reset();
                 }
             };
-            new Timer().scheduleAtFixedRate(task, 0, 500);
-        } catch (IOException e) {
-            e.printStackTrace();
+            new Timer().scheduleAtFixedRate(watchTask, 0, 500);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @SubscribeEvent
+    public void onServerStopping(FMLServerStoppedEvent e) {
+        watchTask.cancel();
+        try {
+            watchService.close();
+        } catch (IOException ignored) {
         }
     }
 
@@ -150,6 +172,10 @@ public abstract class BaseConfig {
     }
 
     protected void saveConfig() {
+        if (!type.isCorrectSide()) {
+            return;
+        }
+
         try {
             getConfigFile().createNewFile();
             writeJson(getConfigFile(), gson.toJson(this));
@@ -221,9 +247,13 @@ public abstract class BaseConfig {
     public enum Type {
         COMMON(modId -> {
             return new File("config/" + modId);
+        }, () -> {
+            return true;
         }),
         CLIENT(modId -> {
             return new File("config/" + modId);
+        }, () -> {
+            return FMLEnvironment.dist.isClient();
         }),
         SERVER(modId -> {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
@@ -232,16 +262,24 @@ public abstract class BaseConfig {
             } else {
                 return new File("saves/" + server.getServerConfiguration().getWorldName() + "/serverconfig/" + modId);
             }
+        }, () -> {
+            return true;
         });
 
         private final Function<String, File> getConfigFolder;
+        private final Supplier<Boolean> isCorrectSide;
 
-        Type(Function<String, File> getConfigFolder) {
+        Type(Function<String, File> getConfigFolder, Supplier<Boolean> isCorrectSide) {
             this.getConfigFolder = getConfigFolder;
+            this.isCorrectSide = isCorrectSide;
         }
 
         File getConfigFolder(String modId) {
             return getConfigFolder.apply(modId);
+        }
+
+        boolean isCorrectSide() {
+            return isCorrectSide.get();
         }
     }
 }
