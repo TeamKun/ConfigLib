@@ -153,7 +153,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
         String sel = argument.get(0).toString();
         return sel.equals("@a") ||
-                sel.equals("@r") ||
+                !value.isEmpty() && sel.equals("@r") ||
                 value.stream()
                         .map(Bukkit::getOfflinePlayer)
                         .map(OfflinePlayer::getName)

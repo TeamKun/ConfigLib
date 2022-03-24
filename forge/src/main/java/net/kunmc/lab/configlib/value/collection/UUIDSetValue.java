@@ -90,7 +90,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
         String sel = argument.get(0).toString();
         return sel.equals("@a") ||
-                sel.equals("@r") ||
+                !value.isEmpty() && sel.equals("@r") ||
                 value.stream()
                         .map(uuid -> ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
                                 .getProfileByUUID(uuid).getName())
