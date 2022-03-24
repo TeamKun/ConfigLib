@@ -2,6 +2,10 @@
 
 [![](https://jitpack.io/v/TeamKun/ConfigLib.svg)](https://jitpack.io/#TeamKun/ConfigLib)
 
+~~ConfigLib depends on [FlyLib Reloaded](https://github.com/TeamKun/flylib-reloaded).~~  
+~~You must add it in your project.~~  
+After 0.9.0, ConfigLib depends on [CommandLib](https://github.com/TeamKun/CommandLib)
+
 ## Getting Started
 
 ### Installation(Gradle Settings)
@@ -69,6 +73,8 @@ reobf {
 
 </details>
 
-~~ConfigLib depends on [FlyLib Reloaded](https://github.com/TeamKun/flylib-reloaded).~~
-~~You must add it in your project.~~  
-After 0.9.0, ConfigLib depends on [CommandLib](https://github.com/TeamKun/CommandLib)
+### Sample Code
+
+[Bukkit](/sample/bukkit/src/main/java/net/kunmc/lab/sampleplugin)  
+[Forge](/sample/forge/src/main/java/net/kunmc/lab/samplemod)
+
