@@ -26,7 +26,7 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.31'
     implementation group: "org.apache.poi", name: "poi", version: "5.1.0"
-    compileOnly "com.github.TeamKun.CommandLib:forge:0.2.2"
+    compileOnly "com.github.TeamKun.CommandLib:forge:0.2.3"
     implementation "org.jetbrains:annotations:16.0.2"
 }
 
