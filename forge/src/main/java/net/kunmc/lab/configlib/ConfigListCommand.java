@@ -34,7 +34,11 @@ class ConfigListCommand extends Command {
 
     @Override
     public void execute(CommandContext ctx) {
-        exec(ctx, config);
+        if (config == null) {
+            ctx.sendHelp();
+        } else {
+            exec(ctx, config);
+        }
     }
 
     private void exec(CommandContext ctx, BaseConfig config) {
