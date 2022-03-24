@@ -14,6 +14,11 @@ public class Config extends BaseConfig {
     public final LocationValue locationValue = new LocationValue();
     public final BlockDataSetValue blockDataSetValue = new BlockDataSetValue();
     public final Enum2DoubleMapValue<Material> enum2DoubleMapValue = new Enum2DoubleMapValue<>();
+    public final TeamValue teamValue = new TeamValue().onModify(team -> {
+        Bukkit.getOnlinePlayers().forEach(p -> {
+            p.sendMessage("teamValue modified!");
+        });
+    });
 
     public Config(@NotNull Plugin plugin) {
         super(plugin);
