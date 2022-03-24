@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class Config extends BaseConfig {
+public class ServerConfig extends BaseConfig {
     public final IntegerValue integerValue = new IntegerValue(123);
     public final LocationValue locationValue = new LocationValue();
     public final BlockStateSetValue blockStateSetValue = new BlockStateSetValue();
@@ -24,7 +24,7 @@ public class Config extends BaseConfig {
         });
     });
 
-    public Config(@NotNull String modId, @NotNull Type type) {
-        super(modId, type);
+    public ServerConfig(@NotNull String modId) {
+        super(modId, Type.SERVER);
     }
 }
