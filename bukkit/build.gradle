@@ -21,8 +21,6 @@ repositories {
 }
 
 dependencies {
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.1"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.1"
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
     implementation group: "com.google.guava", name: "guava", version: "27.0.1-jre"
     compileOnly "dev.kotx:flylib-reloaded:0.5.0"
@@ -32,38 +30,11 @@ dependencies {
     compileOnly "com.mojang:brigadier:1.0.18"
 }
 
-def targetJavaVersion = 8
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            version = version
-        }
-    }
-
-}
-
 shadowJar {
-    archiveFileName = "${rootProject.name}-bukkit-${version}.jar"
     exclude "net/minecraft"
     exclude "org/bukkit"
 }
-
-build {
-    dependsOn shadowJar
-}
-
-test {
-    useJUnitPlatform()
-}
+tasks.build.dependsOn tasks.shadowJar
 
 jar {
     exclude "net/minecraft"

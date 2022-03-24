@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:6.1.0"
+    }
+}
+
 allprojects {
     group "net.kunmc.lab"
     version = "0.8.4"
@@ -7,6 +16,7 @@ subprojects {
     apply plugin: "java"
     apply plugin: "maven-publish"
     apply plugin: "idea"
+    apply plugin: "com.github.johnrengelman.shadow"
 
     idea {
         module {
@@ -21,7 +31,7 @@ subprojects {
 
     publishing {
         publications {
-            mavenJava(MavenPublication) {
+            maven(MavenPublication) {
                 groupId = project.group
                 artifactId = project.name
                 version = project.version
@@ -35,4 +45,9 @@ subprojects {
         options.charSet = "UTF-8"
         options.encoding = "UTF-8"
     }
+   
+    shadowJar {
+        archiveFileName = "${project.name}-${project.version}.jar"
+    }
+    tasks.build.dependsOn tasks.shadowJar
 }

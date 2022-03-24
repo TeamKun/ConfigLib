@@ -5,13 +5,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:6.1.0"
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: "com.github.johnrengelman.shadow"
 
 minecraft {
     mappings channel: 'snapshot', version: '20210309-1.16.5'
@@ -26,39 +24,13 @@ repositories {
 }
 
 dependencies {
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.1"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.1"
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.31'
     implementation group: "org.apache.poi", name: "poi", version: "5.1.0"
     compileOnly "com.github.TeamKun.CommandLib:forge:0.2.2"
     implementation "org.jetbrains:annotations:16.0.2"
 }
 
-def targetJavaVersion = 8
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            version = version
-        }
-    }
-    repositories {
-        maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
-        }
-    }
-}
-
 shadowJar {
-    archiveFileName = "${rootProject.name}-${project.version}.jar"
     dependencies {
         include(dependency("org.apache.poi:poi:.*"))
         include(dependency("org.jetbrains:annotations:.*"))
@@ -67,13 +39,4 @@ shadowJar {
     relocate "org.apache", "${project.group}.${rootProject.name.toLowerCase()}.shadow.apache"
     relocate "org.codehaus", "${project.group}.${rootProject.name.toLowerCase()}.shadow.codehaus"
     finalizedBy("reobfShadowJar")
-}
-
-reobf {
-    shadowJar {
-    }
-}
-
-test {
-    useJUnitPlatform()
 }
