@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.CommandContext;
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.function.TriFunction;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.command.CommandSender;
@@ -34,9 +34,9 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return ((T) this);
     }
 
-    protected abstract void appendKeyArgumentForPut(UsageBuilder builder);
+    protected abstract void appendKeyArgumentForPut(ArgumentBuilder builder);
 
-    protected abstract void appendValueArgumentForPut(UsageBuilder builder);
+    protected abstract void appendValueArgumentForPut(ArgumentBuilder builder);
 
     protected abstract boolean isCorrectKeyArgumentForPut(List<Object> argument, CommandSender sender);
 
@@ -106,7 +106,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return ((T) this);
     }
 
-    protected abstract void appendKeyArgumentForRemove(UsageBuilder builder);
+    protected abstract void appendKeyArgumentForRemove(ArgumentBuilder builder);
 
     protected abstract boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSender sender);
 
@@ -199,7 +199,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     @Override
     protected void sendListMessage(CommandContext ctx, String entryName) {
-        ctx.success(entryName + ": {" + value.entrySet().stream()
+        ctx.sendSuccess(entryName + ": {" + value.entrySet().stream()
                 .map(entry -> String.format("%s:%s", keyToString(entry.getKey()), valueToString(entry.getValue())))
                 .collect(Collectors.joining(", ")) + "}");
     }

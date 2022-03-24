@@ -1,14 +1,13 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.Command;
-import dev.kotx.flylib.command.CommandContext;
-import net.kunmc.lab.configlib.command.AccessibleCommand;
+import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.commandlib.CommandContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.Set;
 
-class ConfigGetCommand extends AccessibleCommand {
+class ConfigGetCommand extends Command {
     public ConfigGetCommand(BaseConfig config) {
         super(SubCommandType.Get.name);
 
@@ -23,7 +22,7 @@ class ConfigGetCommand extends AccessibleCommand {
         }
 
         for (BaseConfig config : configSet) {
-            children(new AccessibleCommand(config.entryName()) {
+            addChildren(new Command(config.entryName()) {
                 {
                     init(config, this);
                 }
@@ -31,7 +30,7 @@ class ConfigGetCommand extends AccessibleCommand {
         }
     }
 
-    private void init(BaseConfig config, AccessibleCommand command) {
+    private void init(BaseConfig config, Command command) {
         for (Field field : config.getClass().getDeclaredFields()) {
             field.setAccessible(true);
 
@@ -48,18 +47,18 @@ class ConfigGetCommand extends AccessibleCommand {
                 if (!v.listable()) {
                     continue;
                 }
-               
-                command.appendChild(new Command(field.getName()) {
+
+                command.addChildren(new Command(field.getName()) {
                     @Override
                     public void execute(@NotNull CommandContext ctx) {
                         v.sendListMessage(ctx, field.getName());
                     }
                 });
             } else {
-                command.appendChild(new Command(field.getName()) {
+                command.addChildren(new Command(field.getName()) {
                     @Override
                     public void execute(@NotNull CommandContext ctx) {
-                        ctx.success(field.getName() + ": " + o);
+                        ctx.sendSuccess(field.getName() + ": " + o);
                     }
                 });
             }

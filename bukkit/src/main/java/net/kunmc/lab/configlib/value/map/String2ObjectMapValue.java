@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.configlib.MapValue;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
     }
 
     @Override
-    protected void appendKeyArgumentForPut(UsageBuilder builder) {
+    protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
         builder.stringArgument("string", StringArgument.Type.PHRASE_QUOTED, sb -> {
             if (allowableKeyStringList.isEmpty()) {
                 keySet().forEach(sb::suggest);
@@ -54,7 +54,7 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
     }
 
     @Override
-    protected void appendKeyArgumentForRemove(UsageBuilder builder) {
+    protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
         builder.stringArgument("string", StringArgument.Type.PHRASE, sb -> {
             keySet().forEach(sb::suggest);
         });

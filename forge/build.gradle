@@ -38,5 +38,5 @@ shadowJar {
     }
     relocate "org.apache", "${project.group}.${rootProject.name.toLowerCase()}.shadow.apache"
     relocate "org.codehaus", "${project.group}.${rootProject.name.toLowerCase()}.shadow.codehaus"
-    finalizedBy("reobfShadowJar")
 }
+jar.finalizedBy("shadowJar")

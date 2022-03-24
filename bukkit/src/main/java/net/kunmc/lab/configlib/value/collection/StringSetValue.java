@@ -1,12 +1,11 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class StringSetValue extends SetValue<String, StringSetValue> {
     protected transient String name = "string";
@@ -37,12 +36,12 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
+    protected void appendArgumentForAdd(ArgumentBuilder builder) {
         builder.stringArgument(name, type, sb -> {
-            sb.suggestAll(allowableStringList.stream()
+            allowableStringList.stream()
                     .filter(s -> !value.contains(s))
-                    .collect(Collectors.toList()));
-        }, null);
+                    .forEach(sb::suggest);
+        });
     }
 
     @Override
@@ -65,10 +64,10 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
+    protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.stringArgument(name, sb -> {
-            sb.suggestAll(new ArrayList<>(value));
-        }, null);
+            value.forEach(sb::suggest);
+        });
     }
 
     @Override

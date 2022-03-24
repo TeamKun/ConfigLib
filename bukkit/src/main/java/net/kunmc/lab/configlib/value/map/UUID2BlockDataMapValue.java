@@ -1,8 +1,6 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.argument.TileArgument;
-import net.kunmc.lab.configlib.util.CommandUtil;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 
@@ -17,8 +15,8 @@ public class UUID2BlockDataMapValue extends UUID2ObjectMapValue<BlockData, UUID2
     }
 
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
-        CommandUtil.addArgument(builder, new TileArgument("name"));
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
+        builder.blockDataArgument("name");
     }
 
     @Override

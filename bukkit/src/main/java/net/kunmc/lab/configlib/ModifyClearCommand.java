@@ -1,12 +1,12 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.CommandContext;
-import net.kunmc.lab.configlib.command.AccessibleCommand;
+import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.commandlib.CommandContext;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
 
-class ModifyClearCommand extends AccessibleCommand {
+class ModifyClearCommand extends Command {
     private final Field field;
     private final CollectionValue configValue;
     private final BaseConfig config;
@@ -26,7 +26,7 @@ class ModifyClearCommand extends AccessibleCommand {
         }
 
         ((Collection) configValue.value()).clear();
-        ctx.success(configValue.clearMessage(field.getName()));
+        ctx.sendSuccess(configValue.clearMessage(field.getName()));
 
         config.saveConfigIfPresent();
     }

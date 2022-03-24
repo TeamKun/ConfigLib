@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.configlib.SingleValue;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +25,7 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T, EnumValue<T>> {
     }
 
     @Override
-    protected void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             Arrays.stream(constants)
                     .filter(x -> x != value)

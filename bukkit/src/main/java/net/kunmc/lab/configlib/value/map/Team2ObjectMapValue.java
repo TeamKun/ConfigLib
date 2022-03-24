@@ -1,20 +1,18 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.MapValue;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>> extends MapValue<Team, V, T> {
-    private transient Scoreboard scoreboard;
+    private final transient Scoreboard scoreboard;
 
     public Team2ObjectMapValue() {
         this(new HashMap<>());
@@ -26,39 +24,24 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
         scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
     }
 
-    public @NotNull Scoreboard scoreboard() {
-        return scoreboard;
-    }
-
-    public T scoreboard(@NotNull Scoreboard scoreboard) {
-        this.scoreboard = scoreboard;
-        return ((T) this);
-    }
-
     @Override
-    protected void appendKeyArgumentForPut(UsageBuilder builder) {
-        builder.stringArgument("team", StringArgument.Type.PHRASE_QUOTED, suggestionBuilder -> {
-            scoreboard.getTeams().stream()
-                    .map(Team::getName)
-                    .forEach(suggestionBuilder::suggest);
-        });
+    protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
+        builder.teamArgument("team");
     }
 
     @Override
     protected boolean isCorrectKeyArgumentForPut(List<Object> argument, CommandSender sender) {
-        return scoreboard.getTeams().stream()
-                .map(Team::getName)
-                .anyMatch(s -> s.equals(argument.get(0)));
+        return argument.get(0) != null;
     }
 
     @Override
     protected String incorrectKeyArgumentMessageForPut(List<Object> argument) {
-        return argument.get(0) + "は存在しないチームです.";
+        return "指定されたチームは存在しません.";
     }
 
     @Override
     protected Team argumentToKeyForPut(List<Object> argument, CommandSender sender) {
-        return scoreboard.getTeam(argument.get(0).toString());
+        return ((Team) argument.get(0));
     }
 
     @Override
@@ -72,29 +55,23 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     }
 
     @Override
-    protected void appendKeyArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("team", StringArgument.Type.PHRASE_QUOTED, sb -> {
-            value.keySet().stream()
-                    .map(Team::getName)
-                    .forEach(sb::suggest);
-        });
+    protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
+        builder.teamArgument("team");
     }
 
     @Override
     protected boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSender sender) {
-        return scoreboard.getTeams().stream()
-                .map(Team::getName)
-                .anyMatch(s -> s.equals(argument.get(0)));
+        return argument.get(0) != null;
     }
 
     @Override
     protected String incorrectKeyArgumentMessageForRemove(List<Object> argument) {
-        return argument.get(0) + "は存在しないチームです.";
+        return "指定されたチームは存在しません.";
     }
 
     @Override
     protected Team argumentToKeyForRemove(List<Object> argument, CommandSender sender) {
-        return scoreboard.getTeam(argument.get(0).toString());
+        return ((Team) argument.get(0));
     }
 
     @Override

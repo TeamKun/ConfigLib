@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +27,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
+    protected void appendArgumentForAdd(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             Arrays.stream(constants)
                     .map(Enum::name)
@@ -55,7 +55,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
+    protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             value.stream()
                     .map(Enum::name)

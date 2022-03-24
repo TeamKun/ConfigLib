@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.Command;
+import net.kunmc.lab.commandlib.Command;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
@@ -13,20 +13,20 @@ class ModifyAddCommand extends Command {
 
         String entryName = field.getName();
 
-        usage(builder -> {
+        argument(builder -> {
             value.appendArgumentForAdd(builder);
 
-            builder.executes(ctx -> {
-                List<Object> argument = ctx.getTypedArgs();
+            builder.execute(ctx -> {
+                List<Object> argument = ctx.getParsedArgs();
                 CommandSender sender = ctx.getSender();
                 if (!value.isCorrectArgumentForAdd(argument, sender)) {
-                    ctx.fail(value.incorrectArgumentMessageForAdd(argument));
+                    ctx.sendFailure(value.incorrectArgumentMessageForAdd(argument));
                     return;
                 }
 
                 Collection newValue = value.argumentToValueForAdd(argument, sender);
                 if (!value.validateForAdd(newValue)) {
-                    ctx.fail(value.invalidValueMessageForAdd(entryName, newValue));
+                    ctx.sendFailure(value.invalidValueMessageForAdd(entryName, newValue));
                     return;
                 }
 
@@ -35,7 +35,7 @@ class ModifyAddCommand extends Command {
                 }
 
                 ((Collection) value.value()).addAll(newValue);
-                ctx.success(value.succeedMessageForAdd(entryName, newValue));
+                ctx.sendSuccess(value.succeedMessageForAdd(entryName, newValue));
 
                 config.saveConfigIfPresent();
             });

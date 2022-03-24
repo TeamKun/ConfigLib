@@ -41,7 +41,6 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
-        //builder.entityArgument("player", false, true);
         builder.stringArgument("player", StringArgument.Type.WORD, sb -> {
             value.keySet().stream()
                     .map(uuid -> ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache().getProfileByUUID(uuid))

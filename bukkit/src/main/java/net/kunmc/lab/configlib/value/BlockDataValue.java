@@ -1,9 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.argument.TileArgument;
-import net.kunmc.lab.configlib.util.CommandUtil;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 
@@ -22,8 +20,8 @@ public class BlockDataValue extends SingleValue<BlockData, BlockDataValue> {
     }
 
     @Override
-    protected void appendArgument(UsageBuilder builder) {
-        CommandUtil.addArgument(builder, new TileArgument("name"));
+    protected void appendArgument(ArgumentBuilder builder) {
+        builder.blockDataArgument("name");
     }
 
     @Override

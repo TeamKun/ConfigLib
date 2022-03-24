@@ -1,8 +1,7 @@
 package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Scoreboard;
@@ -14,12 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * If you need completions on "add" with NewScoreboard, you should register it with scoreboard(Scoreboard) method.
- * When you use NewScoreboard, this class can't be deserialized. Therefore, a field must be qualified as transient at that time.
- */
 public class TeamSetValue extends SetValue<Team, TeamSetValue> {
-    private transient Scoreboard scoreboard;
+    private final transient Scoreboard scoreboard;
 
     public TeamSetValue(Team... teams) {
         this(new HashSet<>(Arrays.asList(teams)));
@@ -34,72 +29,63 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
         return scoreboard;
     }
 
-    public TeamSetValue scoreboard(@NotNull Scoreboard scoreboard) {
-        this.scoreboard = scoreboard;
-        return this;
-    }
-
     @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
-        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
+    protected void appendArgumentForAdd(ArgumentBuilder builder) {
+        builder.teamArgument("team", sb -> {
             scoreboard.getTeams().stream()
                     .map(Team::getName)
                     .filter(name -> value.stream()
                             .map(Team::getName)
                             .noneMatch(s -> s.equals(name)))
-                    .forEach(suggestionBuilder::suggest);
+                    .forEach(sb::suggest);
         });
     }
 
     @Override
     protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
-        String name = argument.get(0).toString();
-        return scoreboard.getTeams().stream()
-                .map(Team::getName)
-                .anyMatch(s -> s.equals(name));
+        return argument.get(0) != null;
     }
 
     @Override
     protected String incorrectArgumentMessageForAdd(List<Object> argument) {
-        return argument.get(0) + "は存在しないチームです";
+        return "指定されたチームは存在しません.";
     }
 
     @Override
     protected Set<Team> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        Team t = scoreboard.getTeam(argument.get(0).toString());
-        return Sets.newHashSet(t);
+        return Sets.newHashSet(((Team) argument.get(0)));
     }
 
     @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
-        builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
+    protected void appendArgumentForRemove(ArgumentBuilder builder) {
+        builder.teamArgument("team", sb -> {
             value.stream()
                     .map(Team::getName)
-                    .forEach(suggestionBuilder::suggest);
+                    .forEach(sb::suggest);
         });
     }
 
     @Override
     protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
-        String name = argument.get(0).toString();
-        return scoreboard.getTeams().stream()
-                .map(Team::getName)
-                .anyMatch(s -> s.equals(name));
+        return argument.get(0) != null;
     }
 
     @Override
     protected String incorrectArgumentMessageForRemove(List<Object> argument) {
-        return argument.get(0) + "は存在しないチームです.";
+        return "指定されたチームは存在しません.";
     }
 
     @Override
     protected Set<Team> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
-        Team t = scoreboard.getTeam(argument.get(0).toString());
-        return Sets.newHashSet(t);
+        return Sets.newHashSet(((Team) argument.get(0)));
     }
 
     @Override
     protected String elementToString(Team team) {
+        if (team == null) {
+            return "null";
+        }
+
         return team.getName();
     }
 }

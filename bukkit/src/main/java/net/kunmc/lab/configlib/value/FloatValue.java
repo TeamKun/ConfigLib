@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.NumericValue;
 import org.bukkit.command.CommandSender;
 
@@ -31,7 +31,7 @@ public class FloatValue extends NumericValue<Float, FloatValue> {
     }
 
     @Override
-    protected void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(ArgumentBuilder builder) {
         builder.floatArgument("float", min, max);
     }
 

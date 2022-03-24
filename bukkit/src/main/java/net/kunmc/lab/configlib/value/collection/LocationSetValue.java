@@ -1,9 +1,7 @@
 package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
-import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.argument.LocationArgument;
-import net.kunmc.lab.configlib.util.CommandUtil;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -27,8 +25,8 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public void appendArgumentForAdd(UsageBuilder builder) {
-        CommandUtil.addArgument(builder, new LocationArgument("location"));
+    public void appendArgumentForAdd(ArgumentBuilder builder) {
+        builder.locationArgument("location");
     }
 
     @Override
@@ -65,30 +63,30 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public void appendArgumentForRemove(UsageBuilder builder) {
-        builder.doubleArgument("x", -Double.MAX_VALUE, Double.MAX_VALUE, suggestionBuilder -> {
-                    suggestionBuilder.suggestAll(value.stream()
+    public void appendArgumentForRemove(ArgumentBuilder builder) {
+        builder.doubleArgument("x", sb -> {
+                    value.stream()
                             .map(Location::getX)
                             .map(Object::toString)
-                            .collect(Collectors.toList()));
-                }, null)
-                .doubleArgument("y", -Double.MAX_VALUE, Double.MAX_VALUE, suggestionBuilder -> {
-                    double x = ((double) suggestionBuilder.getTypedArgs().get(0));
-                    suggestionBuilder.suggestAll(value.stream()
+                            .forEach(sb::suggest);
+                })
+                .doubleArgument("y", sb -> {
+                    double x = ((double) sb.getParsedArgs().get(0));
+                    value.stream()
                             .filter(l -> l.getX() == x)
                             .map(Location::getY)
                             .map(Object::toString)
-                            .collect(Collectors.toList()));
-                }, null)
-                .doubleArgument("z", -Double.MAX_VALUE, Double.MAX_VALUE, suggestionBuilder -> {
-                    double x = ((double) suggestionBuilder.getTypedArgs().get(0));
-                    double y = ((double) suggestionBuilder.getTypedArgs().get(1));
-                    suggestionBuilder.suggestAll(value.stream()
+                            .forEach(sb::suggest);
+                })
+                .doubleArgument("z", sb -> {
+                    double x = ((double) sb.getParsedArgs().get(0));
+                    double y = ((double) sb.getParsedArgs().get(1));
+                    value.stream()
                             .filter(l -> l.getX() == x && l.getY() == y)
                             .map(Location::getZ)
                             .map(Object::toString)
-                            .collect(Collectors.toList()));
-                }, null);
+                            .forEach(sb::suggest);
+                });
     }
 
     @Override

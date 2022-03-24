@@ -1,14 +1,14 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
 public class UUID2FloatMapValue extends UUID2ObjectMapValue<Float, UUID2FloatMapValue> {
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.floatArgument("float", -Float.MAX_VALUE, Float.MAX_VALUE);
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
+        builder.floatArgument("float");
     }
 
     @Override

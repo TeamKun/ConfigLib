@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.CommandContext;
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return ((U) this);
     }
 
-    protected abstract void appendArgumentForAdd(UsageBuilder builder);
+    protected abstract void appendArgumentForAdd(ArgumentBuilder builder);
 
     protected abstract boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender);
 
@@ -86,7 +86,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return ((U) this);
     }
 
-    protected abstract void appendArgumentForRemove(UsageBuilder builder);
+    protected abstract void appendArgumentForRemove(ArgumentBuilder builder);
 
     protected abstract boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender);
 
@@ -173,7 +173,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     @Override
     protected final void sendListMessage(CommandContext ctx, String entryName) {
-        ctx.success(entryName + ": [" + value.stream()
+        ctx.sendSuccess(entryName + ": [" + value.stream()
                 .map(this::elementToString)
                 .collect(Collectors.joining(", ")) + "]");
     }

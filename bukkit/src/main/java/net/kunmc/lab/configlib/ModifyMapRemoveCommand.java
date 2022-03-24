@@ -1,31 +1,31 @@
 package net.kunmc.lab.configlib;
 
-import net.kunmc.lab.configlib.command.AccessibleCommand;
+import net.kunmc.lab.commandlib.Command;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
-class ModifyMapRemoveCommand extends AccessibleCommand {
+class ModifyMapRemoveCommand extends Command {
     public ModifyMapRemoveCommand(Field field, MapValue value, BaseConfig config) {
         super("remove");
 
         String entryName = field.getName();
 
-        usage(builder -> {
+        argument(builder -> {
             value.appendKeyArgumentForRemove(builder);
 
-            builder.executes(ctx -> {
-                List<Object> argument = ctx.getTypedArgs();
+            builder.execute(ctx -> {
+                List<Object> argument = ctx.getParsedArgs();
                 CommandSender sender = ctx.getSender();
                 if (!value.isCorrectKeyArgumentForRemove(argument, sender)) {
-                    ctx.fail(value.incorrectKeyArgumentMessageForRemove(argument));
+                    ctx.sendFailure(value.incorrectKeyArgumentMessageForRemove(argument));
                     return;
                 }
 
                 Object k = value.argumentToKeyForRemove(argument, sender);
                 if (!value.validateKeyForRemove(k)) {
-                    ctx.fail(value.invalidKeyMessageForRemove(entryName, k));
+                    ctx.sendFailure(value.invalidKeyMessageForRemove(entryName, k));
                     return;
                 }
 
@@ -34,7 +34,7 @@ class ModifyMapRemoveCommand extends AccessibleCommand {
                 }
 
                 Object v = value.remove(k);
-                ctx.success(value.succeedMessageForRemove(entryName, k, v));
+                ctx.sendSuccess(value.succeedMessageForRemove(entryName, k, v));
 
                 config.saveConfigIfPresent();
             });

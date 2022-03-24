@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.configlib.SingleValue;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -37,7 +37,7 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
     }
 
     @Override
-    protected void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(ArgumentBuilder builder) {
         builder.stringArgument("team", StringArgument.Type.WORD, suggestionBuilder -> {
             scoreboard.getTeams().stream()
                     .map(Team::getName)

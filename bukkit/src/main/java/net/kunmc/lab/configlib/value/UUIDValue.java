@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.SingleValue;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -50,8 +50,8 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected void appendArgument(UsageBuilder builder) {
-        builder.entityArgument("target", true, false, sb -> {
+    protected void appendArgument(ArgumentBuilder builder) {
+        builder.entityArgument("target", false, true, sb -> {
             List<String> list = Bukkit.getOnlinePlayers().stream()
                     .filter(p -> !p.getUniqueId().equals(value))
                     .map(Player::getName)

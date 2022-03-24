@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.Command;
-import dev.kotx.flylib.command.CommandContext;
+import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.commandlib.CommandContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ class ConfigReloadCommand extends Command {
         this.configList.addAll(configSet);
 
         for (BaseConfig config : configSet) {
-            children(new Command(config.entryName()) {
+            addChildren(new Command(config.entryName()) {
                 @Override
                 public void execute(@NotNull CommandContext ctx) {
                     exec(ctx, config);
@@ -42,9 +42,9 @@ class ConfigReloadCommand extends Command {
     private void exec(CommandContext ctx, BaseConfig config) {
         String fileName = config.getConfigFile().getName();
         if (config.loadConfig()) {
-            ctx.success(fileName + "を再読み込みしました.");
+            ctx.sendSuccess(fileName + "を再読み込みしました.");
         } else {
-            ctx.fail(fileName + "の読み込みに失敗しました.ファイルが存在しません.");
+            ctx.sendFailure(fileName + "の読み込みに失敗しました.ファイルが存在しません.");
         }
     }
 }

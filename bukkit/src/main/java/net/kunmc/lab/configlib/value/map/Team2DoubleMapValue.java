@@ -1,14 +1,14 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
 public class Team2DoubleMapValue extends Team2ObjectMapValue<Double, Team2DoubleMapValue> {
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.doubleArgument("double", -Double.MAX_VALUE, Double.MAX_VALUE);
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
+        builder.doubleArgument("double");
     }
 
     @Override

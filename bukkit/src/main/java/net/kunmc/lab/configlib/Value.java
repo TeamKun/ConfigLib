@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.CommandContext;
+import net.kunmc.lab.commandlib.CommandContext;
 
 public abstract class Value<E, T extends Value<E, T>> {
     protected E value;

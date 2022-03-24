@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.SuggestionAction;
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.SuggestionAction;
+import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.configlib.SingleValue;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -16,8 +16,8 @@ public class StringValue extends SingleValue<String, StringValue> {
     protected transient String name = "string";
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
     protected final transient List<String> allowableStringList = new ArrayList<>();
-    protected transient SuggestionAction suggestionAction = builder -> {
-        builder.suggestAll(allowableStringList);
+    protected transient SuggestionAction suggestionAction = sb -> {
+        allowableStringList.forEach(sb::suggest);
     };
 
     public StringValue(String value) {
@@ -51,7 +51,7 @@ public class StringValue extends SingleValue<String, StringValue> {
     }
 
     @Override
-    protected void appendArgument(UsageBuilder builder) {
+    protected void appendArgument(ArgumentBuilder builder) {
         builder.stringArgument(name, type, suggestionAction);
     }
 

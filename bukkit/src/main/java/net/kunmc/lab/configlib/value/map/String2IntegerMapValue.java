@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import org.bukkit.command.CommandSender;
 
 import java.util.HashMap;
@@ -17,7 +17,7 @@ public class String2IntegerMapValue extends String2ObjectMapValue<Integer, Strin
     }
 
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
         builder.integerArgument("integer");
     }
 

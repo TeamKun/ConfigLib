@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.Command;
-import dev.kotx.flylib.command.CommandContext;
+import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.commandlib.CommandContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -23,7 +23,7 @@ class ConfigListCommand extends Command {
         }
 
         for (BaseConfig config : configSet) {
-            children(new Command(config.entryName()) {
+            addChildren(new Command(config.entryName()) {
                 @Override
                 public void execute(@NotNull CommandContext ctx) {
                     exec(ctx, config);
@@ -59,7 +59,7 @@ class ConfigListCommand extends Command {
                     v.sendListMessage(ctx, field.getName());
                 }
             } else {
-                ctx.success(field.getName() + ": " + o);
+                ctx.sendSuccess(field.getName() + ": " + o);
             }
         }
     }

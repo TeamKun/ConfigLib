@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.Command;
+import net.kunmc.lab.commandlib.Command;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
@@ -13,20 +13,20 @@ class ModifyRemoveCommand extends Command {
 
         String entryName = field.getName();
 
-        usage(builder -> {
+        argument(builder -> {
             value.appendArgumentForRemove(builder);
 
-            builder.executes(ctx -> {
-                List<Object> argument = ctx.getTypedArgs();
+            builder.execute(ctx -> {
+                List<Object> argument = ctx.getParsedArgs();
                 CommandSender sender = ctx.getSender();
                 if (!value.isCorrectArgumentForRemove(argument, sender)) {
-                    ctx.fail(value.incorrectArgumentMessageForRemove(argument));
+                    ctx.sendFailure(value.incorrectArgumentMessageForRemove(argument));
                     return;
                 }
 
                 Collection newValue = value.argumentToValueForRemove(argument, sender);
                 if (!value.validateForRemove(newValue)) {
-                    ctx.fail(value.invalidValueMessageForRemove(entryName, newValue));
+                    ctx.sendFailure(value.invalidValueMessageForRemove(entryName, newValue));
                     return;
                 }
 
@@ -35,7 +35,7 @@ class ModifyRemoveCommand extends Command {
                 }
 
                 ((Collection) value.value()).removeAll(newValue);
-                ctx.success(value.succeedMessageForRemove(entryName, newValue));
+                ctx.sendSuccess(value.succeedMessageForRemove(entryName, newValue));
 
                 config.saveConfigIfPresent();
             });

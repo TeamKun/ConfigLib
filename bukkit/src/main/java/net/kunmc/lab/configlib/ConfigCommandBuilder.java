@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.Command;
+import net.kunmc.lab.commandlib.Command;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,7 +56,7 @@ public class ConfigCommandBuilder {
     public ConfigCommand build() {
         ConfigCommand configCommand = new ConfigCommand(name);
         for (Command cmd : createSubCommands()) {
-            configCommand.appendChild(cmd);
+            configCommand.addChildren(cmd);
         }
 
         return configCommand;

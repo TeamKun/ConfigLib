@@ -1,13 +1,13 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
 public class Team2IntegerMapValue extends Team2ObjectMapValue<Integer, Team2IntegerMapValue> {
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
         builder.integerArgument("integer");
     }
 

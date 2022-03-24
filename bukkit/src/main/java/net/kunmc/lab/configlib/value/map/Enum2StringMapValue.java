@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
 import org.bukkit.command.CommandSender;
 
 import java.util.HashMap;
@@ -18,7 +18,7 @@ public class Enum2StringMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<
     }
 
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
         builder.stringArgument("string", StringArgument.Type.PHRASE);
     }
 

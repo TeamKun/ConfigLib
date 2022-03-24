@@ -1,10 +1,8 @@
 package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
-import net.kunmc.lab.configlib.argument.TileArgument;
-import net.kunmc.lab.configlib.util.CommandUtil;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
@@ -31,8 +29,8 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
     }
 
     @Override
-    protected void appendArgumentForAdd(UsageBuilder builder) {
-        CommandUtil.addArgument(builder, new TileArgument("name"));
+    protected void appendArgumentForAdd(ArgumentBuilder builder) {
+        builder.blockDataArgument("name");
     }
 
     @Override
@@ -51,7 +49,7 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
     }
 
     @Override
-    protected void appendArgumentForRemove(UsageBuilder builder) {
+    protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.PHRASE, sb -> {
             value().stream()
                     .map(BlockData::getAsString)

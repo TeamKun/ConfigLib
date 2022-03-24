@@ -18,14 +18,15 @@ repositories {
     maven {
         url "https://libraries.minecraft.net"
     }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
     implementation group: "com.google.guava", name: "guava", version: "27.0.1-jre"
-    compileOnly "dev.kotx:flylib-reloaded:0.5.0"
     implementation "com.google.code.gson:gson:2.8.9"
     implementation group: "org.apache.poi", name: "poi", version: "5.1.0"
+    compileOnly "com.github.TeamKun.CommandLib:bukkit:0.2.2"
     compileOnly fileTree(dir: "./libs/", include: "patched*.jar")
     compileOnly "com.mojang:brigadier:1.0.18"
 }

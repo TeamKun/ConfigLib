@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import dev.kotx.flylib.command.arguments.StringArgument;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.argument.StringArgument;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Team;
 
@@ -28,7 +28,7 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
     }
 
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
             Arrays.stream(constants())
                     .map(Enum::name)

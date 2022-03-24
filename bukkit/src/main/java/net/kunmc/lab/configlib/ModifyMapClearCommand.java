@@ -1,11 +1,11 @@
 package net.kunmc.lab.configlib;
 
-import dev.kotx.flylib.command.CommandContext;
-import net.kunmc.lab.configlib.command.AccessibleCommand;
+import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.commandlib.CommandContext;
 
 import java.lang.reflect.Field;
 
-class ModifyMapClearCommand extends AccessibleCommand {
+class ModifyMapClearCommand extends Command {
     private final Field field;
     private final MapValue value;
     private final BaseConfig config;
@@ -25,7 +25,7 @@ class ModifyMapClearCommand extends AccessibleCommand {
         }
 
         value.clear();
-        ctx.success(value.clearMessage(field.getName()));
+        ctx.sendSuccess(value.clearMessage(field.getName()));
 
         config.saveConfigIfPresent();
     }

@@ -18,6 +18,16 @@ subprojects {
     apply plugin: "idea"
     apply plugin: "com.github.johnrengelman.shadow"
 
+    def targetJavaVersion = 8
+    java {
+        def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+        if (JavaVersion.current() < javaVersion) {
+            toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+        }
+    }
+
     idea {
         module {
             downloadJavadoc = true
@@ -45,7 +55,7 @@ subprojects {
         options.charSet = "UTF-8"
         options.encoding = "UTF-8"
     }
-   
+
     shadowJar {
         archiveFileName = "${project.name}-${project.version}.jar"
     }

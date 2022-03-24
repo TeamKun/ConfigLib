@@ -1,22 +1,15 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
-import net.kunmc.lab.configlib.argument.LocationArgument;
-import net.kunmc.lab.configlib.util.CommandUtil;
-import org.bukkit.Bukkit;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.List;
 
 public class Team2LocationMapValue extends Team2ObjectMapValue<Location, Team2LocationMapValue> {
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
-        CommandUtil.addArgument(builder, new LocationArgument("location"));
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
+        builder.locationArgument("location");
     }
 
     @Override
@@ -31,25 +24,7 @@ public class Team2LocationMapValue extends Team2ObjectMapValue<Location, Team2Lo
 
     @Override
     protected Location argumentToValueForPut(List<Object> argument, CommandSender sender) {
-        Location l = ((Location) argument.get(1));
-
-        if (sender instanceof ConsoleCommandSender) {
-            l.setWorld(Bukkit.getWorlds().get(0));
-        }
-
-        if (sender instanceof Player) {
-            Player p = ((Player) sender);
-            l.setWorld(p.getWorld());
-            l.setPitch(p.getLocation().getPitch());
-            l.setYaw(p.getLocation().getYaw());
-        }
-
-        if (sender instanceof BlockCommandSender) {
-            World w = ((BlockCommandSender) sender).getBlock().getWorld();
-            l.setWorld(w);
-        }
-
-        return l;
+        return ((Location) argument.get(1));
     }
 
     @Override

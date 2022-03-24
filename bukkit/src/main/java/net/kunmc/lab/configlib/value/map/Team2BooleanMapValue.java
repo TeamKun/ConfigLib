@@ -1,14 +1,14 @@
 package net.kunmc.lab.configlib.value.map;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
 public class Team2BooleanMapValue extends Team2ObjectMapValue<Boolean, Team2BooleanMapValue> {
     @Override
-    protected void appendValueArgumentForPut(UsageBuilder builder) {
-        builder.booleanArgument("bool", null, null);
+    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
+        builder.boolArgument("bool");
     }
 
     @Override

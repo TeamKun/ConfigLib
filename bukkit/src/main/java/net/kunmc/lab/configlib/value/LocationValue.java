@@ -1,9 +1,7 @@
 package net.kunmc.lab.configlib.value;
 
-import dev.kotx.flylib.command.UsageBuilder;
+import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.argument.LocationArgument;
-import net.kunmc.lab.configlib.util.CommandUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -42,8 +40,8 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
     }
 
     @Override
-    protected void appendArgument(UsageBuilder builder) {
-        CommandUtil.addArgument(builder, new LocationArgument("location"));
+    protected void appendArgument(ArgumentBuilder builder) {
+        builder.locationArgument("location");
     }
 
     @Override
