@@ -1,127 +1,74 @@
 # ConfigLib
 
+[![](https://jitpack.io/v/TeamKun/ConfigLib.svg)](https://jitpack.io/#TeamKun/ConfigLib)
+
 ## Getting Started
 
-### Using ConfigLib
+### Installation(Gradle Settings)
 
 <details>
-  <summary>Gradle</summary>
+  <summary>Bukkit</summary>
 
-  ```groovy
-  plugins {
+```groovy
+plugins {
     id "com.github.johnrengelman.shadow" version "6.1.0"
 }
-  ```
 
-  ```groovy
-  allprojects {
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
-}
-  ```
-
-  ```groovy
-  dependencies {
-    implementation 'com.github.TeamKun:ConfigLib:[version]'
+repositories {
+    maven { url 'https://jitpack.io' }
 }
 
+dependencies {
+    implementation "com.github.TeamKun.CommandLib:bukkit:latest.release"
+    implementation 'com.github.TeamKun.ConfigLib:bukkit:latest.release'
+}
+
+shadowJar {
+    archiveFileName = "${rootProject.name}-${project.version}.jar"
+    relocate "net.kunmc.lab.commandlib", "${project.group}.${project.name.toLowerCase()}.commandlib"
+    relocate "net.kunmc.lab.configlib", "${project.group}.${project.name.toLowerCase()}.configlib"
+}
+tasks.build.dependsOn tasks.shadowJar
   ```
 
 </details>
 
 <details>
-  <summary>Maven</summary>
+  <summary>Forge</summary>
 
-  ```xml
+```groovy
+plugins {
+    id "com.github.johnrengelman.shadow" version "6.1.0"
+}
 
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-  ```
+repositories {
+    maven { url 'https://jitpack.io' }
+}
 
-  ```xml
+dependencies {
+    implementation "com.github.TeamKun.CommandLib:forge:latest.release"
+    implementation "com.github.TeamKun.ConfigLib:forge:latest.release"
+}
 
-<dependency>
-    <groupId>com.github.TeamKun</groupId>
-    <artifactId>ConfigLib</artifactId>
-    <version>[version]</version>
-</dependency>
-  ```
+shadowJar {
+    archiveFileName = "${rootProject.name}-${project.version}.jar"
+    dependencies {
+        include(dependency("com.github.TeamKun.CommandLib:forge:.*"))
+        include(dependency("com.github.TeamKun.ConfigLib:forge:.*"))
+    }
+    relocate "net.kunmc.lab.commandlib", "${project.group}.${project.name.toLowerCase()}.commandlib"
+    relocate "net.kunmc.lab.configlib", "${project.group}.${project.name.toLowerCase()}.configlib"
+    finalizedBy("reobfShadowJar")
+}
+
+reobf {
+    shadowJar {
+    }
+}
+```
 
 </details>
 
-ConfigLib depends on [FlyLib Reloaded](https://github.com/TeamKun/flylib-reloaded).  
-You must add it in your project.
-
-First, implement a Config Class which extends BaseConfig Class.
-
-```Java
-import net.kunmc.lab.configlib.BaseConfig;
-import net.kunmc.lab.configlib.value.*;
-import org.bukkit.plugin.Plugin;
-
-public class Config extends BaseConfig {
-    // You must use wrapper class
-    public IntegerValue intValue = new IntegerValue(10);
-    // If you want Value not to be serialized, mark it as transient
-    public transient IntegerValue intValue2 = new IntegerValue(10);
-    public MaterialValue materialValue = new MaterialValue(Material.DIRT);
-
-    public Config(Plugin plugin) {
-        super(plugin);
-    }
-}
-```
-
-Then, build a ConfigCommand in JavaPlugin#onEnable and register it on your command.
-
-```Java
-import net.kunmc.lab.configlib.ConfigCommand;
-import net.kunmc.lab.configlib.ConfigCommandBuilder;
-
-public class SamplePlugin extends JavaPlugin {
-    @Override
-    public void onEnable() {
-        Config config = new Config(this);
-        // If you want save config as file, should do it
-        config.saveConfigIfAbsent();
-        // If you want load config from file, should do it
-        config.loadConfig();
-
-        // build a ConfigCommand
-        ConfigCommand configCommand = new ConfigCommandBuilder(config).build();
-
-        Flylib.create(this, builder -> {
-            builder.command(new TestCommand(configCommand));
-        });
-    }
-}
-
-public class TestCommand extends Command {
-    public TestCommand(ConfigCommand configCommand) {
-        super("test");
-        // register ConfigCommand
-        children(configCommand);
-    }
-}
-```
-
-With above, you will be able to use commands like below.
-
-```
-// show list of current config values
-/test config list
-
-// show current value of intValue's value
-/test config get intValue
-
-// update intValue's value to 5
-/test config modify intValue set 5
-
-// reload config file
-/test config reload
-```
+~~ConfigLib depends on [FlyLib Reloaded](https://github.com/TeamKun/flylib-reloaded).~~
+~~You must add it in your project.~~  
+After 0.9.0, ConfigLib depends on [CommandLib](https://github.com/TeamKun/CommandLib)
