@@ -22,12 +22,12 @@ public class BlockPosValue extends SingleValue<BlockPos, BlockPosValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSource sender) {
         return argument.get(0) + "は不正な引数です.";
     }
 
@@ -37,12 +37,12 @@ public class BlockPosValue extends SingleValue<BlockPos, BlockPosValue> {
     }
 
     @Override
-    protected boolean validateOnSet(BlockPos newValue) {
+    protected boolean validateOnSet(String entryName, BlockPos newValue, CommandSource sender) {
         return !newValue.equals(value);
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, BlockPos newValue) {
+    protected String invalidValueMessage(String entryName, BlockPos newValue, CommandSource sender) {
         return valueToString(newValue) + "はすでに設定されている値です.";
     }
 

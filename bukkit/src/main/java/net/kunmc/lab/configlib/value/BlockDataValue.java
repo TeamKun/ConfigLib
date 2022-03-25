@@ -25,12 +25,12 @@ public class BlockDataValue extends SingleValue<BlockData, BlockDataValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(String entryName, CommandSender sender, List<Object> argument) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSender sender) {
         return "";
     }
 
@@ -40,12 +40,12 @@ public class BlockDataValue extends SingleValue<BlockData, BlockDataValue> {
     }
 
     @Override
-    protected boolean validateOnSet(BlockData newValue) {
+    protected boolean validateOnSet(String entryName, BlockData newValue, CommandSender sender) {
         return true;
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, BlockData newValue) {
+    protected String invalidValueMessage(String entryName, BlockData newValue, CommandSender sender) {
         return "";
     }
 

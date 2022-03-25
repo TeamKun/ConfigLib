@@ -22,12 +22,12 @@ public class TeamValue extends SingleValue<ScorePlayerTeam, TeamValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSource sender) {
         return argument.get(0) != null;
     }
 
     @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSource sender) {
         return "指定されたチームは存在しません.";
     }
 
@@ -37,7 +37,7 @@ public class TeamValue extends SingleValue<ScorePlayerTeam, TeamValue> {
     }
 
     @Override
-    protected boolean validateOnSet(ScorePlayerTeam newValue) {
+    protected boolean validateOnSet(String entryName, ScorePlayerTeam newValue, CommandSource sender) {
         if (value == null) {
             return true;
         }
@@ -46,7 +46,7 @@ public class TeamValue extends SingleValue<ScorePlayerTeam, TeamValue> {
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, ScorePlayerTeam newValue) {
+    protected String invalidValueMessage(String entryName, ScorePlayerTeam newValue, CommandSource sender) {
         return newValue.getName() + "はすでに設定されているチームです.";
     }
 

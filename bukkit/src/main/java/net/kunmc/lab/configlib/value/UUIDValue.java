@@ -64,7 +64,7 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(String entryName, CommandSender sender, List<Object> argument) {
         List<Player> list = ((List<Player>) argument.get(0));
 
         if (list.size() != 1) {
@@ -80,7 +80,7 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSender sender) {
         List<Player> list = ((List<Player>) argument.get(0));
 
         if (list.isEmpty()) {
@@ -100,12 +100,12 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected boolean validateOnSet(UUID newValue) {
+    protected boolean validateOnSet(String entryName, UUID newValue, CommandSender sender) {
         return true;
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, UUID newValue) {
+    protected String invalidValueMessage(String entryName, UUID newValue, CommandSender sender) {
         return newValue + "は不正な値です.";
     }
 

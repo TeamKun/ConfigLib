@@ -36,13 +36,13 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T, EnumValue<T>> {
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants)
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSource sender) {
         return argument.get(0) + "は不明な値です.";
     }
 
@@ -55,12 +55,12 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T, EnumValue<T>> {
     }
 
     @Override
-    protected boolean validateOnSet(T newValue) {
+    protected boolean validateOnSet(String entryName, T newValue, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, T newValue) {
+    protected String invalidValueMessage(String entryName, T newValue, CommandSource sender) {
         return newValue.name() + "は不正な値です.";
     }
 

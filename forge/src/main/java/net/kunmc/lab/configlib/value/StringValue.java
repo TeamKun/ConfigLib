@@ -56,7 +56,7 @@ public class StringValue extends SingleValue<String, StringValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSource sender) {
         if (allowableStringList.isEmpty()) {
             return true;
         }
@@ -65,7 +65,7 @@ public class StringValue extends SingleValue<String, StringValue> {
     }
 
     @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSource sender) {
         return argument.get(0) + "は不正な引数です.";
     }
 
@@ -75,12 +75,12 @@ public class StringValue extends SingleValue<String, StringValue> {
     }
 
     @Override
-    protected boolean validateOnSet(String newValue) {
+    protected boolean validateOnSet(String entryName, String newValue, CommandSource sender) {
         return newValue.length() >= min && newValue.length() <= max;
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, String argument) {
+    protected String invalidValueMessage(String entryName, String argument, CommandSource sender) {
         return entryName + "は" + min + "以上" + max + "以下の文字数で入力してください";
     }
 

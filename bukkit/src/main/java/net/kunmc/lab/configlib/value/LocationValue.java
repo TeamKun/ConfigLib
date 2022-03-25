@@ -45,12 +45,12 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(String entryName, CommandSender sender, List<Object> argument) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(0) + "は不正な引数です.";
     }
 
@@ -78,12 +78,12 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
     }
 
     @Override
-    protected boolean validateOnSet(Location newValue) {
+    protected boolean validateOnSet(String entryName, Location newValue, CommandSender sender) {
         return !newValue.equals(value);
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, Location newValue) {
+    protected String invalidValueMessage(String entryName, Location newValue, CommandSender sender) {
         return valueToString(newValue) + "はすでに設定されている値です.";
     }
 

@@ -47,14 +47,14 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(String entryName, CommandSender sender, List<Object> argument) {
         return scoreboard.getTeams().stream()
                 .map(Team::getName)
                 .anyMatch(s -> s.equals(argument.get(0)));
     }
 
     @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(0) + "は存在しないチームです.";
     }
 
@@ -64,7 +64,7 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
     }
 
     @Override
-    protected boolean validateOnSet(Team newValue) {
+    protected boolean validateOnSet(String entryName, Team newValue, CommandSender sender) {
         if (value == null) {
             return true;
         }
@@ -73,7 +73,7 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, Team newValue) {
+    protected String invalidValueMessage(String entryName, Team newValue, CommandSender sender) {
         return newValue.getName() + "はすでに設定されているチームです.";
     }
 

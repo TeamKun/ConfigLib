@@ -1,5 +1,7 @@
 package net.kunmc.lab.configlib;
 
+import org.bukkit.command.CommandSender;
+
 public abstract class NumericValue<E extends Number & Comparable<E>, T extends NumericValue<E, T>> extends SingleValue<E, T> {
     protected final E min;
     protected final E max;
@@ -18,12 +20,12 @@ public abstract class NumericValue<E extends Number & Comparable<E>, T extends N
     protected abstract int compareTo(Number n);
 
     @Override
-    protected boolean validateOnSet(E newValue) {
+    protected boolean validateOnSet(String entryName, E newValue, CommandSender sender) {
         return newValue.compareTo(min) != -1 && newValue.compareTo(max) != 1;
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, E argument) {
+    protected String invalidValueMessage(String entryName, E argument, CommandSender sender) {
         return min + "以上" + max + "以下の値を入力してください.";
     }
 }

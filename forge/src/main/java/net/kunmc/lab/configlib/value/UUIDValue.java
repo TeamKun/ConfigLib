@@ -46,7 +46,7 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSource sender) {
         return !((List) argument.get(0)).isEmpty();
     }
 
@@ -56,17 +56,17 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSource sender) {
         return "指定されたプレイヤーは存在しないかオフラインです.";
     }
 
     @Override
-    protected boolean validateOnSet(UUID newValue) {
+    protected boolean validateOnSet(String entryName, UUID newValue, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, UUID newValue) {
+    protected String invalidValueMessage(String entryName, UUID newValue, CommandSource sender) {
         return newValue + "は不正な値です.";
     }
 

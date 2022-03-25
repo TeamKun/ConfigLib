@@ -29,15 +29,15 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
 
     protected abstract void appendArgument(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgument(List<Object> argument, CommandSender sender);
+    protected abstract boolean isCorrectArgument(String entryName, CommandSender sender, List<Object> argument);
 
-    protected abstract String incorrectArgumentMessage(List<Object> argument);
+    protected abstract String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSender sender);
 
     protected abstract E argumentToValue(List<Object> argument, CommandSender sender);
 
-    protected abstract boolean validateOnSet(E newValue);
+    protected abstract boolean validateOnSet(String entryName, E newValue, CommandSender sender);
 
-    protected abstract String invalidValueMessage(String entryName, E newValue);
+    protected abstract String invalidValueMessage(String entryName, E newValue, CommandSender sender);
 
     public T onModify(Consumer<E> listener) {
         return onModify((v, ctx) -> {

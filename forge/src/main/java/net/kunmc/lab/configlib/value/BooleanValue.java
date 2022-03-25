@@ -17,12 +17,12 @@ public class BooleanValue extends SingleValue<Boolean, BooleanValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessage(List<Object> argument) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSource sender) {
         return argument.get(0) + "は不正な引数です.";
     }
 
@@ -32,12 +32,12 @@ public class BooleanValue extends SingleValue<Boolean, BooleanValue> {
     }
 
     @Override
-    protected boolean validateOnSet(Boolean newValue) {
+    protected boolean validateOnSet(String entryName, Boolean newValue, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, Boolean newValue) {
+    protected String invalidValueMessage(String entryName, Boolean newValue, CommandSource sender) {
         return newValue + "は不正な値です.";
     }
 
