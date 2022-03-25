@@ -5,19 +5,34 @@ import net.kunmc.lab.configlib.SingleValue;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.text.StringTextComponent;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 
 import static net.minecraft.util.text.TextFormatting.RED;
 
-public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends SingleValue<Pair<L, R>, T> {
+public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends SingleValue<MutablePair<L, R>, T> {
     public PairValue(L left, R right) {
         this(MutablePair.of(left, right));
     }
 
-    private PairValue(Pair<L, R> value) {
+    private PairValue(MutablePair<L, R> value) {
         super(value);
+    }
+
+    public L getLeft() {
+        return value.getLeft();
+    }
+
+    public void setLeft(L left) {
+        value.setLeft(left);
+    }
+
+    public R getRight() {
+        return value.getRight();
+    }
+
+    public void setRight(R right) {
+        value.setRight(right);
     }
 
     @Override
@@ -59,7 +74,7 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
     protected abstract String incorrectRightArgumentMessage(String entryName, List<Object> argument, CommandSource sender);
 
     @Override
-    protected Pair<L, R> argumentToValue(List<Object> argument, CommandSource sender) {
+    protected MutablePair<L, R> argumentToValue(List<Object> argument, CommandSource sender) {
         return MutablePair.of(argumentToLeftValue(argument, sender), argumentToRightValue(argument, sender));
     }
 
@@ -68,7 +83,7 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
     protected abstract R argumentToRightValue(List<Object> argument, CommandSource sender);
 
     @Override
-    protected boolean validateOnSet(String entryName, Pair<L, R> newValue, CommandSource sender) {
+    protected boolean validateOnSet(String entryName, MutablePair<L, R> newValue, CommandSource sender) {
         boolean left = validateLeft(entryName, newValue.getLeft(), sender);
         if (!left) {
             sender.sendFeedback(new StringTextComponent(RED + invalidLeftValueMessage(entryName, newValue.getLeft(), sender)), false);
@@ -91,7 +106,7 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, Pair<L, R> newValue, CommandSource sender) {
+    protected String invalidValueMessage(String entryName, MutablePair<L, R> newValue, CommandSource sender) {
         return "";
     }
 
@@ -104,7 +119,7 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
     }
 
     @Override
-    protected String valueToString(Pair<L, R> pair) {
+    protected String valueToString(MutablePair<L, R> pair) {
         return String.format("(%s, %s)", pair.getLeft(), pair.getRight());
     }
 
