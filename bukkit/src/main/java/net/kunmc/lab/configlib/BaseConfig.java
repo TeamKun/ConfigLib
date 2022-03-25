@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public abstract class BaseConfig {
-    private transient Plugin plugin;
+    private final transient Plugin plugin;
     private transient String entryName = "";
     protected transient boolean enableGet = true;
     protected transient boolean enableList = true;
@@ -44,18 +45,18 @@ public abstract class BaseConfig {
             .registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
             .create();
 
-    public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Class<T> clazz, @NotNull Plugin plugin) {
+    public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Constructor<T> constructor, Object... arguments) {
         String filename = configJSON.getName();
         String json = readJson(configJSON);
+        Class<T> clazz = constructor.getDeclaringClass();
 
         T config = null;
         try {
-            config = clazz.getConstructor(Plugin.class).newInstance(plugin);
-            config.setPlugin(plugin);
+            config = constructor.newInstance(arguments);
             config.setEntryName(filename.substring(0, filename.lastIndexOf('.')));
 
-            config.replaceFields(clazz, gson.fromJson(json, clazz), config);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            replaceFields(clazz, gson.fromJson(json, clazz), config);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
 
@@ -63,7 +64,19 @@ public abstract class BaseConfig {
     }
 
     public BaseConfig(@NotNull Plugin plugin) {
-        setPlugin(plugin);
+        this(plugin, true);
+    }
+
+    public BaseConfig(@NotNull Plugin plugin, boolean makeConfigFile) {
+        this.plugin = plugin;
+
+        if (!makeConfigFile) {
+            return;
+        }
+
+        plugin.getDataFolder().mkdir();
+        saveConfigIfAbsent();
+        loadConfig();
 
         try {
             WatchService watcher = FileSystems.getDefault().newWatchService();
@@ -100,11 +113,6 @@ public abstract class BaseConfig {
         return enableReload;
     }
 
-    void setPlugin(@NotNull Plugin plugin) {
-        this.plugin = plugin;
-        plugin.getDataFolder().mkdir();
-    }
-
     protected void setEntryName(@NotNull String entryName) {
         this.entryName = entryName;
     }
@@ -120,6 +128,38 @@ public abstract class BaseConfig {
         } else {
             return entryName;
         }
+    }
+
+    protected void saveConfig() {
+        try {
+            getConfigFile().createNewFile();
+            writeJson(getConfigFile(), gson.toJson(this));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void saveConfigIfAbsent() {
+        if (!getConfigFile().exists()) {
+            saveConfig();
+        }
+    }
+
+    protected void saveConfigIfPresent() {
+        if (getConfigFile().exists()) {
+            saveConfig();
+        }
+    }
+
+    protected boolean loadConfig() {
+        if (!getConfigFile().exists()) {
+            return false;
+        }
+
+        BaseConfig config = gson.fromJson(readJson(getConfigFile()), this.getClass());
+        replaceFields(this.getClass(), config, this);
+
+        return true;
     }
 
     private static String readJson(File jsonFile) {
@@ -142,39 +182,7 @@ public abstract class BaseConfig {
         }
     }
 
-    protected void saveConfig() {
-        try {
-            getConfigFile().createNewFile();
-            writeJson(getConfigFile(), gson.toJson(this));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void saveConfigIfAbsent() {
-        if (!getConfigFile().exists()) {
-            saveConfig();
-        }
-    }
-
-    public void saveConfigIfPresent() {
-        if (getConfigFile().exists()) {
-            saveConfig();
-        }
-    }
-
-    public boolean loadConfig() {
-        if (!getConfigFile().exists()) {
-            return false;
-        }
-
-        BaseConfig config = gson.fromJson(readJson(getConfigFile()), this.getClass());
-        replaceFields(this.getClass(), config, this);
-
-        return true;
-    }
-
-    void replaceFields(Class<?> clazz, Object src, Object dst) {
+    private static void replaceFields(Class<?> clazz, Object src, Object dst) {
         for (Field field : ReflectionUtils.getFieldsIncludingSuperclasses(clazz)) {
             if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
                 continue;
@@ -195,7 +203,7 @@ public abstract class BaseConfig {
         }
     }
 
-    private void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
+    private static void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
         try {
             List<Field> fieldList = ReflectionUtils.getFieldsIncludingSuperclasses(field.getType());
             Object srcObj = field.get(src);
