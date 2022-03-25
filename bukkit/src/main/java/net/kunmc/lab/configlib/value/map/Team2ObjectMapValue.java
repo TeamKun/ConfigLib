@@ -30,12 +30,12 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(0) != null;
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForPut(List<Object> argument) {
+    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
         return "指定されたチームは存在しません.";
     }
 
@@ -45,12 +45,12 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     }
 
     @Override
-    protected boolean validateKeyForPut(Team team) {
+    protected boolean validateKeyForPut(String entryName, Team team, CommandSender sender) {
         return true;
     }
 
     @Override
-    protected String invalidKeyMessageForPut(String entryName, Team team) {
+    protected String invalidKeyMessageForPut(String entryName, Team team, CommandSender sender) {
         return "This message can't be shown.";
     }
 
@@ -60,12 +60,12 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(0) != null;
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return "指定されたチームは存在しません.";
     }
 

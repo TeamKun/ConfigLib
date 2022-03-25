@@ -20,12 +20,12 @@ public class UUID2BlockDataMapValue extends UUID2ObjectMapValue<BlockData, UUID2
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(List<Object> argument) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
         return "";
     }
 

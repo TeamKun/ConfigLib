@@ -30,12 +30,12 @@ public class String2BlockDataMapValue extends String2ObjectMapValue<BlockData, S
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(List<Object> argument) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
         return "";
     }
 

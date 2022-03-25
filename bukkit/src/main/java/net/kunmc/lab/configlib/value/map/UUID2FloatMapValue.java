@@ -12,12 +12,12 @@ public class UUID2FloatMapValue extends UUID2ObjectMapValue<Float, UUID2FloatMap
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(List<Object> argument) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
         return "";
     }
 

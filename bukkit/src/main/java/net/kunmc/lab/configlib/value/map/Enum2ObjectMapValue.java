@@ -33,13 +33,13 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForPut(List<Object> argument) {
+    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(0) + "は不明な値です.";
     }
 
@@ -62,13 +62,13 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants())
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(0) + "は不明な値です.";
     }
 

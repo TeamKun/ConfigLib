@@ -18,14 +18,14 @@ class ModifyMapRemoveCommand extends Command {
             builder.execute(ctx -> {
                 List<Object> argument = ctx.getParsedArgs();
                 CommandSender sender = ctx.getSender();
-                if (!value.isCorrectKeyArgumentForRemove(argument, sender)) {
-                    ctx.sendFailure(value.incorrectKeyArgumentMessageForRemove(argument));
+                if (!value.isCorrectKeyArgumentForRemove(entryName, argument, sender)) {
+                    ctx.sendFailure(value.incorrectKeyArgumentMessageForRemove(entryName, argument, sender));
                     return;
                 }
 
                 Object k = value.argumentToKeyForRemove(argument, sender);
-                if (!value.validateKeyForRemove(k)) {
-                    ctx.sendFailure(value.invalidKeyMessageForRemove(entryName, k));
+                if (!value.validateKeyForRemove(entryName, k, sender)) {
+                    ctx.sendFailure(value.invalidKeyMessageForRemove(entryName, k, sender));
                     return;
                 }
 

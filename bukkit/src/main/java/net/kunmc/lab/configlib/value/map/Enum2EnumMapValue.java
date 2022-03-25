@@ -35,13 +35,13 @@ public class Enum2EnumMapValue<K extends Enum<K>, V extends Enum<V>> extends Enu
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants)
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(1).toString()));
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(List<Object> argument) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(1) + "は不明な値です.";
     }
 

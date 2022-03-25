@@ -38,31 +38,31 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     protected abstract void appendValueArgumentForPut(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectKeyArgumentForPut(List<Object> argument, CommandSender sender);
+    protected abstract boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandSender sender);
 
-    protected abstract String incorrectKeyArgumentMessageForPut(List<Object> argument);
+    protected abstract String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender);
 
-    protected abstract boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSender sender);
+    protected abstract boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSender sender);
 
-    protected abstract String incorrectValueArgumentMessageForPut(List<Object> argument);
+    protected abstract String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender);
 
     protected abstract K argumentToKeyForPut(List<Object> argument, CommandSender sender);
 
     protected abstract V argumentToValueForPut(List<Object> argument, CommandSender sender);
 
-    protected boolean validateKeyForPut(K k) {
+    protected boolean validateKeyForPut(String entryName, K k, CommandSender sender) {
         return true;
     }
 
-    protected String invalidKeyMessageForPut(String entryName, K k) {
+    protected String invalidKeyMessageForPut(String entryName, K k, CommandSender sender) {
         return "";
     }
 
-    protected boolean validateValueForPut(V v) {
+    protected boolean validateValueForPut(String entryName, V v, CommandSender sender) {
         return true;
     }
 
-    protected String invalidValueMessageForPut(String entryName, V v) {
+    protected String invalidValueMessageForPut(String entryName, V v, CommandSender sender) {
         return "";
     }
 
@@ -108,17 +108,17 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     protected abstract void appendKeyArgumentForRemove(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSender sender);
+    protected abstract boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandSender sender);
 
-    protected abstract String incorrectKeyArgumentMessageForRemove(List<Object> argument);
+    protected abstract String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender);
 
     protected abstract K argumentToKeyForRemove(List<Object> argument, CommandSender sender);
 
-    protected boolean validateKeyForRemove(K k) {
+    protected boolean validateKeyForRemove(String entryName, K k, CommandSender sender) {
         return value.containsKey(k);
     }
 
-    protected String invalidKeyMessageForRemove(String entryName, K k) {
+    protected String invalidKeyMessageForRemove(String entryName, K k, CommandSender sender) {
         return String.format("%sは%sに追加されていませんでした.", keyToString(k), entryName);
     }
 

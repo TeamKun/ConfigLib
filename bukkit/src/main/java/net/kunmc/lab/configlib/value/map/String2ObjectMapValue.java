@@ -34,7 +34,7 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForPut(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
         if (allowableKeyStringList.isEmpty()) {
             return true;
         }
@@ -44,7 +44,7 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForPut(List<Object> argument) {
+    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(0) + "は不正な引数です.";
     }
 
@@ -61,12 +61,12 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return keySet().contains(argument.get(0).toString());
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(0) + "は登録されていないキーです.";
     }
 
