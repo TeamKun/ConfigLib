@@ -32,12 +32,12 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument) {
         return !((List) argument.get(0)).isEmpty();
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return "指定されたプレイヤーは存在しないかオフラインです.";
     }
 
@@ -50,7 +50,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected String invalidValueMessageForAdd(String entryName, Set<UUID> element) {
+    protected String invalidValueMessageForAdd(String entryName, Set<UUID> element, CommandSender sender) {
         if (element.size() == 1) {
             UUID uuid = element.toArray(new UUID[0])[0];
             OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
@@ -88,7 +88,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
         String sel = argument.get(0).toString();
         return sel.equals("@a") ||
                 !value.isEmpty() && sel.equals("@r") ||
@@ -99,7 +99,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected Set<UUID> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected Set<UUID> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
         String s = argument.get(0).toString();
 
         if (s.equals("@a")) {
@@ -116,7 +116,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
         String s = argument.get(0).toString();
 
         if (s.startsWith("@")) {
@@ -127,13 +127,13 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected boolean validateForRemove(Set<UUID> element) {
+    protected boolean validateForRemove(String entryName, Set<UUID> element, CommandSender sender) {
         return element.stream()
                 .anyMatch(value::contains);
     }
 
     @Override
-    protected String invalidValueMessageForRemove(String entryName, Set<UUID> element) {
+    protected String invalidValueMessageForRemove(String entryName, Set<UUID> element, CommandSender sender) {
         if (element.size() == 1) {
             return elementToString(element.toArray(new UUID[0])[0]) + "は" + entryName + "に追加されていませんでした.";
         }

@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value.collection;
 
 import net.kunmc.lab.configlib.CollectionValue;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -13,22 +14,22 @@ public abstract class SetValue<E, U extends SetValue<E, U>> extends CollectionVa
     }
 
     @Override
-    protected boolean validateForAdd(Set<E> element) {
+    protected boolean validateForAdd(String entryName, Set<E> element, CommandSender sender) {
         return !value.containsAll(element);
     }
 
     @Override
-    protected String invalidValueMessageForAdd(String entryName, Set<E> element) {
+    protected String invalidValueMessageForAdd(String entryName, Set<E> element, CommandSender sender) {
         return String.format("%sはすでに%sに追加されています.", elementToString(((E[]) element.toArray())[0]), entryName);
     }
 
     @Override
-    protected boolean validateForRemove(Set<E> element) {
+    protected boolean validateForRemove(String entryName, Set<E> element, CommandSender sender) {
         return value.containsAll(element);
     }
 
     @Override
-    protected String invalidValueMessageForRemove(String entryName, Set<E> element) {
+    protected String invalidValueMessageForRemove(String entryName, Set<E> element, CommandSender sender) {
         return String.format("%sは%sに追加されていませんでした.", elementToString(((E[]) element.toArray())[0]), entryName);
     }
 

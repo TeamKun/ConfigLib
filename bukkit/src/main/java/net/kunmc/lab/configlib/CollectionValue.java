@@ -36,15 +36,15 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract void appendArgumentForAdd(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender);
+    protected abstract boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument);
 
-    protected abstract String incorrectArgumentMessageForAdd(List<Object> argument);
+    protected abstract String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender);
 
     protected abstract T argumentToValueForAdd(List<Object> argument, CommandSender sender);
 
-    protected abstract boolean validateForAdd(T value);
+    protected abstract boolean validateForAdd(String entryName, T value, CommandSender sender);
 
-    protected abstract String invalidValueMessageForAdd(String entryName, T value);
+    protected abstract String invalidValueMessageForAdd(String entryName, T value, CommandSender sender);
 
     public U onAdd(Consumer<T> listener) {
         return onAdd((v, ctx) -> {
@@ -88,15 +88,15 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract void appendArgumentForRemove(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender);
+    protected abstract boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender);
 
-    protected abstract String incorrectArgumentMessageForRemove(List<Object> argument);
+    protected abstract String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender);
 
-    protected abstract T argumentToValueForRemove(List<Object> argument, CommandSender sender);
+    protected abstract T argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender);
 
-    protected abstract boolean validateForRemove(T value);
+    protected abstract boolean validateForRemove(String entryName, T value, CommandSender sender);
 
-    protected abstract String invalidValueMessageForRemove(String entryName, T value);
+    protected abstract String invalidValueMessageForRemove(String entryName, T value, CommandSender sender);
 
     public U onRemove(Consumer<T> listener) {
         return onRemove((v, ctx) -> {

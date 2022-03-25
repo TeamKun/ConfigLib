@@ -34,12 +34,12 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return "";
     }
 
@@ -58,7 +58,7 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
         try {
             Bukkit.createBlockData(argument.get(0).toString());
             return true;
@@ -68,12 +68,12 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(0) + "はブロック化出来ない値です.";
     }
 
     @Override
-    protected Set<BlockData> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected Set<BlockData> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return Sets.newHashSet(Bukkit.createBlockData(argument.get(0).toString()));
     }
 

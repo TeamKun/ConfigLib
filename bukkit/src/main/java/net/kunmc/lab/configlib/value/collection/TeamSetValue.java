@@ -42,12 +42,12 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument) {
         return argument.get(0) != null;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return "指定されたチームは存在しません.";
     }
 
@@ -66,17 +66,17 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(0) != null;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return "指定されたチームは存在しません.";
     }
 
     @Override
-    protected Set<Team> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected Set<Team> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return Sets.newHashSet(((Team) argument.get(0)));
     }
 

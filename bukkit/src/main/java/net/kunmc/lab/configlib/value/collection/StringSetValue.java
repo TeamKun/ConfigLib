@@ -45,7 +45,7 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument) {
         if (allowableStringList.isEmpty()) {
             return true;
         }
@@ -54,7 +54,7 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return argument + "は不正な引数です";
     }
 
@@ -71,17 +71,17 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return argument + "は不正な引数です";
     }
 
     @Override
-    protected Set<String> argumentToValueForRemove(List<Object> argument, CommandSender sender) {
+    protected Set<String> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return Collections.singleton(argument.get(0).toString());
     }
 
