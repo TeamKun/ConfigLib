@@ -89,7 +89,12 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
 
     @Override
     protected String valueToString(Location location) {
-        return String.format("world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f",
-                location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
+        String worldName = "null";
+        if (location.getWorld() != null) {
+            worldName = location.getWorld().getName();
+        }
+
+        return String.format("{world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f}",
+                worldName, location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
     }
 }

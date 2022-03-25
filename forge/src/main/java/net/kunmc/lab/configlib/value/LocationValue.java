@@ -62,7 +62,7 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
             worldName = location.getWorld().getDimensionKey().getLocation().toString();
         }
 
-        return String.format("world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f",
+        return String.format("{world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f}",
                 worldName, location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
     }
 }
