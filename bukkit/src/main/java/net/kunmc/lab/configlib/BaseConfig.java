@@ -75,8 +75,10 @@ public abstract class BaseConfig {
         }
 
         plugin.getDataFolder().mkdir();
-        saveConfigIfAbsent();
-        loadConfig();
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            saveConfigIfAbsent();
+            loadConfig();
+        });
 
         try {
             WatchService watcher = FileSystems.getDefault().newWatchService();

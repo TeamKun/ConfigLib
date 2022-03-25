@@ -108,8 +108,12 @@ public abstract class BaseConfig {
         }
 
         getConfigFolder().mkdirs();
-        saveConfigIfAbsent();
-        loadConfig();
+        new Thread() {
+            public void run() {
+                saveConfigIfAbsent();
+                loadConfig();
+            }
+        }.start();
 
         try {
             watchService = FileSystems.getDefault().newWatchService();
