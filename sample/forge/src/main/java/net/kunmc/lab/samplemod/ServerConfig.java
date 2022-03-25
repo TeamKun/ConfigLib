@@ -23,7 +23,11 @@ public class ServerConfig extends BaseConfig {
             p.sendMessage(new StringTextComponent("teamValue modified!"), UUID.randomUUID());
         });
     });
-
+    public final Integer2IntegerPairValue integer2IntegerPairValue = new Integer2IntegerPairValue(1, 100)
+            .leftMin(1).leftMax(99)
+            .rightMin(2).rightMax(100)
+            .setValidator(pair -> pair.getLeft() < pair.getRight(), pair -> "first arg must be lower than second arg.");
+   
     public ServerConfig(@NotNull String modId) {
         super(modId, Type.SERVER);
     }

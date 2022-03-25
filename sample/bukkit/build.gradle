@@ -21,8 +21,9 @@ repositories {
 
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
-    implementation "com.github.TeamKun.CommandLib:bukkit:0.2.3"
-    implementation "com.github.TeamKun.ConfigLib:bukkit:0.10.0"
+   
+    implementation "com.github.TeamKun.CommandLib:bukkit:0.2.4"
+    implementation "com.github.TeamKun.ConfigLib:bukkit:0.11.1"
 }
 
 shadowJar {

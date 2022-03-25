@@ -11,7 +11,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
-
 @Mod(SampleMod.MOD_ID)
 public class SampleMod {
     public static final String MOD_ID = "samplemod";
