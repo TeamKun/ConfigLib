@@ -7,15 +7,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class SamplePlugin extends JavaPlugin {
     public static Config config;
+    public static NotSerializedConfig notSerializedConfig;
 
     @Override
     public void onEnable() {
         config = new Config(this);
-        config.saveConfigIfAbsent();
-        config.loadConfig();
+        notSerializedConfig = new NotSerializedConfig(this);
 
-        ConfigCommand configCommand = new ConfigCommandBuilder(config).build();
-
+        ConfigCommand configCommand = new ConfigCommandBuilder(config)
+                .addConfig(notSerializedConfig)
+                .build();
         CommandLib.register(this, new TestCommand(configCommand));
     }
 }
