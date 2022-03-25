@@ -5,12 +5,17 @@ import net.kunmc.lab.configlib.SingleValue;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.text.StringTextComponent;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static net.minecraft.util.text.TextFormatting.RED;
 
 public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends SingleValue<MutablePair<L, R>, T> {
+    private transient Function<Pair<L, R>, Boolean> validator = pair -> true;
+    private transient Function<Pair<L, R>, String> invalidMessageSupplier = pair -> "引数の値が不正です.";
+
     public PairValue(L left, R right) {
         this(MutablePair.of(left, right));
     }
@@ -33,6 +38,17 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
 
     public void setRight(R right) {
         value.setRight(right);
+    }
+
+    public T setValidator(Function<Pair<L, R>, Boolean> validator) {
+        this.validator = validator;
+        return ((T) this);
+    }
+
+    public T setValidator(Function<Pair<L, R>, Boolean> validator, Function<Pair<L, R>, String> invalidMessageSupplier) {
+        this.validator = validator;
+        this.invalidMessageSupplier = invalidMessageSupplier;
+        return ((T) this);
     }
 
     @Override
@@ -84,6 +100,11 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
 
     @Override
     protected boolean validateOnSet(String entryName, MutablePair<L, R> newValue, CommandSource sender) {
+        if (!validator.apply(newValue)) {
+            sender.sendFeedback(new StringTextComponent(RED + invalidMessageSupplier.apply(newValue)), false);
+            return false;
+        }
+
         boolean left = validateLeft(entryName, newValue.getLeft(), sender);
         if (!left) {
             sender.sendFeedback(new StringTextComponent(RED + invalidLeftValueMessage(entryName, newValue.getLeft(), sender)), false);
