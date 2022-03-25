@@ -5,7 +5,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.kunmc.lab.configlib.gson.BlockDataTypeAdapter;
 import net.kunmc.lab.configlib.gson.LocationTypeAdapter;
+import net.kunmc.lab.configlib.gson.PairTypeAdapter;
 import net.kunmc.lab.configlib.gson.TeamTypeAdapter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
@@ -40,6 +42,7 @@ public abstract class BaseConfig {
             .setPrettyPrinting()
             .enableComplexMapKeySerialization()
             .excludeFieldsWithModifiers(Modifier.TRANSIENT)
+            .registerTypeAdapter(Pair.class, new PairTypeAdapter<>())
             .registerTypeHierarchyAdapter(Team.class, new TeamTypeAdapter())
             .registerTypeHierarchyAdapter(BlockData.class, new BlockDataTypeAdapter())
             .registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
