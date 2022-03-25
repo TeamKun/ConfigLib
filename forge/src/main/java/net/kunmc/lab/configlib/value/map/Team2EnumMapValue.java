@@ -38,13 +38,13 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants())
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(1).toString()));
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(List<Object> argument) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
         return argument.get(1) + "は不明な値です.";
     }
 

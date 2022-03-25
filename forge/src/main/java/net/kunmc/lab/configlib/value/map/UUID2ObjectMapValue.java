@@ -25,12 +25,12 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForPut(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
         return !((List) argument.get(0)).isEmpty();
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForPut(List<Object> argument) {
+    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
         return "指定されたプレイヤーは存在しないかオフラインです.";
     }
 
@@ -50,7 +50,7 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForRemove(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
         String s = argument.get(0).toString();
         return value.keySet().stream()
                 .map(uuid -> ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache().getProfileByUUID(uuid))
@@ -59,7 +59,7 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return "指定されたプレイヤーは追加されていません.";
     }
 

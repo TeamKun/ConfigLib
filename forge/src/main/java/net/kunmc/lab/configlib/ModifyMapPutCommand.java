@@ -19,23 +19,23 @@ class ModifyMapPutCommand extends Command {
             builder.execute(ctx -> {
                 List<Object> argument = ctx.getParsedArgs();
                 CommandSource sender = ctx.getSender();
-                if (!value.isCorrectKeyArgumentForPut(argument, sender)) {
-                    ctx.sendFailure(value.incorrectKeyArgumentMessageForPut(argument));
+                if (!value.isCorrectKeyArgumentForPut(entryName, argument, sender)) {
+                    ctx.sendFailure(value.incorrectKeyArgumentMessageForPut(entryName, argument, sender));
                     return;
                 }
-                if (!value.isCorrectValueArgumentForPut(argument, sender)) {
-                    ctx.sendFailure((value.incorrectValueArgumentMessageForPut(argument)));
+                if (!value.isCorrectValueArgumentForPut(entryName, argument, sender)) {
+                    ctx.sendFailure((value.incorrectValueArgumentMessageForPut(entryName, argument, sender)));
                     return;
                 }
 
                 Object k = value.argumentToKeyForPut(argument, sender);
                 Object v = value.argumentToValueForPut(argument, sender);
-                if (!value.validateKeyForPut(k)) {
-                    ctx.sendFailure(value.invalidKeyMessageForPut(entryName, k));
+                if (!value.validateKeyForPut(entryName, k, sender)) {
+                    ctx.sendFailure(value.invalidKeyMessageForPut(entryName, k, sender));
                     return;
                 }
-                if (!value.validateValueForPut(v)) {
-                    ctx.sendFailure(value.invalidValueMessageForPut(entryName, v));
+                if (!value.validateValueForPut(entryName, v, sender)) {
+                    ctx.sendFailure(value.invalidValueMessageForPut(entryName, v, sender));
                     return;
                 }
 

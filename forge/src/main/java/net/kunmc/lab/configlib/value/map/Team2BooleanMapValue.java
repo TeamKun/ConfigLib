@@ -12,12 +12,12 @@ public class Team2BooleanMapValue extends Team2ObjectMapValue<Boolean, Team2Bool
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(List<Object> argument) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
         return "";
     }
 

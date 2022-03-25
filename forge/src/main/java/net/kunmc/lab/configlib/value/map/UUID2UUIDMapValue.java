@@ -14,12 +14,12 @@ public class UUID2UUIDMapValue extends UUID2ObjectMapValue<UUID, UUID2UUIDMapVal
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
         return !((List) argument.get(0)).isEmpty();
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(List<Object> argument) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
         return "指定されたプレイヤーは存在しないかオフラインです.";
     }
 
