@@ -30,7 +30,7 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument) {
+    public boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return true;
     }
 

@@ -25,12 +25,12 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender) {
+    public boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return argument.get(0) + "は不正な引数です.";
     }
 
@@ -67,12 +67,12 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
+    public boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return argument + "は不正な引数です.";
     }
 

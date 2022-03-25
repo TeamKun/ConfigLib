@@ -19,14 +19,14 @@ class ModifyRemoveCommand extends Command {
             builder.execute(ctx -> {
                 List<Object> argument = ctx.getParsedArgs();
                 CommandSource sender = ctx.getSender();
-                if (!value.isCorrectArgumentForRemove(argument, sender)) {
-                    ctx.sendFailure(value.incorrectArgumentMessageForRemove(argument));
+                if (!value.isCorrectArgumentForRemove(entryName, argument, sender)) {
+                    ctx.sendFailure(value.incorrectArgumentMessageForRemove(entryName, argument, sender));
                     return;
                 }
 
                 Collection newValue = value.argumentToValueForRemove(argument, sender);
-                if (!value.validateForRemove(newValue)) {
-                    ctx.sendFailure(value.invalidValueMessageForRemove(entryName, newValue));
+                if (!value.validateForRemove(entryName, newValue, sender)) {
+                    ctx.sendFailure(value.invalidValueMessageForRemove(entryName, newValue, sender));
                     return;
                 }
 

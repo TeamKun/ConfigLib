@@ -36,7 +36,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract void appendArgumentForAdd(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument);
+    protected abstract boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender);
 
     protected abstract String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender);
 

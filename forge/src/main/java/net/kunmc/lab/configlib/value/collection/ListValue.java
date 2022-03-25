@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.value.collection;
 
 import net.kunmc.lab.configlib.CollectionValue;
+import net.minecraft.command.CommandSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -27,12 +28,12 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
     }
 
     @Override
-    protected boolean validateForAdd(List<E> value) {
+    protected boolean validateForAdd(String entryName, List<E> value, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String invalidValueMessageForAdd(String entryName, List<E> value) {
+    protected String invalidValueMessageForAdd(String entryName, List<E> value, CommandSource sender) {
         return "This message can't be shown.";
     }
 
@@ -47,12 +48,12 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
     }
 
     @Override
-    public boolean validateForRemove(List<E> element) {
+    public boolean validateForRemove(String entryName, List<E> element, CommandSource sender) {
         return value.containsAll(element);
     }
 
     @Override
-    protected final String invalidValueMessageForRemove(String entryName, List<E> value) {
+    protected final String invalidValueMessageForRemove(String entryName, List<E> value, CommandSource sender) {
         return String.format("%sは%sに追加されていませんでした.", elementToString(value.get(0)), entryName);
     }
 

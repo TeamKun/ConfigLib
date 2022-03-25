@@ -42,7 +42,7 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return argument.get(0) != null;
     }
 

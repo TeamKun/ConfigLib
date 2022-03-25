@@ -45,7 +45,7 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSource sender) {
         if (allowableStringList.isEmpty()) {
             return true;
         }
@@ -54,7 +54,7 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return argument + "は不正な引数です";
     }
 
@@ -71,12 +71,12 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return argument + "は不正な引数です";
     }
 

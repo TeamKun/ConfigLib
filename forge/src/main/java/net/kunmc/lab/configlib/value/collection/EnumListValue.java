@@ -37,13 +37,13 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants)
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return argument.get(0) + "は不明な値です.";
     }
 
@@ -65,13 +65,13 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return Arrays.stream(constants)
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return argument.get(0) + "は不明な値です.";
     }
 

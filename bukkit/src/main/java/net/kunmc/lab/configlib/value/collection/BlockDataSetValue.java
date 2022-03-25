@@ -34,7 +34,7 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return true;
     }
 

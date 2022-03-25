@@ -24,12 +24,12 @@ public class BlockPosSetValue extends SetValue<BlockPos, BlockPosSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return false;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return null;
     }
 
@@ -44,12 +44,12 @@ public class BlockPosSetValue extends SetValue<BlockPos, BlockPosSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return false;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return null;
     }
 

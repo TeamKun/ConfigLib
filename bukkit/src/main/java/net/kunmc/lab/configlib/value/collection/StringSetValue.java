@@ -45,7 +45,7 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
         if (allowableStringList.isEmpty()) {
             return true;
         }

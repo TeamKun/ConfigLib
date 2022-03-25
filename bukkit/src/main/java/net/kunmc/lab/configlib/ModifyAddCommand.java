@@ -19,7 +19,7 @@ class ModifyAddCommand extends Command {
             builder.execute(ctx -> {
                 List<Object> argument = ctx.getParsedArgs();
                 CommandSender sender = ctx.getSender();
-                if (!value.isCorrectArgumentForAdd(entryName, sender, argument)) {
+                if (!value.isCorrectArgumentForAdd(entryName, argument, sender)) {
                     ctx.sendFailure(value.incorrectArgumentMessageForAdd(entryName, argument, sender));
                     return;
                 }

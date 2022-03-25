@@ -33,12 +33,12 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return "";
     }
 
@@ -57,12 +57,12 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return "";
     }
 

@@ -40,7 +40,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants)
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }

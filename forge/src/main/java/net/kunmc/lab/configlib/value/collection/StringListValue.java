@@ -46,7 +46,7 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSource sender) {
         if (allowableStringList.isEmpty()) {
             return true;
         }
@@ -55,7 +55,7 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(List<Object> argument) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return argument + "は不正な引数です.";
     }
 
@@ -67,7 +67,7 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected boolean validateForAdd(List<String> newValue) {
+    protected boolean validateForAdd(String entryName, List<String> newValue, CommandSource sender) {
         if (allowableStringList.isEmpty()) {
             return true;
         }
@@ -83,12 +83,12 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(List<Object> argument) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return argument + "は不正な引数です.";
     }
 

@@ -46,7 +46,7 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
         if (allowableStringList.isEmpty()) {
             return true;
         }

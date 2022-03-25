@@ -32,7 +32,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, CommandSender sender, List<Object> argument) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return !((List) argument.get(0)).isEmpty();
     }
 
