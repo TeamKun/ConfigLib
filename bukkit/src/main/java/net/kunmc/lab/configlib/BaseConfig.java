@@ -41,7 +41,7 @@ public abstract class BaseConfig {
     private static final transient Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .enableComplexMapKeySerialization()
-            .excludeFieldsWithModifiers(Modifier.TRANSIENT)
+            .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
             .registerTypeAdapter(Pair.class, new PairTypeAdapter<>())
             .registerTypeHierarchyAdapter(Team.class, new TeamTypeAdapter())
             .registerTypeHierarchyAdapter(BlockData.class, new BlockDataTypeAdapter())
