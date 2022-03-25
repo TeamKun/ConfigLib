@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib.value.tuple;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.SingleValue;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -83,12 +84,12 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
 
     @Override
     protected boolean validateOnSet(String entryName, MutablePair<L, R> newValue, CommandSender sender) {
-        boolean left = validateLeft(entryName, newValue.getLeft(), sender);
+        boolean left = validateLeft(entryName, newValue.getLeft(), sender, newValue);
         if (!left) {
             sender.sendMessage(RED + invalidLeftValueMessage(entryName, newValue.getLeft(), sender));
         }
 
-        boolean right = validateRight(entryName, newValue.getRight(), sender);
+        boolean right = validateRight(entryName, newValue.getRight(), sender, newValue);
         if (!right) {
             sender.sendMessage(RED + invalidRightValueMessage(entryName, newValue.getRight(), sender));
         }
@@ -96,11 +97,11 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
         return left && right;
     }
 
-    protected boolean validateLeft(String entryName, L newLeft, CommandSender sender) {
+    protected boolean validateLeft(String entryName, L newLeft, CommandSender sender, Pair<L, R> newPair) {
         return true;
     }
 
-    protected boolean validateRight(String entryName, R newRight, CommandSender sender) {
+    protected boolean validateRight(String entryName, R newRight, CommandSender sender, Pair<L, R> newPair) {
         return true;
     }
 
