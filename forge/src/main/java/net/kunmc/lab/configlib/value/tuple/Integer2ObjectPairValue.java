@@ -6,13 +6,26 @@ import net.minecraft.command.CommandSource;
 import java.util.List;
 
 public abstract class Integer2ObjectPairValue<R, T extends Integer2ObjectPairValue<R, T>> extends PairValue<Integer, R, T> {
+    private transient int min = Integer.MIN_VALUE;
+    private transient int max = Integer.MAX_VALUE;
+
     public Integer2ObjectPairValue(Integer left, R right) {
         super(left, right);
     }
 
+    public T leftMin(int min) {
+        this.min = min;
+        return ((T) this);
+    }
+
+    public T leftMax(int max) {
+        this.max = max;
+        return ((T) this);
+    }
+
     @Override
     protected void appendLeftArgument(ArgumentBuilder builder) {
-        builder.integerArgument("integer");
+        builder.integerArgument("integer", min, max);
     }
 
     @Override
