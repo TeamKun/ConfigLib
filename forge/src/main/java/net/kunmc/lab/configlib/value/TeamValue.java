@@ -52,10 +52,6 @@ public class TeamValue extends SingleValue<ScorePlayerTeam, TeamValue> {
 
     @Override
     protected String valueToString(ScorePlayerTeam team) {
-        if (team == null) {
-            return "null";
-        }
-
         return team.getName();
     }
 }
