@@ -47,7 +47,7 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, CommandSender sender, List<Object> argument) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSender sender) {
         return scoreboard.getTeams().stream()
                 .map(Team::getName)
                 .anyMatch(s -> s.equals(argument.get(0)));

@@ -29,7 +29,7 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
 
     protected abstract void appendArgument(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgument(String entryName, CommandSender sender, List<Object> argument);
+    protected abstract boolean isCorrectArgument(String entryName, List<Object> argument, CommandSender sender);
 
     protected abstract String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSender sender);
 

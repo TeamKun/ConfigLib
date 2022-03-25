@@ -36,7 +36,7 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, CommandSender sender, List<Object> argument) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSender sender) {
         return true;
     }
 

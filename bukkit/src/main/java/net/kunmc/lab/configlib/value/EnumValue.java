@@ -36,7 +36,7 @@ public class EnumValue<T extends Enum<T>> extends SingleValue<T, EnumValue<T>> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, CommandSender sender, List<Object> argument) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSender sender) {
         return Arrays.stream(constants)
                 .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
     }

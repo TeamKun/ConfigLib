@@ -18,7 +18,7 @@ class ModifySetCommand extends Command {
 
                 List<Object> argument = ctx.getParsedArgs();
                 CommandSender sender = ctx.getSender();
-                if (!value.isCorrectArgument(entryName, sender, argument)) {
+                if (!value.isCorrectArgument(entryName, argument, sender)) {
                     ctx.sendFailure(value.incorrectArgumentMessage(entryName, argument, sender));
                     return;
                 }

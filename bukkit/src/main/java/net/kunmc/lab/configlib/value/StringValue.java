@@ -56,7 +56,7 @@ public class StringValue extends SingleValue<String, StringValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, CommandSender sender, List<Object> argument) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSender sender) {
         if (allowableStringList.isEmpty()) {
             return true;
         }

@@ -64,7 +64,7 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, CommandSender sender, List<Object> argument) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSender sender) {
         List<Player> list = ((List<Player>) argument.get(0));
 
         if (list.size() != 1) {
