@@ -23,12 +23,12 @@ public class TeamValue extends SingleValue<ScorePlayerTeam, TeamValue> {
 
     @Override
     protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSource sender) {
-        return argument.get(0) != null;
+        return true;
     }
 
     @Override
     protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSource sender) {
-        return "指定されたチームは存在しません.";
+        return "";
     }
 
     @Override
