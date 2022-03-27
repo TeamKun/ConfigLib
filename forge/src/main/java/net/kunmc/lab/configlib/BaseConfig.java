@@ -4,11 +4,9 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.kunmc.lab.commandlib.util.Location;
-import net.kunmc.lab.configlib.gson.BlockPosTypeAdapter;
-import net.kunmc.lab.configlib.gson.BlockStateTypeAdapter;
-import net.kunmc.lab.configlib.gson.LocationTypeAdapter;
-import net.kunmc.lab.configlib.gson.ScorePlayerTeamAdapter;
+import net.kunmc.lab.configlib.gson.*;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -58,6 +56,7 @@ public abstract class BaseConfig {
             .registerTypeHierarchyAdapter(BlockPos.class, new BlockPosTypeAdapter())
             .registerTypeHierarchyAdapter(BlockState.class, new BlockStateTypeAdapter())
             .registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
+            .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackTypeAdapter())
             .registerTypeHierarchyAdapter(ScorePlayerTeam.class, new ScorePlayerTeamAdapter())
             .create();
 

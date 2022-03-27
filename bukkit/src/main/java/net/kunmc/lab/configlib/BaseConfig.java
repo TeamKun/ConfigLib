@@ -3,15 +3,13 @@ package net.kunmc.lab.configlib;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.kunmc.lab.configlib.gson.BlockDataTypeAdapter;
-import net.kunmc.lab.configlib.gson.LocationTypeAdapter;
-import net.kunmc.lab.configlib.gson.PairTypeAdapter;
-import net.kunmc.lab.configlib.gson.TeamTypeAdapter;
+import net.kunmc.lab.configlib.gson.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.libs.org.codehaus.plexus.util.ReflectionUtils;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +43,7 @@ public abstract class BaseConfig {
             .registerTypeAdapter(Pair.class, new PairTypeAdapter<>())
             .registerTypeHierarchyAdapter(Team.class, new TeamTypeAdapter())
             .registerTypeHierarchyAdapter(BlockData.class, new BlockDataTypeAdapter())
+            .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackTypeAdapter())
             .registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
             .create();
 
