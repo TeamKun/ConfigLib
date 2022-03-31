@@ -24,9 +24,6 @@ public class ItemStackTypeAdapter extends TypeAdapter<ItemStack> {
     public ItemStack read(JsonReader in) throws IOException {
         Map<String, Object> map = gson.fromJson(in.nextString(), new TypeToken<Map<String, Object>>() {
         }.getType());
-        map.forEach((k, v) -> {
-            System.out.println(k + " " + v);
-        });
         ItemStack itemStack = ItemStack.deserialize(map);
         ItemMeta meta = ((ItemMeta) ConfigurationSerialization.deserializeObject(((Map<String, Object>) map.get("meta"))));
         itemStack.setItemMeta(meta);
