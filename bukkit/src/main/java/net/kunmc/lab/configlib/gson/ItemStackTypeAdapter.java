@@ -25,8 +25,12 @@ public class ItemStackTypeAdapter extends TypeAdapter<ItemStack> {
         Map<String, Object> map = gson.fromJson(in.nextString(), new TypeToken<Map<String, Object>>() {
         }.getType());
         ItemStack itemStack = ItemStack.deserialize(map);
-        ItemMeta meta = ((ItemMeta) ConfigurationSerialization.deserializeObject(((Map<String, Object>) map.get("meta"))));
-        itemStack.setItemMeta(meta);
+
+        Map<String, Object> metaMap = ((Map<String, Object>) map.get("meta"));
+        if (metaMap != null) {
+            ItemMeta meta = ((ItemMeta) ConfigurationSerialization.deserializeObject((metaMap)));
+            itemStack.setItemMeta(meta);
+        }
         return itemStack;
     }
 }
