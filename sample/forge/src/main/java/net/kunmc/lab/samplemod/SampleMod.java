@@ -14,16 +14,13 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 @Mod(SampleMod.MOD_ID)
 public class SampleMod {
     public static final String MOD_ID = "samplemod";
-    public static CommonConfig commonConfig;
-    public static ClientConfig clientConfig;
-    public static ServerConfig serverConfig;
-    public static NotSerializedConfig notSerializedConfig;
+    public static final CommonConfig commonConfig = new CommonConfig(MOD_ID);
+    public static final ClientConfig clientConfig = new ClientConfig(MOD_ID);
+    public static final ServerConfig serverConfig = new ServerConfig(MOD_ID);
+    public static final NotSerializedConfig notSerializedConfig = new NotSerializedConfig(MOD_ID);
     private final ConfigCommandBuilder builder;
 
     public SampleMod() {
-        commonConfig = new CommonConfig(MOD_ID);
-        serverConfig = new ServerConfig(MOD_ID);
-        notSerializedConfig = new NotSerializedConfig(MOD_ID);
         builder = new ConfigCommandBuilder(commonConfig)
                 .addConfig(serverConfig)
                 .addConfig(notSerializedConfig);
@@ -31,10 +28,9 @@ public class SampleMod {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
     public void onServerStartingOnClient(FMLServerStartingEvent event) {
-        clientConfig = new ClientConfig(MOD_ID);
         builder.addConfig(clientConfig);
     }
 
