@@ -140,7 +140,17 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
 
     @Override
     protected String valueToString(MutablePair<L, R> pair) {
-        return String.format("(%s, %s)", pair.getLeft(), pair.getRight());
+        String leftName = "null";
+        if (getLeft() != null) {
+            leftName = leftToString(getLeft());
+        }
+
+        String rightName = "null";
+        if (getRight() != null) {
+            rightName = rightToString(getRight());
+        }
+
+        return String.format("(%s, %s)", leftName, rightName);
     }
 
     protected abstract String leftToString(L left);
