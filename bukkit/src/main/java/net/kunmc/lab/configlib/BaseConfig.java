@@ -113,7 +113,17 @@ public abstract class BaseConfig implements Listener {
             e.printStackTrace();
         }
 
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        // Pluginがenabledになっていない状態でregisterすると例外が発生するため遅延,ループさせている
+        BaseConfig instance = this;
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().registerEvents(instance, plugin);
+                    cancel();
+                }
+            }
+        }, 100, 100);
     }
 
     boolean isGetEnabled() {
