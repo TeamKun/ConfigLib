@@ -9,6 +9,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.libs.org.codehaus.plexus.util.ReflectionUtils;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Team;
@@ -25,18 +28,21 @@ import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
-public abstract class BaseConfig {
+public abstract class BaseConfig implements Listener {
     private final transient Plugin plugin;
+    private final transient Timer timer = new Timer();
     private transient String entryName = "";
     protected transient boolean enableGet = true;
     protected transient boolean enableList = true;
     protected transient boolean enableModify = true;
     protected transient boolean enableReload = true;
-    private static final transient Gson gson = new GsonBuilder()
+    private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .enableComplexMapKeySerialization()
             .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
@@ -75,30 +81,39 @@ public abstract class BaseConfig {
         if (!makeConfigFile) {
             return;
         }
-
         plugin.getDataFolder().mkdir();
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            saveConfigIfAbsent();
-            loadConfig();
-        });
+
+        // コンストラクタの処理内でシリアライズするとフィールドの初期化が終わってない状態でシリアライズされるため遅延させている.
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                saveConfigIfAbsent();
+                loadConfig();
+            }
+        }, 10);
 
         try {
             WatchService watcher = FileSystems.getDefault().newWatchService();
             WatchKey watchKey = plugin.getDataFolder().toPath().register(watcher, ENTRY_MODIFY);
 
-            Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-                for (WatchEvent<?> e : watchKey.pollEvents()) {
-                    Path filePath = plugin.getDataFolder().toPath().resolve((Path) e.context());
-                    if (filePath.equals(getConfigFile().toPath())) {
-                        loadConfig();
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    for (WatchEvent<?> e : watchKey.pollEvents()) {
+                        Path filePath = plugin.getDataFolder().toPath().resolve((Path) e.context());
+                        if (filePath.equals(getConfigFile().toPath())) {
+                            loadConfig();
+                        }
                     }
-                }
 
-                watchKey.reset();
-            }, 0, 10);
+                    watchKey.reset();
+                }
+            }, 0, 500);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     boolean isGetEnabled() {
@@ -164,6 +179,13 @@ public abstract class BaseConfig {
         replaceFields(this.getClass(), config, this);
 
         return true;
+    }
+
+    @EventHandler
+    private void onPluginDisable(PluginDisableEvent e) {
+        if (e.getPlugin() == plugin) {
+            timer.cancel();
+        }
     }
 
     private static String readJson(File jsonFile) {
