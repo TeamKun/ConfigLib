@@ -4,6 +4,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.CommandContext;
 
 public abstract class Value<E, T extends Value<E, T>> {
+    private String description;
     protected E value;
     private transient boolean listable = true;
 
@@ -17,6 +18,11 @@ public abstract class Value<E, T extends Value<E, T>> {
 
     public void value(E value) {
         this.value = value;
+    }
+
+    public T description(String description) {
+        this.description = description;
+        return ((T) this);
     }
 
     protected boolean listable() {
