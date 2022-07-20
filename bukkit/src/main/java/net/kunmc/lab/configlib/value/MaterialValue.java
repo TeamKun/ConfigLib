@@ -4,7 +4,7 @@ import org.bukkit.Material;
 
 import java.util.Arrays;
 
-public class MaterialValue extends EnumValue<Material> {
+public class MaterialValue extends AbstractEnumValue<Material, MaterialValue> {
     public MaterialValue(Material value) {
         super(value);
     }
