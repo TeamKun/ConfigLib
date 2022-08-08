@@ -8,20 +8,29 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 public abstract class AbstractEnumValue<E extends Enum<E>, T extends AbstractEnumValue<E, T>> extends SingleValue<E, T> {
     private final transient E[] constants;
 
     public AbstractEnumValue(@NotNull E value) {
-        super(value);
-
-        this.constants = value.getDeclaringClass().getEnumConstants();
+        this(value, value.getDeclaringClass().getEnumConstants());
     }
 
     public AbstractEnumValue(@NotNull E value, E[] constants) {
+        this(value, constants, x -> true);
+    }
+
+    public AbstractEnumValue(@NotNull E value, Predicate<E> filter) {
+        this(value, value.getDeclaringClass().getEnumConstants(), filter);
+    }
+
+    public AbstractEnumValue(@NotNull E value, E[] constants, Predicate<E> filter) {
         super(value);
 
-        this.constants = constants;
+        this.constants = Arrays.stream(constants)
+                .filter(filter)
+                .toArray(x -> constants);
     }
 
     @Override

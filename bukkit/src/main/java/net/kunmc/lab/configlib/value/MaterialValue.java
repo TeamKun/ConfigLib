@@ -2,17 +2,14 @@ package net.kunmc.lab.configlib.value;
 
 import org.bukkit.Material;
 
-import java.util.Arrays;
-
 public class MaterialValue extends AbstractEnumValue<Material, MaterialValue> {
     public MaterialValue(Material value) {
-        super(value);
+        this(value, false);
     }
 
     public MaterialValue(Material value, boolean onlyBlock) {
-        super(value, Arrays.stream(Material.values())
-                .filter(x -> !onlyBlock || x.isBlock())
-                .toArray(Material[]::new)
-        );
+        super(value,
+                value.getDeclaringClass().getEnumConstants(),
+                x -> !onlyBlock || x.isBlock());
     }
 }
