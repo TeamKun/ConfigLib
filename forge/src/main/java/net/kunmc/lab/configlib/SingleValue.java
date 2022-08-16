@@ -6,9 +6,8 @@ import net.minecraft.command.CommandSource;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
+import java.util.Optional;
+import java.util.function.*;
 
 public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<E, T> {
     private transient final List<BiFunction<E, CommandContext, Boolean>> listeners = new ArrayList<>();
@@ -16,6 +15,56 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
 
     public SingleValue(E value) {
         super(value);
+    }
+
+    public Optional<E> getOptional() {
+        return Optional.ofNullable(value);
+    }
+
+    public void ifPresent(Consumer<E> consumer) {
+        if (value != null) {
+            consumer.accept(value);
+        }
+    }
+
+    public void ifAbsent(Runnable runnable) {
+        if (value == null) {
+            runnable.run();
+        }
+    }
+
+    public void ifPresentOrElse(Consumer<E> consumer, Runnable runnable) {
+        if (value != null) {
+            consumer.accept(value);
+        } else {
+            runnable.run();
+        }
+    }
+
+    public <U> Optional<U> map(Function<E, U> mapper) {
+        return getOptional().map(mapper);
+    }
+
+    public boolean isPresent() {
+        return value != null;
+    }
+
+    public boolean isEmpty() {
+        return value == null;
+    }
+
+    public E orElse(E other) {
+        if (value != null) {
+            return value;
+        }
+        return other;
+    }
+
+    public E orElseGet(Supplier<? extends E> supplier) {
+        if (value != null) {
+            return value;
+        }
+        return supplier.get();
     }
 
     protected boolean writableByCommand() {

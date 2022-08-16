@@ -5,6 +5,8 @@ import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.function.TriFunction;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -250,5 +252,51 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     public Set<Map.Entry<K, V>> entrySet() {
         return value.entrySet();
+    }
+
+    public V getOrDefault(K key, V defaultValue) {
+        return value.getOrDefault(key, defaultValue);
+    }
+
+    public void forEach(BiConsumer<? super K, ? super V> action) {
+        value.forEach(action);
+    }
+
+    public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
+        value.replaceAll(function);
+    }
+
+    @Nullable
+    public V putIfAbsent(K key, V value) {
+        return this.value.putIfAbsent(key, value);
+    }
+
+    public boolean remove(K key, V value) {
+        return this.value.remove(key, value);
+    }
+
+    public boolean replace(K key, V oldValue, V newValue) {
+        return this.value.replace(key, oldValue, newValue);
+    }
+
+    @Nullable
+    public V replace(K key, V value) {
+        return this.value.replace(key, value);
+    }
+
+    public V computeIfAbsent(K key, @NotNull Function<? super K, ? extends V> mappingFunction) {
+        return value.computeIfAbsent(key, mappingFunction);
+    }
+
+    public V computeIfPresent(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        return value.computeIfPresent(key, remappingFunction);
+    }
+
+    public V compute(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        return value.compute(key, remappingFunction);
+    }
+
+    public V merge(K key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+        return this.value.merge(key, value, remappingFunction);
     }
 }
