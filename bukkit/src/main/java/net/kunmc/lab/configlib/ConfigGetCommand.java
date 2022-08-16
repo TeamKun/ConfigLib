@@ -5,6 +5,7 @@ import net.kunmc.lab.commandlib.CommandContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Set;
 
 class ConfigGetCommand extends Command {
@@ -32,6 +33,12 @@ class ConfigGetCommand extends Command {
 
     private void init(BaseConfig config, Command command) {
         for (Field field : config.getClass().getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            if (Modifier.isTransient(field.getModifiers())) {
+                continue;
+            }
             field.setAccessible(true);
 
             Object o;

@@ -4,6 +4,7 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Set;
 
 class ConfigModifyCommand extends Command {
@@ -31,6 +32,13 @@ class ConfigModifyCommand extends Command {
 
     private void init(BaseConfig config, Command command) {
         for (Field field : ConfigUtil.getSingleValueFields(config)) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            if (Modifier.isTransient(field.getModifiers())) {
+                continue;
+            }
+           
             SingleValue<?, ?> v;
             try {
                 v = ((SingleValue<?, ?>) field.get(config));
