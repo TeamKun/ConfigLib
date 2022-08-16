@@ -146,6 +146,10 @@ public abstract class BaseConfig implements Listener {
         this.entryName = entryName;
     }
 
+    public Plugin plugin() {
+        return plugin;
+    }
+
     public File getConfigFile() {
         return new File(plugin.getDataFolder(), entryName() + ".json");
     }
