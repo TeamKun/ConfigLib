@@ -31,7 +31,7 @@ class ModifyIncCommand extends Command {
             amount = ((Double) ctx.getParsedArgs().get(0));
         }
 
-        if (value.compareTo(value.max.doubleValue() - amount) > 0) {
+        if (value.compare(value.max.doubleValue() - amount) > 0) {
             amount = value.max.doubleValue() - ((Number) value.value).doubleValue();
         }
 

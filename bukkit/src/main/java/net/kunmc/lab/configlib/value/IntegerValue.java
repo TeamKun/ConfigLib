@@ -16,6 +16,58 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
     }
 
     @Override
+    public Integer plus(Number other) {
+        return value + other.intValue();
+    }
+
+    @Override
+    public Integer plus(NumericValue<?, ?> other) {
+        return value + other.intValue();
+
+    }
+
+    @Override
+    public Integer minus(Number other) {
+        return value - other.intValue();
+    }
+
+    @Override
+    public Integer minus(NumericValue<?, ?> other) {
+        return value - other.intValue();
+    }
+
+    @Override
+    public Integer multiply(Number other) {
+        return value * other.intValue();
+    }
+
+    @Override
+    public Integer multiply(NumericValue<?, ?> other) {
+        return value * other.intValue();
+    }
+
+    @Override
+    public Integer divide(Number other) {
+        return value / other.intValue();
+    }
+
+    @Override
+    public Integer divide(NumericValue<?, ?> other) {
+        return value / other.intValue();
+    }
+
+    @Override
+    public Integer mod(Number other) {
+        return value % other.intValue();
+    }
+
+    @Override
+    public Integer mod(NumericValue<?, ?> other) {
+        return value % other.intValue();
+    }
+
+
+    @Override
     protected Integer copyAdd(Number amount) {
         return value + amount.intValue();
     }
@@ -26,7 +78,7 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
     }
 
     @Override
-    protected int compareTo(Number n) {
+    protected int compare(Number n) {
         return value.compareTo(n.intValue());
     }
 

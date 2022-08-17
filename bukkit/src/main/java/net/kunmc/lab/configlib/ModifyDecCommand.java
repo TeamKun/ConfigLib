@@ -31,7 +31,7 @@ class ModifyDecCommand extends Command {
             amount = ((Double) ctx.getParsedArgs().get(0));
         }
 
-        if (value.compareTo(value.min.doubleValue() + amount) < 0) {
+        if (value.compare(value.min.doubleValue() + amount) < 0) {
             amount = ((Number) value.value).doubleValue() - value.min.doubleValue();
         }
 

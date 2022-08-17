@@ -16,6 +16,57 @@ public class DoubleValue extends NumericValue<Double, DoubleValue> {
     }
 
     @Override
+    public Double plus(Number other) {
+        return value + other.doubleValue();
+    }
+
+    @Override
+    public Double plus(NumericValue<?, ?> other) {
+        return value + other.doubleValue();
+
+    }
+
+    @Override
+    public Double minus(Number other) {
+        return value - other.doubleValue();
+    }
+
+    @Override
+    public Double minus(NumericValue<?, ?> other) {
+        return value - other.doubleValue();
+    }
+
+    @Override
+    public Double multiply(Number other) {
+        return value * other.doubleValue();
+    }
+
+    @Override
+    public Double multiply(NumericValue<?, ?> other) {
+        return value * other.doubleValue();
+    }
+
+    @Override
+    public Double divide(Number other) {
+        return value / other.doubleValue();
+    }
+
+    @Override
+    public Double divide(NumericValue<?, ?> other) {
+        return value / other.doubleValue();
+    }
+
+    @Override
+    public Double mod(Number other) {
+        return value % other.doubleValue();
+    }
+
+    @Override
+    public Double mod(NumericValue<?, ?> other) {
+        return value % other.doubleValue();
+    }
+
+    @Override
     protected Double copyAdd(Number amount) {
         return value + amount.doubleValue();
     }
@@ -26,7 +77,7 @@ public class DoubleValue extends NumericValue<Double, DoubleValue> {
     }
 
     @Override
-    protected int compareTo(Number n) {
+    protected int compare(Number n) {
         return value.compareTo(n.doubleValue());
     }
 

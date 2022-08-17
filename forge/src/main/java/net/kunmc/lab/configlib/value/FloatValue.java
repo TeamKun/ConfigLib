@@ -16,6 +16,57 @@ public class FloatValue extends NumericValue<Float, FloatValue> {
     }
 
     @Override
+    public Float plus(Number other) {
+        return value + other.floatValue();
+    }
+
+    @Override
+    public Float plus(NumericValue<?, ?> other) {
+        return value + other.floatValue();
+
+    }
+
+    @Override
+    public Float minus(Number other) {
+        return value - other.floatValue();
+    }
+
+    @Override
+    public Float minus(NumericValue<?, ?> other) {
+        return value - other.floatValue();
+    }
+
+    @Override
+    public Float multiply(Number other) {
+        return value * other.floatValue();
+    }
+
+    @Override
+    public Float multiply(NumericValue<?, ?> other) {
+        return value * other.floatValue();
+    }
+
+    @Override
+    public Float divide(Number other) {
+        return value / other.floatValue();
+    }
+
+    @Override
+    public Float divide(NumericValue<?, ?> other) {
+        return value / other.floatValue();
+    }
+
+    @Override
+    public Float mod(Number other) {
+        return value % other.floatValue();
+    }
+
+    @Override
+    public Float mod(NumericValue<?, ?> other) {
+        return value % other.floatValue();
+    }
+
+    @Override
     protected Float copyAdd(Number amount) {
         return value + amount.floatValue();
     }
@@ -26,7 +77,7 @@ public class FloatValue extends NumericValue<Float, FloatValue> {
     }
 
     @Override
-    protected int compareTo(Number n) {
+    protected int compare(Number n) {
         return value.compareTo(n.floatValue());
     }
 
