@@ -1,16 +1,16 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.configlib.MapValue;
 import net.minecraft.command.CommandSource;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2ObjectMapValue<T, V, U>> extends MapValue<T, V, U> {
     private transient final Class<T> clazz;
+    private transient Predicate<T> filter = x -> true;
 
     public Enum2ObjectMapValue(Map<T, V> value, T... t) {
         super(value);
@@ -18,24 +18,19 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
         clazz = ((Class<T>) t.getClass().getComponentType());
     }
 
-    private T[] constants() {
-        return clazz.getEnumConstants();
+    public U setKeyFilter(Predicate<T> filter) {
+        this.filter = filter;
+        return ((U) this);
     }
 
     @Override
     protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
-        builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(constants())
-                    .map(Enum::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
+        builder.enumArgument("name", clazz, filter);
     }
 
     @Override
     protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
-        return Arrays.stream(constants())
-                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
+        return true;
     }
 
     @Override
@@ -45,26 +40,17 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
 
     @Override
     protected T argumentToKeyForPut(List<Object> argument, CommandSource sender) {
-        return Arrays.stream(constants())
-                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
-                .findFirst()
-                .get();
+        return clazz.cast(argument.get(0));
     }
 
     @Override
     protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
-        builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            value.keySet().stream()
-                    .map(Enum::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
+        builder.enumArgument("name", clazz, x -> value.containsKey(x));
     }
 
     @Override
     protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
-        return Arrays.stream(constants())
-                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
+        return true;
     }
 
     @Override
@@ -74,10 +60,7 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
 
     @Override
     protected T argumentToKeyForRemove(List<Object> argument, CommandSource sender) {
-        return Arrays.stream(constants())
-                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
-                .findFirst()
-                .get();
+        return clazz.cast(argument.get(0));
     }
 
     @Override

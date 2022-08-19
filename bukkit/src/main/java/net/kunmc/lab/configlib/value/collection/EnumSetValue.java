@@ -2,47 +2,37 @@ package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.argument.StringArgument;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>> {
-    private final transient T[] constants;
+    private final transient Class<T> clazz;
+    private final transient Predicate<T> filter;
 
     public EnumSetValue(T... values) {
-        super(new HashSet<>());
-
-        constants = ((T[]) values.getClass().getComponentType().getEnumConstants());
+        this(x -> true, values);
     }
 
-    public EnumSetValue(@NotNull Set<T> value, @NotNull T[] constants, T... values) {
-        super(value);
-        this.value.addAll(Sets.newHashSet(values));
+    public EnumSetValue(@NotNull Predicate<T> filter, T... values) {
+        super(new HashSet<>());
 
-        this.constants = constants;
+        this.clazz = ((Class<T>) values.getClass().getComponentType());
+        this.filter = filter;
     }
 
     @Override
     protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(constants)
-                    .filter(x -> value.stream().noneMatch(e -> x == e))
-                    .map(Enum::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
+        builder.enumArgument("name", clazz, x -> !value.contains(x) && filter.test(x));
     }
 
     @Override
     protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
+        return true;
     }
 
     @Override
@@ -52,25 +42,17 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
 
     @Override
     protected Set<T> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
-                .collect(Collectors.toSet());
+        return Sets.newHashSet(clazz.cast(argument.get(0)));
     }
 
     @Override
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            value.stream()
-                    .map(Enum::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
+        builder.enumArgument("name", clazz, x -> value.contains(x));
     }
 
     @Override
     protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
+        return true;
     }
 
     @Override
@@ -80,9 +62,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
 
     @Override
     protected Set<T> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
-                .collect(Collectors.toSet());
+        return Sets.newHashSet(clazz.cast(argument.get(0)));
     }
 
     @Override

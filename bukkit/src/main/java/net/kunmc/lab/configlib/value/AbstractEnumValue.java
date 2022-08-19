@@ -1,17 +1,16 @@
 package net.kunmc.lab.configlib.value;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.configlib.SingleValue;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
 public abstract class AbstractEnumValue<E extends Enum<E>, T extends AbstractEnumValue<E, T>> extends SingleValue<E, T> {
-    private final transient E[] constants;
+    private final transient Class<E> clazz;
+    private final transient Predicate<E> filter;
 
     public AbstractEnumValue(@NotNull E value) {
         this(value, value.getDeclaringClass().getEnumConstants());
@@ -28,26 +27,18 @@ public abstract class AbstractEnumValue<E extends Enum<E>, T extends AbstractEnu
     public AbstractEnumValue(@NotNull E value, E[] constants, Predicate<E> filter) {
         super(value);
 
-        this.constants = Arrays.stream(constants)
-                .filter(filter)
-                .toArray(x -> constants);
+        this.clazz = ((Class<E>) constants.getClass().getComponentType());
+        this.filter = filter;
     }
 
     @Override
     protected void appendArgument(ArgumentBuilder builder) {
-        builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(constants)
-                    .filter(x -> x != value)
-                    .map(Enum::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
+        builder.enumArgument("name", clazz, filter);
     }
 
     @Override
     protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
+        return true;
     }
 
     @Override
@@ -57,10 +48,7 @@ public abstract class AbstractEnumValue<E extends Enum<E>, T extends AbstractEnu
 
     @Override
     protected E argumentToValue(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
-                .findFirst()
-                .get();
+        return clazz.cast(argument.get(0));
     }
 
     @Override

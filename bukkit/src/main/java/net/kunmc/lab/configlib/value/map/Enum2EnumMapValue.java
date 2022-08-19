@@ -1,43 +1,34 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.argument.StringArgument;
 import org.bukkit.command.CommandSender;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Predicate;
 
 public class Enum2EnumMapValue<K extends Enum<K>, V extends Enum<V>> extends Enum2ObjectMapValue<K, V, Enum2EnumMapValue<K, V>> {
-    private final transient V[] constants;
+    private final transient Class<V> clazz;
+    private transient Predicate<V> filter = x -> true;
 
     public Enum2EnumMapValue(Class<V> valueClass, K... k) {
         super(new HashMap<>(), k);
-
-        constants = valueClass.getEnumConstants();
+        this.clazz = valueClass;
     }
 
-    public Enum2EnumMapValue(Map<K, V> value, V[] constants, K... k) {
-        super(value, k);
-
-        this.constants = constants;
+    public Enum2EnumMapValue<K, V> setValueFilter(Predicate<V> filter) {
+        this.filter = filter;
+        return this;
     }
 
     @Override
     protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.stringArgument("value", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(constants)
-                    .map(Enum::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
+        builder.enumArgument("value", clazz, filter);
     }
 
     @Override
     protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(1).toString()));
+        return true;
     }
 
     @Override
@@ -47,10 +38,7 @@ public class Enum2EnumMapValue<K extends Enum<K>, V extends Enum<V>> extends Enu
 
     @Override
     protected V argumentToValueForPut(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .filter(x -> x.name().equalsIgnoreCase(argument.get(1).toString()))
-                .findFirst()
-                .get();
+        return clazz.cast(argument.get(1));
     }
 
     @Override

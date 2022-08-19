@@ -1,45 +1,37 @@
 package net.kunmc.lab.configlib.value.collection;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.argument.StringArgument;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue<T>> {
-    private final transient T[] constants;
+    private final transient Class<T> clazz;
+    private final transient Predicate<T> filter;
 
     public EnumListValue(T... values) {
-        super(new ArrayList<>());
-
-        constants = ((T[]) values.getClass().getComponentType().getEnumConstants());
+        this(x -> true, values);
     }
 
-    public EnumListValue(@NotNull List<T> value, @NotNull T[] constants, T... values) {
-        super(value);
-        this.value.addAll(Arrays.asList(values));
+    public EnumListValue(@NotNull Predicate<T> filter, T... values) {
+        super(new ArrayList<>());
 
-        this.constants = constants;
+        this.clazz = ((Class<T>) values.getClass().getComponentType());
+        this.filter = filter;
     }
 
     @Override
     protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(constants)
-                    .map(Enum::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
+        builder.enumArgument("name", clazz, filter);
     }
 
     @Override
     protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
+        return true;
     }
 
     @Override
@@ -49,25 +41,17 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
 
     @Override
     protected List<T> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
-                .collect(Collectors.toList());
+        return Collections.singletonList(clazz.cast(argument.get(0)));
     }
 
     @Override
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            value.stream()
-                    .map(Enum::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
+        builder.enumArgument("name", clazz, x -> value.contains(x));
     }
 
     @Override
     protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(0).toString()));
+        return true;
     }
 
     @Override
@@ -77,9 +61,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
 
     @Override
     protected List<T> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
-        return Arrays.stream(constants)
-                .filter(x -> x.name().equalsIgnoreCase(argument.get(0).toString()))
-                .collect(Collectors.toList());
+        return Collections.singletonList(clazz.cast(argument.get(0)));
     }
 
     @Override

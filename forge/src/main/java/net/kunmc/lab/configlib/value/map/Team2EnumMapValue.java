@@ -1,46 +1,35 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.minecraft.command.CommandSource;
-import net.minecraft.scoreboard.ScorePlayerTeam;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Predicate;
 
 public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T, Team2EnumMapValue<T>> {
     private final transient Class<T> clazz;
+    private final transient Predicate<T> filter;
 
     public Team2EnumMapValue(T... e) {
-        this(new HashMap<>(), e);
+        this(x -> true, e);
     }
 
-    public Team2EnumMapValue(Map<ScorePlayerTeam, T> map, T... e) {
-        super(map);
+    public Team2EnumMapValue(Predicate<T> filter, T... e) {
+        super(new HashMap<>());
 
-        clazz = ((Class<T>) e.getClass().getComponentType());
-    }
-
-    private T[] constants() {
-        return clazz.getEnumConstants();
+        this.clazz = ((Class<T>) e.getClass().getComponentType());
+        this.filter = filter;
     }
 
     @Override
     protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.stringArgument("name", StringArgument.Type.WORD, sb -> {
-            Arrays.stream(constants())
-                    .map(Enum::name)
-                    .map(String::toLowerCase)
-                    .forEach(sb::suggest);
-        });
+        builder.enumArgument("name", clazz, filter);
     }
 
     @Override
     protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
-        return Arrays.stream(constants())
-                .anyMatch(x -> x.name().equalsIgnoreCase(argument.get(1).toString()));
+        return true;
     }
 
     @Override
@@ -50,10 +39,7 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
 
     @Override
     protected T argumentToValueForPut(List<Object> argument, CommandSource sender) {
-        return Arrays.stream(constants())
-                .filter(x -> x.name().equalsIgnoreCase(argument.get(1).toString()))
-                .findFirst()
-                .get();
+        return clazz.cast(argument.get(1));
     }
 
     @Override
