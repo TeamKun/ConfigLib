@@ -58,6 +58,7 @@ public abstract class BaseConfig {
             .registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
             .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackTypeAdapter())
             .registerTypeHierarchyAdapter(ScorePlayerTeam.class, new ScorePlayerTeamAdapter())
+            .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
             .create();
 
     public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Constructor<T> constructor, Object... arguments) {

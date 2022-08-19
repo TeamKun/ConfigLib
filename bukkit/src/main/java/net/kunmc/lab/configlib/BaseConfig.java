@@ -51,6 +51,7 @@ public abstract class BaseConfig implements Listener {
             .registerTypeHierarchyAdapter(BlockData.class, new BlockDataTypeAdapter())
             .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackTypeAdapter())
             .registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
+            .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
             .create();
 
     public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Constructor<T> constructor, Object... arguments) {

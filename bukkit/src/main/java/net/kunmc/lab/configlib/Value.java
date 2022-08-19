@@ -19,6 +19,10 @@ public abstract class Value<E, T extends Value<E, T>> {
         this.value = value;
     }
 
+    public String description() {
+        return description;
+    }
+
     public T description(String description) {
         this.description = description;
         return ((T) this);
