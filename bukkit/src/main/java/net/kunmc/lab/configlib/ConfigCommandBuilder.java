@@ -2,21 +2,17 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigCommandBuilder {
-    private final Set<BaseConfig> configSet = new HashSet<>();
+    private final Set<BaseConfig> configs = new HashSet<>();
     private final Map<SubCommandType, Boolean> subCommandTypeEnabledMap = new HashMap<>();
     private String name = "config";
 
     public ConfigCommandBuilder(@NotNull BaseConfig config) {
-        configSet.add(config);
+        configs.add(config);
 
         for (SubCommandType subCommand : SubCommandType.values()) {
             subCommandTypeEnabledMap.put(subCommand, true);
@@ -44,7 +40,7 @@ public class ConfigCommandBuilder {
     }
 
     public ConfigCommandBuilder addConfig(@NotNull BaseConfig config) {
-        configSet.add(config);
+        configs.add(config);
         return this;
     }
 
@@ -55,44 +51,39 @@ public class ConfigCommandBuilder {
 
     public ConfigCommand build() {
         ConfigCommand configCommand = new ConfigCommand(name);
-        for (Command cmd : createSubCommands()) {
-            configCommand.addChildren(cmd);
-        }
-
+        createSubCommands().forEach(configCommand::addChildren);
         return configCommand;
     }
 
     private Set<Command> createSubCommands() {
-        Set<Command> subCommandSet = new HashSet<>();
+        Set<Command> subCommands = new HashSet<>();
+
         for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeEnabledMap.entrySet()) {
             SubCommandType type = entry.getKey();
-            Set<BaseConfig> usedConfigs = type.hasEntryFor(configSet).entrySet().stream()
+            Set<BaseConfig> usedConfigs = type.hasEntryFor(configs).entrySet().stream()
                     .peek(e -> e.setValue(e.getValue() && type.isEnabledFor(e.getKey())))
                     .filter(Map.Entry::getValue)
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toSet());
 
             if (entry.getValue()) {
-                Command cmd = createSubCommand(usedConfigs, type);
-                if (cmd != null) {
-                    subCommandSet.add(cmd);
-                }
+                createSubCommand(usedConfigs, type).ifPresent(subCommands::add);
             }
         }
 
-        return subCommandSet;
+        return subCommands;
     }
 
-    private @Nullable Command createSubCommand(Set<BaseConfig> configSet, SubCommandType type) {
-        if (configSet.size() == 0) {
-            return null;
+    private Optional<Command> createSubCommand(Set<BaseConfig> configs, SubCommandType type) {
+        if (configs.size() == 0) {
+            return Optional.empty();
         }
 
-        if (configSet.size() == 1) {
-            BaseConfig config = configSet.toArray(new BaseConfig[0])[0];
-            return type.of(config);
+        if (configs.size() == 1) {
+            BaseConfig config = configs.toArray(new BaseConfig[0])[0];
+            return Optional.of(type.of(config));
         } else {
-            return type.of(configSet);
+            return Optional.of(type.of(configs));
         }
     }
 }
