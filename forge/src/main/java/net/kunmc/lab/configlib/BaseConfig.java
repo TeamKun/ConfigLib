@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.kunmc.lab.commandlib.util.Location;
 import net.kunmc.lab.configlib.gson.*;
+import net.kunmc.lab.configlib.value.Nameable;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.ScorePlayerTeam;
@@ -56,6 +57,7 @@ public abstract class BaseConfig {
             .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackTypeAdapter())
             .registerTypeHierarchyAdapter(ScorePlayerTeam.class, new ScorePlayerTeamAdapter())
             .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
+            .registerTypeHierarchyAdapter(Nameable.class, new NameableTypeAdapter())
             .create();
 
     public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Constructor<T> constructor, Object... arguments) {

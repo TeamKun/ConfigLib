@@ -4,6 +4,7 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.kunmc.lab.configlib.gson.*;
+import net.kunmc.lab.configlib.value.Nameable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -49,6 +50,7 @@ public abstract class BaseConfig implements Listener {
             .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackTypeAdapter())
             .registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
             .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
+            .registerTypeHierarchyAdapter(Nameable.class, new NameableTypeAdapter())
             .create();
 
     public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Constructor<T> constructor, Object... arguments) {
