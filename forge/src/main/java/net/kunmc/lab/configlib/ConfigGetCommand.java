@@ -23,11 +23,9 @@ class ConfigGetCommand extends Command {
         }
 
         for (BaseConfig config : configSet) {
-            addChildren(new Command(config.entryName()) {
-                {
-                    init(config, this);
-                }
-            });
+            addChildren(new Command(config.entryName()) {{
+                init(config, this);
+            }});
         }
     }
 
@@ -44,9 +42,8 @@ class ConfigGetCommand extends Command {
             Object o;
             try {
                 o = field.get(config);
-            } catch (Exception e) {
-                e.printStackTrace();
-                continue;
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
 
             if (o instanceof Value) {

@@ -41,9 +41,8 @@ public class ConfigUtil {
                 .map(f -> {
                     try {
                         return f.get(config);
-                    } catch (IllegalAccessException exception) {
-                        exception.printStackTrace();
-                        return null;
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
                     }
                 })
                 .map(x -> ((SingleValue<?, ?>) x))
@@ -56,8 +55,7 @@ public class ConfigUtil {
                     try {
                         return f.get(config);
                     } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                        return null;
+                        throw new RuntimeException(e);
                     }
                 })
                 .map(x -> ((CollectionValue<?, ?, ?>) x))
@@ -70,8 +68,7 @@ public class ConfigUtil {
                     try {
                         return f.get(config);
                     } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                        return null;
+                        throw new RuntimeException(e);
                     }
                 })
                 .map(x -> ((MapValue<?, ?, ?>) x))

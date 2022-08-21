@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Set;
 
 class ConfigReloadCommand extends Command {
-    private final List<BaseConfig> configList = new ArrayList<>();
+    private final List<BaseConfig> configs = new ArrayList<>();
 
     public ConfigReloadCommand(@NotNull BaseConfig config) {
         super(SubCommandType.Reload.name);
-        configList.add(config);
+        configs.add(config);
     }
 
     public ConfigReloadCommand(@NotNull Set<BaseConfig> configSet) {
@@ -22,7 +22,7 @@ class ConfigReloadCommand extends Command {
         if (configSet.isEmpty()) {
             throw new IllegalArgumentException("configSet is empty");
         }
-        this.configList.addAll(configSet);
+        this.configs.addAll(configSet);
 
         for (BaseConfig config : configSet) {
             addChildren(new Command(config.entryName()) {
@@ -36,7 +36,7 @@ class ConfigReloadCommand extends Command {
 
     @Override
     public void execute(CommandContext ctx) {
-        configList.forEach(x -> exec(ctx, x));
+        configs.forEach(x -> exec(ctx, x));
     }
 
     private void exec(CommandContext ctx, BaseConfig config) {

@@ -22,11 +22,9 @@ class ConfigModifyCommand extends Command {
         }
 
         for (BaseConfig config : configSet) {
-            addChildren(new Command(config.entryName()) {
-                {
-                    init(config, this);
-                }
-            });
+            addChildren(new Command(config.entryName()) {{
+                init(config, this);
+            }});
         }
     }
 
@@ -38,85 +36,76 @@ class ConfigModifyCommand extends Command {
             if (Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
-           
+
             SingleValue<?, ?> v;
             try {
                 v = ((SingleValue<?, ?>) field.get(config));
-            } catch (Exception e) {
-                e.printStackTrace();
-                continue;
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
 
             if (!v.writableByCommand()) {
                 continue;
             }
 
-            command.addChildren(new Command(field.getName()) {
-                {
-                    addChildren(new ModifySetCommand(field, v, config));
+            command.addChildren(new Command(field.getName()) {{
+                addChildren(new ModifySetCommand(field, v, config));
 
-                    if (v instanceof NumericValue) {
-                        addChildren(new ModifyIncCommand(field, ((NumericValue<?, ?>) v), config));
-                        addChildren(new ModifyDecCommand(field, ((NumericValue<?, ?>) v), config));
-                    }
+                if (v instanceof NumericValue) {
+                    addChildren(new ModifyIncCommand(field, ((NumericValue<?, ?>) v), config));
+                    addChildren(new ModifyDecCommand(field, ((NumericValue<?, ?>) v), config));
                 }
-            });
+            }});
         }
 
         for (Field field : ConfigUtil.getCollectionValueFields(config)) {
             CollectionValue<?, ?, ?> v;
             try {
                 v = ((CollectionValue<?, ?, ?>) field.get(config));
-            } catch (Exception e) {
-                e.printStackTrace();
-                continue;
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
 
             if (!v.addableByCommand() && !v.removableByCommand() && !v.clearableByCommand()) {
                 continue;
             }
 
-            command.addChildren(new Command(field.getName()) {
-                {
-                    if (v.addableByCommand()) {
-                        addChildren(new ModifyAddCommand(field, v, config));
-                    }
-                    if (v.removableByCommand()) {
-                        addChildren(new ModifyRemoveCommand(field, v, config));
-                    }
-                    if (v.clearableByCommand()) {
-                        addChildren(new ModifyClearCommand(field, v, config));
-                    }
+            command.addChildren(new Command(field.getName()) {{
+                if (v.addableByCommand()) {
+                    addChildren(new ModifyAddCommand(field, v, config));
                 }
-            });
+                if (v.removableByCommand()) {
+                    addChildren(new ModifyRemoveCommand(field, v, config));
+                }
+                if (v.clearableByCommand()) {
+                    addChildren(new ModifyClearCommand(field, v, config));
+                }
+            }});
         }
 
         for (Field field : ConfigUtil.getMapValueFields(config)) {
             MapValue<?, ?, ?> v;
             try {
                 v = ((MapValue<?, ?, ?>) field.get(config));
-            } catch (Exception e) {
-                e.printStackTrace();
-                continue;
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
 
             if (!v.puttableByCommand() && !v.removableByCommand() && !v.clearableByCommand()) {
                 continue;
             }
 
-            command.addChildren(new Command(field.getName()) {
-                {
-                    if (v.puttableByCommand()) {
-                        addChildren(new ModifyMapPutCommand(field, v, config));
-                    }
-                    if (v.removableByCommand()) {
-                        addChildren(new ModifyMapRemoveCommand(field, v, config));
-                    }
-                    if (v.clearableByCommand()) {
-                        addChildren(new ModifyMapClearCommand(field, v, config));
-                    }
+            command.addChildren(new Command(field.getName()) {{
+                if (v.puttableByCommand()) {
+                    addChildren(new ModifyMapPutCommand(field, v, config));
                 }
-            });
+                if (v.removableByCommand()) {
+                    addChildren(new ModifyMapRemoveCommand(field, v, config));
+                }
+                if (v.clearableByCommand()) {
+                    addChildren(new ModifyMapClearCommand(field, v, config));
+                }
+            }});
         }
     }
 }

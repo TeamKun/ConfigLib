@@ -16,14 +16,14 @@ class ConfigListCommand extends Command {
         this.config = config;
     }
 
-    public ConfigListCommand(Set<BaseConfig> configSet) {
+    public ConfigListCommand(Set<BaseConfig> configs) {
         super(SubCommandType.List.name);
 
-        if (configSet.isEmpty()) {
-            throw new IllegalArgumentException("configSet is empty");
+        if (configs.isEmpty()) {
+            throw new IllegalArgumentException("configs is empty");
         }
 
-        for (BaseConfig config : configSet) {
+        for (BaseConfig config : configs) {
             addChildren(new Command(config.entryName()) {
                 @Override
                 public void execute(@NotNull CommandContext ctx) {
@@ -35,6 +35,7 @@ class ConfigListCommand extends Command {
 
     @Override
     public void execute(CommandContext ctx) {
+        // configsのコンストラクタで生成された時はconfigフィールドがnullになる
         if (config == null) {
             ctx.sendHelp();
         } else {
@@ -55,9 +56,8 @@ class ConfigListCommand extends Command {
             Object o;
             try {
                 o = field.get(config);
-            } catch (Exception e) {
-                e.printStackTrace();
-                continue;
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
 
             if (o instanceof Value) {

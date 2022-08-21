@@ -44,9 +44,8 @@ class ConfigGetCommand extends Command {
             Object o;
             try {
                 o = field.get(config);
-            } catch (Exception e) {
-                e.printStackTrace();
-                continue;
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
 
             if (o instanceof Value) {

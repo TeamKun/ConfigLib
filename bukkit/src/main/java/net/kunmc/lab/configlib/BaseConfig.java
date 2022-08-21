@@ -17,10 +17,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -59,17 +56,14 @@ public abstract class BaseConfig implements Listener {
         String json = readJson(configJSON);
         Class<T> clazz = constructor.getDeclaringClass();
 
-        T config = null;
         try {
-            config = constructor.newInstance(arguments);
+            T config = constructor.newInstance(arguments);
             config.setEntryName(filename.substring(0, filename.lastIndexOf('.')));
-
             replaceFields(clazz, gson.fromJson(json, clazz), config);
+            return config;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return config;
     }
 
     public BaseConfig(@NotNull Plugin plugin) {
@@ -111,7 +105,7 @@ public abstract class BaseConfig implements Listener {
                 }
             }, 0, 500);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
 
         // Pluginがenabledになっていない状態でregisterすると例外が発生するため遅延,ループさせている
@@ -169,7 +163,7 @@ public abstract class BaseConfig implements Listener {
             getConfigFile().createNewFile();
             writeJson(getConfigFile(), gson.toJson(this));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -192,7 +186,6 @@ public abstract class BaseConfig implements Listener {
 
         BaseConfig config = gson.fromJson(readJson(getConfigFile()), this.getClass());
         replaceFields(this.getClass(), config, this);
-
         return true;
     }
 
@@ -204,22 +197,19 @@ public abstract class BaseConfig implements Listener {
     }
 
     private static String readJson(File jsonFile) {
-        String json = null;
         try {
-            json = Files.readLines(jsonFile, StandardCharsets.UTF_8).stream()
+            return Files.readLines(jsonFile, StandardCharsets.UTF_8).stream()
                     .collect(Collectors.joining(System.lineSeparator()));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
-
-        return json;
     }
 
     private static void writeJson(File jsonFile, String json) {
         try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(jsonFile), StandardCharsets.UTF_8)) {
             writer.write(json);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -239,7 +229,7 @@ public abstract class BaseConfig implements Listener {
             try {
                 replaceField(field, src, dst);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }
