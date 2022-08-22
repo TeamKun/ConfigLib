@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.gson;
 
 import com.google.gson.*;
-import net.kunmc.lab.configlib.value.Nameable;
+import net.kunmc.lab.commandlib.Nameable;
 import org.bukkit.craftbukkit.libs.org.codehaus.plexus.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -25,7 +25,7 @@ public class NameableTypeAdapter implements JsonSerializer<Nameable>, JsonDeseri
                         throw new RuntimeException(e);
                     }
                 });
-       
+
         return object;
     }
 

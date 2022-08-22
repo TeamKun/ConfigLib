@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.gson;
 
 import com.google.gson.*;
-import net.kunmc.lab.configlib.value.Nameable;
+import net.kunmc.lab.commandlib.Nameable;
 import org.codehaus.plexus.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
