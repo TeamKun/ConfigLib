@@ -26,6 +26,7 @@ import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
@@ -51,6 +52,7 @@ public abstract class BaseConfig implements Listener {
             .registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
             .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
             .registerTypeHierarchyAdapter(Nameable.class, new NameableTypeAdapter())
+            .registerTypeHierarchyAdapter(Set.class, new SetTypeAdapter())
             .create();
 
     public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Constructor<T> constructor, Object... arguments) {
