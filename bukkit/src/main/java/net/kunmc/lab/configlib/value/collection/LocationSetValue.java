@@ -40,7 +40,7 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public Set<Location> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    public Set<Location> argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender) {
         Location l = ((Location) argument.get(0));
 
         if (sender instanceof ConsoleCommandSender) {

@@ -24,7 +24,7 @@ class ModifyRemoveCommand extends Command {
                     return;
                 }
 
-                Collection newValue = value.argumentToValueForRemove(argument, sender);
+                Collection newValue = value.argumentToValueForRemove(entryName, argument, sender);
                 if (!value.validateForRemove(entryName, newValue, sender)) {
                     ctx.sendFailure(value.invalidValueMessageForRemove(entryName, newValue, sender));
                     return;

@@ -40,7 +40,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender);
 
-    protected abstract T argumentToValueForAdd(List<Object> argument, CommandSender sender);
+    protected abstract T argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender);
 
     protected abstract boolean validateForAdd(String entryName, T value, CommandSender sender);
 

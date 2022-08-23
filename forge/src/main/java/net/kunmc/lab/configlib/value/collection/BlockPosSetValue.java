@@ -34,7 +34,7 @@ public class BlockPosSetValue extends SetValue<BlockPos, BlockPosSetValue> {
     }
 
     @Override
-    protected Set<BlockPos> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
+    protected Set<BlockPos> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return null;
     }
 
@@ -54,7 +54,7 @@ public class BlockPosSetValue extends SetValue<BlockPos, BlockPosSetValue> {
     }
 
     @Override
-    protected Set<BlockPos> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
+    protected Set<BlockPos> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return null;
     }
 

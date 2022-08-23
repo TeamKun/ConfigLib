@@ -41,7 +41,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
     }
 
     @Override
-    protected Set<T> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
+    protected Set<T> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return Sets.newHashSet(clazz.cast(argument.get(0)));
     }
 
@@ -61,7 +61,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
     }
 
     @Override
-    protected Set<T> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
+    protected Set<T> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return Sets.newHashSet(clazz.cast(argument.get(0)));
     }
 

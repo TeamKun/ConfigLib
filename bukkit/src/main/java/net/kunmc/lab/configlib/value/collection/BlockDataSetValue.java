@@ -44,7 +44,7 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
     }
 
     @Override
-    protected Set<BlockData> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    protected Set<BlockData> argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return Sets.newHashSet((BlockData) argument.get(0));
     }
 

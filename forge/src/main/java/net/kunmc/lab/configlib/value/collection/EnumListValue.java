@@ -40,7 +40,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected List<T> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
+    protected List<T> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return Collections.singletonList(clazz.cast(argument.get(0)));
     }
 
@@ -60,7 +60,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected List<T> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
+    protected List<T> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return Collections.singletonList(clazz.cast(argument.get(0)));
     }
 

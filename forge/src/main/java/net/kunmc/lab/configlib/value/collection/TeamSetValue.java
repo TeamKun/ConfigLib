@@ -49,7 +49,7 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     }
 
     @Override
-    protected Set<ScorePlayerTeam> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
+    protected Set<ScorePlayerTeam> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return Sets.newHashSet(((ScorePlayerTeam) argument.get(0)));
     }
 
@@ -73,7 +73,7 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     }
 
     @Override
-    protected Set<ScorePlayerTeam> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
+    protected Set<ScorePlayerTeam> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return Sets.newHashSet(((ScorePlayerTeam) argument.get(0)));
     }
 

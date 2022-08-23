@@ -42,7 +42,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
 
     @Override
-    protected Set<UUID> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
+    protected Set<UUID> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return ((List<Entity>) argument.get(0)).stream()
                 .map(Entity::getUniqueID).collect(Collectors.toSet());
     }
@@ -98,7 +98,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected Set<UUID> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
+    protected Set<UUID> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
         String s = argument.get(0).toString();
 
         if (s.equals("@a")) {

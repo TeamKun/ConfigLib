@@ -50,7 +50,7 @@ public class ObjectSetValue<T extends Nameable> extends SetValue<T, ObjectSetVal
     }
 
     @Override
-    protected Set<T> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    protected Set<T> argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return Sets.newHashSet(((T) argument.get(0)));
     }
 

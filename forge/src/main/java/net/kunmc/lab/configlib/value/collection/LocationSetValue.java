@@ -35,7 +35,7 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public Set<Location> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
+    public Set<Location> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return Sets.newHashSet((Location) argument.get(0));
     }
 
@@ -77,7 +77,7 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public Set<Location> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
+    public Set<Location> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
         double x = ((Double) argument.get(0));
         double y = ((Double) argument.get(1));
         double z = ((Double) argument.get(2));

@@ -52,7 +52,7 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     }
 
     @Override
-    protected Set<Team> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    protected Set<Team> argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return Sets.newHashSet(((Team) argument.get(0)));
     }
 

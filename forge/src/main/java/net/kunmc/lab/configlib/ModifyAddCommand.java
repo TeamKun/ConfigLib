@@ -24,7 +24,7 @@ class ModifyAddCommand extends Command {
                     return;
                 }
 
-                Collection newValue = value.argumentToValueForAdd(argument, sender);
+                Collection newValue = value.argumentToValueForAdd(entryName, argument, sender);
                 if (!value.validateForAdd(entryName, newValue, sender)) {
                     ctx.sendFailure(value.invalidValueMessageForAdd(entryName, newValue, sender));
                     return;

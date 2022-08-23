@@ -59,7 +59,7 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected Set<String> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
+    protected Set<String> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return Collections.singleton(argument.get(0).toString());
     }
 
@@ -81,7 +81,7 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected Set<String> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
+    protected Set<String> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return Collections.singleton(argument.get(0).toString());
     }
 

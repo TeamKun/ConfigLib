@@ -43,7 +43,7 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
     }
 
     @Override
-    protected Set<BlockState> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
+    protected Set<BlockState> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return Sets.newHashSet(((BlockStateInput) argument.get(0)).getState());
     }
 
@@ -67,7 +67,7 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
     }
 
     @Override
-    protected Set<BlockState> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
+    protected Set<BlockState> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return Sets.newHashSet(((BlockStateInput) argument.get(0)).getState());
     }
 

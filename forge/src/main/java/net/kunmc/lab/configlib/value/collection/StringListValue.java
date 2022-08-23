@@ -60,7 +60,7 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected List<String> argumentToValueForAdd(List<Object> argument, CommandSource sender) {
+    protected List<String> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
         return argument.stream()
                 .map(Object::toString)
                 .collect(Collectors.toList());
@@ -93,7 +93,7 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected List<String> argumentToValueForRemove(List<Object> argument, CommandSource sender) {
+    protected List<String> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
         return argument.stream()
                 .map(Object::toString)
                 .collect(Collectors.toList());

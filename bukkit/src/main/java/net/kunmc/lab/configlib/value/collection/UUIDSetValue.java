@@ -43,7 +43,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
 
     @Override
-    protected Set<UUID> argumentToValueForAdd(List<Object> argument, CommandSender sender) {
+    protected Set<UUID> argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return ((List<Entity>) argument.get(0)).stream()
                 .map(Entity::getUniqueId)
                 .collect(Collectors.toSet());

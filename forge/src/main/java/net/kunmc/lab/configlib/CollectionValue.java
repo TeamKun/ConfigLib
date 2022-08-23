@@ -40,7 +40,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSource sender);
 
-    protected abstract T argumentToValueForAdd(List<Object> argument, CommandSource sender);
+    protected abstract T argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender);
 
     protected abstract boolean validateForAdd(String entryName, T value, CommandSource sender);
 
@@ -92,7 +92,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender);
 
-    protected abstract T argumentToValueForRemove(List<Object> argument, CommandSource sender);
+    protected abstract T argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender);
 
     protected abstract boolean validateForRemove(String entryName, T value, CommandSource sender);
 
