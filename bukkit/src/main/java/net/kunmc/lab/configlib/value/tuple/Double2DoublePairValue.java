@@ -25,7 +25,7 @@ public class Double2DoublePairValue extends Double2ObjectPairValue<Double, Doubl
 
     @Override
     protected void appendRightArgument(ArgumentBuilder builder) {
-        builder.doubleArgument("double2");
+        builder.doubleArgument("double2", min, max);
     }
 
     @Override
