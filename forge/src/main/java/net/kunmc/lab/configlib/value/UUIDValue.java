@@ -25,34 +25,32 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     public @Nullable PlayerEntity toPlayer() {
-        if (value != null) {
-            return ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByUUID(value);
+        if (value == null) {
+            return null;
         }
-
-        return null;
+        return ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByUUID(value);
     }
 
     public String playerName() {
         if (value == null) {
             return "";
         }
-
         return valueToString(value);
     }
 
     @Override
     protected void appendArgument(ArgumentBuilder builder) {
-        builder.entityArgument("target", false, true);
+        builder.playerArgument("target");
     }
 
     @Override
     protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSource sender) {
-        return !((List) argument.get(0)).isEmpty();
+        return true;
     }
 
     @Override
     protected UUID argumentToValue(List<Object> argument, CommandSource sender) {
-        return ((List<PlayerEntity>) argument.get(0)).get(0).getUniqueID();
+        return ((PlayerEntity) argument.get(0)).getUniqueID();
     }
 
     @Override

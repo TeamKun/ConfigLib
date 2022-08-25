@@ -28,23 +28,23 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
     @Override
     protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.entityArgument("players", false, false);
+        builder.playersArgument("players");
     }
 
     @Override
     protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
-        return !((List) argument.get(0)).isEmpty();
+        return true;
     }
 
     @Override
     protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender) {
-        return "指定されたプレイヤーは存在しないかオフラインです.";
+        return "";
     }
 
 
     @Override
     protected Set<UUID> argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender) {
-        return ((List<Entity>) argument.get(0)).stream()
+        return ((List<Player>) argument.get(0)).stream()
                 .map(Entity::getUniqueId)
                 .collect(Collectors.toSet());
     }

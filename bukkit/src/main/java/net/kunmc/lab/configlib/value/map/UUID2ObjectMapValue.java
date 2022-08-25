@@ -5,7 +5,6 @@ import net.kunmc.lab.configlib.MapValue;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,22 +20,22 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
-        builder.entityArgument("player", false, true);
+        builder.offlinePlayerArgument("player");
     }
 
     @Override
     protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
-        return !((List) argument.get(0)).isEmpty();
+        return true;
     }
 
     @Override
     protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
-        return "指定されたプレイヤーは存在しないかオフラインです.";
+        return "";
     }
 
     @Override
     protected UUID argumentToKeyForPut(List<Object> argument, CommandSender sender) {
-        return ((List<Entity>) argument.get(0)).get(0).getUniqueId();
+        return ((OfflinePlayer) argument.get(0)).getUniqueId();
     }
 
     @Override

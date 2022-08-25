@@ -5,7 +5,6 @@ import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.configlib.MapValue;
 import net.minecraft.command.CommandSource;
-import net.minecraft.entity.Entity;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import java.util.*;
@@ -21,22 +20,22 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
-        builder.entityArgument("player", false, true);
+        builder.gameProfileArgument("player");
     }
 
     @Override
     protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
-        return !((List) argument.get(0)).isEmpty();
+        return true;
     }
 
     @Override
     protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
-        return "指定されたプレイヤーは存在しないかオフラインです.";
+        return "";
     }
 
     @Override
     protected UUID argumentToKeyForPut(List<Object> argument, CommandSource sender) {
-        return ((List<Entity>) argument.get(0)).get(0).getUniqueID();
+        return ((GameProfile) argument.get(0)).getId();
     }
 
     @Override
