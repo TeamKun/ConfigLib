@@ -27,7 +27,7 @@ dependencies {
     implementation "com.google.code.gson:gson:2.8.9"
     implementation group: "org.apache.poi", name: "poi", version: "5.1.0"
     implementation "org.apache.commons:commons-lang3:3.0"
-    compileOnly "com.github.TeamKun.CommandLib:bukkit:0.5.2"
+    compileOnly "com.github.TeamKun.CommandLib:bukkit:0.6.0"
     compileOnly fileTree(dir: "./libs/", include: "patched*.jar")
     compileOnly "com.mojang:brigadier:1.0.18"
 }
