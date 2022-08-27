@@ -43,7 +43,7 @@ public abstract class BaseConfig {
     protected transient boolean enableList = true;
     protected transient boolean enableModify = true;
     protected transient boolean enableReload = true;
-    private final transient List<Runnable> onLoadListeners = new ArrayList<>();
+    private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
     private transient WatchService watchService;
     private transient TimerTask watchTask;
     private static final Gson gson = new GsonBuilder()
@@ -108,7 +108,7 @@ public abstract class BaseConfig {
             public void run() {
                 saveConfigIfAbsent();
                 loadConfig();
-                onLoadListeners.forEach(Runnable::run);
+                onInitializeListeners.forEach(Runnable::run);
             }
         }.start();
 
@@ -151,8 +151,8 @@ public abstract class BaseConfig {
     /**
      * set listener fired on initialization.
      */
-    protected final void onLoad(Runnable onLoad) {
-        onLoadListeners.add(onLoad);
+    protected final void onInitialize(Runnable onLoad) {
+        onInitializeListeners.add(onLoad);
     }
 
     boolean isGetEnabled() {

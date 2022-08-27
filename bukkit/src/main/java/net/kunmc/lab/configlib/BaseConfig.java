@@ -36,7 +36,7 @@ public abstract class BaseConfig implements Listener {
     private final transient Timer timer = new Timer();
     private transient String entryName = "";
 
-    private final transient List<Runnable> onLoadListeners = new ArrayList<>();
+    private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
     protected transient boolean enableGet = true;
     protected transient boolean enableList = true;
     protected transient boolean enableModify = true;
@@ -88,7 +88,7 @@ public abstract class BaseConfig implements Listener {
             public void run() {
                 saveConfigIfAbsent();
                 loadConfig();
-                onLoadListeners.forEach(Runnable::run);
+                onInitializeListeners.forEach(Runnable::run);
             }
         }.runTask(plugin);
 
@@ -129,8 +129,8 @@ public abstract class BaseConfig implements Listener {
     /**
      * set listener fired on initialization.
      */
-    protected final void onLoad(Runnable onLoad) {
-        onLoadListeners.add(onLoad);
+    protected final void onInitialize(Runnable onLoad) {
+        onInitializeListeners.add(onLoad);
     }
 
     boolean isGetEnabled() {
