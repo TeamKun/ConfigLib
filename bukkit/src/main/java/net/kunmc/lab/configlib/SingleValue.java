@@ -89,11 +89,17 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
 
     protected abstract String invalidValueMessage(String entryName, E newValue, CommandSender sender);
 
+    /**
+     * set value after firing listeners registered by {@link net.kunmc.lab.configlib.SingleValue#onModify(Consumer)}
+     */
     public final void setValueWithEvent(E value) {
         modifyListeners.forEach(x -> x.accept(value));
         super.value(value);
     }
 
+    /**
+     * add an event listener fired on modify command or {@link net.kunmc.lab.configlib.SingleValue#setValueWithEvent}.
+     */
     public T onModify(Consumer<E> listener) {
         modifyListeners.add(listener);
         return onModify((v, ctx) -> {

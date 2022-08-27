@@ -148,6 +148,9 @@ public abstract class BaseConfig {
         }
     }
 
+    /**
+     * set listener fired on initialization.
+     */
     protected final void onLoad(Runnable onLoad) {
         onLoadListeners.add(onLoad);
     }
