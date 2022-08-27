@@ -10,7 +10,8 @@ import java.util.Optional;
 import java.util.function.*;
 
 public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<E, T> {
-    private transient final List<BiFunction<E, CommandContext, Boolean>> listeners = new ArrayList<>();
+    private transient final List<BiFunction<E, CommandContext, Boolean>> modifyCommandListeners = new ArrayList<>();
+    private transient final List<Consumer<E>> modifyListeners = new ArrayList<>();
     private transient boolean writable = true;
 
     public SingleValue(E value) {
@@ -88,7 +89,13 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
 
     protected abstract String invalidValueMessage(String entryName, E newValue, CommandSource sender);
 
+    public final void setValueWithEvent(E value) {
+        modifyListeners.forEach(x -> x.accept(value));
+        super.value(value);
+    }
+
     public T onModify(Consumer<E> listener) {
+        modifyListeners.add(listener);
         return onModify((v, ctx) -> {
             listener.accept(v);
         });
@@ -105,12 +112,12 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
      * @return true if you want to cancel event, otherwise false
      */
     public T onModify(BiFunction<E, CommandContext, Boolean> listener) {
-        listeners.add(listener);
+        modifyCommandListeners.add(listener);
         return ((T) this);
     }
 
     protected boolean onModifyValue(E newValue, CommandContext ctx) {
-        return listeners.stream()
+        return modifyCommandListeners.stream()
                 .map(x -> x.apply(newValue, ctx))
                 .reduce(false, (a, b) -> a || b);
     }
