@@ -27,10 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.List;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -46,9 +43,10 @@ public abstract class BaseConfig {
     protected transient boolean enableList = true;
     protected transient boolean enableModify = true;
     protected transient boolean enableReload = true;
+    private final transient List<Runnable> onLoadListeners = new ArrayList<>();
     private transient WatchService watchService;
     private transient TimerTask watchTask;
-    private static final transient Gson gson = new GsonBuilder()
+    private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .enableComplexMapKeySerialization()
             .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
@@ -110,6 +108,7 @@ public abstract class BaseConfig {
             public void run() {
                 saveConfigIfAbsent();
                 loadConfig();
+                onLoadListeners.forEach(Runnable::run);
             }
         }.start();
 
@@ -147,6 +146,10 @@ public abstract class BaseConfig {
                 throw new UncheckedIOException(ex);
             }
         }
+    }
+
+    protected final void onLoad(Runnable onLoad) {
+        onLoadListeners.add(onLoad);
     }
 
     boolean isGetEnabled() {

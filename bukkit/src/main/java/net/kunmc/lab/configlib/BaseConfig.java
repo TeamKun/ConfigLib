@@ -25,10 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.List;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
@@ -37,6 +34,8 @@ public abstract class BaseConfig implements Listener {
     private final transient Plugin plugin;
     private final transient Timer timer = new Timer();
     private transient String entryName = "";
+
+    private final transient List<Runnable> onLoadListeners = new ArrayList<>();
     protected transient boolean enableGet = true;
     protected transient boolean enableList = true;
     protected transient boolean enableModify = true;
@@ -88,6 +87,7 @@ public abstract class BaseConfig implements Listener {
             public void run() {
                 saveConfigIfAbsent();
                 loadConfig();
+                onLoadListeners.forEach(Runnable::run);
             }
         }, 10);
 
@@ -123,6 +123,10 @@ public abstract class BaseConfig implements Listener {
                 }
             }
         }, 100, 100);
+    }
+
+    protected final void onLoad(Runnable onLoad) {
+        onLoadListeners.add(onLoad);
     }
 
     boolean isGetEnabled() {
