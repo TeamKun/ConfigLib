@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
@@ -82,14 +83,14 @@ public abstract class BaseConfig implements Listener {
         plugin.getDataFolder().mkdir();
 
         // コンストラクタの処理内でシリアライズするとフィールドの初期化が終わってない状態でシリアライズされるため遅延させている.
-        timer.schedule(new TimerTask() {
+        new BukkitRunnable() {
             @Override
             public void run() {
                 saveConfigIfAbsent();
                 loadConfig();
                 onLoadListeners.forEach(Runnable::run);
             }
-        }, 10);
+        }.runTask(plugin);
 
         try {
             WatchService watcher = FileSystems.getDefault().newWatchService();
