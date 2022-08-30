@@ -33,7 +33,6 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public abstract class BaseConfig implements Listener {
     private final transient Plugin plugin;
-    private final transient Timer timer = new Timer();
     private transient String entryName = "";
 
     private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
@@ -92,9 +91,12 @@ public abstract class BaseConfig implements Listener {
             }
         }.runTask(plugin);
 
+        Timer timer = new Timer();
+        WatchService watcher;
+        WatchKey watchKey;
         try {
-            WatchService watcher = FileSystems.getDefault().newWatchService();
-            WatchKey watchKey = plugin.getDataFolder().toPath().register(watcher, ENTRY_MODIFY);
+            watcher = FileSystems.getDefault().newWatchService();
+            watchKey = plugin.getDataFolder().toPath().register(watcher, ENTRY_MODIFY);
 
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
@@ -110,16 +112,30 @@ public abstract class BaseConfig implements Listener {
                 }
             }, 0, 500);
         } catch (IOException e) {
+            e.printStackTrace();
             throw new UncheckedIOException(e);
         }
 
         // Pluginがenabledになっていない状態でregisterすると例外が発生するため遅延,ループさせている
-        BaseConfig instance = this;
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().registerEvents(instance, plugin);
+                    Bukkit.getPluginManager().registerEvents(new Listener() {
+                        @EventHandler
+                        public void onPluginDisable(PluginDisableEvent e) {
+                            if (e.getPlugin() == plugin) {
+                                try {
+                                    timer.cancel();
+                                    watcher.close();
+                                    watchKey.cancel();
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        }
+                    }, plugin);
+
                     cancel();
                 }
             }
@@ -199,13 +215,6 @@ public abstract class BaseConfig implements Listener {
         BaseConfig config = gson.fromJson(readJson(getConfigFile()), this.getClass());
         replaceFields(this.getClass(), config, this);
         return true;
-    }
-
-    @EventHandler
-    private void onPluginDisable(PluginDisableEvent e) {
-        if (e.getPlugin() == plugin) {
-            timer.cancel();
-        }
     }
 
     private static String readJson(File jsonFile) {
