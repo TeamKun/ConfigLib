@@ -10,23 +10,23 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class ObjectValue<T extends Nameable> extends SingleValue<T, ObjectValue<T>> {
+public class NameableObjectValue<T extends Nameable> extends SingleValue<T, NameableObjectValue<T>> {
     private transient final Collection<? extends T> candidates;
     private transient final Predicate<? super T> filter;
 
-    public ObjectValue(T initial, T candidate, T... candidates) {
+    public NameableObjectValue(T initial, T candidate, T... candidates) {
         this(initial, Lists.asList(candidate, candidates));
     }
 
-    public ObjectValue(T initial, Predicate<T> filter, T candidate, T... candidates) {
+    public NameableObjectValue(T initial, Predicate<T> filter, T candidate, T... candidates) {
         this(initial, Lists.asList(candidate, candidates), filter);
     }
 
-    public ObjectValue(T initial, Collection<? extends T> candidates) {
+    public NameableObjectValue(T initial, Collection<? extends T> candidates) {
         this(initial, candidates, x -> true);
     }
 
-    public ObjectValue(T initial, Collection<? extends T> candidates, Predicate<? super T> filter) {
+    public NameableObjectValue(T initial, Collection<? extends T> candidates, Predicate<? super T> filter) {
         super(initial);
 
         this.candidates = candidates;
@@ -35,7 +35,7 @@ public class ObjectValue<T extends Nameable> extends SingleValue<T, ObjectValue<
 
     @Override
     protected void appendArgument(ArgumentBuilder builder) {
-        builder.objectArgument("name", candidates, filter);
+        builder.nameableObjectArgument("name", candidates, filter);
     }
 
     @Override

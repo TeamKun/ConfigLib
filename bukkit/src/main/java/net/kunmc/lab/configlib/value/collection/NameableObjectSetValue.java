@@ -11,15 +11,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public class ObjectSetValue<T extends Nameable> extends SetValue<T, ObjectSetValue<T>> {
+public class NameableObjectSetValue<T extends Nameable> extends SetValue<T, NameableObjectSetValue<T>> {
     private transient final Collection<? extends T> candidates;
     private transient final Predicate<? super T> filter;
 
-    public ObjectSetValue(Collection<? extends T> candidates) {
+    public NameableObjectSetValue(Collection<? extends T> candidates) {
         this(candidates, x -> true);
     }
 
-    public ObjectSetValue(Collection<? extends T> candidates, Predicate<? super T> filter) {
+    public NameableObjectSetValue(Collection<? extends T> candidates, Predicate<? super T> filter) {
         super(new NameableSet<>());
 
         this.candidates = candidates;
@@ -28,10 +28,10 @@ public class ObjectSetValue<T extends Nameable> extends SetValue<T, ObjectSetVal
 
     @Override
     protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.objectArgument("name", candidates, x -> {
+        builder.nameableObjectArgument("name", candidates, x -> {
             if (value.stream()
-                    .map(Nameable::tabCompleteName)
-                    .anyMatch(y -> y.equals(x.tabCompleteName()))) {
+                     .map(Nameable::tabCompleteName)
+                     .anyMatch(y -> y.equals(x.tabCompleteName()))) {
                 return false;
             }
 
@@ -61,10 +61,10 @@ public class ObjectSetValue<T extends Nameable> extends SetValue<T, ObjectSetVal
 
     @Override
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.objectArgument("name", candidates, x -> {
+        builder.nameableObjectArgument("name", candidates, x -> {
             return value.stream()
-                    .map(Nameable::tabCompleteName)
-                    .anyMatch(y -> y.equals(x.tabCompleteName()));
+                        .map(Nameable::tabCompleteName)
+                        .anyMatch(y -> y.equals(x.tabCompleteName()));
         });
     }
 
