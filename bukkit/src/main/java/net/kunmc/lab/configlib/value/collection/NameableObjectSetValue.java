@@ -55,7 +55,7 @@ public class NameableObjectSetValue<T extends Nameable> extends SetValue<T, Name
     }
 
     @Override
-    protected boolean validateForRemove(String entryName, Set<T> element, CommandSender sender) {
+    protected boolean validateForRemove(String entryName, Set<T> value, CommandSender sender) {
         return true;
     }
 

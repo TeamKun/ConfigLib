@@ -1,7 +1,6 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.UUID;
 public class UUID2UUIDMapValue extends UUID2ObjectMapValue<UUID, UUID2UUIDMapValue> {
     @Override
     protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.offlinePlayerArgument("player2");
+        builder.uuidArgument("target2");
     }
 
     @Override
@@ -19,13 +18,15 @@ public class UUID2UUIDMapValue extends UUID2ObjectMapValue<UUID, UUID2UUIDMapVal
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSender sender) {
         return "";
     }
 
     @Override
     protected UUID argumentToValueForPut(List<Object> argument, CommandSender sender) {
-        return ((OfflinePlayer) argument.get(1)).getUniqueId();
+        return ((UUID) argument.get(1));
     }
 
     @Override

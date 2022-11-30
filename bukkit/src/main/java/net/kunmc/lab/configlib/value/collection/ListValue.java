@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class ListValue<E, U extends ListValue<E, U>> extends CollectionValue<List<E>, E, U> implements Iterable<E> {
@@ -54,7 +55,11 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
 
     @Override
     protected final String invalidValueMessageForRemove(String entryName, List<E> value, CommandSender sender) {
-        return String.format("%sは%sに追加されていませんでした.", elementToString(value.get(0)), entryName);
+        return String.format("%sは%sに追加されていませんでした.",
+                             value.stream()
+                                  .map(this::elementToString)
+                                  .collect(Collectors.toList()),
+                             entryName);
     }
 
     @Override

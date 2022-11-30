@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.MapValue;
+import net.kunmc.lab.configlib.util.UUIDUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -20,7 +21,7 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
-        builder.offlinePlayerArgument("player");
+        builder.uuidArgument("target");
     }
 
     @Override
@@ -35,62 +36,45 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected UUID argumentToKeyForPut(List<Object> argument, CommandSender sender) {
-        return ((OfflinePlayer) argument.get(0)).getUniqueId();
+        return ((UUID) argument.get(0));
     }
 
     @Override
     protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
-        builder.unparsedArgument("target", sb -> {
-            List<String> list = value.keySet().stream()
-                    .map(Bukkit::getOfflinePlayer)
-                    .map(OfflinePlayer::getName)
-                    .collect(Collectors.toList());
-            if (!list.isEmpty()) {
-                list.add("@r");
-            }
-
-            list.forEach(sb::suggest);
+        builder.uuidArgumentWith("target", option -> {
+            List<UUID> offlinePlayerUUIDs = Arrays.stream(Bukkit.getOfflinePlayers())
+                                                  .map(OfflinePlayer::getUniqueId)
+                                                  .collect(Collectors.toList());
+            option.filter(x -> value.containsKey(x))
+                  .additionalSuggestionAction(sb -> {
+                      value.keySet()
+                           .stream()
+                           .filter(x -> !offlinePlayerUUIDs.contains(x))
+                           .map(Object::toString)
+                           .forEach(sb::suggest);
+                  });
         });
     }
 
     @Override
     protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
-        String sel = argument.get(0).toString();
-        return !value.isEmpty() && sel.equals("@r") ||
-                value.keySet().stream()
-                        .map(Bukkit::getOfflinePlayer)
-                        .map(OfflinePlayer::getName)
-                        .anyMatch(s -> s.equals(sel));
+        return true;
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
-        String s = argument.get(0).toString();
-
-        if (s.equals("@r")) {
-            return "セレクターは@rのみ指定できます.";
-        }
-
-        return s + "は追加されていませんでした.";
+    protected String incorrectKeyArgumentMessageForRemove(String entryName,
+                                                          List<Object> argument,
+                                                          CommandSender sender) {
+        return "";
     }
 
     @Override
     protected UUID argumentToKeyForRemove(List<Object> argument, CommandSender sender) {
-        String s = argument.get(0).toString();
-
-        if (s.equals("@r")) {
-            List<UUID> list = new ArrayList<>(value.keySet());
-            Collections.shuffle(list);
-            return list.get(0);
-        }
-
-        return Bukkit.getOfflinePlayerIfCached(s).getUniqueId();
+        return (UUID) argument.get(0);
     }
 
     @Override
     protected String keyToString(UUID uuid) {
-        return Optional.of(Bukkit.getOfflinePlayer(uuid))
-                .map(OfflinePlayer::getName)
-                .orElse("null");
+        return UUIDUtil.getNameOrUuid(uuid);
     }
 }
