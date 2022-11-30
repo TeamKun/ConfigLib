@@ -26,7 +26,7 @@ public class UUID2UUIDMapValue extends UUID2ObjectMapValue<UUID, UUID2UUIDMapVal
 
     @Override
     protected UUID argumentToValueForPut(List<Object> argument, CommandSender sender) {
-        return ((UUID) argument.get(1))
+        return ((UUID) argument.get(1));
     }
 
     @Override
