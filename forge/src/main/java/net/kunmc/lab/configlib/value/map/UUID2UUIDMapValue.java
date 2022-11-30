@@ -1,6 +1,5 @@
 package net.kunmc.lab.configlib.value.map;
 
-import com.mojang.authlib.GameProfile;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.minecraft.command.CommandSource;
 
@@ -10,7 +9,7 @@ import java.util.UUID;
 public class UUID2UUIDMapValue extends UUID2ObjectMapValue<UUID, UUID2UUIDMapValue> {
     @Override
     protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.gameProfileArgument("player2");
+        builder.uuidArgument("target2");
     }
 
     @Override
@@ -19,13 +18,15 @@ public class UUID2UUIDMapValue extends UUID2ObjectMapValue<UUID, UUID2UUIDMapVal
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 
     @Override
     protected UUID argumentToValueForPut(List<Object> argument, CommandSource sender) {
-        return ((GameProfile) argument.get(1)).getId();
+        return ((UUID) argument.get(1));
     }
 
     @Override

@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value;
 
-import com.mojang.authlib.GameProfile;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.UUIDUtil;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -28,7 +28,9 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
         if (value == null) {
             return null;
         }
-        return ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByUUID(value);
+        return ServerLifecycleHooks.getCurrentServer()
+                                   .getPlayerList()
+                                   .getPlayerByUUID(value);
     }
 
     public String playerName() {
@@ -40,7 +42,7 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
 
     @Override
     protected void appendArgument(ArgumentBuilder builder) {
-        builder.playerArgument("target");
+        builder.uuidArgument("target");
     }
 
     @Override
@@ -50,12 +52,12 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
 
     @Override
     protected UUID argumentToValue(List<Object> argument, CommandSource sender) {
-        return ((PlayerEntity) argument.get(0)).getUniqueID();
+        return ((UUID) argument.get(0));
     }
 
     @Override
     protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSource sender) {
-        return "指定されたプレイヤーは存在しないかオフラインです.";
+        return "";
     }
 
     @Override
@@ -65,17 +67,12 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
 
     @Override
     protected String invalidValueMessage(String entryName, UUID newValue, CommandSource sender) {
-        return newValue + "は不正な値です.";
+        return "";
     }
 
     @Override
     protected String valueToString(UUID uuid) {
-        GameProfile profile = ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache().getProfileByUUID(uuid);
-        if (profile == null) {
-            return "null";
-        }
-
-        return profile.getName();
+        return UUIDUtil.getNameOrUuid(uuid);
     }
 
     @Override

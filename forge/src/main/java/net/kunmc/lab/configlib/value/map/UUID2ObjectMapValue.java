@@ -2,12 +2,15 @@ package net.kunmc.lab.configlib.value.map;
 
 import com.mojang.authlib.GameProfile;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.configlib.MapValue;
+import net.kunmc.lab.configlib.util.UUIDUtil;
 import net.minecraft.command.CommandSource;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>> extends MapValue<UUID, V, T> {
     public UUID2ObjectMapValue() {
@@ -40,38 +43,39 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
-        builder.stringArgument("player", StringArgument.Type.WORD, sb -> {
-            value.keySet().stream()
-                    .map(uuid -> ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache().getProfileByUUID(uuid))
-                    .map(GameProfile::getName)
-                    .forEach(sb::suggest);
+        builder.uuidArgumentWith("target", option -> {
+            option.additionalSuggestionAction(sb -> {
+                      value.keySet()
+                           .stream()
+                           .filter(x -> ServerLifecycleHooks.getCurrentServer()
+                                                            .getPlayerProfileCache()
+                                                            .getProfileByUUID(x) == null)
+                           .map(Object::toString)
+                           .forEach(sb::suggest);
+                  })
+                  .filter(x -> value.containsKey(x));
         });
     }
 
     @Override
     protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
-        String s = argument.get(0).toString();
-        return value.keySet().stream()
-                .map(uuid -> ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache().getProfileByUUID(uuid))
-                .map(GameProfile::getName)
-                .anyMatch(x -> x.equals(s));
+        return true;
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
-        return "指定されたプレイヤーは追加されていません.";
+    protected String incorrectKeyArgumentMessageForRemove(String entryName,
+                                                          List<Object> argument,
+                                                          CommandSource sender) {
+        return "";
     }
 
     @Override
     protected UUID argumentToKeyForRemove(List<Object> argument, CommandSource sender) {
-        return ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
-                .getGameProfileForUsername(argument.get(0).toString()).getId();
+        return ((UUID) argument.get(0));
     }
 
     @Override
     protected String keyToString(UUID uuid) {
-        return Optional.ofNullable(ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache().getProfileByUUID(uuid))
-                .map(GameProfile::getName)
-                .orElse("null");
+        return UUIDUtil.getNameOrUuid(uuid);
     }
 }

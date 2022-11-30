@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -14,23 +15,31 @@ public abstract class SetValue<E, U extends SetValue<E, U>> extends CollectionVa
     }
 
     @Override
-    protected boolean validateForAdd(String entryName, Set<E> element, CommandSender sender) {
-        return !value.containsAll(element);
+    protected boolean validateForAdd(String entryName, Set<E> value, CommandSender sender) {
+        return !this.value.containsAll(value);
     }
 
     @Override
-    protected String invalidValueMessageForAdd(String entryName, Set<E> element, CommandSender sender) {
-        return String.format("%sはすでに%sに追加されています.", elementToString(((E[]) element.toArray())[0]), entryName);
+    protected String invalidValueMessageForAdd(String entryName, Set<E> value, CommandSender sender) {
+        return String.format("%sはすでに%sに追加されています.",
+                             value.stream()
+                                  .map(this::elementToString)
+                                  .collect(Collectors.toList()),
+                             entryName);
     }
 
     @Override
-    protected boolean validateForRemove(String entryName, Set<E> element, CommandSender sender) {
-        return value.containsAll(element);
+    protected boolean validateForRemove(String entryName, Set<E> value, CommandSender sender) {
+        return this.value.containsAll(value);
     }
 
     @Override
-    protected String invalidValueMessageForRemove(String entryName, Set<E> element, CommandSender sender) {
-        return String.format("%sは%sに追加されていませんでした.", elementToString(((E[]) element.toArray())[0]), entryName);
+    protected String invalidValueMessageForRemove(String entryName, Set<E> value, CommandSender sender) {
+        return String.format("%sは%sに追加されていませんでした.",
+                             value.stream()
+                                  .map(this::elementToString)
+                                  .collect(Collectors.toList()),
+                             entryName);
     }
 
     public int size() {

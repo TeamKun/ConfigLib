@@ -2,12 +2,16 @@ package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.configlib.util.UUIDUtil;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
@@ -17,8 +21,8 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
     public UUIDSetValue(Collection<PlayerEntity> players) {
         this(players.stream()
-                .map(Entity::getUniqueID)
-                .collect(Collectors.toSet()));
+                    .map(Entity::getUniqueID)
+                    .collect(Collectors.toSet()));
     }
 
     public UUIDSetValue(Set<UUID> value) {
@@ -27,7 +31,11 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
     @Override
     protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.playersArgument("players");
+        builder.uuidsArgumentWith("targets", option -> {
+            option.filter(x -> {
+                return x.size() > 1 || !value.contains(x.get(0));
+            });
+        });
     }
 
     @Override
@@ -43,117 +51,64 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
     @Override
     protected Set<UUID> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
-        return ((List<PlayerEntity>) argument.get(0)).stream()
-                .map(Entity::getUniqueID)
-                .collect(Collectors.toSet());
-    }
-
-    @Override
-    protected String invalidValueMessageForAdd(String entryName, Set<UUID> element, CommandSource sender) {
-        if (element.size() == 1) {
-            UUID uuid = element.toArray(new UUID[0])[0];
-            return ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache().getProfileByUUID(uuid).getName()
-                    + "はすでに" + entryName + "に追加されています.";
-        }
-
-        return element.size() + "人のプレイヤーはすでに" + entryName + "に追加されています";
+        return Sets.newHashSet(((List<UUID>) argument.get(0)));
     }
 
     @Override
     protected String succeedMessageForAdd(String entryName, Set<UUID> element) {
         if (element.size() == 1) {
             UUID uuid = element.toArray(new UUID[0])[0];
-            String name = ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
-                    .getProfileByUUID(uuid).getName();
-            return entryName + "に" + name + "を追加しました.";
+            return entryName + "に" + elementToString(uuid) + "を追加しました.";
         }
-
-        return entryName + "に" + element.size() + "人のプレイヤーを追加しました";
+        return entryName + "に" + element.size() + "個のUUIDを追加しました.";
     }
 
     @Override
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.unparsedArgument("targets", sb -> {
-            List<String> list = value.stream()
-                    .map(uuid -> ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
-                            .getProfileByUUID(uuid).getName())
-                    .collect(Collectors.toList());
-            if (!list.isEmpty()) {
-                list.add("@a");
-                list.add("@r");
-            }
-
-            list.forEach(sb::suggest);
+        builder.uuidArgumentWith("target", option -> {
+            option.filter(x -> value.contains(x))
+                  .additionalSuggestionAction(sb -> {
+                      value.stream()
+                           .filter(x -> ServerLifecycleHooks.getCurrentServer()
+                                                            .getPlayerProfileCache()
+                                                            .getProfileByUUID(x) == null)
+                           .forEach(x -> sb.suggest(x.toString()));
+                  });
         });
     }
 
     @Override
     protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
-        String sel = argument.get(0).toString();
-        return sel.equals("@a") ||
-                !value.isEmpty() && sel.equals("@r") ||
-                value.stream()
-                        .map(uuid -> ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
-                                .getProfileByUUID(uuid).getName())
-                        .anyMatch(s -> s.equals(sel));
-    }
-
-    @Override
-    protected Set<UUID> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
-        String s = argument.get(0).toString();
-
-        if (s.equals("@a")) {
-            return Sets.newHashSet(value);
-        }
-
-        if (s.equals("@r")) {
-            List<UUID> list = new ArrayList<>(value);
-            Collections.shuffle(list);
-            return Sets.newHashSet(list.get(0));
-        }
-
-        return Sets.newHashSet(ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
-                .getGameProfileForUsername(s).getId());
+        return true;
     }
 
     @Override
     protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
-        String s = argument.get(0).toString();
-
-        if (s.startsWith("@")) {
-            return "セレクターは@aか@rのみを指定できます.";
-        }
-
-        return s + "は追加されていませんでした.";
+        return "";
     }
 
     @Override
-    protected boolean validateForRemove(String entryName, Set<UUID> element, CommandSource sender) {
-        return element.stream()
-                .anyMatch(value::contains);
+    protected Set<UUID> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
+        return Sets.newHashSet(((UUID) argument.get(0)));
+    }
+
+    @Override
+    protected boolean validateForRemove(String entryName, Set<UUID> value, CommandSource sender) {
+        return true;
     }
 
     @Override
     protected String invalidValueMessageForRemove(String entryName, Set<UUID> element, CommandSource sender) {
-        if (element.size() == 1) {
-            return elementToString(element.toArray(new UUID[0])[0]) + "は" + entryName + "に追加されていませんでした.";
-        }
-
-        return element.size() + "人のプレイヤーは" + entryName + "に追加されていませんでした.";
+        return "";
     }
 
     @Override
     protected String succeedMessageForRemove(String entryName, Set<UUID> element) {
-        if (element.size() == 1) {
-            return entryName + "から" + elementToString(element.toArray(new UUID[0])[0]) + "を削除しました.";
-        }
-
-        return entryName + "から" + element.size() + "人のプレイヤーを削除しました.";
+        return entryName + "から" + elementToString(element.toArray(new UUID[0])[0]) + "を削除しました.";
     }
 
     @Override
     protected String elementToString(UUID uuid) {
-        return ServerLifecycleHooks.getCurrentServer().getPlayerProfileCache()
-                .getProfileByUUID(uuid).getName();
+        return UUIDUtil.getNameOrUuid(uuid);
     }
 }

@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.value;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.UUIDUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -24,20 +25,23 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
         super(value);
     }
 
-    public @Nullable OfflinePlayer toOfflinePlayer() {
+    @Nullable
+    public OfflinePlayer toOfflinePlayer() {
         if (value == null) {
             return null;
         }
         return Bukkit.getOfflinePlayer(value);
     }
 
-    public @Nullable Player toPlayer() {
+    @Nullable
+    public Player toPlayer() {
         if (value == null) {
             return null;
         }
         return Bukkit.getPlayer(value);
     }
 
+    @Nullable
     public String playerName() {
         if (value == null) {
             return "";
@@ -47,12 +51,12 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
 
     @Override
     protected void appendArgument(ArgumentBuilder builder) {
-        builder.playerArgument("target");
+        builder.uuidArgument("target");
     }
 
     @Override
     protected UUID argumentToValue(List<Object> argument, CommandSender sender) {
-        return ((Player) argument.get(0)).getUniqueId();
+        return ((UUID) argument.get(0));
     }
 
     @Override
@@ -77,7 +81,7 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
 
     @Override
     protected String valueToString(UUID uuid) {
-        return Bukkit.getOfflinePlayer(uuid).getName();
+        return UUIDUtil.getNameOrUuid(uuid);
     }
 
     @Override
