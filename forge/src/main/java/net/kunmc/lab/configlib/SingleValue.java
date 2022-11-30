@@ -6,6 +6,7 @@ import net.minecraft.command.CommandSource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.*;
 
@@ -68,6 +69,21 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
         return supplier.get();
     }
 
+    public E orElseThrow() {
+        if (value == null) {
+            throw new NoSuchElementException("No value present");
+        }
+        return value;
+    }
+
+    public <X extends Throwable> E orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
+        if (value != null) {
+            return value;
+        } else {
+            throw exceptionSupplier.get();
+        }
+    }
+
     protected boolean writableByCommand() {
         return writable;
     }
@@ -124,8 +140,8 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
 
     protected boolean onModifyValue(E newValue, CommandContext ctx) {
         return modifyCommandListeners.stream()
-                .map(x -> x.apply(newValue, ctx))
-                .reduce(false, (a, b) -> a || b);
+                                     .map(x -> x.apply(newValue, ctx))
+                                     .reduce(false, (a, b) -> a || b);
     }
 
     protected String succeedModifyMessage(String entryName) {
