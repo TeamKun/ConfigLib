@@ -42,7 +42,8 @@ public class TeamValue extends SingleValue<ScorePlayerTeam, TeamValue> {
             return true;
         }
 
-        return !value.getName().equals(newValue.getName());
+        return !value.getName()
+                     .equals(newValue.getName());
     }
 
     @Override

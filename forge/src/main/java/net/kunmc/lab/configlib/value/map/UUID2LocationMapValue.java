@@ -18,7 +18,9 @@ public class UUID2LocationMapValue extends UUID2ObjectMapValue<Location, UUID2Lo
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 
@@ -31,10 +33,18 @@ public class UUID2LocationMapValue extends UUID2ObjectMapValue<Location, UUID2Lo
     protected String valueToString(Location location) {
         String worldName = "null";
         if (location.getWorld() != null) {
-            worldName = location.getWorld().getDimensionKey().getLocation().toString();
+            worldName = location.getWorld()
+                                .getDimensionKey()
+                                .getLocation()
+                                .toString();
         }
 
         return String.format("world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f",
-                worldName, location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
+                             worldName,
+                             location.getX(),
+                             location.getY(),
+                             location.getZ(),
+                             location.getPitch(),
+                             location.getYaw());
     }
 }

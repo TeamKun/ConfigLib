@@ -27,7 +27,9 @@ public class String2BooleanMapValue extends String2ObjectMapValue<Boolean, Strin
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 

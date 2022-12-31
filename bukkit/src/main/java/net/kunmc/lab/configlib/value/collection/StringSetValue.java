@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class StringSetValue extends SetValue<String, StringSetValue> {
+    private final transient List<String> allowableStringList = new ArrayList<>();
     protected transient String name = "string";
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
-    private final transient List<String> allowableStringList = new ArrayList<>();
 
     public StringSetValue(String... strings) {
         this(new HashSet<>(Arrays.asList(strings)));
@@ -39,8 +39,8 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     protected void appendArgumentForAdd(ArgumentBuilder builder) {
         builder.stringArgument(name, type, sb -> {
             allowableStringList.stream()
-                    .filter(s -> !value.contains(s))
-                    .forEach(sb::suggest);
+                               .filter(s -> !value.contains(s))
+                               .forEach(sb::suggest);
         });
     }
 
@@ -50,7 +50,8 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
             return true;
         }
 
-        return allowableStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
+        return allowableStringList.stream()
+                                  .anyMatch(s -> s.equals(argument.get(0)));
     }
 
     @Override
@@ -60,7 +61,8 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
 
     @Override
     protected Set<String> argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender) {
-        return Collections.singleton(argument.get(0).toString());
+        return Collections.singleton(argument.get(0)
+                                             .toString());
     }
 
     @Override
@@ -82,7 +84,8 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
 
     @Override
     protected Set<String> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
-        return Collections.singleton(argument.get(0).toString());
+        return Collections.singleton(argument.get(0)
+                                             .toString());
     }
 
     @Override

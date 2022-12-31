@@ -28,7 +28,9 @@ public class Enum2StringMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSender sender) {
         return "";
     }
 

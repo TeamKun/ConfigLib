@@ -18,7 +18,9 @@ public class UUID2StringMapValue extends UUID2ObjectMapValue<String, UUID2String
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 

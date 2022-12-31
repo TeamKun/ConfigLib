@@ -21,7 +21,8 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     public Team2ObjectMapValue(Map<Team, V> map) {
         super(map);
 
-        scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        scoreboard = Bukkit.getScoreboardManager()
+                           .getMainScoreboard();
     }
 
     @Override
@@ -65,7 +66,9 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectKeyArgumentMessageForRemove(String entryName,
+                                                          List<Object> argument,
+                                                          CommandSender sender) {
         return "指定されたチームは存在しません.";
     }
 

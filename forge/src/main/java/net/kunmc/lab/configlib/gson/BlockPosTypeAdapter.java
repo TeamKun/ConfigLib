@@ -17,9 +17,12 @@ public class BlockPosTypeAdapter extends TypeAdapter<BlockPos> {
 
         out.beginObject();
 
-        out.name("x").value(value.getX());
-        out.name("y").value(value.getY());
-        out.name("z").value(value.getZ());
+        out.name("x")
+           .value(value.getX());
+        out.name("y")
+           .value(value.getY());
+        out.name("z")
+           .value(value.getZ());
 
         out.endObject();
     }

@@ -7,6 +7,9 @@ import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import java.util.UUID;
 
 public final class UUIDUtil {
+    private UUIDUtil() {
+    }
+
     public static String getNameOrUuid(UUID uuid) {
         GameProfile gameProfile = ServerLifecycleHooks.getCurrentServer()
                                                       .getPlayerProfileCache()
@@ -18,8 +21,5 @@ public final class UUIDUtil {
             return uuid.toString();
         }
         return gameProfile.getName();
-    }
-
-    private UUIDUtil() {
     }
 }

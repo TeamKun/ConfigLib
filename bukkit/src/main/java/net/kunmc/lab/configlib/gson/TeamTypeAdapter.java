@@ -21,6 +21,8 @@ public class TeamTypeAdapter extends TypeAdapter<Team> {
     @Override
     public Team read(JsonReader in) throws IOException {
         String s = in.nextString();
-        return Bukkit.getScoreboardManager().getMainScoreboard().getTeam(s);
+        return Bukkit.getScoreboardManager()
+                     .getMainScoreboard()
+                     .getTeam(s);
     }
 }

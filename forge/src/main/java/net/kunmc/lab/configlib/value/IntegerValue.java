@@ -108,6 +108,11 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
     }
 
     public String toString() {
-        return String.format("IntegerValue{value=%d,min=%d,max=%d,listable=%b,writable=%b}", value, min, max, listable(), writableByCommand());
+        return String.format("IntegerValue{value=%d,min=%d,max=%d,listable=%b,writable=%b}",
+                             value,
+                             min,
+                             max,
+                             listable(),
+                             writableByCommand());
     }
 }

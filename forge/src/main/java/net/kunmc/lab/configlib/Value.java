@@ -4,8 +4,8 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.CommandContext;
 
 public abstract class Value<E, T extends Value<E, T>> {
-    private String description;
     protected E value;
+    private String description;
     private transient boolean listable = true;
 
     public Value(E value) {

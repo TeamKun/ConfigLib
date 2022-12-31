@@ -59,7 +59,9 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectKeyArgumentMessageForRemove(String entryName,
+                                                          List<Object> argument,
+                                                          CommandSource sender) {
         return "指定されたチームは存在しません.";
     }
 

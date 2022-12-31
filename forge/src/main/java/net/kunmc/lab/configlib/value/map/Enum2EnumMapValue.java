@@ -32,7 +32,9 @@ public class Enum2EnumMapValue<K extends Enum<K>, V extends Enum<V>> extends Enu
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return argument.get(1) + "は不明な値です.";
     }
 

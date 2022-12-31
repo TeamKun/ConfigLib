@@ -27,7 +27,9 @@ public class Enum2BooleanMapValue<T extends Enum<T>> extends Enum2ObjectMapValue
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 

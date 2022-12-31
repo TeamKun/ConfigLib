@@ -45,7 +45,8 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
         return ((T) this);
     }
 
-    public T setValidator(Function<Pair<L, R>, Boolean> validator, Function<Pair<L, R>, String> invalidMessageSupplier) {
+    public T setValidator(Function<Pair<L, R>, Boolean> validator,
+                          Function<Pair<L, R>, String> invalidMessageSupplier) {
         this.validator = validator;
         this.invalidMessageSupplier = invalidMessageSupplier;
         return ((T) this);
@@ -65,12 +66,16 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
     protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSource sender) {
         boolean left = isCorrectLeftArgument(entryName, argument, sender);
         if (!left) {
-            sender.sendFeedback(new StringTextComponent(RED + incorrectLeftArgumentMessage(entryName, argument, sender)), false);
+            sender.sendFeedback(new StringTextComponent(RED + incorrectLeftArgumentMessage(entryName,
+                                                                                           argument,
+                                                                                           sender)), false);
         }
 
         boolean right = isCorrectRightArgument(entryName, argument, sender);
         if (!right) {
-            sender.sendFeedback(new StringTextComponent(RED + incorrectRightArgumentMessage(entryName, argument, sender)), false);
+            sender.sendFeedback(new StringTextComponent(RED + incorrectRightArgumentMessage(entryName,
+                                                                                            argument,
+                                                                                            sender)), false);
         }
 
         return left && right;
@@ -85,9 +90,13 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
         return "";
     }
 
-    protected abstract String incorrectLeftArgumentMessage(String entryName, List<Object> argument, CommandSource sender);
+    protected abstract String incorrectLeftArgumentMessage(String entryName,
+                                                           List<Object> argument,
+                                                           CommandSource sender);
 
-    protected abstract String incorrectRightArgumentMessage(String entryName, List<Object> argument, CommandSource sender);
+    protected abstract String incorrectRightArgumentMessage(String entryName,
+                                                            List<Object> argument,
+                                                            CommandSource sender);
 
     @Override
     protected MutablePair<L, R> argumentToValue(List<Object> argument, CommandSource sender) {
@@ -107,12 +116,16 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
 
         boolean left = validateLeft(entryName, newValue.getLeft(), sender);
         if (!left) {
-            sender.sendFeedback(new StringTextComponent(RED + invalidLeftValueMessage(entryName, newValue.getLeft(), sender)), false);
+            sender.sendFeedback(new StringTextComponent(RED + invalidLeftValueMessage(entryName,
+                                                                                      newValue.getLeft(),
+                                                                                      sender)), false);
         }
 
         boolean right = validateRight(entryName, newValue.getRight(), sender);
         if (!right) {
-            sender.sendFeedback(new StringTextComponent(RED + invalidRightValueMessage(entryName, newValue.getRight(), sender)), false);
+            sender.sendFeedback(new StringTextComponent(RED + invalidRightValueMessage(entryName,
+                                                                                       newValue.getRight(),
+                                                                                       sender)), false);
         }
 
         return left && right;

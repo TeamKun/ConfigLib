@@ -35,45 +35,35 @@ import java.util.stream.Collectors;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public abstract class BaseConfig {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting()
+                                                      .enableComplexMapKeySerialization()
+                                                      .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
+                                                      .registerTypeHierarchyAdapter(BlockPos.class,
+                                                                                    new BlockPosTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(BlockState.class,
+                                                                                    new BlockStateTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(Location.class,
+                                                                                    new LocationTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(ItemStack.class,
+                                                                                    new ItemStackTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(ScorePlayerTeam.class,
+                                                                                    new ScorePlayerTeamAdapter())
+                                                      .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(Nameable.class,
+                                                                                    new NameableTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(Set.class, new SetTypeAdapter())
+                                                      .create();
     private final transient String modId;
     private final transient Type type;
     private final transient boolean makeConfigFile;
-    private transient String entryName = "";
+    private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
     protected transient boolean enableGet = true;
     protected transient boolean enableList = true;
     protected transient boolean enableModify = true;
     protected transient boolean enableReload = true;
-    private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
+    private transient String entryName = "";
     private transient WatchService watchService;
     private transient TimerTask watchTask;
-    private static final Gson gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .enableComplexMapKeySerialization()
-            .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
-            .registerTypeHierarchyAdapter(BlockPos.class, new BlockPosTypeAdapter())
-            .registerTypeHierarchyAdapter(BlockState.class, new BlockStateTypeAdapter())
-            .registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
-            .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackTypeAdapter())
-            .registerTypeHierarchyAdapter(ScorePlayerTeam.class, new ScorePlayerTeamAdapter())
-            .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
-            .registerTypeHierarchyAdapter(Nameable.class, new NameableTypeAdapter())
-            .registerTypeHierarchyAdapter(Set.class, new SetTypeAdapter())
-            .create();
-
-    public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Constructor<T> constructor, Object... arguments) {
-        String filename = configJSON.getName();
-        String json = readJson(configJSON);
-        Class<T> clazz = constructor.getDeclaringClass();
-
-        try {
-            T config = constructor.newInstance(arguments);
-            config.setEntryName(filename.substring(0, filename.lastIndexOf('.')));
-            replaceFields(clazz, gson.fromJson(json, clazz), config);
-            return config;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public BaseConfig(@NotNull String modId, @NotNull Type type) {
         this(modId, type, true);
@@ -88,6 +78,79 @@ public abstract class BaseConfig {
             init();
         } else {
             MinecraftForge.EVENT_BUS.register(this);
+        }
+    }
+
+    public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON,
+                                                           @NotNull Constructor<T> constructor,
+                                                           Object... arguments) {
+        String filename = configJSON.getName();
+        String json = readJson(configJSON);
+        Class<T> clazz = constructor.getDeclaringClass();
+
+        try {
+            T config = constructor.newInstance(arguments);
+            config.setEntryName(filename.substring(0, filename.lastIndexOf('.')));
+            replaceFields(clazz, gson.fromJson(json, clazz), config);
+            return config;
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String readJson(File jsonFile) {
+        try {
+            return Files.readLines(jsonFile, StandardCharsets.UTF_8)
+                        .stream()
+                        .collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static void writeJson(File jsonFile, String json) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(jsonFile),
+                                                                StandardCharsets.UTF_8)) {
+            writer.write(json);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static void replaceFields(Class<?> clazz, Object src, Object dst) {
+        for (Field field : ReflectionUtils.getFieldsIncludingSuperclasses(clazz)) {
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+                continue;
+            }
+
+            try {
+                field.setAccessible(true);
+            } catch (Exception e) {
+                // InaccessibleObjectExceptionが発生した場合スルーする
+                continue;
+            }
+
+            try {
+                replaceField(field, src, dst);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
+        try {
+            List<Field> fieldList = ReflectionUtils.getFieldsIncludingSuperclasses(field.getType());
+            Object srcObj = field.get(src);
+            Object dstObj = field.get(dst);
+
+            if (fieldList.isEmpty()) {
+                field.set(dst, srcObj);
+            } else {
+                replaceFields(field.getType(), srcObj, dstObj);
+            }
+        } catch (NullPointerException ignored) {
+            // 新しいフィールドが追加されるとNullPointerExceptionが発生するため握りつぶしている
         }
     }
 
@@ -113,13 +176,17 @@ public abstract class BaseConfig {
         }.start();
 
         try {
-            watchService = FileSystems.getDefault().newWatchService();
-            WatchKey watchKey = type.getConfigFolder(modId).toPath().register(watchService, ENTRY_MODIFY);
+            watchService = FileSystems.getDefault()
+                                      .newWatchService();
+            WatchKey watchKey = type.getConfigFolder(modId)
+                                    .toPath()
+                                    .register(watchService, ENTRY_MODIFY);
             watchTask = new TimerTask() {
                 @Override
                 public void run() {
                     for (WatchEvent<?> e : watchKey.pollEvents()) {
-                        Path filePath = getConfigFolder().toPath().resolve((Path) e.context());
+                        Path filePath = getConfigFolder().toPath()
+                                                         .resolve((Path) e.context());
                         if (filePath.equals(getConfigFile().toPath())) {
                             loadConfig();
                         }
@@ -186,7 +253,8 @@ public abstract class BaseConfig {
     public String entryName() {
         if (entryName.equals("")) {
             String n = getClass().getSimpleName();
-            return n.substring(0, 1).toLowerCase() + n.substring(1);
+            return n.substring(0, 1)
+                    .toLowerCase() + n.substring(1);
         } else {
             return entryName;
         }
@@ -227,60 +295,6 @@ public abstract class BaseConfig {
         return true;
     }
 
-    private static String readJson(File jsonFile) {
-        try {
-            return Files.readLines(jsonFile, StandardCharsets.UTF_8).stream()
-                    .collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    private static void writeJson(File jsonFile, String json) {
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(jsonFile), StandardCharsets.UTF_8)) {
-            writer.write(json);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    private static void replaceFields(Class<?> clazz, Object src, Object dst) {
-        for (Field field : ReflectionUtils.getFieldsIncludingSuperclasses(clazz)) {
-            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
-                continue;
-            }
-
-            try {
-                field.setAccessible(true);
-            } catch (Exception e) {
-                // InaccessibleObjectExceptionが発生した場合スルーする
-                continue;
-            }
-
-            try {
-                replaceField(field, src, dst);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private static void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
-        try {
-            List<Field> fieldList = ReflectionUtils.getFieldsIncludingSuperclasses(field.getType());
-            Object srcObj = field.get(src);
-            Object dstObj = field.get(dst);
-
-            if (fieldList.isEmpty()) {
-                field.set(dst, srcObj);
-            } else {
-                replaceFields(field.getType(), srcObj, dstObj);
-            }
-        } catch (NullPointerException ignored) {
-            // 新しいフィールドが追加されるとNullPointerExceptionが発生するため握りつぶしている
-        }
-    }
-
     public enum Type {
         COMMON(modId -> {
             return new File("config/" + modId);
@@ -297,7 +311,8 @@ public abstract class BaseConfig {
             if (server.isDedicatedServer()) {
                 return new File("world/serverconfig/" + modId);
             } else {
-                return new File("saves/" + server.getServerConfiguration().getWorldName() + "/serverconfig/" + modId);
+                return new File("saves/" + server.getServerConfiguration()
+                                                 .getWorldName() + "/serverconfig/" + modId);
             }
         }, () -> {
             return true;

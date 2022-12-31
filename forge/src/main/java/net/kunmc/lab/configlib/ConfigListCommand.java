@@ -44,7 +44,8 @@ class ConfigListCommand extends Command {
     }
 
     private void exec(CommandContext ctx, BaseConfig config) {
-        for (Field field : config.getClass().getDeclaredFields()) {
+        for (Field field : config.getClass()
+                                 .getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }

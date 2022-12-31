@@ -25,6 +25,8 @@ public class ScorePlayerTeamAdapter extends TypeAdapter<ScorePlayerTeam> {
             return null;
         }
 
-        return ServerLifecycleHooks.getCurrentServer().getScoreboard().getTeam(s);
+        return ServerLifecycleHooks.getCurrentServer()
+                                   .getScoreboard()
+                                   .getTeam(s);
     }
 }

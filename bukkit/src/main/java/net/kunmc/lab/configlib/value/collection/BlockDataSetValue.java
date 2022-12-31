@@ -52,15 +52,16 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.stringArgument("name", StringArgument.Type.PHRASE, sb -> {
             value().stream()
-                    .map(BlockData::getAsString)
-                    .forEach(sb::suggest);
+                   .map(BlockData::getAsString)
+                   .forEach(sb::suggest);
         });
     }
 
     @Override
     protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
         try {
-            Bukkit.createBlockData(argument.get(0).toString());
+            Bukkit.createBlockData(argument.get(0)
+                                           .toString());
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -74,13 +75,15 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
 
     @Override
     protected Set<BlockData> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
-        return Sets.newHashSet(Bukkit.createBlockData(argument.get(0).toString()));
+        return Sets.newHashSet(Bukkit.createBlockData(argument.get(0)
+                                                              .toString()));
     }
 
     @Override
     protected String elementToString(BlockData blockData) {
         if (listOnlyBlockName) {
-            return blockData.getMaterial().name();
+            return blockData.getMaterial()
+                            .name();
         } else {
             return blockData.getAsString();
         }

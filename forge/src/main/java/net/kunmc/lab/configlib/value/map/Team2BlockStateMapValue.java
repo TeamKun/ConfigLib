@@ -26,7 +26,9 @@ public class Team2BlockStateMapValue extends Team2ObjectMapValue<BlockState, Tea
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 
@@ -38,7 +40,10 @@ public class Team2BlockStateMapValue extends Team2ObjectMapValue<BlockState, Tea
     @Override
     protected String valueToString(BlockState blockState) {
         if (listOnlyBlockName) {
-            return blockState.getBlockState().getBlock().getRegistryName().getPath();
+            return blockState.getBlockState()
+                             .getBlock()
+                             .getRegistryName()
+                             .getPath();
         } else {
             return blockState.toString();
         }

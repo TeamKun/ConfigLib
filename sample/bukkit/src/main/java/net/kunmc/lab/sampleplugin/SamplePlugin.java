@@ -14,9 +14,8 @@ public final class SamplePlugin extends JavaPlugin {
         config = new Config(this);
         notSerializedConfig = new NotSerializedConfig(this);
 
-        ConfigCommand configCommand = new ConfigCommandBuilder(config)
-                .addConfig(notSerializedConfig)
-                .build();
+        ConfigCommand configCommand = new ConfigCommandBuilder(config).addConfig(notSerializedConfig)
+                                                                      .build();
         CommandLib.register(this, new TestCommand(configCommand));
     }
 }

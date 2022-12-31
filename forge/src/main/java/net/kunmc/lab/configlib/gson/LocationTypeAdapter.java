@@ -22,14 +22,23 @@ public class LocationTypeAdapter extends TypeAdapter<Location> {
 
             String worldName = "null";
             if (value.getWorld() != null) {
-                worldName = value.getWorld().getDimensionKey().getLocation().toString();
+                worldName = value.getWorld()
+                                 .getDimensionKey()
+                                 .getLocation()
+                                 .toString();
             }
-            out.name("world").value(worldName);
-            out.name("x").value(value.getX());
-            out.name("y").value(value.getY());
-            out.name("z").value(value.getZ());
-            out.name("pitch").value(value.getPitch());
-            out.name("yaw").value(value.getYaw());
+            out.name("world")
+               .value(worldName);
+            out.name("x")
+               .value(value.getX());
+            out.name("y")
+               .value(value.getY());
+            out.name("z")
+               .value(value.getZ());
+            out.name("pitch")
+               .value(value.getPitch());
+            out.name("yaw")
+               .value(value.getYaw());
 
             out.endObject();
         }
@@ -43,7 +52,9 @@ public class LocationTypeAdapter extends TypeAdapter<Location> {
         String worldName = in.nextString();
         World w = null;
         if (ServerLifecycleHooks.getCurrentServer() != null) {
-            w = ServerLifecycleHooks.getCurrentServer().getWorld(RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(worldName)));
+            w = ServerLifecycleHooks.getCurrentServer()
+                                    .getWorld(RegistryKey.getOrCreateKey(Registry.WORLD_KEY,
+                                                                         new ResourceLocation(worldName)));
         }
 
         in.nextName();

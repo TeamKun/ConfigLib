@@ -19,7 +19,8 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
 
     public TeamValue(Team value) {
         super(value);
-        scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        scoreboard = Bukkit.getScoreboardManager()
+                           .getMainScoreboard();
     }
 
     public @NotNull Scoreboard scoreboard() {
@@ -51,8 +52,9 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
         if (value == null) {
             return true;
         }
-       
-        return !value.getName().equals(newValue.getName());
+
+        return !value.getName()
+                     .equals(newValue.getName());
     }
 
     @Override

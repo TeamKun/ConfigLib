@@ -124,8 +124,8 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
 
     protected boolean onModifyValue(E newValue, CommandContext ctx) {
         return modifyCommandListeners.stream()
-                .map(x -> x.apply(newValue, ctx))
-                .reduce(false, (a, b) -> a || b);
+                                     .map(x -> x.apply(newValue, ctx))
+                                     .reduce(false, (a, b) -> a || b);
     }
 
     protected String succeedModifyMessage(String entryName) {

@@ -21,7 +21,8 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
     public EnumSetValue(@NotNull Predicate<T> filter, T... values) {
         super(new HashSet<>());
 
-        this.clazz = ((Class<T>) values.getClass().getComponentType());
+        this.clazz = ((Class<T>) values.getClass()
+                                       .getComponentType());
         this.filter = filter;
     }
 

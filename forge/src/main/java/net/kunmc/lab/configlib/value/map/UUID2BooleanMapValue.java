@@ -17,7 +17,9 @@ public class UUID2BooleanMapValue extends UUID2ObjectMapValue<Boolean, UUID2Bool
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 

@@ -29,12 +29,15 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     @Override
     protected void appendArgumentForAdd(ArgumentBuilder builder) {
         builder.teamArgument("name", sb -> {
-            ServerLifecycleHooks.getCurrentServer().getScoreboard().getTeams().stream()
-                    .map(Team::getName)
-                    .filter(name -> value.stream()
-                            .map(Team::getName)
-                            .noneMatch(s -> s.equals(name)))
-                    .forEach(sb::suggest);
+            ServerLifecycleHooks.getCurrentServer()
+                                .getScoreboard()
+                                .getTeams()
+                                .stream()
+                                .map(Team::getName)
+                                .filter(name -> value.stream()
+                                                     .map(Team::getName)
+                                                     .noneMatch(s -> s.equals(name)))
+                                .forEach(sb::suggest);
         });
     }
 
@@ -49,7 +52,9 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     }
 
     @Override
-    protected Set<ScorePlayerTeam> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    protected Set<ScorePlayerTeam> argumentToValueForAdd(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return Sets.newHashSet(((ScorePlayerTeam) argument.get(0)));
     }
 
@@ -57,8 +62,8 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.teamArgument("team", suggestionBuilder -> {
             value.stream()
-                    .map(Team::getName)
-                    .forEach(suggestionBuilder::suggest);
+                 .map(Team::getName)
+                 .forEach(suggestionBuilder::suggest);
         });
     }
 
@@ -73,7 +78,9 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     }
 
     @Override
-    protected Set<ScorePlayerTeam> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected Set<ScorePlayerTeam> argumentToValueForRemove(String entryName,
+                                                            List<Object> argument,
+                                                            CommandSource sender) {
         return Sets.newHashSet(((ScorePlayerTeam) argument.get(0)));
     }
 

@@ -22,7 +22,8 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
 
     public TeamSetValue(@NotNull Set<Team> value) {
         super(value);
-        scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        scoreboard = Bukkit.getScoreboardManager()
+                           .getMainScoreboard();
     }
 
     public @NotNull Scoreboard scoreboard() {
@@ -32,12 +33,13 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     @Override
     protected void appendArgumentForAdd(ArgumentBuilder builder) {
         builder.teamArgument("team", sb -> {
-            scoreboard.getTeams().stream()
-                    .map(Team::getName)
-                    .filter(name -> value.stream()
-                            .map(Team::getName)
-                            .noneMatch(s -> s.equals(name)))
-                    .forEach(sb::suggest);
+            scoreboard.getTeams()
+                      .stream()
+                      .map(Team::getName)
+                      .filter(name -> value.stream()
+                                           .map(Team::getName)
+                                           .noneMatch(s -> s.equals(name)))
+                      .forEach(sb::suggest);
         });
     }
 
@@ -60,8 +62,8 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.teamArgument("team", sb -> {
             value.stream()
-                    .map(Team::getName)
-                    .forEach(sb::suggest);
+                 .map(Team::getName)
+                 .forEach(sb::suggest);
         });
     }
 

@@ -1,5 +1,7 @@
 # User-specific stuff
-.idea/*
+.idea/**
+!.idea/codeStyles/
+!.idea/codeStyles/**
 !.idea/saveactions_settings.xml
 
 *.iml

@@ -18,7 +18,8 @@ public class UUID2EnumMapValue<T extends Enum<T>> extends UUID2ObjectMapValue<T,
     public UUID2EnumMapValue(Predicate<T> filter, T... t) {
         super(new HashMap<>());
 
-        this.clazz = ((Class<T>) t.getClass().getComponentType());
+        this.clazz = ((Class<T>) t.getClass()
+                                  .getComponentType());
         this.filter = filter;
     }
 
@@ -33,7 +34,9 @@ public class UUID2EnumMapValue<T extends Enum<T>> extends UUID2ObjectMapValue<T,
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSender sender) {
         return argument.get(1) + "は不明な値です.";
     }
 

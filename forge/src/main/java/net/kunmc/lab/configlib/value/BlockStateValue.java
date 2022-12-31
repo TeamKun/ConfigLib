@@ -61,7 +61,9 @@ public class BlockStateValue extends SingleValue<BlockState, BlockStateValue> {
         }
 
         if (listOnlyBlockName) {
-            return blockState.getBlock().getRegistryName().getPath();
+            return blockState.getBlock()
+                             .getRegistryName()
+                             .getPath();
         } else {
             return blockState.toString();
         }
@@ -69,6 +71,9 @@ public class BlockStateValue extends SingleValue<BlockState, BlockStateValue> {
 
     @Override
     public String toString() {
-        return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}", value(), listable(), writableByCommand());
+        return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}",
+                             value(),
+                             listable(),
+                             writableByCommand());
     }
 }

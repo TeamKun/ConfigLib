@@ -62,7 +62,7 @@ public class BooleanValue extends SingleValue<Boolean, BooleanValue> {
     public boolean xor(BooleanValue b) {
         return value ^ b.value;
     }
-   
+
     @Override
     protected void appendArgument(ArgumentBuilder builder) {
         builder.boolArgument("bool");

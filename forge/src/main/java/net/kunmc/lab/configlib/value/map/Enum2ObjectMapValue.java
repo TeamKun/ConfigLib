@@ -15,7 +15,8 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     public Enum2ObjectMapValue(Map<T, V> value, T... t) {
         super(value);
 
-        clazz = ((Class<T>) t.getClass().getComponentType());
+        clazz = ((Class<T>) t.getClass()
+                             .getComponentType());
     }
 
     public U setKeyFilter(Predicate<T> filter) {
@@ -54,7 +55,9 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectKeyArgumentMessageForRemove(String entryName,
+                                                          List<Object> argument,
+                                                          CommandSource sender) {
         return argument.get(0) + "は不明な値です.";
     }
 

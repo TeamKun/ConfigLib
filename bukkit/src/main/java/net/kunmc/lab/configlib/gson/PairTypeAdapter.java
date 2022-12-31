@@ -9,7 +9,9 @@ import java.lang.reflect.Type;
 
 public class PairTypeAdapter<L, R> implements JsonSerializer<Pair<L, R>>, JsonDeserializer<Pair<L, R>> {
     @Override
-    public Pair<L, R> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext ctx) throws JsonParseException {
+    public Pair<L, R> deserialize(JsonElement jsonElement,
+                                  Type type,
+                                  JsonDeserializationContext ctx) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         L left = ctx.deserialize(jsonObject.get("left"), ((ParameterizedType) type).getActualTypeArguments()[0]);
         R right = ctx.deserialize(jsonObject.get("right"), ((ParameterizedType) type).getActualTypeArguments()[1]);

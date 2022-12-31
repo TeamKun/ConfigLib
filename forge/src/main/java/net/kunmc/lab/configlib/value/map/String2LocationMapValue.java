@@ -28,7 +28,9 @@ public class String2LocationMapValue extends String2ObjectMapValue<Location, Str
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 
@@ -41,10 +43,18 @@ public class String2LocationMapValue extends String2ObjectMapValue<Location, Str
     protected String valueToString(Location location) {
         String worldName = "null";
         if (location.getWorld() != null) {
-            worldName = location.getWorld().getDimensionKey().getLocation().toString();
+            worldName = location.getWorld()
+                                .getDimensionKey()
+                                .getLocation()
+                                .toString();
         }
 
         return String.format("world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f",
-                worldName, location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
+                             worldName,
+                             location.getX(),
+                             location.getY(),
+                             location.getZ(),
+                             location.getPitch(),
+                             location.getYaw());
     }
 }

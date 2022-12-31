@@ -19,7 +19,8 @@ public class NameableSet<E extends Nameable> extends AbstractSet<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return map.values().iterator();
+        return map.values()
+                  .iterator();
     }
 
     @Override
@@ -66,14 +67,15 @@ public class NameableSet<E extends Nameable> extends AbstractSet<E> {
         Objects.requireNonNull(c);
 
         List<String> list = c.stream()
-                .filter(x -> Nameable.class.isAssignableFrom(x.getClass()))
-                .map(Nameable.class::cast)
-                .map(Nameable::tabCompleteName)
-                .collect(Collectors.toList());
+                             .filter(x -> Nameable.class.isAssignableFrom(x.getClass()))
+                             .map(Nameable.class::cast)
+                             .map(Nameable::tabCompleteName)
+                             .collect(Collectors.toList());
         boolean modified = false;
         Iterator<E> it = iterator();
         while (it.hasNext()) {
-            if (!list.contains(it.next().tabCompleteName())) {
+            if (!list.contains(it.next()
+                                 .tabCompleteName())) {
                 it.remove();
                 modified = true;
             }
@@ -87,6 +89,7 @@ public class NameableSet<E extends Nameable> extends AbstractSet<E> {
     }
 
     public Spliterator<E> spliterator() {
-        return map.values().spliterator();
+        return map.values()
+                  .spliterator();
     }
 }

@@ -20,7 +20,8 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     public EnumListValue(@NotNull Predicate<T> filter, T... values) {
         super(new ArrayList<>());
 
-        this.clazz = ((Class<T>) values.getClass().getComponentType());
+        this.clazz = ((Class<T>) values.getClass()
+                                       .getComponentType());
         this.filter = filter;
     }
 

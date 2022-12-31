@@ -14,12 +14,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class CollectionValue<T extends Collection<E>, E, U extends CollectionValue<T, E, U>> extends Value<T, U> {
-    private transient boolean addable = true;
-    private transient boolean removable = true;
-    private transient boolean clearable = true;
     private final transient List<BiFunction<T, CommandContext, Boolean>> addListeners = new ArrayList<>();
     private final transient List<BiFunction<T, CommandContext, Boolean>> removeListeners = new ArrayList<>();
     private final transient List<Function<CommandContext, Boolean>> clearListeners = new ArrayList<>();
+    private transient boolean addable = true;
+    private transient boolean removable = true;
+    private transient boolean clearable = true;
 
     public CollectionValue(T value) {
         super(value);
@@ -38,7 +38,9 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender);
 
-    protected abstract String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender);
+    protected abstract String incorrectArgumentMessageForAdd(String entryName,
+                                                             List<Object> argument,
+                                                             CommandSender sender);
 
     protected abstract T argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender);
 
@@ -69,8 +71,8 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected boolean onAddValue(T newValue, CommandContext ctx) {
         return addListeners.stream()
-                .map(x -> x.apply(newValue, ctx))
-                .reduce(false, (a, b) -> a || b);
+                           .map(x -> x.apply(newValue, ctx))
+                           .reduce(false, (a, b) -> a || b);
     }
 
     protected String succeedMessageForAdd(String entryName, T value) {
@@ -88,9 +90,13 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract void appendArgumentForRemove(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender);
+    protected abstract boolean isCorrectArgumentForRemove(String entryName,
+                                                          List<Object> argument,
+                                                          CommandSender sender);
 
-    protected abstract String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender);
+    protected abstract String incorrectArgumentMessageForRemove(String entryName,
+                                                                List<Object> argument,
+                                                                CommandSender sender);
 
     protected abstract T argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender);
 
@@ -121,8 +127,8 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected boolean onRemoveValue(T newValue, CommandContext ctx) {
         return removeListeners.stream()
-                .map(x -> x.apply(newValue, ctx))
-                .reduce(false, (a, b) -> a || b);
+                              .map(x -> x.apply(newValue, ctx))
+                              .reduce(false, (a, b) -> a || b);
     }
 
     protected String succeedMessageForRemove(String entryName, T value) {
@@ -161,8 +167,8 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected boolean onClearValue(CommandContext ctx) {
         return clearListeners.stream()
-                .map(x -> x.apply(ctx))
-                .reduce(false, (a, b) -> a || b);
+                             .map(x -> x.apply(ctx))
+                             .reduce(false, (a, b) -> a || b);
     }
 
     protected final String clearMessage(String entryName) {
@@ -174,7 +180,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
     @Override
     protected final void sendListMessage(CommandContext ctx, String entryName) {
         ctx.sendSuccess(entryName + ": [" + value.stream()
-                .map(this::elementToString)
-                .collect(Collectors.joining(", ")) + "]");
+                                                 .map(this::elementToString)
+                                                 .collect(Collectors.joining(", ")) + "]");
     }
 }

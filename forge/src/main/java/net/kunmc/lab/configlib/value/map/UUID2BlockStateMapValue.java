@@ -26,7 +26,9 @@ public class UUID2BlockStateMapValue extends UUID2ObjectMapValue<BlockState, UUI
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 
@@ -38,7 +40,9 @@ public class UUID2BlockStateMapValue extends UUID2ObjectMapValue<BlockState, UUI
     @Override
     protected String valueToString(BlockState blockState) {
         if (listOnlyBlockName) {
-            return blockState.getBlock().getRegistryName().getPath();
+            return blockState.getBlock()
+                             .getRegistryName()
+                             .getPath();
         } else {
             return blockState.toString();
         }

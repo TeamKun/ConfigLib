@@ -27,7 +27,9 @@ public class String2IntegerMapValue extends String2ObjectMapValue<Integer, Strin
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSender sender) {
         return "";
     }
 

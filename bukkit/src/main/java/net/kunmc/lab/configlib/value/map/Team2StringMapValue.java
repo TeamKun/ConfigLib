@@ -18,7 +18,9 @@ public class Team2StringMapValue extends Team2ObjectMapValue<String, Team2String
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSender sender) {
         return "";
     }
 

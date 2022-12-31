@@ -42,28 +42,31 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     @Override
     public void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.doubleArgument("x", sb -> {
-                    value.stream()
-                            .map(Location::getX)
-                            .map(Object::toString)
-                            .forEach(sb::suggest);
-                })
-                .doubleArgument("y", sb -> {
-                    double x = ((double) sb.getParsedArgs().get(0));
-                    value.stream()
-                            .filter(l -> l.getX() == x)
-                            .map(Location::getY)
-                            .map(Object::toString)
-                            .forEach(sb::suggest);
-                })
-                .doubleArgument("z", sb -> {
-                    double x = ((double) sb.getParsedArgs().get(0));
-                    double y = ((double) sb.getParsedArgs().get(1));
-                    value.stream()
-                            .filter(l -> l.getX() == x && l.getY() == y)
-                            .map(Location::getZ)
-                            .map(Object::toString)
-                            .forEach(sb::suggest);
-                });
+                   value.stream()
+                        .map(Location::getX)
+                        .map(Object::toString)
+                        .forEach(sb::suggest);
+               })
+               .doubleArgument("y", sb -> {
+                   double x = ((double) sb.getParsedArgs()
+                                          .get(0));
+                   value.stream()
+                        .filter(l -> l.getX() == x)
+                        .map(Location::getY)
+                        .map(Object::toString)
+                        .forEach(sb::suggest);
+               })
+               .doubleArgument("z", sb -> {
+                   double x = ((double) sb.getParsedArgs()
+                                          .get(0));
+                   double y = ((double) sb.getParsedArgs()
+                                          .get(1));
+                   value.stream()
+                        .filter(l -> l.getX() == x && l.getY() == y)
+                        .map(Location::getZ)
+                        .map(Object::toString)
+                        .forEach(sb::suggest);
+               });
     }
 
     @Override
@@ -83,20 +86,28 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
         double z = ((Double) argument.get(2));
 
         return value.stream()
-                .filter(l -> l.getX() == x)
-                .filter(l -> l.getY() == y)
-                .filter(l -> l.getZ() == z)
-                .collect(Collectors.toSet());
+                    .filter(l -> l.getX() == x)
+                    .filter(l -> l.getY() == y)
+                    .filter(l -> l.getZ() == z)
+                    .collect(Collectors.toSet());
     }
 
     @Override
     protected String elementToString(Location location) {
         String worldName = "null";
         if (location.getWorld() != null) {
-            worldName = location.getWorld().getDimensionKey().getLocation().toString();
+            worldName = location.getWorld()
+                                .getDimensionKey()
+                                .getLocation()
+                                .toString();
         }
 
         return String.format("world=%s,x=%.1f,y=%.1f,z=%.1f,pitch=%.1f,yaw=%.1f",
-                worldName, location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
+                             worldName,
+                             location.getX(),
+                             location.getY(),
+                             location.getZ(),
+                             location.getPitch(),
+                             location.getYaw());
     }
 }

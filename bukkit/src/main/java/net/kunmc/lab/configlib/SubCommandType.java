@@ -12,33 +12,52 @@ import java.util.stream.Stream;
 
 enum SubCommandType {
     Reload("reload",
-            BaseConfig::isReloadEnabled,
-            x -> !(ConfigUtil.getSingleValueFields(x).isEmpty() && ConfigUtil.getCollectionValueFields(x).isEmpty() && ConfigUtil.getMapValueFields(x).isEmpty()),
-            ConfigReloadCommand::new,
-            ConfigReloadCommand::new),
+           BaseConfig::isReloadEnabled,
+           x -> !(ConfigUtil.getSingleValueFields(x)
+                            .isEmpty() && ConfigUtil.getCollectionValueFields(x)
+                                                    .isEmpty() && ConfigUtil.getMapValueFields(x)
+                                                                            .isEmpty()),
+           ConfigReloadCommand::new,
+           ConfigReloadCommand::new),
     List("list",
-            BaseConfig::isListEnabled,
-            x -> Stream.of(ConfigUtil.getSingleValues(x).stream(), ConfigUtil.getCollectionValues(x).stream(), ConfigUtil.getMapValues(x).stream())
+         BaseConfig::isListEnabled,
+         x -> Stream.of(ConfigUtil.getSingleValues(x)
+                                  .stream(),
+                        ConfigUtil.getCollectionValues(x)
+                                  .stream(),
+                        ConfigUtil.getMapValues(x)
+                                  .stream())
                     .reduce(Stream::concat)
                     .orElseGet(Stream::empty)
                     .anyMatch(Value::listable),
-            ConfigListCommand::new,
-            ConfigListCommand::new),
+         ConfigListCommand::new,
+         ConfigListCommand::new),
     Modify("modify",
-            BaseConfig::isModifyEnabled,
-            x -> ConfigUtil.getSingleValues(x).stream().anyMatch(SingleValue::writableByCommand) ||
-                    ConfigUtil.getCollectionValues(x).stream().anyMatch(v -> v.addableByCommand() || v.removableByCommand() || v.clearableByCommand()) ||
-                    ConfigUtil.getMapValues(x).stream().anyMatch(v -> v.puttableByCommand() || v.removableByCommand() || v.clearableByCommand()),
-            ConfigModifyCommand::new,
-            ConfigModifyCommand::new),
+           BaseConfig::isModifyEnabled,
+           x -> ConfigUtil.getSingleValues(x)
+                          .stream()
+                          .anyMatch(SingleValue::writableByCommand) || ConfigUtil.getCollectionValues(x)
+                                                                                 .stream()
+                                                                                 .anyMatch(v -> v.addableByCommand() || v.removableByCommand() || v.clearableByCommand()) || ConfigUtil.getMapValues(
+                                                                                                                                                                                               x)
+                                                                                                                                                                                       .stream()
+                                                                                                                                                                                       .anyMatch(
+                                                                                                                                                                                               v -> v.puttableByCommand() || v.removableByCommand() || v.clearableByCommand()),
+           ConfigModifyCommand::new,
+           ConfigModifyCommand::new),
     Get("get",
-            BaseConfig::isGetEnabled,
-            x -> Stream.of(ConfigUtil.getSingleValues(x).stream(), ConfigUtil.getCollectionValues(x).stream(), ConfigUtil.getMapValues(x).stream())
-                    .reduce(Stream::concat)
-                    .orElseGet(Stream::empty)
-                    .anyMatch(Value::listable),
-            ConfigGetCommand::new,
-            ConfigGetCommand::new);
+        BaseConfig::isGetEnabled,
+        x -> Stream.of(ConfigUtil.getSingleValues(x)
+                                 .stream(),
+                       ConfigUtil.getCollectionValues(x)
+                                 .stream(),
+                       ConfigUtil.getMapValues(x)
+                                 .stream())
+                   .reduce(Stream::concat)
+                   .orElseGet(Stream::empty)
+                   .anyMatch(Value::listable),
+        ConfigGetCommand::new,
+        ConfigGetCommand::new);
 
     public final String name;
     private final Predicate<BaseConfig> isEnabledFor;
@@ -46,7 +65,11 @@ enum SubCommandType {
     private final Function<BaseConfig, Command> instantiator;
     private final Function<Set<BaseConfig>, Command> instantiator2;
 
-    SubCommandType(String name, Predicate<BaseConfig> isEnabledFor, Predicate<BaseConfig> hasEntryFor, Function<BaseConfig, Command> instantiator, Function<Set<BaseConfig>, Command> instantiator2) {
+    SubCommandType(String name,
+                   Predicate<BaseConfig> isEnabledFor,
+                   Predicate<BaseConfig> hasEntryFor,
+                   Function<BaseConfig, Command> instantiator,
+                   Function<Set<BaseConfig>, Command> instantiator2) {
         this.name = name;
         this.isEnabledFor = isEnabledFor;
         this.hasEntryFor = hasEntryFor;
@@ -64,7 +87,7 @@ enum SubCommandType {
 
     public Map<BaseConfig, Boolean> hasEntryFor(Set<BaseConfig> configSet) {
         return configSet.stream()
-                .collect(Collectors.toMap(baseConfig -> baseConfig, this::hasEntryFor));
+                        .collect(Collectors.toMap(baseConfig -> baseConfig, this::hasEntryFor));
     }
 
     public Command of(BaseConfig config) {

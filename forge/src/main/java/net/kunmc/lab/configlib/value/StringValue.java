@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StringValue extends SingleValue<String, StringValue> {
+    protected final transient List<String> allowableStringList = new ArrayList<>();
     private final int min;
     private final int max;
     protected transient String name = "string";
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
-    protected final transient List<String> allowableStringList = new ArrayList<>();
     protected transient SuggestionAction suggestionAction = sb -> {
         allowableStringList.forEach(sb::suggest);
     };
@@ -61,7 +61,8 @@ public class StringValue extends SingleValue<String, StringValue> {
             return true;
         }
 
-        return allowableStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
+        return allowableStringList.stream()
+                                  .anyMatch(s -> s.equals(argument.get(0)));
     }
 
     @Override
@@ -71,7 +72,8 @@ public class StringValue extends SingleValue<String, StringValue> {
 
     @Override
     protected String argumentToValue(List<Object> argument, CommandSource sender) {
-        return argument.get(0).toString();
+        return argument.get(0)
+                       .toString();
     }
 
     @Override
@@ -91,6 +93,11 @@ public class StringValue extends SingleValue<String, StringValue> {
 
     @Override
     public String toString() {
-        return String.format("StringValue{value=%s,min=%d,max=%d,listable=%b,writable=%b}", value, min, max, listable(), writableByCommand());
+        return String.format("StringValue{value=%s,min=%d,max=%d,listable=%b,writable=%b}",
+                             value,
+                             min,
+                             max,
+                             listable(),
+                             writableByCommand());
     }
 }

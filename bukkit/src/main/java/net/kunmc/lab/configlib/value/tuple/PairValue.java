@@ -44,7 +44,8 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
         return ((T) this);
     }
 
-    public T setValidator(Function<Pair<L, R>, Boolean> validator, Function<Pair<L, R>, String> invalidMessageSupplier) {
+    public T setValidator(Function<Pair<L, R>, Boolean> validator,
+                          Function<Pair<L, R>, String> invalidMessageSupplier) {
         this.validator = validator;
         this.invalidMessageSupplier = invalidMessageSupplier;
         return ((T) this);
@@ -84,9 +85,13 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
         return "";
     }
 
-    protected abstract String incorrectLeftArgumentMessage(String entryName, List<Object> argument, CommandSender sender);
+    protected abstract String incorrectLeftArgumentMessage(String entryName,
+                                                           List<Object> argument,
+                                                           CommandSender sender);
 
-    protected abstract String incorrectRightArgumentMessage(String entryName, List<Object> argument, CommandSender sender);
+    protected abstract String incorrectRightArgumentMessage(String entryName,
+                                                            List<Object> argument,
+                                                            CommandSender sender);
 
     @Override
     protected MutablePair<L, R> argumentToValue(List<Object> argument, CommandSender sender) {

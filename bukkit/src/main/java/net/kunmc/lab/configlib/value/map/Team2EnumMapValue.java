@@ -18,7 +18,8 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
     public Team2EnumMapValue(Predicate<T> filter, T... e) {
         super(new HashMap<>());
 
-        this.clazz = ((Class<T>) e.getClass().getComponentType());
+        this.clazz = ((Class<T>) e.getClass()
+                                  .getComponentType());
         this.filter = filter;
     }
 
@@ -33,7 +34,9 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSender sender) {
         return argument.get(1) + "は不明な値です.";
     }
 

@@ -27,8 +27,10 @@ class ModifyIncCommand extends Command {
         String entryName = field.getName();
 
         double amount = 1.0;
-        if (!ctx.getParsedArgs().isEmpty()) {
-            amount = ((Double) ctx.getParsedArgs().get(0));
+        if (!ctx.getParsedArgs()
+                .isEmpty()) {
+            amount = ((Double) ctx.getParsedArgs()
+                                  .get(0));
         }
 
         if (value.compare(value.max.doubleValue() - amount) > 0) {

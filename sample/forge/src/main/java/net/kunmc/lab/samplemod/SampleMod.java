@@ -21,9 +21,8 @@ public class SampleMod {
     private final ConfigCommandBuilder builder;
 
     public SampleMod() {
-        builder = new ConfigCommandBuilder(commonConfig)
-                .addConfig(serverConfig)
-                .addConfig(notSerializedConfig);
+        builder = new ConfigCommandBuilder(commonConfig).addConfig(serverConfig)
+                                                        .addConfig(notSerializedConfig);
 
         MinecraftForge.EVENT_BUS.register(this);
     }

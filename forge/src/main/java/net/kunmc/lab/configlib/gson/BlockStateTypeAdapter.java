@@ -17,7 +17,10 @@ public class BlockStateTypeAdapter extends TypeAdapter<BlockState> {
             return;
         }
 
-        out.value(BlockState.CODEC.encodeStart(JsonOps.INSTANCE, value).result().get().toString());
+        out.value(BlockState.CODEC.encodeStart(JsonOps.INSTANCE, value)
+                                  .result()
+                                  .get()
+                                  .toString());
     }
 
     @Override
@@ -28,6 +31,9 @@ public class BlockStateTypeAdapter extends TypeAdapter<BlockState> {
             return null;
         }
 
-        return BlockState.CODEC.decode(JsonOps.INSTANCE, new JsonParser().parse(s)).result().get().getFirst();
+        return BlockState.CODEC.decode(JsonOps.INSTANCE, new JsonParser().parse(s))
+                               .result()
+                               .get()
+                               .getFirst();
     }
 }

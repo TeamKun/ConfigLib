@@ -17,7 +17,9 @@ public class UUID2FloatMapValue extends UUID2ObjectMapValue<Float, UUID2FloatMap
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 

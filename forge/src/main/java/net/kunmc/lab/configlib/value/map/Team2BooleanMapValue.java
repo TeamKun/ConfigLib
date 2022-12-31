@@ -17,7 +17,9 @@ public class Team2BooleanMapValue extends Team2ObjectMapValue<Boolean, Team2Bool
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 

@@ -12,11 +12,17 @@ import java.io.IOException;
 public class ItemStackTypeAdapter extends TypeAdapter<ItemStack> {
     @Override
     public void write(JsonWriter out, ItemStack value) throws IOException {
-        out.value(ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, value).result().get().toString());
+        out.value(ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, value)
+                                 .result()
+                                 .get()
+                                 .toString());
     }
 
     @Override
     public ItemStack read(JsonReader in) throws IOException {
-        return ItemStack.CODEC.decode(JsonOps.INSTANCE, new JsonParser().parse(in.nextString())).result().get().getFirst();
+        return ItemStack.CODEC.decode(JsonOps.INSTANCE, new JsonParser().parse(in.nextString()))
+                              .result()
+                              .get()
+                              .getFirst();
     }
 }

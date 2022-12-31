@@ -12,30 +12,37 @@ public class NameableTypeAdapter implements JsonSerializer<Nameable>, JsonDeseri
     @Override
     public JsonElement serialize(Nameable src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject object = new JsonObject();
-        object.addProperty("class", src.getClass().getName());
+        object.addProperty("class",
+                           src.getClass()
+                              .getName());
 
-        ReflectionUtils.getFieldsIncludingSuperclasses(src.getClass()).stream()
-                .peek(x -> x.setAccessible(true))
-                .filter(x -> !Modifier.isTransient(x.getModifiers()))
-                .filter(x -> !Modifier.isStatic((x.getModifiers())))
-                .forEach(x -> {
-                    try {
-                        object.add(x.getName(), context.serialize(x.get(src)));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        ReflectionUtils.getFieldsIncludingSuperclasses(src.getClass())
+                       .stream()
+                       .peek(x -> x.setAccessible(true))
+                       .filter(x -> !Modifier.isTransient(x.getModifiers()))
+                       .filter(x -> !Modifier.isStatic((x.getModifiers())))
+                       .forEach(x -> {
+                           try {
+                               object.add(x.getName(), context.serialize(x.get(src)));
+                           } catch (IllegalAccessException e) {
+                               throw new RuntimeException(e);
+                           }
+                       });
 
         return object;
     }
 
     @Override
-    public Nameable deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public Nameable deserialize(JsonElement json,
+                                Type typeOfT,
+                                JsonDeserializationContext context) throws JsonParseException {
         JsonObject object = json.getAsJsonObject();
-        String className = object.get("class").getAsString();
+        String className = object.get("class")
+                                 .getAsString();
         try {
             Class<?> clazz = Class.forName(className);
-            Object result = clazz.getConstructor().newInstance();
+            Object result = clazz.getConstructor()
+                                 .newInstance();
 
             for (Field f : clazz.getDeclaredFields()) {
                 if (Modifier.isStatic(f.getModifiers())) {

@@ -11,12 +11,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class StringListValue extends ListValue<String, StringListValue> {
+    private final transient List<String> allowableStringList = new ArrayList<>();
     protected transient String name = "string";
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
-    private final transient List<String> allowableStringList = new ArrayList<>();
 
     public StringListValue(String... strings) {
-        this(Arrays.stream(strings).collect(Collectors.toList()));
+        this(Arrays.stream(strings)
+                   .collect(Collectors.toList()));
     }
 
     public StringListValue(List<String> value) {
@@ -51,7 +52,8 @@ public class StringListValue extends ListValue<String, StringListValue> {
             return true;
         }
 
-        return allowableStringList.stream().anyMatch(s -> s.equals(argument.get(0)));
+        return allowableStringList.stream()
+                                  .anyMatch(s -> s.equals(argument.get(0)));
     }
 
     @Override
@@ -62,8 +64,8 @@ public class StringListValue extends ListValue<String, StringListValue> {
     @Override
     protected List<String> argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender) {
         return argument.stream()
-                .map(Object::toString)
-                .collect(Collectors.toList());
+                       .map(Object::toString)
+                       .collect(Collectors.toList());
     }
 
     @Override
@@ -95,8 +97,8 @@ public class StringListValue extends ListValue<String, StringListValue> {
     @Override
     protected List<String> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
         return argument.stream()
-                .map(Object::toString)
-                .collect(Collectors.toList());
+                       .map(Object::toString)
+                       .collect(Collectors.toList());
     }
 
     @Override

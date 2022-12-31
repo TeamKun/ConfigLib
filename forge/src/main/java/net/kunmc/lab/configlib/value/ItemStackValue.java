@@ -19,7 +19,7 @@ public class ItemStackValue extends SingleValue<ItemStack, ItemStackValue> {
     @Override
     protected void appendArgument(ArgumentBuilder builder) {
         builder.itemStackArgument("item")
-                .integerArgument("amount", 1, Integer.MAX_VALUE);
+               .integerArgument("amount", 1, Integer.MAX_VALUE);
     }
 
     @Override

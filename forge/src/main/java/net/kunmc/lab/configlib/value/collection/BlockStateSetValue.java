@@ -51,8 +51,8 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.blockStateArgument("name", sb -> {
             value().stream()
-                    .map(BlockState::toString)
-                    .forEach(sb::suggest);
+                   .map(BlockState::toString)
+                   .forEach(sb::suggest);
         });
     }
 
@@ -74,7 +74,9 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
     @Override
     protected String elementToString(BlockState blockState) {
         if (listOnlyBlockName) {
-            return blockState.getBlock().getRegistryName().getPath();
+            return blockState.getBlock()
+                             .getRegistryName()
+                             .getPath();
         } else {
             return blockState.toString();
         }

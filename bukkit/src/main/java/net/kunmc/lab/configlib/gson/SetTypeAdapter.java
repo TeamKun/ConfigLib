@@ -11,7 +11,9 @@ import java.util.Set;
 
 public class SetTypeAdapter implements JsonDeserializer<Set<?>> {
     @Override
-    public Set<?> deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
+    public Set<?> deserialize(JsonElement json,
+                              Type type,
+                              JsonDeserializationContext context) throws JsonParseException {
         JsonArray jsonArray = json.getAsJsonArray();
         Set<?> set = new LinkedHashSet<>();
         Class<?> clazz = ((Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0]);

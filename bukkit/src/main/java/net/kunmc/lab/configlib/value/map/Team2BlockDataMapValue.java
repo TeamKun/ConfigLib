@@ -25,7 +25,9 @@ public class Team2BlockDataMapValue extends Team2ObjectMapValue<BlockData, Team2
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSender sender) {
         return "";
     }
 
@@ -37,7 +39,8 @@ public class Team2BlockDataMapValue extends Team2ObjectMapValue<BlockData, Team2
     @Override
     protected String valueToString(BlockData blockData) {
         if (listOnlyBlockName) {
-            return blockData.getMaterial().name();
+            return blockData.getMaterial()
+                            .name();
         } else {
             return blockData.getAsString();
         }

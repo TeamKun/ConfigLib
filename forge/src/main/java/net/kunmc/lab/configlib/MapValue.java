@@ -16,12 +16,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<Map<K, V>, T> {
-    private transient boolean puttable = true;
-    private transient boolean removable = true;
-    private transient boolean clearable = true;
     private final transient List<TriFunction<K, V, CommandContext, Boolean>> putListeners = new ArrayList<>();
     private final transient List<BiFunction<K, CommandContext, Boolean>> removeListeners = new ArrayList<>();
     private final transient List<Function<CommandContext, Boolean>> clearListeners = new ArrayList<>();
+    private transient boolean puttable = true;
+    private transient boolean removable = true;
+    private transient boolean clearable = true;
 
     public MapValue(Map<K, V> value) {
         super(value);
@@ -40,13 +40,21 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     protected abstract void appendValueArgumentForPut(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandSource sender);
+    protected abstract boolean isCorrectKeyArgumentForPut(String entryName,
+                                                          List<Object> argument,
+                                                          CommandSource sender);
 
-    protected abstract String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender);
+    protected abstract String incorrectKeyArgumentMessageForPut(String entryName,
+                                                                List<Object> argument,
+                                                                CommandSource sender);
 
-    protected abstract boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSource sender);
+    protected abstract boolean isCorrectValueArgumentForPut(String entryName,
+                                                            List<Object> argument,
+                                                            CommandSource sender);
 
-    protected abstract String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender);
+    protected abstract String incorrectValueArgumentMessageForPut(String entryName,
+                                                                  List<Object> argument,
+                                                                  CommandSource sender);
 
     protected abstract K argumentToKeyForPut(List<Object> argument, CommandSource sender);
 
@@ -91,8 +99,8 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     protected boolean onPutValue(K k, V v, CommandContext ctx) {
         return putListeners.stream()
-                .map(x -> x.apply(k, v, ctx))
-                .reduce(false, (a, b) -> a || b);
+                           .map(x -> x.apply(k, v, ctx))
+                           .reduce(false, (a, b) -> a || b);
     }
 
     protected String succeedMessageForPut(String entryName, K k, V v) {
@@ -110,9 +118,13 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     protected abstract void appendKeyArgumentForRemove(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandSource sender);
+    protected abstract boolean isCorrectKeyArgumentForRemove(String entryName,
+                                                             List<Object> argument,
+                                                             CommandSource sender);
 
-    protected abstract String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender);
+    protected abstract String incorrectKeyArgumentMessageForRemove(String entryName,
+                                                                   List<Object> argument,
+                                                                   CommandSource sender);
 
     protected abstract K argumentToKeyForRemove(List<Object> argument, CommandSource sender);
 
@@ -147,8 +159,8 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     protected boolean onRemoveKey(K k, CommandContext ctx) {
         return removeListeners.stream()
-                .map(x -> x.apply(k, ctx))
-                .reduce(false, (a, b) -> a || b);
+                              .map(x -> x.apply(k, ctx))
+                              .reduce(false, (a, b) -> a || b);
     }
 
     protected String succeedMessageForRemove(String entryName, K k, V v) {
@@ -187,8 +199,8 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     protected boolean onClearMap(CommandContext ctx) {
         return clearListeners.stream()
-                .map(x -> x.apply(ctx))
-                .reduce(false, (a, b) -> a || b);
+                             .map(x -> x.apply(ctx))
+                             .reduce(false, (a, b) -> a || b);
     }
 
     protected String clearMessage(String entryName) {
@@ -201,9 +213,12 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     @Override
     protected void sendListMessage(CommandContext ctx, String entryName) {
-        ctx.sendSuccess(entryName + ": {" + value.entrySet().stream()
-                .map(entry -> String.format("%s:%s", keyToString(entry.getKey()), valueToString(entry.getValue())))
-                .collect(Collectors.joining(", ")) + "}");
+        ctx.sendSuccess(entryName + ": {" + value.entrySet()
+                                                 .stream()
+                                                 .map(entry -> String.format("%s:%s",
+                                                                             keyToString(entry.getKey()),
+                                                                             valueToString(entry.getValue())))
+                                                 .collect(Collectors.joining(", ")) + "}");
     }
 
     public int size() {

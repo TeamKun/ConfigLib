@@ -11,15 +11,19 @@ public class NotSerializedConfig extends BaseConfig {
     public final BlockDataSetValue blockDataSetValue = new BlockDataSetValue();
     public final Enum2DoubleMapValue<Material> enum2DoubleMapValue = new Enum2DoubleMapValue<>();
     public final TeamValue teamValue = new TeamValue().onModify(team -> {
-        Bukkit.getOnlinePlayers().forEach(p -> {
-            p.sendMessage("teamValue modified!");
-        });
+        Bukkit.getOnlinePlayers()
+              .forEach(p -> {
+                  p.sendMessage("teamValue modified!");
+              });
     });
-    public final Integer2IntegerPairValue integer2IntegerPairValue = new Integer2IntegerPairValue(1, 100)
-            .leftMin(1).leftMax(99)
-            .rightMin(2).rightMax(100)
-            .setValidator(pair -> pair.getLeft() < pair.getRight(), pair -> "first arg must be lower than second arg.");
-   
+    public final Integer2IntegerPairValue integer2IntegerPairValue = new Integer2IntegerPairValue(1, 100).leftMin(1)
+                                                                                                         .leftMax(99)
+                                                                                                         .rightMin(2)
+                                                                                                         .rightMax(100)
+                                                                                                         .setValidator(
+                                                                                                                 pair -> pair.getLeft() < pair.getRight(),
+                                                                                                                 pair -> "first arg must be lower than second arg.");
+
     public NotSerializedConfig(@NotNull Plugin plugin) {
         super(plugin, false);
     }

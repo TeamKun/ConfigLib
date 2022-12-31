@@ -32,42 +32,29 @@ import java.util.stream.Collectors;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public abstract class BaseConfig implements Listener {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting()
+                                                      .enableComplexMapKeySerialization()
+                                                      .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
+                                                      .registerTypeAdapter(Pair.class, new PairTypeAdapter<>())
+                                                      .registerTypeHierarchyAdapter(Team.class, new TeamTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(BlockData.class,
+                                                                                    new BlockDataTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(ItemStack.class,
+                                                                                    new ItemStackTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(Location.class,
+                                                                                    new LocationTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(Nameable.class,
+                                                                                    new NameableTypeAdapter())
+                                                      .registerTypeHierarchyAdapter(Set.class, new SetTypeAdapter())
+                                                      .create();
     private final transient Plugin plugin;
-    private transient String entryName = "";
-
     private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
     protected transient boolean enableGet = true;
     protected transient boolean enableList = true;
     protected transient boolean enableModify = true;
     protected transient boolean enableReload = true;
-    private static final Gson gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .enableComplexMapKeySerialization()
-            .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
-            .registerTypeAdapter(Pair.class, new PairTypeAdapter<>())
-            .registerTypeHierarchyAdapter(Team.class, new TeamTypeAdapter())
-            .registerTypeHierarchyAdapter(BlockData.class, new BlockDataTypeAdapter())
-            .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackTypeAdapter())
-            .registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
-            .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
-            .registerTypeHierarchyAdapter(Nameable.class, new NameableTypeAdapter())
-            .registerTypeHierarchyAdapter(Set.class, new SetTypeAdapter())
-            .create();
-
-    public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON, @NotNull Constructor<T> constructor, Object... arguments) {
-        String filename = configJSON.getName();
-        String json = readJson(configJSON);
-        Class<T> clazz = constructor.getDeclaringClass();
-
-        try {
-            T config = constructor.newInstance(arguments);
-            config.setEntryName(filename.substring(0, filename.lastIndexOf('.')));
-            replaceFields(clazz, gson.fromJson(json, clazz), config);
-            return config;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private transient String entryName = "";
 
     public BaseConfig(@NotNull Plugin plugin) {
         this(plugin, true);
@@ -79,7 +66,8 @@ public abstract class BaseConfig implements Listener {
         if (!makeConfigFile) {
             return;
         }
-        plugin.getDataFolder().mkdir();
+        plugin.getDataFolder()
+              .mkdir();
 
         // コンストラクタの処理内でシリアライズするとフィールドの初期化が終わってない状態でシリアライズされるため遅延させている.
         new BukkitRunnable() {
@@ -95,14 +83,19 @@ public abstract class BaseConfig implements Listener {
         WatchService watcher;
         WatchKey watchKey;
         try {
-            watcher = FileSystems.getDefault().newWatchService();
-            watchKey = plugin.getDataFolder().toPath().register(watcher, ENTRY_MODIFY);
+            watcher = FileSystems.getDefault()
+                                 .newWatchService();
+            watchKey = plugin.getDataFolder()
+                             .toPath()
+                             .register(watcher, ENTRY_MODIFY);
 
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
                     for (WatchEvent<?> e : watchKey.pollEvents()) {
-                        Path filePath = plugin.getDataFolder().toPath().resolve((Path) e.context());
+                        Path filePath = plugin.getDataFolder()
+                                              .toPath()
+                                              .resolve((Path) e.context());
                         if (filePath.equals(getConfigFile().toPath())) {
                             loadConfig();
                         }
@@ -121,20 +114,21 @@ public abstract class BaseConfig implements Listener {
             @Override
             public void run() {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().registerEvents(new Listener() {
-                        @EventHandler
-                        public void onPluginDisable(PluginDisableEvent e) {
-                            if (e.getPlugin() == plugin) {
-                                try {
-                                    timer.cancel();
-                                    watcher.close();
-                                    watchKey.cancel();
-                                } catch (IOException ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
-                        }
-                    }, plugin);
+                    Bukkit.getPluginManager()
+                          .registerEvents(new Listener() {
+                              @EventHandler
+                              public void onPluginDisable(PluginDisableEvent e) {
+                                  if (e.getPlugin() == plugin) {
+                                      try {
+                                          timer.cancel();
+                                          watcher.close();
+                                          watchKey.cancel();
+                                      } catch (IOException ex) {
+                                          ex.printStackTrace();
+                                      }
+                                  }
+                              }
+                          }, plugin);
 
                     cancel();
                 }
@@ -142,92 +136,36 @@ public abstract class BaseConfig implements Listener {
         }, 100, 100);
     }
 
-    /**
-     * set listener fired on initialization.
-     */
-    protected final void onInitialize(Runnable onLoad) {
-        onInitializeListeners.add(onLoad);
-    }
+    public static <T extends BaseConfig> T newInstanceFrom(@NotNull File configJSON,
+                                                           @NotNull Constructor<T> constructor,
+                                                           Object... arguments) {
+        String filename = configJSON.getName();
+        String json = readJson(configJSON);
+        Class<T> clazz = constructor.getDeclaringClass();
 
-    boolean isGetEnabled() {
-        return enableGet;
-    }
-
-    boolean isListEnabled() {
-        return enableList;
-    }
-
-    boolean isModifyEnabled() {
-        return enableModify;
-    }
-
-    boolean isReloadEnabled() {
-        return enableReload;
-    }
-
-    protected void setEntryName(@NotNull String entryName) {
-        this.entryName = entryName;
-    }
-
-    public Plugin plugin() {
-        return plugin;
-    }
-
-    public File getConfigFile() {
-        return new File(plugin.getDataFolder(), entryName() + ".json");
-    }
-
-    public String entryName() {
-        if (entryName.equals("")) {
-            String n = getClass().getSimpleName();
-            return n.substring(0, 1).toLowerCase() + n.substring(1);
-        } else {
-            return entryName;
-        }
-    }
-
-    protected void saveConfig() {
         try {
-            getConfigFile().createNewFile();
-            writeJson(getConfigFile(), gson.toJson(this));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            T config = constructor.newInstance(arguments);
+            config.setEntryName(filename.substring(0, filename.lastIndexOf('.')));
+            replaceFields(clazz, gson.fromJson(json, clazz), config);
+            return config;
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    protected void saveConfigIfAbsent() {
-        if (!getConfigFile().exists()) {
-            saveConfig();
-        }
-    }
-
-    protected void saveConfigIfPresent() {
-        if (getConfigFile().exists()) {
-            saveConfig();
-        }
-    }
-
-    protected boolean loadConfig() {
-        if (!getConfigFile().exists()) {
-            return false;
-        }
-
-        BaseConfig config = gson.fromJson(readJson(getConfigFile()), this.getClass());
-        replaceFields(this.getClass(), config, this);
-        return true;
     }
 
     private static String readJson(File jsonFile) {
         try {
-            return Files.readLines(jsonFile, StandardCharsets.UTF_8).stream()
-                    .collect(Collectors.joining(System.lineSeparator()));
+            return Files.readLines(jsonFile, StandardCharsets.UTF_8)
+                        .stream()
+                        .collect(Collectors.joining(System.lineSeparator()));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
     private static void writeJson(File jsonFile, String json) {
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(jsonFile), StandardCharsets.UTF_8)) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(jsonFile),
+                                                                StandardCharsets.UTF_8)) {
             writer.write(json);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -269,5 +207,81 @@ public abstract class BaseConfig implements Listener {
         } catch (NullPointerException ignored) {
             // 新しいフィールドが追加されるとNullPointerExceptionが発生するため握りつぶしている
         }
+    }
+
+    /**
+     * set listener fired on initialization.
+     */
+    protected final void onInitialize(Runnable onLoad) {
+        onInitializeListeners.add(onLoad);
+    }
+
+    boolean isGetEnabled() {
+        return enableGet;
+    }
+
+    boolean isListEnabled() {
+        return enableList;
+    }
+
+    boolean isModifyEnabled() {
+        return enableModify;
+    }
+
+    boolean isReloadEnabled() {
+        return enableReload;
+    }
+
+    protected void setEntryName(@NotNull String entryName) {
+        this.entryName = entryName;
+    }
+
+    public Plugin plugin() {
+        return plugin;
+    }
+
+    public File getConfigFile() {
+        return new File(plugin.getDataFolder(), entryName() + ".json");
+    }
+
+    public String entryName() {
+        if (entryName.equals("")) {
+            String n = getClass().getSimpleName();
+            return n.substring(0, 1)
+                    .toLowerCase() + n.substring(1);
+        } else {
+            return entryName;
+        }
+    }
+
+    protected void saveConfig() {
+        try {
+            getConfigFile().createNewFile();
+            writeJson(getConfigFile(), gson.toJson(this));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    protected void saveConfigIfAbsent() {
+        if (!getConfigFile().exists()) {
+            saveConfig();
+        }
+    }
+
+    protected void saveConfigIfPresent() {
+        if (getConfigFile().exists()) {
+            saveConfig();
+        }
+    }
+
+    protected boolean loadConfig() {
+        if (!getConfigFile().exists()) {
+            return false;
+        }
+
+        BaseConfig config = gson.fromJson(readJson(getConfigFile()), this.getClass());
+        replaceFields(this.getClass(), config, this);
+        return true;
     }
 }

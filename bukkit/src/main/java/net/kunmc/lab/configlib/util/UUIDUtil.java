@@ -5,6 +5,9 @@ import org.bukkit.Bukkit;
 import java.util.UUID;
 
 public final class UUIDUtil {
+    private UUIDUtil() {
+    }
+
     public static String getNameOrUuid(UUID uuid) {
         String s = Bukkit.getOfflinePlayer(uuid)
                          .getName();
@@ -12,8 +15,5 @@ public final class UUIDUtil {
             s = uuid.toString();
         }
         return s;
-    }
-
-    private UUIDUtil() {
     }
 }

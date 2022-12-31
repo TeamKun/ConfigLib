@@ -9,7 +9,8 @@ public class MaterialValue extends AbstractEnumValue<Material, MaterialValue> {
 
     public MaterialValue(Material value, boolean onlyBlock) {
         super(value,
-                value.getDeclaringClass().getEnumConstants(),
-                x -> !onlyBlock || x.isBlock());
+              value.getDeclaringClass()
+                   .getEnumConstants(),
+              x -> !onlyBlock || x.isBlock());
     }
 }

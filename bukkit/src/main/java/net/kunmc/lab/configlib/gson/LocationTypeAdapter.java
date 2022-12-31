@@ -16,12 +16,19 @@ public class LocationTypeAdapter extends TypeAdapter<Location> {
             out.nullValue();
         } else {
             out.beginObject();
-            out.name("world").value(value.getWorld().getName());
-            out.name("x").value(value.getX());
-            out.name("y").value(value.getY());
-            out.name("z").value(value.getZ());
-            out.name("pitch").value(value.getPitch());
-            out.name("yaw").value(value.getYaw());
+            out.name("world")
+               .value(value.getWorld()
+                           .getName());
+            out.name("x")
+               .value(value.getX());
+            out.name("y")
+               .value(value.getY());
+            out.name("z")
+               .value(value.getZ());
+            out.name("pitch")
+               .value(value.getPitch());
+            out.name("yaw")
+               .value(value.getYaw());
             out.endObject();
         }
     }

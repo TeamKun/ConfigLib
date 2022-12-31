@@ -52,7 +52,8 @@ public class BlockDataValue extends SingleValue<BlockData, BlockDataValue> {
     @Override
     protected String valueToString(BlockData blockData) {
         if (listOnlyBlockName) {
-            return blockData.getMaterial().name();
+            return blockData.getMaterial()
+                            .name();
         } else {
             return blockData.getAsString();
         }
@@ -60,6 +61,9 @@ public class BlockDataValue extends SingleValue<BlockData, BlockDataValue> {
 
     @Override
     public String toString() {
-        return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}", value(), listable(), writableByCommand());
+        return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}",
+                             value(),
+                             listable(),
+                             writableByCommand());
     }
 }

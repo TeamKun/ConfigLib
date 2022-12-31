@@ -17,7 +17,9 @@ public class Team2FloatMapValue extends Team2ObjectMapValue<Float, Team2FloatMap
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName,
+                                                         List<Object> argument,
+                                                         CommandSource sender) {
         return "";
     }
 
