@@ -2,9 +2,11 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.configlib.util.ConfigUtil;
+import net.minecraft.command.CommandSource;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Set;
 
 class ConfigModifyCommand extends Command {
@@ -49,7 +51,13 @@ class ConfigModifyCommand extends Command {
             }
 
             command.addChildren(new Command(field.getName()) {{
-                addChildren(new ModifySetCommand(field, v, config));
+                execute(ctx -> {
+                    v.sendListMessage(ctx, field.getName());
+                });
+                applySet(this, field, v, config);
+                addChildren(new Command("set") {{
+                    applySet(this, field, v, config);
+                }});
 
                 if (v instanceof NumericValue) {
                     addChildren(new ModifyIncCommand(field, ((NumericValue<?, ?>) v), config));
@@ -107,5 +115,37 @@ class ConfigModifyCommand extends Command {
                 }
             }});
         }
+    }
+
+    private static void applySet(Command command, Field field, SingleValue value, BaseConfig config) {
+        command.argument(builder -> {
+            value.appendArgument(builder);
+
+            builder.execute(ctx -> {
+                String entryName = field.getName();
+
+                List<Object> argument = ctx.getParsedArgs();
+                CommandSource sender = ctx.getSender();
+                if (!value.isCorrectArgument(entryName, argument, sender)) {
+                    ctx.sendFailure(value.incorrectArgumentMessage(entryName, argument, sender));
+                    return;
+                }
+
+                Object newValue = value.argumentToValue(argument, sender);
+                if (!value.validateOnSet(entryName, newValue, sender)) {
+                    ctx.sendFailure(value.invalidValueMessage(entryName, newValue, sender));
+                    return;
+                }
+
+                if (value.onModifyValue(newValue, ctx)) {
+                    return;
+                }
+
+                value.value(newValue);
+                ctx.sendSuccess(value.succeedModifyMessage(entryName));
+
+                config.saveConfigIfPresent();
+            });
+        });
     }
 }
