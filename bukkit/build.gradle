@@ -1,14 +1,3 @@
-buildscript {
-    repositories {
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:6.1.0"
-    }
-}
-
-apply plugin: "com.github.johnrengelman.shadow"
-
 repositories {
     mavenCentral()
     maven {
@@ -23,16 +12,18 @@ repositories {
 
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
-    implementation group: "com.google.guava", name: "guava", version: "27.0.1-jre"
+    implementation group: "com.google.guava", name: "guava", version: '30.0-android'
     implementation 'org.codehaus.plexus:plexus-utils:3.5.0'
-    implementation "com.google.code.gson:gson:2.8.9"
+    implementation 'com.google.code.gson:gson:2.10'
     implementation group: "org.apache.poi", name: "poi", version: "5.1.0"
-    implementation "org.apache.commons:commons-lang3:3.0"
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
     compileOnly "com.github.TeamKun.CommandLib:bukkit:0.10.0"
     compileOnly fileTree(dir: "./libs/", include: "patched*.jar")
     compileOnly "com.mojang:brigadier:1.0.18"
 }
 
 shadowJar {
+    relocate "org", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org"
+    relocate "com", "${project.group}.${rootProject.name.toLowerCase()}.shadow.com"
 }
 tasks.build.dependsOn tasks.shadowJar
