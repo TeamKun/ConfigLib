@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import net.kunmc.lab.configlib.Value;
-import org.bukkit.craftbukkit.libs.org.codehaus.plexus.util.ReflectionUtils;
+import org.codehaus.plexus.util.ReflectionUtils;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;

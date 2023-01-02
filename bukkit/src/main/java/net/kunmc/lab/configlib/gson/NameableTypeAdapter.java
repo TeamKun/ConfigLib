@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib.gson;
 
 import com.google.gson.*;
 import net.kunmc.lab.commandlib.Nameable;
-import org.bukkit.craftbukkit.libs.org.codehaus.plexus.util.ReflectionUtils;
+import org.codehaus.plexus.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
