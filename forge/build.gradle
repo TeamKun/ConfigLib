@@ -30,8 +30,7 @@ dependencies {
 shadowJar {
     dependencies {
         include(dependency("org.apache.poi:poi:.*"))
-        include(dependency("org.codehaus.plexus:plexus-utils:.*"))
     }
-    relocate "org", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org"
+    relocate "org.apache", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org.apache"
 }
 jar.finalizedBy("shadowJar")

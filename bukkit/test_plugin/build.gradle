@@ -13,7 +13,6 @@ buildscript {
 
 apply plugin: "java"
 apply plugin: "com.github.johnrengelman.shadow"
-apply from: "../build.gradle"
 
 group = "net.kunmc.lab"
 version = "1.0.0"
@@ -28,11 +27,17 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven { url = 'https://jitpack.io' }
     flatDir { dirs "server/cache", "libs" }
 }
 
 dependencies {
     compileOnly name: "patched_1.16.5"
+    implementation group: "com.google.guava", name: "guava", version: '30.0-android'
+    implementation 'org.codehaus.plexus:plexus-utils:3.5.0'
+    implementation 'com.google.code.gson:gson:2.10'
+    implementation group: "org.apache.poi", name: "poi", version: "5.1.0"
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation "com.github.TeamKun.CommandLib:bukkit:0.10.0"
 }
 
