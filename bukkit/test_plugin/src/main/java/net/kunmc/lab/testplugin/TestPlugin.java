@@ -25,7 +25,9 @@ public final class TestPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         Config config = new Config(this);
-        ConfigCommand configCommand = new ConfigCommandBuilder(config).build();
+        Config2 config2 = new Config2(this);
+        ConfigCommand configCommand = new ConfigCommandBuilder(config).addConfig(config2)
+                                                                      .build();
 
         CommandLib.register(this, new Command("configlibtest") {{
             addChildren(configCommand);

@@ -2,44 +2,29 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 
 class ConfigListCommand extends Command {
-    private BaseConfig config;
-
     public ConfigListCommand(BaseConfig config) {
         super(SubCommandType.List.name);
-        this.config = config;
+
+        execute(ctx -> exec(ctx, config));
     }
 
-    public ConfigListCommand(Set<BaseConfig> configs) {
+    public ConfigListCommand(Set<BaseConfig> configSet) {
         super(SubCommandType.List.name);
 
-        if (configs.isEmpty()) {
-            throw new IllegalArgumentException("configs is empty");
+        if (configSet.isEmpty()) {
+            throw new IllegalArgumentException("configSet is empty");
         }
 
-        for (BaseConfig config : configs) {
-            addChildren(new Command(config.entryName()) {
-                @Override
-                public void execute(@NotNull CommandContext ctx) {
-                    exec(ctx, config);
-                }
-            });
-        }
-    }
-
-    @Override
-    public void execute(CommandContext ctx) {
-        // configsのコンストラクタで生成された時はconfigフィールドがnullになる
-        if (config == null) {
-            ctx.sendHelp();
-        } else {
-            exec(ctx, config);
+        for (BaseConfig config : configSet) {
+            addChildren(new Command(config.entryName()) {{
+                execute(ctx -> exec(ctx, config));
+            }});
         }
     }
 
