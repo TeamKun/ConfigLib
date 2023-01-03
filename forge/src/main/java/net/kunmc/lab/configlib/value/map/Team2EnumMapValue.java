@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.minecraft.command.CommandSource;
+import net.kunmc.lab.commandlib.CommandContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,19 +29,17 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName,
-                                                         List<Object> argument,
-                                                         CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return argument.get(1) + "は不明な値です.";
     }
 
     @Override
-    protected T argumentToValueForPut(List<Object> argument, CommandSource sender) {
+    protected T argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return clazz.cast(argument.get(1));
     }
 

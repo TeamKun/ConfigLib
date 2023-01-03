@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.minecraft.block.BlockState;
-import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.BlockStateInput;
 
 import java.util.List;
@@ -21,19 +21,17 @@ public class UUID2BlockStateMapValue extends UUID2ObjectMapValue<BlockState, UUI
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName,
-                                                         List<Object> argument,
-                                                         CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected BlockState argumentToValueForPut(List<Object> argument, CommandSource sender) {
+    protected BlockState argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((BlockStateInput) argument.get(1)).getState();
     }
 

@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.StringArgument;
-import net.minecraft.command.CommandSource;
 
 import java.util.List;
 
@@ -13,19 +13,17 @@ public class UUID2StringMapValue extends UUID2ObjectMapValue<String, UUID2String
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName,
-                                                         List<Object> argument,
-                                                         CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected String argumentToValueForPut(List<Object> argument, CommandSource sender) {
+    protected String argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((String) argument.get(1));
     }
 

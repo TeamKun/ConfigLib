@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import org.bukkit.command.CommandSender;
+import net.kunmc.lab.commandlib.CommandContext;
 
 import java.util.List;
 
@@ -12,19 +12,17 @@ public class Team2BooleanMapValue extends Team2ObjectMapValue<Boolean, Team2Bool
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName,
-                                                         List<Object> argument,
-                                                         CommandSender sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected Boolean argumentToValueForPut(List<Object> argument, CommandSender sender) {
+    protected Boolean argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((Boolean) argument.get(1));
     }
 

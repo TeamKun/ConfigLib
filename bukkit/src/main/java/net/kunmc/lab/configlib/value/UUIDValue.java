@@ -1,11 +1,11 @@
 package net.kunmc.lab.configlib.value;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.SingleValue;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,27 +55,27 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected UUID argumentToValue(List<Object> argument, CommandSender sender) {
+    protected UUID argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((UUID) argument.get(0));
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected boolean validateOnSet(String entryName, UUID newValue, CommandSender sender) {
+    protected boolean validateOnSet(String entryName, UUID newValue, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, UUID newValue, CommandSender sender) {
+    protected String invalidValueMessage(String entryName, UUID newValue, CommandContext ctx) {
         return newValue + "は不正な値です.";
     }
 

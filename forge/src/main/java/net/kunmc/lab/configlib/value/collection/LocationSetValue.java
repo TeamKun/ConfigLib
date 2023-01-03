@@ -2,8 +2,8 @@ package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.util.Location;
-import net.minecraft.command.CommandSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -25,17 +25,17 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    public boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return argument.get(0) + "は不正な引数です.";
     }
 
     @Override
-    public Set<Location> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    public Set<Location> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet((Location) argument.get(0));
     }
 
@@ -70,17 +70,17 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    public boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return argument + "は不正な引数です.";
     }
 
     @Override
-    public Set<Location> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    public Set<Location> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         double x = ((Double) argument.get(0));
         double y = ((Double) argument.get(1));
         double z = ((Double) argument.get(2));

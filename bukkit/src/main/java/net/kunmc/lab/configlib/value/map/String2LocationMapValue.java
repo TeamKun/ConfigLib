@@ -1,13 +1,8 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import org.bukkit.Bukkit;
+import net.kunmc.lab.commandlib.CommandContext;
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.command.BlockCommandSender;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,42 +23,18 @@ public class String2LocationMapValue extends String2ObjectMapValue<Location, Str
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName,
-                                                         List<Object> argument,
-                                                         CommandSender sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected Location argumentToValueForPut(List<Object> argument, CommandSender sender) {
-        Location l = ((Location) argument.get(1));
-
-        if (sender instanceof ConsoleCommandSender) {
-            l.setWorld(Bukkit.getWorlds()
-                             .get(0));
-        }
-
-        if (sender instanceof Player) {
-            Player p = ((Player) sender);
-            l.setWorld(p.getWorld());
-            l.setPitch(p.getLocation()
-                        .getPitch());
-            l.setYaw(p.getLocation()
-                      .getYaw());
-        }
-
-        if (sender instanceof BlockCommandSender) {
-            World w = ((BlockCommandSender) sender).getBlock()
-                                                   .getWorld();
-            l.setWorld(w);
-        }
-
-        return l;
+    protected Location argumentToValueForPut(List<Object> argument, CommandContext ctx) {
+        return ((Location) argument.get(1));
     }
 
     @Override

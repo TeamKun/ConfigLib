@@ -2,8 +2,8 @@ package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -44,17 +44,17 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return argument.get(0) != null;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return "指定されたチームは存在しません.";
     }
 
     @Override
-    protected Set<Team> argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender) {
+    protected Set<Team> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet(((Team) argument.get(0)));
     }
 
@@ -68,17 +68,17 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return argument.get(0) != null;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return "指定されたチームは存在しません.";
     }
 
     @Override
-    protected Set<Team> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
+    protected Set<Team> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet(((Team) argument.get(0)));
     }
 

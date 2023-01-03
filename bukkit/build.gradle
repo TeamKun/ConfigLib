@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
+    implementation project(":common")
     implementation group: "com.google.guava", name: "guava", version: '30.0-android'
     implementation 'org.codehaus.plexus:plexus-utils:3.5.0'
     implementation 'com.google.code.gson:gson:2.10'

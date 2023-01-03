@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.minecraft.command.CommandSource;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,17 +24,17 @@ public class BlockPosSetValue extends SetValue<BlockPos, BlockPosSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return false;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return null;
     }
 
     @Override
-    protected Set<BlockPos> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    protected Set<BlockPos> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return null;
     }
 
@@ -44,17 +44,17 @@ public class BlockPosSetValue extends SetValue<BlockPos, BlockPosSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return false;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return null;
     }
 
     @Override
-    protected Set<BlockPos> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected Set<BlockPos> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return null;
     }
 

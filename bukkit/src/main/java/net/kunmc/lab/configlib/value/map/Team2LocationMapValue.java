@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
@@ -13,19 +13,17 @@ public class Team2LocationMapValue extends Team2ObjectMapValue<Location, Team2Lo
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName,
-                                                         List<Object> argument,
-                                                         CommandSender sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected Location argumentToValueForPut(List<Object> argument, CommandSender sender) {
+    protected Location argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((Location) argument.get(1));
     }
 

@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.minecraft.command.CommandSource;
+import net.kunmc.lab.commandlib.CommandContext;
 
 import java.util.List;
 
@@ -12,19 +12,17 @@ public class Team2DoubleMapValue extends Team2ObjectMapValue<Double, Team2Double
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName,
-                                                         List<Object> argument,
-                                                         CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected Double argumentToValueForPut(List<Object> argument, CommandSource sender) {
+    protected Double argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((Double) argument.get(1));
     }
 

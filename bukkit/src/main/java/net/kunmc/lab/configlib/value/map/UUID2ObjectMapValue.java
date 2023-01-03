@@ -1,11 +1,11 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.MapValue;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,17 +25,17 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected UUID argumentToKeyForPut(List<Object> argument, CommandSender sender) {
+    protected UUID argumentToKeyForPut(List<Object> argument, CommandContext ctx) {
         return ((UUID) argument.get(0));
     }
 
@@ -57,19 +57,17 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForRemove(String entryName,
-                                                          List<Object> argument,
-                                                          CommandSender sender) {
+    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected UUID argumentToKeyForRemove(List<Object> argument, CommandSender sender) {
+    protected UUID argumentToKeyForRemove(List<Object> argument, CommandContext ctx) {
         return (UUID) argument.get(0);
     }
 

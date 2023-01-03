@@ -1,9 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.SingleValue;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -33,22 +33,22 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected Team argumentToValue(List<Object> argument, CommandSender sender) {
+    protected Team argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((Team) argument.get(0));
     }
 
     @Override
-    protected boolean validateOnSet(String entryName, Team newValue, CommandSender sender) {
+    protected boolean validateOnSet(String entryName, Team newValue, CommandContext ctx) {
         if (value == null) {
             return true;
         }
@@ -58,7 +58,7 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, Team newValue, CommandSender sender) {
+    protected String invalidValueMessage(String entryName, Team newValue, CommandContext ctx) {
         return newValue.getName() + "はすでに設定されているチームです.";
     }
 

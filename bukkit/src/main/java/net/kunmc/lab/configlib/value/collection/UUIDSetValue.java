@@ -2,10 +2,10 @@ package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -36,18 +36,18 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
 
     @Override
-    protected Set<UUID> argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender) {
+    protected Set<UUID> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet(((List<UUID>) argument.get(0)));
     }
 
@@ -76,27 +76,27 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected Set<UUID> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
+    protected Set<UUID> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet(((UUID) argument.get(0)));
     }
 
     @Override
-    protected boolean validateForRemove(String entryName, Set<UUID> value, CommandSender sender) {
+    protected boolean validateForRemove(String entryName, Set<UUID> value, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String invalidValueMessageForRemove(String entryName, Set<UUID> element, CommandSender sender) {
+    protected String invalidValueMessageForRemove(String entryName, Set<UUID> element, CommandContext ctx) {
         return "";
     }
 

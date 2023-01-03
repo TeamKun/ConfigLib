@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.minecraft.command.CommandSource;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Team;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -42,19 +42,19 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return argument.get(0) != null;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return "指定されたチームは存在しません.";
     }
 
     @Override
     protected Set<ScorePlayerTeam> argumentToValueForAdd(String entryName,
                                                          List<Object> argument,
-                                                         CommandSource sender) {
+                                                         CommandContext ctx) {
         return Sets.newHashSet(((ScorePlayerTeam) argument.get(0)));
     }
 
@@ -68,19 +68,19 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return argument.get(0) != null;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return "指定されたチームは存在しません.";
     }
 
     @Override
     protected Set<ScorePlayerTeam> argumentToValueForRemove(String entryName,
                                                             List<Object> argument,
-                                                            CommandSource sender) {
+                                                            CommandContext ctx) {
         return Sets.newHashSet(((ScorePlayerTeam) argument.get(0)));
     }
 

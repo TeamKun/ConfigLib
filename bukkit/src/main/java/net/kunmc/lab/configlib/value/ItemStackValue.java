@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.SingleValue;
-import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -23,29 +23,29 @@ public class ItemStackValue extends SingleValue<ItemStack, ItemStackValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected ItemStack argumentToValue(List<Object> argument, CommandSender sender) {
+    protected ItemStack argumentToValue(List<Object> argument, CommandContext ctx) {
         ItemStack item = ((ItemStack) argument.get(0));
         item.setAmount(((Integer) argument.get(1)));
         return item;
     }
 
     @Override
-    protected boolean validateOnSet(String entryName, ItemStack newValue, CommandSender sender) {
+    protected boolean validateOnSet(String entryName, ItemStack newValue, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, ItemStack newValue, CommandSender sender) {
+    protected String invalidValueMessage(String entryName, ItemStack newValue, CommandContext ctx) {
         return "";
     }
 

@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.SingleValue;
-import net.minecraft.command.CommandSource;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.List;
@@ -22,22 +22,22 @@ public class TeamValue extends SingleValue<ScorePlayerTeam, TeamValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected ScorePlayerTeam argumentToValue(List<Object> argument, CommandSource sender) {
+    protected ScorePlayerTeam argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((ScorePlayerTeam) argument.get(0));
     }
 
     @Override
-    protected boolean validateOnSet(String entryName, ScorePlayerTeam newValue, CommandSource sender) {
+    protected boolean validateOnSet(String entryName, ScorePlayerTeam newValue, CommandContext ctx) {
         if (value == null) {
             return true;
         }
@@ -47,7 +47,7 @@ public class TeamValue extends SingleValue<ScorePlayerTeam, TeamValue> {
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, ScorePlayerTeam newValue, CommandSource sender) {
+    protected String invalidValueMessage(String entryName, ScorePlayerTeam newValue, CommandContext ctx) {
         return newValue.getName() + "はすでに設定されているチームです.";
     }
 

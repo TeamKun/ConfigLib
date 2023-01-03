@@ -2,10 +2,10 @@ package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.StringArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -34,17 +34,17 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected Set<BlockData> argumentToValueForAdd(String entryName, List<Object> argument, CommandSender sender) {
+    protected Set<BlockData> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet((BlockData) argument.get(0));
     }
 
@@ -58,7 +58,7 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSender sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         try {
             Bukkit.createBlockData(argument.get(0)
                                            .toString());
@@ -69,12 +69,12 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSender sender) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return argument.get(0) + "はブロック化出来ない値です.";
     }
 
     @Override
-    protected Set<BlockData> argumentToValueForRemove(String entryName, List<Object> argument, CommandSender sender) {
+    protected Set<BlockData> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet(Bukkit.createBlockData(argument.get(0)
                                                               .toString()));
     }

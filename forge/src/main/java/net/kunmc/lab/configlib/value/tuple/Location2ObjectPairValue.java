@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.tuple;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.util.Location;
-import net.minecraft.command.CommandSource;
 
 import java.util.List;
 
@@ -17,17 +17,17 @@ public abstract class Location2ObjectPairValue<R, T extends Location2ObjectPairV
     }
 
     @Override
-    protected boolean isCorrectLeftArgument(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectLeftArgument(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectLeftArgumentMessage(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectLeftArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected Location argumentToLeftValue(List<Object> argument, CommandSource sender) {
+    protected Location argumentToLeftValue(List<Object> argument, CommandContext ctx) {
         return ((Location) argument.get(0));
     }
 

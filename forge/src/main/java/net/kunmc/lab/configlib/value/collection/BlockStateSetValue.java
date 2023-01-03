@@ -2,8 +2,8 @@ package net.kunmc.lab.configlib.value.collection;
 
 import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.minecraft.block.BlockState;
-import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.BlockStateInput;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,17 +33,17 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected Set<BlockState> argumentToValueForAdd(String entryName, List<Object> argument, CommandSource sender) {
+    protected Set<BlockState> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet(((BlockStateInput) argument.get(0)).getState());
     }
 
@@ -57,17 +57,17 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected Set<BlockState> argumentToValueForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected Set<BlockState> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet(((BlockStateInput) argument.get(0)).getState());
     }
 

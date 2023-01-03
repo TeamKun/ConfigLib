@@ -1,3 +1,2 @@
 rootProject.name = "ConfigLib"
-include "bukkit", "forge"
-
+include "bukkit", "forge", "common"

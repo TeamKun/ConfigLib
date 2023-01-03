@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.minecraft.command.CommandSource;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.HashMap;
@@ -23,19 +23,17 @@ public class String2BlockPosValue extends String2ObjectMapValue<BlockPos, String
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName,
-                                                         List<Object> argument,
-                                                         CommandSource sender) {
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected BlockPos argumentToValueForPut(List<Object> argument, CommandSource sender) {
+    protected BlockPos argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((BlockPos) argument.get(1));
     }
 

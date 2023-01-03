@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.MapValue;
-import net.minecraft.command.CommandSource;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.HashMap;
@@ -24,27 +24,27 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return argument.get(0) != null;
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
         return "指定されたチームは存在しません.";
     }
 
     @Override
-    protected ScorePlayerTeam argumentToKeyForPut(List<Object> argument, CommandSource sender) {
+    protected ScorePlayerTeam argumentToKeyForPut(List<Object> argument, CommandContext ctx) {
         return ((ScorePlayerTeam) argument.get(0));
     }
 
     @Override
-    protected boolean validateKeyForPut(String entryName, ScorePlayerTeam team, CommandSource sender) {
+    protected boolean validateKeyForPut(String entryName, ScorePlayerTeam team, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String invalidKeyMessageForPut(String entryName, ScorePlayerTeam team, CommandSource sender) {
+    protected String invalidKeyMessageForPut(String entryName, ScorePlayerTeam team, CommandContext ctx) {
         return "This message can't be shown.";
     }
 
@@ -54,19 +54,17 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return argument.get(0) != null;
     }
 
     @Override
-    protected String incorrectKeyArgumentMessageForRemove(String entryName,
-                                                          List<Object> argument,
-                                                          CommandSource sender) {
+    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return "指定されたチームは存在しません.";
     }
 
     @Override
-    protected ScorePlayerTeam argumentToKeyForRemove(List<Object> argument, CommandSource sender) {
+    protected ScorePlayerTeam argumentToKeyForRemove(List<Object> argument, CommandContext ctx) {
         return ((ScorePlayerTeam) argument.get(0));
     }
 

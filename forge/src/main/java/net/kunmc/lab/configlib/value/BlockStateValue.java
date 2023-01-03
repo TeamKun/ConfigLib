@@ -1,9 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.SingleValue;
 import net.minecraft.block.BlockState;
-import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.BlockStateInput;
 
 import java.util.List;
@@ -30,27 +30,27 @@ public class BlockStateValue extends SingleValue<BlockState, BlockStateValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandSource sender) {
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandSource sender) {
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
     @Override
-    protected BlockState argumentToValue(List<Object> argument, CommandSource sender) {
+    protected BlockState argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((BlockStateInput) argument.get(0)).getState();
     }
 
     @Override
-    protected boolean validateOnSet(String entryName, BlockState newValue, CommandSource sender) {
+    protected boolean validateOnSet(String entryName, BlockState newValue, CommandContext ctx) {
         return true;
     }
 
     @Override
-    protected String invalidValueMessage(String entryName, BlockState newValue, CommandSource sender) {
+    protected String invalidValueMessage(String entryName, BlockState newValue, CommandContext ctx) {
         return "";
     }
 
