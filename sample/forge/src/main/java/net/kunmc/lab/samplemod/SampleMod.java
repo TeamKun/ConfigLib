@@ -27,7 +27,7 @@ public class SampleMod {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     @OnlyIn(Dist.CLIENT)
     public void onServerStartingOnClient(FMLServerStartingEvent event) {
         builder.addConfig(clientConfig);

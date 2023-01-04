@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib;
 
 import com.google.common.io.Files;
 import com.google.gson.Gson;
+import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,49 +15,112 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.nio.file.*;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public abstract class CommonBaseConfig {
     protected transient boolean enableGet = true;
     protected transient boolean enableList = true;
     protected transient boolean enableModify = true;
     protected transient boolean enableReload = true;
+    transient boolean makeConfigFile = true;
+    private transient volatile boolean initialized = false;
     private transient String entryName = "";
+    private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
+    protected final transient Timer timer = new Timer();
+    private transient WatchService watchService;
+    private transient WatchKey watchKey;
+
+    protected CommonBaseConfig() {
+        String s = getClass().getSimpleName();
+        this.entryName = s.substring(0, 1)
+                          .toLowerCase() + s.substring(1);
+    }
 
     protected void setEntryName(@NotNull String entryName) {
         this.entryName = entryName;
     }
 
-    public String entryName() {
-        if (entryName.equals("")) {
-            String n = getClass().getSimpleName();
-            return n.substring(0, 1)
-                    .toLowerCase() + n.substring(1);
-        } else {
-            return entryName;
-        }
+    public final String entryName() {
+        return entryName;
     }
 
-    boolean isGetEnabled() {
+    final void init() {
+        if (!makeConfigFile) {
+            return;
+        }
+        getConfigFolder().mkdirs();
+
+        try {
+            watchService = FileSystems.getDefault()
+                                      .newWatchService();
+            watchKey = getConfigFolder().toPath()
+                                        .register(watchService, ENTRY_MODIFY);
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    for (WatchEvent<?> e : watchKey.pollEvents()) {
+                        Path filePath = getConfigFolder().toPath()
+                                                         .resolve((Path) e.context());
+                        if (filePath.equals(getConfigFile().toPath())) {
+                            loadConfig();
+                        }
+                    }
+                    watchKey.reset();
+                }
+            }, 0, 500);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
+        // コンストラクタの処理内でシリアライズすると子クラスのフィールドの初期化が終わってない状態でシリアライズされるため別スレッドでループ待機させている.
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                List<Value<?, ?>> values = ConfigUtil.getValues(CommonBaseConfig.this);
+                if (values.stream()
+                          .allMatch(Objects::nonNull)) {
+                    saveConfigIfAbsent();
+                    loadConfig();
+                    cancel();
+                }
+            }
+        }, 0, 1);
+    }
+
+    /**
+     * set listener fired on initialization.
+     */
+    protected final void onInitialize(Runnable onLoad) {
+        onInitializeListeners.add(onLoad);
+    }
+
+    final boolean isGetEnabled() {
         return enableGet;
     }
 
-    boolean isListEnabled() {
+    final boolean isListEnabled() {
         return enableList;
     }
 
-    boolean isModifyEnabled() {
+    final boolean isModifyEnabled() {
         return enableModify;
     }
 
-    boolean isReloadEnabled() {
+    final boolean isReloadEnabled() {
         return enableReload;
     }
 
     protected abstract Gson gson();
 
-    public abstract File getConfigFile();
+    abstract File getConfigFolder();
+
+    public final File getConfigFile() {
+        return new File(getConfigFolder(), entryName() + ".json");
+    }
 
     protected void saveConfig() {
         try {
@@ -79,21 +143,39 @@ public abstract class CommonBaseConfig {
         }
     }
 
-    protected boolean loadConfig() {
+    protected final synchronized boolean loadConfig() {
         if (!getConfigFile().exists()) {
             return false;
         }
 
         CommonBaseConfig config = gson().fromJson(readJson(getConfigFile()), this.getClass());
         replaceFields(this.getClass(), config, this);
+        if (!initialized) {
+            onInitializeListeners.forEach(Runnable::run);
+            initialized = true;
+        }
         return true;
     }
 
-    public static <T extends CommonBaseConfig> T newInstanceFrom(@NotNull File configJSON,
+    protected final void close() {
+        try {
+            timer.cancel();
+            if (watchService != null) {
+                watchService.close();
+            }
+            if (watchKey != null) {
+                watchKey.cancel();
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T extends CommonBaseConfig> T newInstanceFrom(@NotNull File jsonFile,
                                                                  @NotNull Constructor<T> constructor,
                                                                  Object... arguments) {
-        String filename = configJSON.getName();
-        String json = readJson(configJSON);
+        String filename = jsonFile.getName();
+        String json = readJson(jsonFile);
         Class<T> clazz = constructor.getDeclaringClass();
 
         try {
@@ -109,7 +191,7 @@ public abstract class CommonBaseConfig {
         }
     }
 
-    protected static String readJson(File jsonFile) {
+    private static String readJson(File jsonFile) {
         try {
             return Files.readLines(jsonFile, StandardCharsets.UTF_8)
                         .stream()
@@ -119,7 +201,7 @@ public abstract class CommonBaseConfig {
         }
     }
 
-    protected static void writeJson(File jsonFile, String json) {
+    private static void writeJson(File jsonFile, String json) {
         try (OutputStreamWriter writer = new OutputStreamWriter(java.nio.file.Files.newOutputStream(jsonFile.toPath()),
                                                                 StandardCharsets.UTF_8)) {
             writer.write(json);
@@ -128,7 +210,7 @@ public abstract class CommonBaseConfig {
         }
     }
 
-    protected static void replaceFields(Class<?> clazz, Object src, Object dst) {
+    private static void replaceFields(Class<?> clazz, Object src, Object dst) {
         for (Field field : ReflectionUtils.getFieldsIncludingSuperclasses(clazz)) {
             if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
                 continue;
@@ -149,7 +231,7 @@ public abstract class CommonBaseConfig {
         }
     }
 
-    protected static void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
+    private static void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
         try {
             List<Field> fieldList = ReflectionUtils.getFieldsIncludingSuperclasses(field.getType());
             Object srcObj = field.get(src);

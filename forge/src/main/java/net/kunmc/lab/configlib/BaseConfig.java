@@ -19,15 +19,10 @@ import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.reflect.Modifier;
-import java.nio.file.*;
-import java.util.*;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public abstract class BaseConfig extends CommonBaseConfig {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting()
@@ -50,10 +45,6 @@ public abstract class BaseConfig extends CommonBaseConfig {
                                                       .create();
     private final transient String modId;
     private final transient Type type;
-    private final transient boolean makeConfigFile;
-    private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
-    private transient WatchService watchService;
-    private transient TimerTask watchTask;
 
     public BaseConfig(@NotNull String modId, @NotNull Type type) {
         this(modId, type, true);
@@ -64,11 +55,7 @@ public abstract class BaseConfig extends CommonBaseConfig {
         this.type = type;
         this.makeConfigFile = makeConfigFile;
 
-        if (ServerLifecycleHooks.getCurrentServer() != null) {
-            init();
-        } else {
-            MinecraftForge.EVENT_BUS.register(this);
-        }
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
@@ -78,68 +65,15 @@ public abstract class BaseConfig extends CommonBaseConfig {
         }
     }
 
-    private void init() {
-        if (!makeConfigFile) {
-            return;
-        }
-
-        getConfigFolder().mkdirs();
-        new Thread() {
-            public void run() {
-                saveConfigIfAbsent();
-                loadConfig();
-                onInitializeListeners.forEach(Runnable::run);
-            }
-        }.start();
-
-        try {
-            watchService = FileSystems.getDefault()
-                                      .newWatchService();
-            WatchKey watchKey = type.getConfigFolder(modId)
-                                    .toPath()
-                                    .register(watchService, ENTRY_MODIFY);
-            watchTask = new TimerTask() {
-                @Override
-                public void run() {
-                    for (WatchEvent<?> e : watchKey.pollEvents()) {
-                        Path filePath = getConfigFolder().toPath()
-                                                         .resolve((Path) e.context());
-                        if (filePath.equals(getConfigFile().toPath())) {
-                            loadConfig();
-                        }
-                    }
-
-                    watchKey.reset();
-                }
-            };
-            new Timer().scheduleAtFixedRate(watchTask, 0, 500);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
     @SubscribeEvent
     public void onServerStopping(FMLServerStoppedEvent e) {
-        if (watchTask != null) {
-            watchTask.cancel();
-        }
-        if (watchService != null) {
-            try {
-                watchService.close();
-            } catch (IOException ex) {
-                throw new UncheckedIOException(ex);
-            }
+        if (type.shouldClose) {
+            close();
         }
     }
 
-    /**
-     * set listener fired on initialization.
-     */
-    protected final void onInitialize(Runnable onLoad) {
-        onInitializeListeners.add(onLoad);
-    }
-
-    private File getConfigFolder() {
+    @Override
+    File getConfigFolder() {
         return type.getConfigFolder(modId);
     }
 
@@ -148,20 +82,15 @@ public abstract class BaseConfig extends CommonBaseConfig {
         return gson;
     }
 
-    @Override
-    public File getConfigFile() {
-        return new File(getConfigFolder(), entryName() + ".json");
-    }
-
     public enum Type {
         COMMON(modId -> {
             return new File("config/" + modId);
-        }, () -> true),
+        }, () -> true, false),
         CLIENT(modId -> {
             return new File("config/" + modId);
         }, () -> {
             return FMLEnvironment.dist.isClient();
-        }),
+        }, false),
         SERVER(modId -> {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             if (server.isDedicatedServer()) {
@@ -170,16 +99,16 @@ public abstract class BaseConfig extends CommonBaseConfig {
                 return new File("saves/" + server.getServerConfiguration()
                                                  .getWorldName() + "/serverconfig/" + modId);
             }
-        }, () -> {
-            return true;
-        });
+        }, () -> true, true);
 
         private final Function<String, File> getConfigFolder;
         private final Supplier<Boolean> isCorrectSide;
+        private final boolean shouldClose;
 
-        Type(Function<String, File> getConfigFolder, Supplier<Boolean> isCorrectSide) {
+        Type(Function<String, File> getConfigFolder, Supplier<Boolean> isCorrectSide, boolean shouldClose) {
             this.getConfigFolder = getConfigFolder;
             this.isCorrectSide = isCorrectSide;
+            this.shouldClose = shouldClose;
         }
 
         File getConfigFolder(String modId) {

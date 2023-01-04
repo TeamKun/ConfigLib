@@ -13,18 +13,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.reflect.Modifier;
-import java.nio.file.*;
-import java.util.*;
-
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import java.util.Set;
+import java.util.TimerTask;
 
 public abstract class BaseConfig extends CommonBaseConfig implements Listener {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting()
@@ -44,7 +39,6 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
                                                       .registerTypeHierarchyAdapter(Set.class, new SetTypeAdapter())
                                                       .create();
     private final transient Plugin plugin;
-    private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
 
     public BaseConfig(@NotNull Plugin plugin) {
         this(plugin, true);
@@ -52,52 +46,9 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
 
     public BaseConfig(@NotNull Plugin plugin, boolean makeConfigFile) {
         this.plugin = plugin;
+        this.makeConfigFile = makeConfigFile;
 
-        if (!makeConfigFile) {
-            return;
-        }
-        plugin.getDataFolder()
-              .mkdir();
-
-        // コンストラクタの処理内でシリアライズするとフィールドの初期化が終わってない状態でシリアライズされるため遅延させている.
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                saveConfigIfAbsent();
-                loadConfig();
-                onInitializeListeners.forEach(Runnable::run);
-            }
-        }.runTask(plugin);
-
-        Timer timer = new Timer();
-        WatchService watcher;
-        WatchKey watchKey;
-        try {
-            watcher = FileSystems.getDefault()
-                                 .newWatchService();
-            watchKey = plugin.getDataFolder()
-                             .toPath()
-                             .register(watcher, ENTRY_MODIFY);
-
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    for (WatchEvent<?> e : watchKey.pollEvents()) {
-                        Path filePath = plugin.getDataFolder()
-                                              .toPath()
-                                              .resolve((Path) e.context());
-                        if (filePath.equals(getConfigFile().toPath())) {
-                            loadConfig();
-                        }
-                    }
-
-                    watchKey.reset();
-                }
-            }, 0, 500);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new UncheckedIOException(e);
-        }
+        init();
 
         // Pluginがenabledになっていない状態でregisterすると例外が発生するため遅延,ループさせている
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -109,13 +60,7 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
                               @EventHandler
                               public void onPluginDisable(PluginDisableEvent e) {
                                   if (e.getPlugin() == plugin) {
-                                      try {
-                                          timer.cancel();
-                                          watcher.close();
-                                          watchKey.cancel();
-                                      } catch (IOException ex) {
-                                          ex.printStackTrace();
-                                      }
+                                      close();
                                   }
                               }
                           }, plugin);
@@ -124,13 +69,6 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
                 }
             }
         }, 100, 100);
-    }
-
-    /**
-     * set listener fired on initialization.
-     */
-    protected final void onInitialize(Runnable onLoad) {
-        onInitializeListeners.add(onLoad);
     }
 
     public Plugin plugin() {
@@ -143,7 +81,7 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
     }
 
     @Override
-    public File getConfigFile() {
-        return new File(plugin.getDataFolder(), entryName() + ".json");
+    File getConfigFolder() {
+        return plugin.getDataFolder();
     }
 }
