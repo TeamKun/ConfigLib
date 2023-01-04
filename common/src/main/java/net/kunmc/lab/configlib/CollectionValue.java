@@ -7,16 +7,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class CollectionValue<T extends Collection<E>, E, U extends CollectionValue<T, E, U>> extends Value<T, U> {
-    private final transient List<BiFunction<T, CommandContext, Boolean>> addListeners = new ArrayList<>();
-    private final transient List<BiFunction<T, CommandContext, Boolean>> removeListeners = new ArrayList<>();
-    private final transient List<Function<CommandContext, Boolean>> clearListeners = new ArrayList<>();
+    private final transient List<Consumer<T>> addListeners = new ArrayList<>();
+    private final transient List<Consumer<T>> removeListeners = new ArrayList<>();
+    private final transient List<Runnable> clearListeners = new ArrayList<>();
     private transient boolean addable = true;
     private transient boolean removable = true;
     private transient boolean clearable = true;
@@ -48,31 +45,13 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract String invalidValueMessageForAdd(String entryName, T value, CommandContext ctx);
 
-    public U onAdd(Consumer<T> listener) {
-        return onAdd((v, ctx) -> {
-            listener.accept(v);
-        });
-    }
-
-    public U onAdd(BiConsumer<T, CommandContext> listener) {
-        return onAdd((v, ctx) -> {
-            listener.accept(v, ctx);
-            return false;
-        });
-    }
-
-    /**
-     * @return true if you want to cancel event, otherwise false
-     */
-    public U onAdd(BiFunction<T, CommandContext, Boolean> listener) {
+    public final U onAdd(Consumer<T> listener) {
         addListeners.add(listener);
         return ((U) this);
     }
 
-    protected boolean onAddValue(T newValue, CommandContext ctx) {
-        return addListeners.stream()
-                           .map(x -> x.apply(newValue, ctx))
-                           .reduce(false, (a, b) -> a || b);
+    protected final void onAddValue(T newValue) {
+        addListeners.forEach(x -> x.accept(newValue));
     }
 
     protected String succeedMessageForAdd(String entryName, T value) {
@@ -102,31 +81,13 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract String invalidValueMessageForRemove(String entryName, T value, CommandContext ctx);
 
-    public U onRemove(Consumer<T> listener) {
-        return onRemove((v, ctx) -> {
-            listener.accept(v);
-        });
-    }
-
-    public U onRemove(BiConsumer<T, CommandContext> listener) {
-        return onRemove((v, ctx) -> {
-            listener.accept(v, ctx);
-            return false;
-        });
-    }
-
-    /**
-     * @return true if you want to cancel event, otherwise false
-     */
-    public U onRemove(BiFunction<T, CommandContext, Boolean> listener) {
+    public final U onRemove(Consumer<T> listener) {
         removeListeners.add(listener);
         return ((U) this);
     }
 
-    protected boolean onRemoveValue(T newValue, CommandContext ctx) {
-        return removeListeners.stream()
-                              .map(x -> x.apply(newValue, ctx))
-                              .reduce(false, (a, b) -> a || b);
+    protected final void onRemoveValue(T newValue) {
+        removeListeners.forEach(x -> x.accept(newValue));
     }
 
     protected String succeedMessageForRemove(String entryName, T value) {
@@ -142,31 +103,13 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return ((U) this);
     }
 
-    public U onClear(Runnable listener) {
-        return onClear(ctx -> {
-            listener.run();
-        });
-    }
-
-    public U onClear(Consumer<CommandContext> listener) {
-        return onClear(ctx -> {
-            listener.accept(ctx);
-            return false;
-        });
-    }
-
-    /**
-     * @return true if you want to cancel event, otherwise false
-     */
-    public U onClear(Function<CommandContext, Boolean> listener) {
+    public final U onClear(Runnable listener) {
         clearListeners.add(listener);
         return ((U) this);
     }
 
-    protected boolean onClearValue(CommandContext ctx) {
-        return clearListeners.stream()
-                             .map(x -> x.apply(ctx))
-                             .reduce(false, (a, b) -> a || b);
+    protected final void onClearValue() {
+        clearListeners.forEach(Runnable::run);
     }
 
     protected final String clearMessage(String entryName) {

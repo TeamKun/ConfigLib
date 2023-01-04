@@ -28,9 +28,7 @@ class ModifyAddCommand extends Command {
                     return;
                 }
 
-                if (value.onAddValue(newValue, ctx)) {
-                    return;
-                }
+                value.onAddValue(newValue);
 
                 ((Collection) value.value()).addAll(newValue);
                 ctx.sendSuccess(value.succeedMessageForAdd(entryName, newValue));

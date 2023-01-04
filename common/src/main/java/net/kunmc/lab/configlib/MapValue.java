@@ -2,22 +2,19 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
-import net.kunmc.lab.configlib.function.TriFunction;
-import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<Map<K, V>, T> {
-    private final transient List<TriFunction<K, V, CommandContext, Boolean>> putListeners = new ArrayList<>();
-    private final transient List<BiFunction<K, CommandContext, Boolean>> removeListeners = new ArrayList<>();
-    private final transient List<Function<CommandContext, Boolean>> clearListeners = new ArrayList<>();
+    private final transient List<BiConsumer<K, V>> putListeners = new ArrayList<>();
+    private final transient List<BiConsumer<K, V>> removeListeners = new ArrayList<>();
+    private final transient List<Runnable> clearListeners = new ArrayList<>();
     private transient boolean puttable = true;
     private transient boolean removable = true;
     private transient boolean clearable = true;
@@ -73,31 +70,13 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return "";
     }
 
-    public T onPut(BiConsumer<K, V> listener) {
-        return onPut((k, v, ctx) -> {
-            listener.accept(k, v);
-        });
-    }
-
-    public T onPut(TriConsumer<K, V, CommandContext> listener) {
-        return onPut((k, v, ctx) -> {
-            listener.accept(k, v, ctx);
-            return false;
-        });
-    }
-
-    /**
-     * @return true if you want to cancel event, otherwise false
-     */
-    public T onPut(TriFunction<K, V, CommandContext, Boolean> listener) {
+    public final T onPut(BiConsumer<K, V> listener) {
         putListeners.add(listener);
         return ((T) this);
     }
 
-    protected boolean onPutValue(K k, V v, CommandContext ctx) {
-        return putListeners.stream()
-                           .map(x -> x.apply(k, v, ctx))
-                           .reduce(false, (a, b) -> a || b);
+    protected final void onPutValue(K k, V v) {
+        putListeners.forEach(x -> x.accept(k, v));
     }
 
     protected String succeedMessageForPut(String entryName, K k, V v) {
@@ -133,31 +112,13 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return String.format("%sは%sに追加されていませんでした.", keyToString(k), entryName);
     }
 
-    public T onRemove(Consumer<K> listener) {
-        return onRemove((k, ctx) -> {
-            listener.accept(k);
-        });
-    }
-
-    public T onRemove(BiConsumer<K, CommandContext> listener) {
-        return onRemove((k, ctx) -> {
-            listener.accept(k, ctx);
-            return false;
-        });
-    }
-
-    /**
-     * @return true if you want to cancel event, otherwise false
-     */
-    public T onRemove(BiFunction<K, CommandContext, Boolean> listener) {
+    public final T onRemove(BiConsumer<K, V> listener) {
         removeListeners.add(listener);
         return ((T) this);
     }
 
-    protected boolean onRemoveKey(K k, CommandContext ctx) {
-        return removeListeners.stream()
-                              .map(x -> x.apply(k, ctx))
-                              .reduce(false, (a, b) -> a || b);
+    protected final void onRemoveKey(K k, V v) {
+        removeListeners.forEach(x -> x.accept(k, v));
     }
 
     protected String succeedMessageForRemove(String entryName, K k, V v) {
@@ -168,36 +129,18 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return clearable;
     }
 
-    public T clearableByCommand(boolean clearable) {
+    public final T clearableByCommand(boolean clearable) {
         this.clearable = clearable;
         return ((T) this);
     }
 
-    public T onClear(Runnable listener) {
-        return onClear(ctx -> {
-            listener.run();
-        });
-    }
-
-    public T onClear(Consumer<CommandContext> listener) {
-        return onClear(ctx -> {
-            listener.accept(ctx);
-            return false;
-        });
-    }
-
-    /**
-     * @return true if you want to cancel event, otherwise false
-     */
-    public T onClear(Function<CommandContext, Boolean> listener) {
+    public final T onClear(Runnable listener) {
         clearListeners.add(listener);
         return ((T) this);
     }
 
-    protected boolean onClearMap(CommandContext ctx) {
-        return clearListeners.stream()
-                             .map(x -> x.apply(ctx))
-                             .reduce(false, (a, b) -> a || b);
+    protected void onClearMap() {
+        clearListeners.forEach(Runnable::run);
     }
 
     protected String clearMessage(String entryName) {

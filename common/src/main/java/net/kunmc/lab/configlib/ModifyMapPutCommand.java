@@ -37,9 +37,7 @@ class ModifyMapPutCommand extends Command {
                     return;
                 }
 
-                if (value.onPutValue(k, v, ctx)) {
-                    return;
-                }
+                value.onPutValue(k, v);
 
                 value.put(k, v);
                 ctx.sendSuccess(value.succeedMessageForPut(entryName, k, v));

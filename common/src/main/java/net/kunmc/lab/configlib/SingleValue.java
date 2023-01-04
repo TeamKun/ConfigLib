@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<E, T> {
-    private transient final List<BiFunction<E, CommandContext, Boolean>> modifyCommandListeners = new ArrayList<>();
     private transient final List<Consumer<E>> modifyListeners = new ArrayList<>();
     private transient boolean writable = true;
 
@@ -90,42 +91,20 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
     protected abstract String invalidValueMessage(String entryName, E newValue, CommandContext ctx);
 
     /**
-     * set value after firing listeners registered by {@link SingleValue#onModify(Consumer)}
+     * set value after firing listeners.
      */
     public final void setValueWithEvent(E value) {
         modifyListeners.forEach(x -> x.accept(value));
         super.value(value);
     }
 
-    /**
-     * add an event listener fired on modify command or {@link SingleValue#setValueWithEvent}.
-     */
     public T onModify(Consumer<E> listener) {
         modifyListeners.add(listener);
-        return onModify((v, ctx) -> {
-            listener.accept(v);
-        });
-    }
-
-    public T onModify(BiConsumer<E, CommandContext> listener) {
-        return onModify((v, ctx) -> {
-            listener.accept(v, ctx);
-            return false;
-        });
-    }
-
-    /**
-     * @return true if you want to cancel event, otherwise false
-     */
-    public T onModify(BiFunction<E, CommandContext, Boolean> listener) {
-        modifyCommandListeners.add(listener);
         return ((T) this);
     }
 
-    protected boolean onModifyValue(E newValue, CommandContext ctx) {
-        return modifyCommandListeners.stream()
-                                     .map(x -> x.apply(newValue, ctx))
-                                     .reduce(false, (a, b) -> a || b);
+    protected void onModifyValue(E newValue) {
+        modifyListeners.forEach(x -> x.accept(newValue));
     }
 
     protected String succeedModifyMessage(String entryName) {

@@ -30,9 +30,7 @@ class ModifyIncCommand extends Command {
         }
 
         Number newValue = value.copyAdd(amount);
-        if (value.onModifyValue(newValue, ctx)) {
-            return;
-        }
+        value.onModifyValue(newValue);
 
         value.value(newValue);
         ctx.sendSuccess(value.succeedModifyMessage(entryName));

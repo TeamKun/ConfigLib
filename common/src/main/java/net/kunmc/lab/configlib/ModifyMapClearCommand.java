@@ -9,9 +9,7 @@ class ModifyMapClearCommand extends Command {
         super("clear");
 
         execute(ctx -> {
-            if (value.onClearMap(ctx)) {
-                return;
-            }
+            value.onClearMap();
 
             value.clear();
             ctx.sendSuccess(value.clearMessage(field.getName()));

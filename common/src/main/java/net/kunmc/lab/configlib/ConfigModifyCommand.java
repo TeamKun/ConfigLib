@@ -135,10 +135,7 @@ class ConfigModifyCommand extends Command {
                     ctx.sendFailure(value.invalidValueMessage(entryName, newValue, ctx));
                     return;
                 }
-
-                if (value.onModifyValue(newValue, ctx)) {
-                    return;
-                }
+                value.onModifyValue(newValue);
 
                 value.value(newValue);
                 ctx.sendSuccess(value.succeedModifyMessage(entryName));

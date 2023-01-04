@@ -10,9 +10,7 @@ class ModifyClearCommand extends Command {
         super("clear");
 
         execute(ctx -> {
-            if (value.onClearValue(ctx)) {
-                return;
-            }
+            value.onClearValue();
 
             ((Collection) value.value()).clear();
             ctx.sendSuccess(value.clearMessage(field.getName()));

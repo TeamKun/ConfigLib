@@ -30,9 +30,7 @@ class ModifyDecCommand extends Command {
         }
 
         Number newValue = value.copySub(amount);
-        if (value.onModifyValue(newValue, ctx)) {
-            return;
-        }
+        value.onModifyValue(newValue);
 
         value.value(newValue);
         ctx.sendSuccess(value.succeedModifyMessage(entryName));

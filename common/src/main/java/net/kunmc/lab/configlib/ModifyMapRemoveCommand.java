@@ -26,14 +26,10 @@ class ModifyMapRemoveCommand extends Command {
                     ctx.sendFailure(value.invalidKeyMessageForRemove(entryName, k, ctx));
                     return;
                 }
-
-                if (value.onRemoveKey(k, ctx)) {
-                    return;
-                }
-
                 Object v = value.remove(k);
-                ctx.sendSuccess(value.succeedMessageForRemove(entryName, k, v));
+                value.onRemoveKey(k, v);
 
+                ctx.sendSuccess(value.succeedMessageForRemove(entryName, k, v));
                 config.saveConfigIfPresent();
             });
         });
