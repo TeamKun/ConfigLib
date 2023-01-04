@@ -23,11 +23,11 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         super(value);
     }
 
-    protected boolean puttableByCommand() {
+    protected final boolean puttableByCommand() {
         return puttable;
     }
 
-    public T puttableByCommand(boolean puttable) {
+    public final T puttableByCommand(boolean puttable) {
         this.puttable = puttable;
         return ((T) this);
     }
@@ -83,11 +83,11 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return String.format("%sに{%s:%s}を追加しました.", entryName, keyToString(k), valueToString(v));
     }
 
-    protected boolean removableByCommand() {
+    protected final boolean removableByCommand() {
         return removable;
     }
 
-    public T removableByCommand(boolean removable) {
+    public final T removableByCommand(boolean removable) {
         this.removable = removable;
         return ((T) this);
     }
@@ -125,7 +125,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return String.format("%sから{%s:%s}を削除しました.", entryName, keyToString(k), valueToString(v));
     }
 
-    protected boolean clearableByCommand() {
+    protected final boolean clearableByCommand() {
         return clearable;
     }
 
@@ -139,7 +139,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return ((T) this);
     }
 
-    protected void onClearMap() {
+    protected final void onClearMap() {
         clearListeners.forEach(Runnable::run);
     }
 

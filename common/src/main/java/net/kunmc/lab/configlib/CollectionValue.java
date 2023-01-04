@@ -22,11 +22,11 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         super(value);
     }
 
-    protected boolean addableByCommand() {
+    protected final boolean addableByCommand() {
         return addable;
     }
 
-    public U addableByCommand(boolean addable) {
+    public final U addableByCommand(boolean addable) {
         this.addable = addable;
         return ((U) this);
     }
@@ -58,11 +58,11 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return String.format("%sに%sを追加しました.", entryName, elementToString(((E[]) value.toArray())[0]));
     }
 
-    protected boolean removableByCommand() {
+    protected final boolean removableByCommand() {
         return removable;
     }
 
-    public U removableByCommand(boolean removable) {
+    public final U removableByCommand(boolean removable) {
         this.removable = removable;
         return ((U) this);
     }
@@ -94,11 +94,11 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return String.format("%sから%sを削除しました.", entryName, elementToString(((E[]) value.toArray())[0]));
     }
 
-    protected boolean clearableByCommand() {
+    protected final boolean clearableByCommand() {
         return clearable;
     }
 
-    public U clearableByCommand(boolean clearable) {
+    public final U clearableByCommand(boolean clearable) {
         this.clearable = clearable;
         return ((U) this);
     }

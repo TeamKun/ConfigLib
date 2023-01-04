@@ -9,23 +9,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class ListValue<E, U extends ListValue<E, U>> extends CollectionValue<List<E>, E, U> implements Iterable<E> {
-    protected transient boolean listable = true;
-    protected transient boolean addable = true;
-    protected transient boolean removable = true;
-    protected transient boolean clearable = true;
-
     public ListValue(List<E> value) {
         super(value);
-    }
-
-    @Override
-    public boolean addableByCommand() {
-        return addable;
-    }
-
-    public U addableByCommand(boolean addable) {
-        this.addable = addable;
-        return (U) this;
     }
 
     @Override
@@ -36,16 +21,6 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
     @Override
     protected String invalidValueMessageForAdd(String entryName, List<E> value, CommandContext ctx) {
         return "This message can't be shown.";
-    }
-
-    @Override
-    public boolean removableByCommand() {
-        return removable;
-    }
-
-    public U removableByCommand(boolean removable) {
-        this.removable = removable;
-        return (U) this;
     }
 
     @Override
@@ -60,26 +35,6 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
                                   .map(this::elementToString)
                                   .collect(Collectors.toList()),
                              entryName);
-    }
-
-    @Override
-    public boolean clearableByCommand() {
-        return clearable;
-    }
-
-    public U clearableByCommand(boolean clearable) {
-        this.clearable = clearable;
-        return (U) this;
-    }
-
-    @Override
-    public boolean listable() {
-        return listable;
-    }
-
-    public U listable(boolean listable) {
-        this.listable = listable;
-        return (U) this;
     }
 
     public int size() {

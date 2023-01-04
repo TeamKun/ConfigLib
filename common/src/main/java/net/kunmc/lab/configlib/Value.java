@@ -21,20 +21,20 @@ public abstract class Value<E, T extends Value<E, T>> {
         this.value = value;
     }
 
-    public String description() {
+    public final String description() {
         return description;
     }
 
-    public T description(String description) {
+    public final T description(String description) {
         this.description = description;
         return ((T) this);
     }
 
-    protected boolean listable() {
+    protected final boolean listable() {
         return listable;
     }
 
-    public T listable(boolean listable) {
+    public final T listable(boolean listable) {
         this.listable = listable;
         return ((T) this);
     }
