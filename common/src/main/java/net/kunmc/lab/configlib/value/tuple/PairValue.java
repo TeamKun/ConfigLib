@@ -9,8 +9,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.bukkit.ChatColor.RED;
-
 public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends SingleValue<MutablePair<L, R>, T> {
     private transient Function<Pair<L, R>, Boolean> validator = pair -> true;
     private transient Function<Pair<L, R>, String> invalidMessageSupplier = pair -> "引数の値が不正です.";
@@ -65,12 +63,12 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
     protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
         boolean left = isCorrectLeftArgument(entryName, argument, ctx);
         if (!left) {
-            ctx.sendMessage(RED + incorrectLeftArgumentMessage(entryName, argument, ctx));
+            ctx.sendFailure(incorrectLeftArgumentMessage(entryName, argument, ctx));
         }
 
         boolean right = isCorrectRightArgument(entryName, argument, ctx);
         if (!right) {
-            ctx.sendMessage(RED + incorrectRightArgumentMessage(entryName, argument, ctx));
+            ctx.sendFailure(incorrectRightArgumentMessage(entryName, argument, ctx));
         }
 
         return left && right;
@@ -103,18 +101,18 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
     @Override
     protected boolean validateOnSet(String entryName, MutablePair<L, R> newValue, CommandContext ctx) {
         if (!validator.apply(newValue)) {
-            ctx.sendMessage(RED + invalidMessageSupplier.apply(newValue));
+            ctx.sendFailure(invalidMessageSupplier.apply(newValue));
             return false;
         }
 
         boolean left = validateLeft(entryName, newValue.getLeft(), ctx, newValue);
         if (!left) {
-            ctx.sendMessage(RED + invalidLeftValueMessage(entryName, newValue.getLeft(), ctx));
+            ctx.sendFailure(invalidLeftValueMessage(entryName, newValue.getLeft(), ctx));
         }
 
         boolean right = validateRight(entryName, newValue.getRight(), ctx, newValue);
         if (!right) {
-            ctx.sendMessage(RED + invalidRightValueMessage(entryName, newValue.getRight(), ctx));
+            ctx.sendFailure(invalidRightValueMessage(entryName, newValue.getRight(), ctx));
         }
 
         return left && right;

@@ -18,7 +18,8 @@ dependencies {
     compileOnly group: "org.apache.poi", name: "poi", version: "5.1.0"
     compileOnly 'org.codehaus.plexus:plexus-utils:3.5.0'
     compileOnly 'org.jetbrains:annotations:20.1.0'
-    compileOnly "com.github.TeamKun.CommandLib:bukkit:0.11.0"
+    // commonだとコマンド周りを上手く実装出来ないためbukkitを使う
+    compileOnly "com.github.TeamKun.CommandLib:bukkit:0.12.0"
     // CommandContext#sendMessageを呼ぶ時にnet.kyori.adventure.text.Componentを見つけられずコンパイルが通らないため追加
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
 }

@@ -16,7 +16,7 @@ public class StringValue extends SingleValue<String, StringValue> {
     private final int max;
     protected transient String name = "string";
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
-    protected transient SuggestionAction suggestionAction = sb -> {
+    protected transient SuggestionAction<CommandContext> suggestionAction = sb -> {
         allowableStringList.forEach(sb::suggest);
     };
 
@@ -45,7 +45,7 @@ public class StringValue extends SingleValue<String, StringValue> {
         return this;
     }
 
-    public StringValue suggestionAction(@NotNull SuggestionAction action) {
+    public StringValue suggestionAction(@NotNull SuggestionAction<CommandContext> action) {
         this.suggestionAction = action;
         return this;
     }
