@@ -11,6 +11,7 @@ public abstract class Value<E, T extends Value<E, T>> {
     protected E value;
     private String description;
     private transient boolean listable = true;
+    private transient final List<Consumer<E>> initializeListeners = new ArrayList<>();
     private transient final List<Consumer<E>> modifyListeners = new ArrayList<>();
 
     public Value(E value) {
@@ -49,6 +50,19 @@ public abstract class Value<E, T extends Value<E, T>> {
             return 0;
         }
         return value.hashCode();
+    }
+
+
+    /**
+     * Add a listener fired on value initialized.
+     */
+    public T onInitialize(Consumer<E> listener) {
+        initializeListeners.add(listener);
+        return ((T) this);
+    }
+
+    protected void onInitializeValue(E newValue) {
+        initializeListeners.forEach(x -> x.accept(newValue));
     }
 
     /**

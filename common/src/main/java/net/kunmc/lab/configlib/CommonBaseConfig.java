@@ -181,6 +181,10 @@ public abstract class CommonBaseConfig {
             replaceFields(this.getClass(), config, this);
             if (!initialized) {
                 onInitializeListeners.forEach(Runnable::run);
+                ConfigUtil.getValues(this)
+                          .stream()
+                          .map(Value.class::cast)
+                          .forEach(x -> x.onInitializeValue(x.value()));
                 initializeHash();
                 initialized = true;
             }
@@ -189,16 +193,7 @@ public abstract class CommonBaseConfig {
     }
 
     private void initializeHash() {
-        ConfigUtil.getValueFields(this)
-                  .stream()
-                  .map(x -> {
-                      try {
-                          return x.get(this);
-                      } catch (IllegalAccessException e) {
-                          throw new RuntimeException(e);
-                      }
-                  })
-                  .map(Value.class::cast)
+        ConfigUtil.getValues(this)
                   .forEach(x -> valueToHashMap.put(x, x.valueHashCode()));
     }
 
