@@ -56,24 +56,24 @@ public abstract class Value<E, T extends Value<E, T>> {
     /**
      * Add a listener fired on value initialized.
      */
-    public T onInitialize(Consumer<E> listener) {
+    public final T onInitialize(Consumer<E> listener) {
         initializeListeners.add(listener);
         return ((T) this);
     }
 
-    protected void onInitializeValue(E newValue) {
+    final void onInitializeValue(E newValue) {
         initializeListeners.forEach(x -> x.accept(newValue));
     }
 
     /**
      * Add a listener fired on value modified.
      */
-    public T onModify(Consumer<E> listener) {
+    public final T onModify(Consumer<E> listener) {
         modifyListeners.add(listener);
         return ((T) this);
     }
 
-    protected void onModifyValue(E newValue) {
+    final void onModifyValue(E newValue) {
         modifyListeners.forEach(x -> x.accept(newValue));
     }
 

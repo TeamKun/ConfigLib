@@ -18,23 +18,23 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
         super(value);
     }
 
-    public Optional<E> getOptional() {
+    public final Optional<E> getOptional() {
         return Optional.ofNullable(value);
     }
 
-    public void ifPresent(Consumer<E> consumer) {
+    public final void ifPresent(Consumer<E> consumer) {
         if (value != null) {
             consumer.accept(value);
         }
     }
 
-    public void ifAbsent(Runnable runnable) {
+    public final void ifAbsent(Runnable runnable) {
         if (value == null) {
             runnable.run();
         }
     }
 
-    public void ifPresentOrElse(Consumer<E> consumer, Runnable runnable) {
+    public final void ifPresentOrElse(Consumer<E> consumer, Runnable runnable) {
         if (value != null) {
             consumer.accept(value);
         } else {
@@ -42,39 +42,39 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
         }
     }
 
-    public <U> Optional<U> map(Function<E, U> mapper) {
+    public final <U> Optional<U> map(Function<E, U> mapper) {
         return getOptional().map(mapper);
     }
 
-    public boolean isPresent() {
+    public final boolean isPresent() {
         return value != null;
     }
 
-    public boolean isEmpty() {
+    public final boolean isEmpty() {
         return value == null;
     }
 
-    public E orElse(E other) {
+    public final E orElse(E other) {
         if (value != null) {
             return value;
         }
         return other;
     }
 
-    public E orElseGet(Supplier<? extends E> supplier) {
+    public final E orElseGet(Supplier<? extends E> supplier) {
         if (value != null) {
             return value;
         }
         return supplier.get();
     }
 
-    protected boolean writableByCommand() {
-        return writable;
-    }
-
-    public T writableByCommand(boolean writable) {
+    public final T writableByCommand(boolean writable) {
         this.writable = writable;
         return ((T) this);
+    }
+
+    protected final boolean writableByCommand() {
+        return writable;
     }
 
     protected abstract void appendArgument(ArgumentBuilder builder);
@@ -92,12 +92,12 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
     /**
      * Add a listener fired on modify command.
      */
-    public T onModifyCommand(Consumer<E> listener) {
+    public final T onModifyCommand(Consumer<E> listener) {
         modifyCommandListeners.add(listener);
         return ((T) this);
     }
 
-    protected void onModifyValueCommand(E newValue) {
+    final void onModifyValueCommand(E newValue) {
         modifyCommandListeners.forEach(x -> x.accept(newValue));
     }
 

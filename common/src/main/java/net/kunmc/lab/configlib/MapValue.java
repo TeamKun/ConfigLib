@@ -23,13 +23,13 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         super(value);
     }
 
-    protected final boolean puttableByCommand() {
-        return puttable;
-    }
-
     public final T puttableByCommand(boolean puttable) {
         this.puttable = puttable;
         return ((T) this);
+    }
+
+    protected final boolean puttableByCommand() {
+        return puttable;
     }
 
     protected abstract void appendKeyArgumentForPut(ArgumentBuilder builder);
@@ -78,7 +78,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return ((T) this);
     }
 
-    protected final void onPutValue(K k, V v) {
+    final void onPutValue(K k, V v) {
         putListeners.forEach(x -> x.accept(k, v));
     }
 
@@ -86,13 +86,13 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return String.format("%sに{%s:%s}を追加しました.", entryName, keyToString(k), valueToString(v));
     }
 
-    protected final boolean removableByCommand() {
-        return removable;
-    }
-
     public final T removableByCommand(boolean removable) {
         this.removable = removable;
         return ((T) this);
+    }
+
+    protected final boolean removableByCommand() {
+        return removable;
     }
 
     protected abstract void appendKeyArgumentForRemove(ArgumentBuilder builder);
@@ -123,7 +123,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return ((T) this);
     }
 
-    protected final void onRemoveKey(K k, V v) {
+    final void onRemoveKey(K k, V v) {
         removeListeners.forEach(x -> x.accept(k, v));
     }
 
@@ -131,13 +131,13 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return String.format("%sから{%s:%s}を削除しました.", entryName, keyToString(k), valueToString(v));
     }
 
-    protected final boolean clearableByCommand() {
-        return clearable;
-    }
-
     public final T clearableByCommand(boolean clearable) {
         this.clearable = clearable;
         return ((T) this);
+    }
+
+    protected final boolean clearableByCommand() {
+        return clearable;
     }
 
     /**
@@ -148,7 +148,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return ((T) this);
     }
 
-    protected final void onClearMap() {
+    final void onClearMap() {
         clearListeners.forEach(Runnable::run);
     }
 

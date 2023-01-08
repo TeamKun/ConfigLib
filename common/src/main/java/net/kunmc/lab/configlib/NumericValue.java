@@ -50,27 +50,27 @@ public abstract class NumericValue<E extends Number & Comparable<E>, T extends N
         return value.doubleValue() >= other.doubleValue();
     }
 
-    public int intValue() {
+    public final int intValue() {
         return value.intValue();
     }
 
-    public float floatValue() {
+    public final float floatValue() {
         return value.floatValue();
     }
 
-    public double doubleValue() {
+    public final double doubleValue() {
         return value.doubleValue();
     }
 
-    public byte byteValue() {
+    public final byte byteValue() {
         return value.byteValue();
     }
 
-    public long longValue() {
+    public final long longValue() {
         return value.longValue();
     }
 
-    public short shortValue() {
+    public final short shortValue() {
         return value.shortValue();
     }
 

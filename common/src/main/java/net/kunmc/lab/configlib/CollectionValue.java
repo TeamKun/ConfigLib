@@ -21,13 +21,13 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         super(value);
     }
 
-    protected final boolean addableByCommand() {
-        return addable;
-    }
-
     public final U addableByCommand(boolean addable) {
         this.addable = addable;
         return ((U) this);
+    }
+
+    protected final boolean addableByCommand() {
+        return addable;
     }
 
     protected abstract void appendArgumentForAdd(ArgumentBuilder builder);
@@ -60,13 +60,13 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return String.format("%sに%sを追加しました.", entryName, elementToString(((E[]) value.toArray())[0]));
     }
 
-    protected final boolean removableByCommand() {
-        return removable;
-    }
-
     public final U removableByCommand(boolean removable) {
         this.removable = removable;
         return ((U) this);
+    }
+
+    protected final boolean removableByCommand() {
+        return removable;
     }
 
     protected abstract void appendArgumentForRemove(ArgumentBuilder builder);
@@ -91,7 +91,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return ((U) this);
     }
 
-    protected final void onRemoveValue(T newValue) {
+    final void onRemoveValue(T newValue) {
         removeListeners.forEach(x -> x.accept(newValue));
     }
 
@@ -99,13 +99,13 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return String.format("%sから%sを削除しました.", entryName, elementToString(((E[]) value.toArray())[0]));
     }
 
-    protected final boolean clearableByCommand() {
-        return clearable;
-    }
-
     public final U clearableByCommand(boolean clearable) {
         this.clearable = clearable;
         return ((U) this);
+    }
+
+    protected final boolean clearableByCommand() {
+        return clearable;
     }
 
     /**
@@ -116,12 +116,8 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return ((U) this);
     }
 
-    protected final void onClearValue() {
+    final void onClearValue() {
         clearListeners.forEach(Runnable::run);
-    }
-
-    protected final String clearMessage(String entryName) {
-        return entryName + "をクリアしました.";
     }
 
     protected abstract String elementToString(E e);

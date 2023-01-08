@@ -13,7 +13,7 @@ class ModifyClearCommand extends Command {
             value.onClearValue();
             ((Collection) value.value()).clear();
 
-            ctx.sendSuccess(value.clearMessage(field.getName()));
+            ctx.sendSuccess(field.getName() + "をクリアしました");
         });
     }
 }
