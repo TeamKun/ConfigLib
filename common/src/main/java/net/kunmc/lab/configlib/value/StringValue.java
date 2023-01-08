@@ -21,7 +21,7 @@ public class StringValue extends SingleValue<String, StringValue> {
     };
 
     public StringValue(String value) {
-        this(value, 0, 256);
+        this(value, 0, Integer.MAX_VALUE);
     }
 
     public StringValue(String value, int min, int max) {
