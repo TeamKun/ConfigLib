@@ -28,9 +28,8 @@ class ModifyMapRemoveCommand extends Command {
                 }
                 Object v = value.remove(k);
                 value.onRemoveKey(k, v);
-
+               
                 ctx.sendSuccess(value.succeedMessageForRemove(entryName, k, v));
-                config.saveConfigIfPresent();
             });
         });
     }

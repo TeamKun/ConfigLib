@@ -11,11 +11,9 @@ class ModifyClearCommand extends Command {
 
         execute(ctx -> {
             value.onClearValue();
-
             ((Collection) value.value()).clear();
+           
             ctx.sendSuccess(value.clearMessage(field.getName()));
-
-            config.saveConfigIfPresent();
         });
     }
 }

@@ -31,10 +31,8 @@ class ModifyDecCommand extends Command {
 
         Number newValue = value.copySub(amount);
         value.onModifyValue(newValue);
-
         value.value(newValue);
+       
         ctx.sendSuccess(value.succeedModifyMessage(entryName));
-
-        config.saveConfigIfPresent();
     }
 }

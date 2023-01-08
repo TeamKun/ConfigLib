@@ -29,11 +29,9 @@ class ModifyRemoveCommand extends Command {
                 }
 
                 value.onRemoveValue(newValue);
-
                 ((Collection) value.value()).removeAll(newValue);
+               
                 ctx.sendSuccess(value.succeedMessageForRemove(entryName, newValue));
-
-                config.saveConfigIfPresent();
             });
         });
     }

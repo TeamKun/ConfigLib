@@ -2,6 +2,7 @@ package net.kunmc.lab.testplugin;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandLib;
+import net.kunmc.lab.commandlib.argument.IntegerArgument;
 import net.kunmc.lab.configlib.ConfigCommand;
 import net.kunmc.lab.configlib.ConfigCommandBuilder;
 import org.bukkit.Bukkit;
@@ -31,6 +32,10 @@ public final class TestPlugin extends JavaPlugin {
 
         CommandLib.register(this, new Command("configlibtest") {{
             addChildren(configCommand);
+
+            argument(new IntegerArgument("integer"), (integer, ctx) -> {
+                config2.n.value(integer);
+            });
         }});
     }
 

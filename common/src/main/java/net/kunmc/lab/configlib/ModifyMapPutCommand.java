@@ -38,11 +38,9 @@ class ModifyMapPutCommand extends Command {
                 }
 
                 value.onPutValue(k, v);
-
                 value.put(k, v);
+               
                 ctx.sendSuccess(value.succeedMessageForPut(entryName, k, v));
-
-                config.saveConfigIfPresent();
             });
         });
     }

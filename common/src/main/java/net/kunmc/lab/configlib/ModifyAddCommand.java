@@ -29,11 +29,9 @@ class ModifyAddCommand extends Command {
                 }
 
                 value.onAddValue(newValue);
-
                 ((Collection) value.value()).addAll(newValue);
-                ctx.sendSuccess(value.succeedMessageForAdd(entryName, newValue));
 
-                config.saveConfigIfPresent();
+                ctx.sendSuccess(value.succeedMessageForAdd(entryName, newValue));
             });
         });
     }

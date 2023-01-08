@@ -33,6 +33,8 @@ public abstract class CommonBaseConfig {
     protected final transient Timer timer = new Timer();
     private transient WatchService watchService;
     private transient WatchKey watchKey;
+    private final transient Object lock = new Object();
+    private final transient Map<Value<?, ?>, Integer> valueToHashMap = new HashMap<>();
 
     protected CommonBaseConfig() {
         String s = getClass().getSimpleName();
@@ -53,6 +55,20 @@ public abstract class CommonBaseConfig {
             return;
         }
         getConfigFolder().mkdirs();
+
+        // コンストラクタの処理内でシリアライズすると子クラスのフィールドの初期化が終わってない状態でシリアライズされるため別スレッドでループ待機させている.
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                List<Value<?, ?>> values = ConfigUtil.getValues(CommonBaseConfig.this);
+                if (values.stream()
+                          .allMatch(Objects::nonNull)) {
+                    saveConfigIfAbsent();
+                    loadConfig();
+                    cancel();
+                }
+            }
+        }, 0, 1);
 
         try {
             watchService = FileSystems.getDefault()
@@ -76,19 +92,28 @@ public abstract class CommonBaseConfig {
             throw new UncheckedIOException(e);
         }
 
-        // コンストラクタの処理内でシリアライズすると子クラスのフィールドの初期化が終わってない状態でシリアライズされるため別スレッドでループ待機させている.
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                List<Value<?, ?>> values = ConfigUtil.getValues(CommonBaseConfig.this);
-                if (values.stream()
-                          .allMatch(Objects::nonNull)) {
-                    saveConfigIfAbsent();
-                    loadConfig();
-                    cancel();
+                if (!initialized) {
+                    return;
+                }
+
+                boolean modified = false;
+                for (Map.Entry<Value<?, ?>, Integer> entry : valueToHashMap.entrySet()) {
+                    Value<?, ?> value = entry.getKey();
+                    int oldHash = entry.getValue();
+                    int newHash = value.valueHashCode();
+                    if (newHash != oldHash) {
+                        valueToHashMap.put(value, newHash);
+                        modified = true;
+                    }
+                }
+                if (modified) {
+                    saveConfigIfPresent();
                 }
             }
-        }, 0, 1);
+        }, 0, 500);
     }
 
     /**
@@ -123,11 +148,13 @@ public abstract class CommonBaseConfig {
     }
 
     protected void saveConfig() {
-        try {
-            getConfigFile().createNewFile();
-            writeJson(getConfigFile(), gson().toJson(this));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        synchronized (lock) {
+            try {
+                getConfigFile().createNewFile();
+                writeJson(getConfigFile(), gson().toJson(this));
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
     }
 
@@ -143,18 +170,37 @@ public abstract class CommonBaseConfig {
         }
     }
 
-    protected final synchronized boolean loadConfig() {
-        if (!getConfigFile().exists()) {
-            return false;
-        }
+    protected final boolean loadConfig() {
+        synchronized (lock) {
+            if (!getConfigFile().exists()) {
+                return false;
+            }
 
-        CommonBaseConfig config = gson().fromJson(readJson(getConfigFile()), this.getClass());
-        replaceFields(this.getClass(), config, this);
-        if (!initialized) {
-            onInitializeListeners.forEach(Runnable::run);
-            initialized = true;
+            CommonBaseConfig config = gson().fromJson(readJson(getConfigFile()), this.getClass());
+            replaceFields(this.getClass(), config, this);
+            if (!initialized) {
+                onInitializeListeners.forEach(Runnable::run);
+                initializeHash();
+                initialized = true;
+            }
+            return true;
         }
-        return true;
+    }
+
+    private void initializeHash() {
+        ConfigUtil.getValueFields(this)
+                  .stream()
+                  .filter(x -> !Modifier.isTransient(x.getModifiers()))
+                  .filter(x -> !Modifier.isStatic(x.getModifiers()))
+                  .map(x -> {
+                      try {
+                          return x.get(this);
+                      } catch (IllegalAccessException e) {
+                          throw new RuntimeException(e);
+                      }
+                  })
+                  .map(Value.class::cast)
+                  .forEach(x -> valueToHashMap.put(x, x.valueHashCode()));
     }
 
     protected final void close() {

@@ -39,5 +39,12 @@ public abstract class Value<E, T extends Value<E, T>> {
         return ((T) this);
     }
 
+    final int valueHashCode() {
+        if (value == null) {
+            return 0;
+        }
+        return value.hashCode();
+    }
+
     protected abstract List<String> listMessages(CommandContext ctx, String entryName);
 }

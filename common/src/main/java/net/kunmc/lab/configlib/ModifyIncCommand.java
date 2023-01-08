@@ -31,10 +31,8 @@ class ModifyIncCommand extends Command {
 
         Number newValue = value.copyAdd(amount);
         value.onModifyValue(newValue);
-
         value.value(newValue);
-        ctx.sendSuccess(value.succeedModifyMessage(entryName));
 
-        config.saveConfigIfPresent();
+        ctx.sendSuccess(value.succeedModifyMessage(entryName));
     }
 }

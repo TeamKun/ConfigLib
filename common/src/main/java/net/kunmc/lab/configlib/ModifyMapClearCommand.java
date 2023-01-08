@@ -10,11 +10,9 @@ class ModifyMapClearCommand extends Command {
 
         execute(ctx -> {
             value.onClearMap();
-
             value.clear();
+           
             ctx.sendSuccess(value.clearMessage(field.getName()));
-
-            config.saveConfigIfPresent();
         });
     }
 }
