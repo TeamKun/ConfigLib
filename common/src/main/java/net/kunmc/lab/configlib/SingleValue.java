@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<E, T> {
-    private transient final List<Consumer<E>> modifyListeners = new ArrayList<>();
+    private transient final List<Consumer<E>> modifyCommandListeners = new ArrayList<>();
     private transient boolean writable = true;
 
     public SingleValue(E value) {
@@ -93,20 +93,20 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
      * Set value after firing listeners.
      */
     public final void setValueWithEvent(E value) {
-        modifyListeners.forEach(x -> x.accept(value));
+        modifyCommandListeners.forEach(x -> x.accept(value));
         super.value(value);
     }
 
     /**
      * Add a listener fired on modify command.
      */
-    public T onModify(Consumer<E> listener) {
-        modifyListeners.add(listener);
+    public T onModifyCommand(Consumer<E> listener) {
+        modifyCommandListeners.add(listener);
         return ((T) this);
     }
 
-    protected void onModifyValue(E newValue) {
-        modifyListeners.forEach(x -> x.accept(newValue));
+    protected void onModifyValueCommand(E newValue) {
+        modifyCommandListeners.forEach(x -> x.accept(newValue));
     }
 
     protected String succeedModifyMessage(String entryName) {
