@@ -5,7 +5,6 @@ import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Set;
 
 class ConfigGetCommand extends Command {
@@ -32,9 +31,6 @@ class ConfigGetCommand extends Command {
     private void init(CommonBaseConfig config, Command command) {
         for (Field field : config.getClass()
                                  .getDeclaredFields()) {
-            if (Modifier.isTransient(field.getModifiers())) {
-                continue;
-            }
             field.setAccessible(true);
 
             Object o;

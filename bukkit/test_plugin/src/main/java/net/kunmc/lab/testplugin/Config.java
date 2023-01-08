@@ -9,7 +9,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class Config extends BaseConfig {
-    public final UUIDValue uuidValue = new UUIDValue().description("test description");
+    public final transient UUIDValue uuidValue = new UUIDValue().description("test description");
     public final UUIDSetValue uuidSetValue = new UUIDSetValue();
     public final UUID2LocationMapValue uuid2LocationMapValue = new UUID2LocationMapValue();
 
