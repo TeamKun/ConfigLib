@@ -17,21 +17,16 @@ enum SubCommandType {
                             .isEmpty() && ConfigUtil.getCollectionValueFields(x)
                                                     .isEmpty() && ConfigUtil.getMapValueFields(x)
                                                                             .isEmpty()),
-           ConfigReloadCommand::new,
            ConfigReloadCommand::new),
-    List("list",
-         CommonBaseConfig::isListEnabled,
-         x -> Stream.of(ConfigUtil.getSingleValues(x)
-                                  .stream(),
-                        ConfigUtil.getCollectionValues(x)
-                                  .stream(),
-                        ConfigUtil.getMapValues(x)
-                                  .stream())
-                    .reduce(Stream::concat)
-                    .orElseGet(Stream::empty)
-                    .anyMatch(Value::listable),
-         ConfigListCommand::new,
-         ConfigListCommand::new),
+    List("list", CommonBaseConfig::isListEnabled, x -> Stream.of(ConfigUtil.getSingleValues(x)
+                                                                           .stream(),
+                                                                 ConfigUtil.getCollectionValues(x)
+                                                                           .stream(),
+                                                                 ConfigUtil.getMapValues(x)
+                                                                           .stream())
+                                                             .reduce(Stream::concat)
+                                                             .orElseGet(Stream::empty)
+                                                             .anyMatch(Value::listable), ConfigListCommand::new),
     Modify("modify",
            CommonBaseConfig::isModifyEnabled,
            x -> ConfigUtil.getSingleValues(x)
@@ -43,38 +38,30 @@ enum SubCommandType {
                                                                                                                                                                                        .stream()
                                                                                                                                                                                        .anyMatch(
                                                                                                                                                                                                v -> v.puttableByCommand() || v.removableByCommand() || v.clearableByCommand()),
-           ConfigModifyCommand::new,
            ConfigModifyCommand::new),
-    Get("get",
-        CommonBaseConfig::isGetEnabled,
-        x -> Stream.of(ConfigUtil.getSingleValues(x)
-                                 .stream(),
-                       ConfigUtil.getCollectionValues(x)
-                                 .stream(),
-                       ConfigUtil.getMapValues(x)
-                                 .stream())
-                   .reduce(Stream::concat)
-                   .orElseGet(Stream::empty)
-                   .anyMatch(Value::listable),
-        ConfigGetCommand::new,
-        ConfigGetCommand::new);
+    Get("get", CommonBaseConfig::isGetEnabled, x -> Stream.of(ConfigUtil.getSingleValues(x)
+                                                                        .stream(),
+                                                              ConfigUtil.getCollectionValues(x)
+                                                                        .stream(),
+                                                              ConfigUtil.getMapValues(x)
+                                                                        .stream())
+                                                          .reduce(Stream::concat)
+                                                          .orElseGet(Stream::empty)
+                                                          .anyMatch(Value::listable), ConfigGetCommand::new);
 
     public final String name;
     private final Predicate<CommonBaseConfig> isEnabledFor;
     private final Predicate<CommonBaseConfig> hasEntryFor;
-    private final Function<CommonBaseConfig, Command> instantiator;
-    private final Function<Set<CommonBaseConfig>, Command> instantiator2;
+    private final Function<Set<CommonBaseConfig>, Command> instantiator;
 
     SubCommandType(String name,
                    Predicate<CommonBaseConfig> isEnabledFor,
                    Predicate<CommonBaseConfig> hasEntryFor,
-                   Function<CommonBaseConfig, Command> instantiator,
-                   Function<Set<CommonBaseConfig>, Command> instantiator2) {
+                   Function<Set<CommonBaseConfig>, Command> instantiator) {
         this.name = name;
         this.isEnabledFor = isEnabledFor;
         this.hasEntryFor = hasEntryFor;
         this.instantiator = instantiator;
-        this.instantiator2 = instantiator2;
     }
 
     public boolean hasEntryFor(CommonBaseConfig config) {
@@ -90,11 +77,7 @@ enum SubCommandType {
                         .collect(Collectors.toMap(baseConfig -> baseConfig, this::hasEntryFor));
     }
 
-    public Command of(CommonBaseConfig config) {
-        return instantiator.apply(config);
-    }
-
     public Command of(Set<CommonBaseConfig> config) {
-        return instantiator2.apply(config);
+        return instantiator.apply(config);
     }
 }

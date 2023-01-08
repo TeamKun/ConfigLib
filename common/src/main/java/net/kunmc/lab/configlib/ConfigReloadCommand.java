@@ -4,39 +4,31 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 class ConfigReloadCommand extends Command {
-    private final List<CommonBaseConfig> configs = new ArrayList<>();
-
-    public ConfigReloadCommand(@NotNull CommonBaseConfig config) {
-        super(SubCommandType.Reload.name);
-        configs.add(config);
-    }
-
-    public ConfigReloadCommand(@NotNull Set<CommonBaseConfig> configSet) {
+    public ConfigReloadCommand(@NotNull Set<CommonBaseConfig> configs) {
         super(SubCommandType.Reload.name);
 
-        if (configSet.isEmpty()) {
-            throw new IllegalArgumentException("configSet is empty");
+        if (configs.isEmpty()) {
+            throw new IllegalArgumentException("configs is empty");
         }
-        this.configs.addAll(configSet);
 
-        for (CommonBaseConfig config : configSet) {
-            addChildren(new Command(config.entryName()) {
-                @Override
-                public void execute(@NotNull CommandContext ctx) {
-                    exec(ctx, config);
-                }
+        execute(ctx -> {
+            configs.forEach(config -> {
+                exec(ctx, config);
+            });
+        });
+
+        if (configs.size() > 1) {
+            configs.forEach(config -> {
+                addChildren(new Command(config.entryName()) {{
+                    execute(ctx -> {
+                        exec(ctx, config);
+                    });
+                }});
             });
         }
-    }
-
-    @Override
-    public void execute(CommandContext ctx) {
-        configs.forEach(x -> exec(ctx, x));
     }
 
     private void exec(CommandContext ctx, CommonBaseConfig config) {

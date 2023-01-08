@@ -10,23 +10,23 @@ import java.lang.reflect.Modifier;
 import java.util.Set;
 
 class ConfigListCommand extends Command {
-    public ConfigListCommand(CommonBaseConfig config) {
+    public ConfigListCommand(Set<CommonBaseConfig> configs) {
         super(SubCommandType.List.name);
 
-        execute(ctx -> exec(ctx, config));
-    }
-
-    public ConfigListCommand(Set<CommonBaseConfig> configSet) {
-        super(SubCommandType.List.name);
-
-        if (configSet.isEmpty()) {
-            throw new IllegalArgumentException("configSet is empty");
+        if (configs.isEmpty()) {
+            throw new IllegalArgumentException("configs is empty");
         }
 
-        for (CommonBaseConfig config : configSet) {
-            addChildren(new Command(config.entryName()) {{
+        if (configs.size() == 1) {
+            configs.forEach(config -> {
                 execute(ctx -> exec(ctx, config));
-            }});
+            });
+        } else {
+            configs.forEach(config -> {
+                addChildren(new Command(config.entryName()) {{
+                    execute(ctx -> exec(ctx, config));
+                }});
+            });
         }
     }
 

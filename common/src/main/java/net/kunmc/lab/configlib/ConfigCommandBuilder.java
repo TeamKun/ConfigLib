@@ -63,8 +63,7 @@ public class ConfigCommandBuilder {
             Set<CommonBaseConfig> usedConfigs = type.hasEntryFor(configs)
                                                     .entrySet()
                                                     .stream()
-                                                    .peek(e -> e.setValue(e.getValue() && type.isEnabledFor(e.getKey())))
-                                                    .filter(Map.Entry::getValue)
+                                                    .filter(x -> x.getValue() && type.isEnabledFor(x.getKey()))
                                                     .map(Map.Entry::getKey)
                                                     .collect(Collectors.toSet());
 
@@ -80,12 +79,6 @@ public class ConfigCommandBuilder {
         if (configs.size() == 0) {
             return Optional.empty();
         }
-
-        if (configs.size() == 1) {
-            CommonBaseConfig config = configs.toArray(new CommonBaseConfig[0])[0];
-            return Optional.of(type.of(config));
-        } else {
-            return Optional.of(type.of(configs));
-        }
+        return Optional.of(type.of(configs));
     }
 }

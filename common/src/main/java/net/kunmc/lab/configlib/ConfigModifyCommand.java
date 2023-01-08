@@ -9,12 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 class ConfigModifyCommand extends Command {
-    public ConfigModifyCommand(CommonBaseConfig config) {
-        super(SubCommandType.Modify.name);
-
-        init(config, this);
-    }
-
     public ConfigModifyCommand(Set<CommonBaseConfig> configSet) {
         super(SubCommandType.Modify.name);
 
@@ -22,10 +16,12 @@ class ConfigModifyCommand extends Command {
             throw new IllegalArgumentException("configSet is empty");
         }
 
-        for (CommonBaseConfig config : configSet) {
-            addChildren(new Command(config.entryName()) {{
+        if (configSet.size() == 1) {
+            configSet.forEach(config -> init(config, this));
+        } else {
+            configSet.forEach(config -> addChildren(new Command(config.entryName()) {{
                 init(config, this);
-            }});
+            }}));
         }
     }
 

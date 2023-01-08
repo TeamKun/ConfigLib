@@ -9,40 +9,30 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ConfigUtil {
+    private static List<Field> getFields(CommonBaseConfig config, Class<?> targetClass) {
+        List<Field> fields = Arrays.stream(config.getClass()
+                                                 .getDeclaredFields())
+                                   .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                                   .filter(f -> targetClass.isAssignableFrom(f.getType()))
+                                   .collect(Collectors.toList());
+        fields.forEach(x -> x.setAccessible(true));
+        return fields;
+    }
+
     public static List<Field> getValueFields(CommonBaseConfig config) {
-        return Arrays.stream(config.getClass()
-                                   .getDeclaredFields())
-                     .filter(f -> !Modifier.isStatic(f.getModifiers()))
-                     .filter(f -> Value.class.isAssignableFrom(f.getType()))
-                     .peek(f -> f.setAccessible(true))
-                     .collect(Collectors.toList());
+        return getFields(config, Value.class);
     }
 
     public static List<Field> getSingleValueFields(CommonBaseConfig config) {
-        return Arrays.stream(config.getClass()
-                                   .getDeclaredFields())
-                     .filter(f -> !Modifier.isStatic(f.getModifiers()))
-                     .filter(f -> SingleValue.class.isAssignableFrom(f.getType()))
-                     .peek(f -> f.setAccessible(true))
-                     .collect(Collectors.toList());
+        return getFields(config, SingleValue.class);
     }
 
     public static List<Field> getCollectionValueFields(CommonBaseConfig config) {
-        return Arrays.stream(config.getClass()
-                                   .getDeclaredFields())
-                     .filter(f -> !Modifier.isStatic(f.getModifiers()))
-                     .filter(f -> CollectionValue.class.isAssignableFrom(f.getType()))
-                     .peek(f -> f.setAccessible(true))
-                     .collect(Collectors.toList());
+        return getFields(config, CollectionValue.class);
     }
 
     public static List<Field> getMapValueFields(CommonBaseConfig config) {
-        return Arrays.stream(config.getClass()
-                                   .getDeclaredFields())
-                     .filter(f -> !Modifier.isStatic(f.getModifiers()))
-                     .filter(f -> MapValue.class.isAssignableFrom(f.getType()))
-                     .peek(f -> f.setAccessible(true))
-                     .collect(Collectors.toList());
+        return getFields(config, MapValue.class);
     }
 
     public static List<Value<?, ?>> getValues(CommonBaseConfig config) {

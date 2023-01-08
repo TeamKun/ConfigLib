@@ -9,23 +9,23 @@ import java.lang.reflect.Modifier;
 import java.util.Set;
 
 class ConfigGetCommand extends Command {
-    public ConfigGetCommand(CommonBaseConfig config) {
+    public ConfigGetCommand(Set<CommonBaseConfig> configs) {
         super(SubCommandType.Get.name);
 
-        init(config, this);
-    }
-
-    public ConfigGetCommand(Set<CommonBaseConfig> configSet) {
-        super(SubCommandType.Get.name);
-
-        if (configSet.isEmpty()) {
-            throw new IllegalArgumentException("configSet is empty");
+        if (configs.isEmpty()) {
+            throw new IllegalArgumentException("configs is empty");
         }
 
-        for (CommonBaseConfig config : configSet) {
-            addChildren(new Command(config.entryName()) {{
+        if (configs.size() == 1) {
+            configs.forEach(config -> {
                 init(config, this);
-            }});
+            });
+        } else {
+            configs.forEach(config -> {
+                addChildren(new Command(config.entryName()) {{
+                    init(config, this);
+                }});
+            });
         }
     }
 
