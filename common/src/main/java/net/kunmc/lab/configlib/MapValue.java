@@ -70,6 +70,9 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return "";
     }
 
+    /**
+     * Add a listener fired on put command.
+     */
     public final T onPut(BiConsumer<K, V> listener) {
         putListeners.add(listener);
         return ((T) this);
@@ -112,6 +115,9 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return String.format("%sは%sに追加されていませんでした.", keyToString(k), entryName);
     }
 
+    /**
+     * Add a listener fired on remove command.
+     */
     public final T onRemove(BiConsumer<K, V> listener) {
         removeListeners.add(listener);
         return ((T) this);
@@ -134,6 +140,9 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return ((T) this);
     }
 
+    /**
+     * Add a listener fired on clear command.
+     */
     public final T onClear(Runnable listener) {
         clearListeners.add(listener);
         return ((T) this);

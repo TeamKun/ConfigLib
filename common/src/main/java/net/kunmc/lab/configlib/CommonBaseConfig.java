@@ -117,7 +117,7 @@ public abstract class CommonBaseConfig {
     }
 
     /**
-     * set listener fired on initialization.
+     * Add a listener fired on initialization.
      */
     protected final void onInitialize(Runnable onLoad) {
         onInitializeListeners.add(onLoad);

@@ -44,6 +44,9 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract String invalidValueMessageForAdd(String entryName, T value, CommandContext ctx);
 
+    /**
+     * Add a listener fired on add command.
+     */
     public final U onAdd(Consumer<T> listener) {
         addListeners.add(listener);
         return ((U) this);
@@ -80,6 +83,9 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract String invalidValueMessageForRemove(String entryName, T value, CommandContext ctx);
 
+    /**
+     * Add a listener fired on remove command.
+     */
     public final U onRemove(Consumer<T> listener) {
         removeListeners.add(listener);
         return ((U) this);
@@ -102,6 +108,9 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return ((U) this);
     }
 
+    /**
+     * Add a listener fired on clear command.
+     */
     public final U onClear(Runnable listener) {
         clearListeners.add(listener);
         return ((U) this);
