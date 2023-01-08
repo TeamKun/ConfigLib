@@ -191,8 +191,6 @@ public abstract class CommonBaseConfig {
     private void initializeHash() {
         ConfigUtil.getValueFields(this)
                   .stream()
-                  .filter(x -> !Modifier.isTransient(x.getModifiers()))
-                  .filter(x -> !Modifier.isStatic(x.getModifiers()))
                   .map(x -> {
                       try {
                           return x.get(this);

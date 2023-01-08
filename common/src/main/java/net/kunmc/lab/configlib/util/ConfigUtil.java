@@ -44,7 +44,7 @@ public class ConfigUtil {
                                              throw new RuntimeException(e);
                                          }
                                      })
-                                     .map(x -> ((SingleValue<?, ?>) x))
+                                     .map(x -> ((Value<?, ?>) x))
                                      .collect(Collectors.toList());
     }
 
