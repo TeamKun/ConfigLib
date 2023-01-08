@@ -5,7 +5,6 @@ import net.kunmc.lab.commandlib.CommandContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -119,9 +118,9 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
     protected abstract String elementToString(E e);
 
     @Override
-    protected List<String> listMessages(CommandContext ctx, String entryName) {
-        return Collections.singletonList(entryName + ": [" + value.stream()
-                                                                  .map(this::elementToString)
-                                                                  .collect(Collectors.joining(", ")) + "]");
+    protected String asString(CommandContext ctx) {
+        return "[" + value.stream()
+                          .map(this::elementToString)
+                          .collect(Collectors.joining(", ")) + "]";
     }
 }

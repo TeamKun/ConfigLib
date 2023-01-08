@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 
 import java.lang.reflect.Field;
@@ -47,8 +48,9 @@ class ConfigModifyCommand extends Command {
 
             command.addChildren(new Command(field.getName()) {{
                 execute(ctx -> {
-                    v.listMessages(ctx, field.getName())
-                     .forEach(ctx::sendSuccess);
+                    ctx.sendMessageWithOption(field.getName() + ": " + v.asString(ctx),
+                                              option -> option.rgb(ChatColorUtil.GREEN.getRGB())
+                                                              .hoverText(v.description()));
                 });
                 applySet(this, field, v, config);
                 addChildren(new Command("set") {{

@@ -51,10 +51,9 @@ class ConfigListCommand extends Command {
             if (o instanceof Value) {
                 Value<?, ?> v = ((Value<?, ?>) o);
                 if (v.listable()) {
-                    v.listMessages(ctx, field.getName())
-                     .forEach(x -> ctx.sendMessageWithOption(x,
-                                                             option -> option.rgb(ChatColorUtil.GREEN.getRGB())
-                                                                             .hoverText(StringUtils.defaultString(v.description()))));
+                    ctx.sendMessageWithOption(field.getName() + ": " + v.asString(ctx),
+                                              option -> option.rgb(ChatColorUtil.GREEN.getRGB())
+                                                              .hoverText(StringUtils.defaultString(v.description())));
                 }
             } else {
                 ctx.sendSuccess(field.getName() + ": " + o);

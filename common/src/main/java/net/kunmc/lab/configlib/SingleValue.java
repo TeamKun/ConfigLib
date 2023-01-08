@@ -4,7 +4,6 @@ import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -112,11 +111,11 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
     }
 
     @Override
-    protected List<String> listMessages(CommandContext ctx, String entryName) {
+    protected String asString(CommandContext ctx) {
         if (value() == null) {
-            return Collections.singletonList(entryName + ": null");
+            return "null";
         }
-        return Collections.singletonList(entryName + ": " + valueToString(value()));
+        return valueToString(value());
     }
 
     protected abstract String valueToString(E e);

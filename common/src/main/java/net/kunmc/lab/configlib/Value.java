@@ -3,8 +3,6 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.CommandContext;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 public abstract class Value<E, T extends Value<E, T>> {
     protected E value;
     private String description;
@@ -48,5 +46,5 @@ public abstract class Value<E, T extends Value<E, T>> {
         return value.hashCode();
     }
 
-    protected abstract List<String> listMessages(CommandContext ctx, String entryName);
+    protected abstract String asString(CommandContext ctx);
 }
