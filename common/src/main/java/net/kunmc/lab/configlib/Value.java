@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.CommandContext;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public abstract class Value<E, T extends Value<E, T>> {
         this.value = value;
     }
 
+    @Nullable
     public final String description() {
         return description;
     }

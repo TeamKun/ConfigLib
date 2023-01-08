@@ -7,7 +7,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class Config extends BaseConfig {
-    public final UUIDValue uuidValue = new UUIDValue();
+    public final UUIDValue uuidValue = new UUIDValue().description("test description");
 
     public Config(@NotNull Plugin plugin) {
         super(plugin);

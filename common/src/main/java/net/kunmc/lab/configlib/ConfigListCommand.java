@@ -2,6 +2,8 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.util.ChatColorUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -50,7 +52,9 @@ class ConfigListCommand extends Command {
                 Value<?, ?> v = ((Value<?, ?>) o);
                 if (v.listable()) {
                     v.listMessages(ctx, field.getName())
-                     .forEach(ctx::sendSuccess);
+                     .forEach(x -> ctx.sendMessageWithOption(x,
+                                                             option -> option.rgb(ChatColorUtil.GREEN.getRGB())
+                                                                             .hoverText(StringUtils.defaultString(v.description()))));
                 }
             } else {
                 ctx.sendSuccess(field.getName() + ": " + o);
