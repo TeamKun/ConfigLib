@@ -90,14 +90,6 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
     protected abstract String invalidValueMessage(String entryName, E newValue, CommandContext ctx);
 
     /**
-     * Set value after firing listeners.
-     */
-    public final void setValueWithEvent(E value) {
-        modifyCommandListeners.forEach(x -> x.accept(value));
-        super.value(value);
-    }
-
-    /**
      * Add a listener fired on modify command.
      */
     public T onModifyCommand(Consumer<E> listener) {
