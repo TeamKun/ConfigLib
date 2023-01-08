@@ -10,17 +10,17 @@ import java.util.List;
 import java.util.Set;
 
 class ConfigModifyCommand extends Command {
-    public ConfigModifyCommand(Set<CommonBaseConfig> configSet) {
+    public ConfigModifyCommand(Set<CommonBaseConfig> configs) {
         super(SubCommandType.Modify.name);
 
-        if (configSet.isEmpty()) {
-            throw new IllegalArgumentException("configSet is empty");
+        if (configs.isEmpty()) {
+            throw new IllegalArgumentException("configs is empty");
         }
 
-        if (configSet.size() == 1) {
-            configSet.forEach(config -> init(config, this));
+        if (configs.size() == 1) {
+            configs.forEach(config -> init(config, this));
         } else {
-            configSet.forEach(config -> addChildren(new Command(config.entryName()) {{
+            configs.forEach(config -> addChildren(new Command(config.entryName()) {{
                 init(config, this);
             }}));
         }
@@ -28,9 +28,6 @@ class ConfigModifyCommand extends Command {
 
     private static void init(CommonBaseConfig config, Command command) {
         for (Field field : ConfigUtil.getSingleValueFields(config)) {
-            if (Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
             if (Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
@@ -52,14 +49,14 @@ class ConfigModifyCommand extends Command {
                                               option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                               .hoverText(v.description()));
                 });
-                applySet(this, field, v, config);
+                applySet(this, field, v);
                 addChildren(new Command("set") {{
-                    applySet(this, field, v, config);
+                    applySet(this, field, v);
                 }});
 
                 if (v instanceof NumericValue) {
-                    addChildren(new ModifyIncCommand(field, ((NumericValue<?, ?>) v), config));
-                    addChildren(new ModifyDecCommand(field, ((NumericValue<?, ?>) v), config));
+                    addChildren(new ModifyIncCommand(field, ((NumericValue<?, ?>) v)));
+                    addChildren(new ModifyDecCommand(field, ((NumericValue<?, ?>) v)));
                 }
             }});
         }
@@ -78,13 +75,13 @@ class ConfigModifyCommand extends Command {
 
             command.addChildren(new Command(field.getName()) {{
                 if (v.addableByCommand()) {
-                    addChildren(new ModifyAddCommand(field, v, config));
+                    addChildren(new ModifyAddCommand(field, v));
                 }
                 if (v.removableByCommand()) {
-                    addChildren(new ModifyRemoveCommand(field, v, config));
+                    addChildren(new ModifyRemoveCommand(field, v));
                 }
                 if (v.clearableByCommand()) {
-                    addChildren(new ModifyClearCommand(field, v, config));
+                    addChildren(new ModifyClearCommand(field, v));
                 }
             }});
         }
@@ -103,19 +100,19 @@ class ConfigModifyCommand extends Command {
 
             command.addChildren(new Command(field.getName()) {{
                 if (v.puttableByCommand()) {
-                    addChildren(new ModifyMapPutCommand(field, v, config));
+                    addChildren(new ModifyMapPutCommand(field, v));
                 }
                 if (v.removableByCommand()) {
-                    addChildren(new ModifyMapRemoveCommand(field, v, config));
+                    addChildren(new ModifyMapRemoveCommand(field, v));
                 }
                 if (v.clearableByCommand()) {
-                    addChildren(new ModifyMapClearCommand(field, v, config));
+                    addChildren(new ModifyMapClearCommand(field, v));
                 }
             }});
         }
     }
 
-    private static void applySet(Command command, Field field, SingleValue value, CommonBaseConfig config) {
+    private static void applySet(Command command, Field field, SingleValue value) {
         command.argument(builder -> {
             value.appendArgument(builder);
 

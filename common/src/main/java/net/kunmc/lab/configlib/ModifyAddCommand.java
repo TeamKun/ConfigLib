@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 class ModifyAddCommand extends Command {
-    public ModifyAddCommand(Field field, CollectionValue value, CommonBaseConfig config) {
+    public ModifyAddCommand(Field field, CollectionValue value) {
         super("add");
 
         String entryName = field.getName();

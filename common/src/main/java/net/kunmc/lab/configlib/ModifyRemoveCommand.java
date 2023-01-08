@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 class ModifyRemoveCommand extends Command {
-    public ModifyRemoveCommand(Field field, CollectionValue value, CommonBaseConfig config) {
+    public ModifyRemoveCommand(Field field, CollectionValue value) {
         super("remove");
 
         argument(builder -> {
@@ -30,7 +30,7 @@ class ModifyRemoveCommand extends Command {
 
                 value.onRemoveValue(newValue);
                 ((Collection) value.value()).removeAll(newValue);
-               
+
                 ctx.sendSuccess(value.succeedMessageForRemove(entryName, newValue));
             });
         });

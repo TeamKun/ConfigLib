@@ -32,9 +32,6 @@ class ConfigGetCommand extends Command {
     private void init(CommonBaseConfig config, Command command) {
         for (Field field : config.getClass()
                                  .getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
             if (Modifier.isTransient(field.getModifiers())) {
                 continue;
             }

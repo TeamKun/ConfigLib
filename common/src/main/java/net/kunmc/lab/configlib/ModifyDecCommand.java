@@ -9,14 +9,12 @@ import java.lang.reflect.Field;
 class ModifyDecCommand extends Command {
     private final Field field;
     private final NumericValue value;
-    private final CommonBaseConfig config;
 
-    public ModifyDecCommand(Field field, NumericValue value, CommonBaseConfig config) {
+    public ModifyDecCommand(Field field, NumericValue value) {
         super("dec");
 
         this.field = field;
         this.value = value;
-        this.config = config;
 
         execute(ctx -> exec(1.0, ctx));
         argument(new DoubleArgument("decValue"), this::exec);

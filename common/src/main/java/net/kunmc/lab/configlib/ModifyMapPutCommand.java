@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 class ModifyMapPutCommand extends Command {
-    public ModifyMapPutCommand(Field field, MapValue value, CommonBaseConfig config) {
+    public ModifyMapPutCommand(Field field, MapValue value) {
         super("put");
 
         argument(builder -> {
@@ -39,7 +39,7 @@ class ModifyMapPutCommand extends Command {
 
                 value.onPutValue(k, v);
                 value.put(k, v);
-               
+
                 ctx.sendSuccess(value.succeedMessageForPut(entryName, k, v));
             });
         });

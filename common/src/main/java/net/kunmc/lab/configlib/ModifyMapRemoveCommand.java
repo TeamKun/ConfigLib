@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 class ModifyMapRemoveCommand extends Command {
-    public ModifyMapRemoveCommand(Field field, MapValue value, CommonBaseConfig config) {
+    public ModifyMapRemoveCommand(Field field, MapValue value) {
         super("remove");
 
         argument(builder -> {
@@ -28,7 +28,7 @@ class ModifyMapRemoveCommand extends Command {
                 }
                 Object v = value.remove(k);
                 value.onRemoveKey(k, v);
-               
+
                 ctx.sendSuccess(value.succeedMessageForRemove(entryName, k, v));
             });
         });
