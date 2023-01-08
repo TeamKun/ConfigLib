@@ -105,6 +105,7 @@ public abstract class CommonBaseConfig {
                     int oldHash = entry.getValue();
                     int newHash = value.valueHashCode();
                     if (newHash != oldHash) {
+                        ((Value) value).onModifyValue(value.value());
                         valueToHashMap.put(value, newHash);
                         modified = true;
                     }

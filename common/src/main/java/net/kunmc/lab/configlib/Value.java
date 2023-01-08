@@ -3,10 +3,15 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.CommandContext;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 public abstract class Value<E, T extends Value<E, T>> {
     protected E value;
     private String description;
     private transient boolean listable = true;
+    private transient final List<Consumer<E>> modifyListeners = new ArrayList<>();
 
     public Value(E value) {
         this.value = value;
@@ -45,6 +50,19 @@ public abstract class Value<E, T extends Value<E, T>> {
         }
         return value.hashCode();
     }
+
+    /**
+     * Add a listener fired on value modified.
+     */
+    public T onModify(Consumer<E> listener) {
+        modifyListeners.add(listener);
+        return ((T) this);
+    }
+
+    protected void onModifyValue(E newValue) {
+        modifyListeners.forEach(x -> x.accept(newValue));
+    }
+
 
     protected abstract String asString(CommandContext ctx);
 }
