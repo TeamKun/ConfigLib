@@ -1,5 +1,6 @@
 package net.kunmc.lab.configlib;
 
+import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import net.kunmc.lab.configlib.util.ConfigUtil;
@@ -18,6 +19,7 @@ import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
@@ -27,7 +29,6 @@ public abstract class CommonBaseConfig {
     protected transient boolean enableList = true;
     protected transient boolean enableModify = true;
     protected transient boolean enableReload = true;
-    transient boolean makeConfigFile = true;
     private transient volatile boolean initialized = false;
     private transient String entryName = "";
     private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
@@ -51,8 +52,11 @@ public abstract class CommonBaseConfig {
         return entryName;
     }
 
-    final void init() {
-        if (!makeConfigFile) {
+    final void init(Consumer<Option> options) {
+        Option option = new Option();
+        options.accept(option);
+
+        if (!option.makeConfigFile) {
             return;
         }
         getConfigFolder().mkdirs();
@@ -119,7 +123,7 @@ public abstract class CommonBaseConfig {
                     saveConfigIfPresent();
                 }
             }
-        }, 0, 500);
+        }, 0, option.modifyDetectionTimerPeriod);
     }
 
     /**
@@ -296,6 +300,25 @@ public abstract class CommonBaseConfig {
             }
         } catch (NullPointerException ignored) {
             // 新しいフィールドが追加されるとNullPointerExceptionが発生するため握りつぶしている
+        }
+    }
+
+    public static final class Option {
+        boolean makeConfigFile = true;
+        int modifyDetectionTimerPeriod = 500;
+
+        Option() {
+        }
+
+        public Option makeConfigFile(boolean makeConfigFile) {
+            this.makeConfigFile = makeConfigFile;
+            return this;
+        }
+
+        public Option modifyDetectionTimerPeriod(int period) {
+            Preconditions.checkArgument(period > 0);
+            this.modifyDetectionTimerPeriod = period;
+            return this;
         }
     }
 }

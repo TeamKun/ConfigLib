@@ -20,6 +20,7 @@ import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 
 public abstract class BaseConfig extends CommonBaseConfig implements Listener {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting()
@@ -41,14 +42,13 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
     private final transient Plugin plugin;
 
     public BaseConfig(@NotNull Plugin plugin) {
-        this(plugin, true);
+        this(plugin, option -> {
+        });
     }
 
-    public BaseConfig(@NotNull Plugin plugin, boolean makeConfigFile) {
+    public BaseConfig(@NotNull Plugin plugin, Consumer<Option> options) {
         this.plugin = plugin;
-        this.makeConfigFile = makeConfigFile;
-
-        init();
+        init(options);
 
         // Pluginがenabledになっていない状態でregisterすると例外が発生するため遅延,ループさせている
         timer.scheduleAtFixedRate(new TimerTask() {

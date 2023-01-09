@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -45,15 +46,17 @@ public abstract class BaseConfig extends CommonBaseConfig {
                                                       .create();
     private final transient String modId;
     private final transient Type type;
+    private final transient Consumer<Option> options;
 
     public BaseConfig(@NotNull String modId, @NotNull Type type) {
-        this(modId, type, true);
+        this(modId, type, option -> {
+        });
     }
 
-    public BaseConfig(@NotNull String modId, @NotNull Type type, boolean makeConfigFile) {
+    public BaseConfig(@NotNull String modId, @NotNull Type type, Consumer<Option> options) {
         this.modId = modId;
         this.type = type;
-        this.makeConfigFile = makeConfigFile;
+        this.options = options;
 
         MinecraftForge.EVENT_BUS.register(this);
     }
@@ -61,7 +64,7 @@ public abstract class BaseConfig extends CommonBaseConfig {
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent e) {
         if (type.isCorrectSide()) {
-            init();
+            init(options);
         }
     }
 
