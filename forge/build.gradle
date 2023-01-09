@@ -24,7 +24,6 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.31'
     implementation project(":common")
-    implementation group: "org.apache.poi", name: "poi", version: '5.2.2'
     implementation 'org.codehaus.plexus:plexus-utils:3.5.0'
     implementation group: "com.google.guava", name: "guava", version: '30.0-android'
     implementation 'com.google.code.gson:gson:2.10'
@@ -33,13 +32,11 @@ dependencies {
 
 shadowJar {
     dependencies {
-        include(dependency("org.apache.poi:poi:.*"))
         include(dependency("org.codehaus.plexus:plexus-utils:.*"))
         include(dependency("com.google.guava:guava:.*"))
         include(dependency("com.google.code.gson:gson:.*"))
         include(project(":common"))
     }
-    relocate "org.apache", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org.apache"
     relocate "org.codehaus", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org.codehaus"
     relocate "com.google", "${project.group}.${rootProject.name.toLowerCase()}.shadow.com.google"
 }
