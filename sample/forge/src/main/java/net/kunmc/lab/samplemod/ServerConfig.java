@@ -6,6 +6,7 @@ import net.kunmc.lab.configlib.value.LocationValue;
 import net.kunmc.lab.configlib.value.TeamValue;
 import net.kunmc.lab.configlib.value.collection.BlockStateSetValue;
 import net.kunmc.lab.configlib.value.map.Enum2DoubleMapValue;
+import net.kunmc.lab.configlib.value.tuple.Integer2IntegerPairValue;
 import net.minecraft.item.ItemTier;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;

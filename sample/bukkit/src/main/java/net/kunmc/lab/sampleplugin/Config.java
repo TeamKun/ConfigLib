@@ -6,6 +6,7 @@ import net.kunmc.lab.configlib.value.LocationValue;
 import net.kunmc.lab.configlib.value.TeamValue;
 import net.kunmc.lab.configlib.value.collection.BlockDataSetValue;
 import net.kunmc.lab.configlib.value.map.Enum2DoubleMapValue;
+import net.kunmc.lab.configlib.value.tuple.Integer2IntegerPairValue;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;

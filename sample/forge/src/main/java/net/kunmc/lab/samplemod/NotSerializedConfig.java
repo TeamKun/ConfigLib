@@ -6,6 +6,7 @@ import net.kunmc.lab.configlib.value.LocationValue;
 import net.kunmc.lab.configlib.value.TeamValue;
 import net.kunmc.lab.configlib.value.collection.BlockStateSetValue;
 import net.kunmc.lab.configlib.value.map.Enum2DoubleMapValue;
+import net.kunmc.lab.configlib.value.tuple.Integer2IntegerPairValue;
 import net.minecraft.item.ItemTier;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -34,7 +35,7 @@ public class NotSerializedConfig extends BaseConfig {
                                                                                                                  pair -> pair.getLeft() < pair.getRight(),
                                                                                                                  pair -> "first arg must be lower than second arg.");
 
-    public Config(@NotNull String modId) {
-        super(modId, Type.COMMON, false);
+    public NotSerializedConfig(@NotNull String modId) {
+        super(modId, Type.COMMON, option -> option.makeConfigFile(false));
     }
 }
