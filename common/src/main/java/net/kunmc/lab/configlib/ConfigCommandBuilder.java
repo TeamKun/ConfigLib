@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigCommandBuilder {
-    private final Set<CommonBaseConfig> configs = new HashSet<>();
+    private final List<CommonBaseConfig> configs = new ArrayList<>();
     private final Map<SubCommandType, Boolean> subCommandTypeEnabledMap = new HashMap<>();
     private String name = "config";
 
@@ -49,6 +49,15 @@ public class ConfigCommandBuilder {
         return this;
     }
 
+    public ConfigCommandBuilder sort() {
+        return sort(Comparator.comparing(CommonBaseConfig::entryName));
+    }
+
+    public ConfigCommandBuilder sort(Comparator<? super CommonBaseConfig> sorter) {
+        configs.sort(sorter);
+        return this;
+    }
+
     public ConfigCommand build() {
         ConfigCommand configCommand = new ConfigCommand(name);
         createSubCommands().forEach(configCommand::addChildren);
@@ -65,7 +74,7 @@ public class ConfigCommandBuilder {
                                                     .stream()
                                                     .filter(x -> x.getValue() && type.isEnabledFor(x.getKey()))
                                                     .map(Map.Entry::getKey)
-                                                    .collect(Collectors.toSet());
+                                                    .collect(Collectors.toCollection(LinkedHashSet::new));
 
             if (entry.getValue()) {
                 createSubCommand(usedConfigs, type).ifPresent(subCommands::add);

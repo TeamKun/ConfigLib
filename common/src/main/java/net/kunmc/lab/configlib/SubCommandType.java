@@ -3,6 +3,8 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -72,12 +74,14 @@ enum SubCommandType {
         return isEnabledFor.test(config);
     }
 
-    public Map<CommonBaseConfig, Boolean> hasEntryFor(Set<CommonBaseConfig> configSet) {
-        return configSet.stream()
-                        .collect(Collectors.toMap(baseConfig -> baseConfig, this::hasEntryFor));
+    public Map<CommonBaseConfig, Boolean> hasEntryFor(List<CommonBaseConfig> configs) {
+        return configs.stream()
+                      .collect(Collectors.toMap(baseConfig -> baseConfig, this::hasEntryFor, (a, b) -> {
+                          throw new IllegalStateException();
+                      }, LinkedHashMap::new));
     }
 
-    public Command of(Set<CommonBaseConfig> config) {
-        return instantiator.apply(config);
+    public Command of(Set<CommonBaseConfig> configs) {
+        return instantiator.apply(configs);
     }
 }
