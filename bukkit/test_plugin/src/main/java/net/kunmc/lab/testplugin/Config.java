@@ -9,8 +9,8 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class Config extends BaseConfig {
-    public final transient UUIDValue uuidValue = new UUIDValue().description("test description");
-    public final UUIDSetValue uuidSetValue = new UUIDSetValue();
+    public final UUIDValue uuidValue = new UUIDValue().description("test description");
+    public final UUIDSetValue uuidSetValue = new UUIDSetValue().onModify(TestPlugin::broadcast);
     public final UUID2LocationMapValue uuid2LocationMapValue = new UUID2LocationMapValue();
 
     public Config(@NotNull Plugin plugin) {

@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import net.kunmc.lab.configlib.util.ConfigUtil;
+import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +35,7 @@ public abstract class CommonBaseConfig {
     private transient WatchService watchService;
     private transient WatchKey watchKey;
     private final transient Object lock = new Object();
-    private final transient Map<Value<?, ?>, Integer> valueToHashMap = new HashMap<>();
+    private final transient Map<Field, Pair<Value<?, ?>, Integer>> fieldToValueAndHashMap = new HashMap<>();
 
     protected CommonBaseConfig() {
         String s = getClass().getSimpleName();
@@ -100,16 +101,20 @@ public abstract class CommonBaseConfig {
                 }
 
                 boolean modified = false;
-                for (Map.Entry<Value<?, ?>, Integer> entry : valueToHashMap.entrySet()) {
-                    Value<?, ?> value = entry.getKey();
-                    int oldHash = entry.getValue();
+                for (Map.Entry<Field, Pair<Value<?, ?>, Integer>> entry : fieldToValueAndHashMap.entrySet()) {
+                    Field field = entry.getKey();
+                    Value<?, ?> value = entry.getValue()
+                                             .getKey();
+                    int oldHash = entry.getValue()
+                                       .getValue();
                     int newHash = value.valueHashCode();
                     if (newHash != oldHash) {
                         ((Value) value).onModifyValue(value.value());
-                        valueToHashMap.put(value, newHash);
+                        fieldToValueAndHashMap.put(field, Pair.of(value, newHash));
                         modified = true;
                     }
                 }
+
                 if (modified) {
                     saveConfigIfPresent();
                 }
@@ -193,8 +198,15 @@ public abstract class CommonBaseConfig {
     }
 
     private void initializeHash() {
-        ConfigUtil.getValues(this)
-                  .forEach(x -> valueToHashMap.put(x, x.valueHashCode()));
+        ConfigUtil.getValueFields(this)
+                  .forEach(x -> {
+                      try {
+                          Value<?, ?> value = ((Value<?, ?>) x.get(this));
+                          fieldToValueAndHashMap.put(x, Pair.of(value, value.valueHashCode()));
+                      } catch (IllegalAccessException e) {
+                          throw new RuntimeException(e);
+                      }
+                  });
     }
 
     protected final void close() {
