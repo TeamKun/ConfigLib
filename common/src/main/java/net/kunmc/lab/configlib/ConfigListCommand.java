@@ -6,6 +6,7 @@ import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Set;
 
 class ConfigListCommand extends Command {
@@ -32,6 +33,9 @@ class ConfigListCommand extends Command {
     private void exec(CommandContext ctx, CommonBaseConfig config) {
         for (Field field : config.getClass()
                                  .getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
             field.setAccessible(true);
 
             Object o;
