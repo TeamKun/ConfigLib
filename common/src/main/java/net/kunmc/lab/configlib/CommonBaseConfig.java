@@ -36,7 +36,7 @@ public abstract class CommonBaseConfig {
     private transient WatchService watchService;
     private transient WatchKey watchKey;
     private final transient Object lock = new Object();
-    private final transient Map<Field, Pair<Value<?, ?>, Integer>> fieldToValueAndHashMap = new HashMap<>();
+    private final transient Map<Field, Pair<Object, Integer>> fieldToObjectAndHashMap = new HashMap<>();
 
     protected CommonBaseConfig() {
         String s = getClass().getSimpleName();
@@ -105,17 +105,32 @@ public abstract class CommonBaseConfig {
                 }
 
                 boolean modified = false;
-                for (Map.Entry<Field, Pair<Value<?, ?>, Integer>> entry : fieldToValueAndHashMap.entrySet()) {
+                for (Map.Entry<Field, Pair<Object, Integer>> entry : fieldToObjectAndHashMap.entrySet()) {
                     Field field = entry.getKey();
-                    Value<?, ?> value = entry.getValue()
-                                             .getKey();
+                    Object o = entry.getValue()
+                                    .getKey();
                     int oldHash = entry.getValue()
                                        .getValue();
-                    int newHash = value.valueHashCode();
-                    if (newHash != oldHash) {
-                        ((Value) value).onModifyValue(value.value());
-                        fieldToValueAndHashMap.put(field, Pair.of(value, newHash));
-                        modified = true;
+                    if (o instanceof Value) {
+                        Value value = ((Value) o);
+                        int newHash = value.valueHashCode();
+                        if (newHash != oldHash) {
+                            value.onModifyValue(value.value());
+                            fieldToObjectAndHashMap.put(field, Pair.of(value, newHash));
+                            modified = true;
+                        }
+                    } else {
+                        try {
+                            // 通常のクラスだとインスタンスが変わっている可能性があるため再取得
+                            Object newObj = field.get(CommonBaseConfig.this);
+                            int newHash = Objects.hashCode(newObj);
+                            if (newHash != oldHash) {
+                                fieldToObjectAndHashMap.put(field, Pair.of(newObj, newHash));
+                                modified = true;
+                            }
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 
@@ -190,6 +205,7 @@ public abstract class CommonBaseConfig {
             replaceFields(this.getClass(), config, this);
             if (!initialized) {
                 onInitializeListeners.forEach(Runnable::run);
+
                 ConfigUtil.getValues(this)
                           .stream()
                           .map(Value.class::cast)
@@ -202,11 +218,16 @@ public abstract class CommonBaseConfig {
     }
 
     private void initializeHash() {
-        ConfigUtil.getValueFields(this)
+        ConfigUtil.getFields(this, Object.class)
                   .forEach(x -> {
                       try {
-                          Value<?, ?> value = ((Value<?, ?>) x.get(this));
-                          fieldToValueAndHashMap.put(x, Pair.of(value, value.valueHashCode()));
+                          Object o = x.get(this);
+                          if (o instanceof Value<?, ?>) {
+                              Value<?, ?> value = ((Value<?, ?>) o);
+                              fieldToObjectAndHashMap.put(x, Pair.of(value, value.valueHashCode()));
+                          } else {
+                              fieldToObjectAndHashMap.put(x, Pair.of(o, Objects.hashCode(o)));
+                          }
                       } catch (IllegalAccessException e) {
                           throw new RuntimeException(e);
                       }

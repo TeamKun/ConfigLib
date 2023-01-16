@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ConfigUtil {
-    private static List<Field> getFields(CommonBaseConfig config, Class<?> targetClass) {
+    public static List<Field> getFields(CommonBaseConfig config, Class<?> targetClass) {
         List<Field> fields = Arrays.stream(config.getClass()
                                                  .getDeclaredFields())
                                    .filter(f -> !Modifier.isStatic(f.getModifiers()))

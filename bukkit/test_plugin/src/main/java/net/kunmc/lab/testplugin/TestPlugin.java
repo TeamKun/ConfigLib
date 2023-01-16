@@ -34,7 +34,8 @@ public final class TestPlugin extends JavaPlugin {
             addChildren(configCommand);
 
             argument(new IntegerArgument("integer"), (integer, ctx) -> {
-                config2.n.value(integer);
+                ctx.sendSuccess(config.strings);
+                config.strings.add(integer.toString());
             });
         }});
     }
