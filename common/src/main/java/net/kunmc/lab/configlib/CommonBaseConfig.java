@@ -314,6 +314,11 @@ public abstract class CommonBaseConfig {
             Object srcObj = field.get(src);
             Object dstObj = field.get(dst);
 
+            // jsonにキーが存在しない場合nullになる
+            if (srcObj == null) {
+                return;
+            }
+
             if (fieldList.isEmpty()) {
                 field.set(dst, srcObj);
             } else {
