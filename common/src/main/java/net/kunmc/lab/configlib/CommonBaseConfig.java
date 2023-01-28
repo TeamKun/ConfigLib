@@ -32,6 +32,7 @@ public abstract class CommonBaseConfig {
     private transient volatile boolean initialized = false;
     private transient String entryName = "";
     private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
+    private final transient List<Runnable> onReloadListeners = new ArrayList<>();
     protected final transient Timer timer = new Timer();
     private transient WatchService watchService;
     private transient WatchKey watchKey;
@@ -144,8 +145,12 @@ public abstract class CommonBaseConfig {
     /**
      * Add a listener fired on initialization.
      */
-    protected final void onInitialize(Runnable onLoad) {
-        onInitializeListeners.add(onLoad);
+    protected final void onInitialize(Runnable onInitialize) {
+        onInitializeListeners.add(onInitialize);
+    }
+
+    public final void onReload(Runnable onReload) {
+        onReloadListeners.add(onReload);
     }
 
     final boolean isGetEnabled() {
@@ -212,7 +217,10 @@ public abstract class CommonBaseConfig {
                           .forEach(x -> x.onInitializeValue(x.value()));
                 initializeHash();
                 initialized = true;
+                return true;
             }
+           
+            onReloadListeners.forEach(Runnable::run);
             return true;
         }
     }
