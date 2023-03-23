@@ -24,7 +24,7 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
     }
 
     @Override
-    public boolean validateForRemove(String entryName, List<E> element, CommandContext ctx) {
+    protected boolean validateForRemove(String entryName, List<E> element, CommandContext ctx) {
         return value.containsAll(element);
     }
 

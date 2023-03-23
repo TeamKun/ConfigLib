@@ -37,7 +37,7 @@ dependencies {
     implementation 'org.codehaus.plexus:plexus-utils:3.5.0'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation "com.github.TeamKun.CommandLib:bukkit:0.12.0"
+    implementation "com.github.TeamKun.CommandLib:bukkit:0.12.3"
 }
 
 def targetJavaVersion = 8
