@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ItemStackTypeAdapter extends TypeAdapter<ItemStack> {
@@ -17,20 +18,22 @@ public class ItemStackTypeAdapter extends TypeAdapter<ItemStack> {
 
     @Override
     public void write(JsonWriter out, ItemStack itemStack) throws IOException {
-        out.value(gson.toJson(itemStack.serialize()));
+        Map<String, Object> map = itemStack.serialize();
+        map.computeIfPresent("meta", (k, v) -> {
+            Map<String, Object> meta = new HashMap<>(((ItemMeta) v).serialize());
+            meta.put("==", "ItemMeta");
+            return meta;
+        });
+
+        out.value(gson.toJson(map));
     }
 
     @Override
     public ItemStack read(JsonReader in) throws IOException {
         Map<String, Object> map = gson.fromJson(in.nextString(), new TypeToken<Map<String, Object>>() {
         }.getType());
-        ItemStack itemStack = ItemStack.deserialize(map);
+        map.computeIfPresent("meta", (k, v) -> ConfigurationSerialization.deserializeObject(((Map<String, Object>) v)));
 
-        Map<String, Object> metaMap = ((Map<String, Object>) map.get("meta"));
-        if (metaMap != null) {
-            ItemMeta meta = ((ItemMeta) ConfigurationSerialization.deserializeObject((metaMap)));
-            itemStack.setItemMeta(meta);
-        }
-        return itemStack;
+        return ItemStack.deserialize(map);
     }
 }
