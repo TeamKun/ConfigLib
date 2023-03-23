@@ -50,6 +50,7 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
         this.plugin = plugin;
         init(options, (t, e) -> {
             e.printStackTrace();
+            close();
             Bukkit.getPluginManager()
                   .disablePlugin(plugin);
         });
