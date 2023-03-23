@@ -64,7 +64,11 @@ public abstract class BaseConfig extends CommonBaseConfig {
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent e) {
         if (type.isCorrectSide()) {
-            init(options);
+            init(options, (t, ex) -> {
+                ex.printStackTrace();
+                e.getServer()
+                 .close();
+            });
         }
     }
 

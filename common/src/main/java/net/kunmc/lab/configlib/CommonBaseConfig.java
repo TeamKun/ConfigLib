@@ -53,7 +53,7 @@ public abstract class CommonBaseConfig {
         return entryName;
     }
 
-    final void init(Consumer<Option> options) {
+    final void init(Consumer<Option> options, Thread.UncaughtExceptionHandler onInitExceptionHandler) {
         Option option = new Option();
         options.accept(option);
 
@@ -66,11 +66,16 @@ public abstract class CommonBaseConfig {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                List<Value<?, ?>> values = ConfigUtil.getValues(CommonBaseConfig.this);
-                if (values.stream()
-                          .allMatch(Objects::nonNull)) {
-                    saveConfigIfAbsent();
-                    loadConfig();
+                try {
+                    List<Value<?, ?>> values = ConfigUtil.getValues(CommonBaseConfig.this);
+                    if (values.stream()
+                              .allMatch(Objects::nonNull)) {
+                        saveConfigIfAbsent();
+                        loadConfig();
+                        cancel();
+                    }
+                } catch (Throwable e) {
+                    onInitExceptionHandler.uncaughtException(Thread.currentThread(), e);
                     cancel();
                 }
             }
@@ -219,7 +224,7 @@ public abstract class CommonBaseConfig {
                 initialized = true;
                 return true;
             }
-           
+
             onReloadListeners.forEach(Runnable::run);
             return true;
         }

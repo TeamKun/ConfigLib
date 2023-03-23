@@ -48,7 +48,11 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
 
     public BaseConfig(@NotNull Plugin plugin, Consumer<Option> options) {
         this.plugin = plugin;
-        init(options);
+        init(options, (t, e) -> {
+            e.printStackTrace();
+            Bukkit.getPluginManager()
+                  .disablePlugin(plugin);
+        });
 
         // Pluginがenabledになっていない状態でregisterすると例外が発生するため遅延,ループさせている
         timer.scheduleAtFixedRate(new TimerTask() {
