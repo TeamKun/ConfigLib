@@ -97,7 +97,7 @@ public abstract class CommonBaseConfig {
                             try {
                                 loadConfig();
                             } catch (JsonParseException ex) {
-                                ex.printStackTrace();
+                                option.jsonParseExceptionHandler.onException(ex);
                             }
                         }
                     }
@@ -351,6 +351,7 @@ public abstract class CommonBaseConfig {
         boolean makeConfigFile = true;
         int modifyDetectionTimerPeriod = 500;
         int initializeTimerDelay = 0;
+        JsonParseExceptionHandler jsonParseExceptionHandler = Throwable::printStackTrace;
 
         Option() {
         }
@@ -371,5 +372,15 @@ public abstract class CommonBaseConfig {
             this.initializeTimerDelay = delay;
             return this;
         }
+
+        public Option jsonParseExceptionHandler(JsonParseExceptionHandler handler) {
+            this.jsonParseExceptionHandler = Objects.requireNonNull(handler);
+            return this;
+        }
+    }
+
+    @FunctionalInterface
+    public interface JsonParseExceptionHandler {
+        void onException(JsonParseException e);
     }
 }
