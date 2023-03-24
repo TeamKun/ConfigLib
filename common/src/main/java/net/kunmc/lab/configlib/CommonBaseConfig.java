@@ -59,6 +59,53 @@ public abstract class CommonBaseConfig {
 
         getConfigFolder().mkdirs();
 
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (!initialized) {
+                    return;
+                }
+
+                boolean modified = false;
+                for (Map.Entry<Field, Pair<Object, Integer>> entry : fieldToObjectAndHashMap.entrySet()) {
+                    Field field = entry.getKey();
+                    Object o = entry.getValue()
+                                    .getKey();
+                    int oldHash = entry.getValue()
+                                       .getValue();
+                    if (o instanceof Value) {
+                        Value value = ((Value) o);
+                        int newHash = value.valueHashCode();
+                        if (newHash != oldHash) {
+                            value.onModifyValue(value.value());
+                            fieldToObjectAndHashMap.put(field, Pair.of(value, newHash));
+                            modified = true;
+                        }
+                    } else {
+                        try {
+                            // 通常のクラスだとインスタンスが変わっている可能性があるため再取得
+                            Object newObj = field.get(CommonBaseConfig.this);
+                            int newHash = Objects.hashCode(newObj);
+                            if (newHash != oldHash) {
+                                fieldToObjectAndHashMap.put(field, Pair.of(newObj, newHash));
+                                modified = true;
+                            }
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                if (modified) {
+                    saveConfigIfPresent();
+                }
+            }
+        }, 0, option.modifyDetectionTimerPeriod);
+
+        if (!option.enableAutoReload) {
+            return;
+        }
+
         // コンストラクタの処理内でシリアライズすると子クラスのフィールドの初期化が終わってない状態でシリアライズされるため別スレッドでループ待機させている.
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -103,49 +150,6 @@ public abstract class CommonBaseConfig {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (!initialized) {
-                    return;
-                }
-
-                boolean modified = false;
-                for (Map.Entry<Field, Pair<Object, Integer>> entry : fieldToObjectAndHashMap.entrySet()) {
-                    Field field = entry.getKey();
-                    Object o = entry.getValue()
-                                    .getKey();
-                    int oldHash = entry.getValue()
-                                       .getValue();
-                    if (o instanceof Value) {
-                        Value value = ((Value) o);
-                        int newHash = value.valueHashCode();
-                        if (newHash != oldHash) {
-                            value.onModifyValue(value.value());
-                            fieldToObjectAndHashMap.put(field, Pair.of(value, newHash));
-                            modified = true;
-                        }
-                    } else {
-                        try {
-                            // 通常のクラスだとインスタンスが変わっている可能性があるため再取得
-                            Object newObj = field.get(CommonBaseConfig.this);
-                            int newHash = Objects.hashCode(newObj);
-                            if (newHash != oldHash) {
-                                fieldToObjectAndHashMap.put(field, Pair.of(newObj, newHash));
-                                modified = true;
-                            }
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
-                if (modified) {
-                    saveConfigIfPresent();
-                }
-            }
-        }, 0, option.modifyDetectionTimerPeriod);
     }
 
     /**
@@ -349,11 +353,17 @@ public abstract class CommonBaseConfig {
     }
 
     public static final class Option {
+        boolean enableAutoReload = true;
         int modifyDetectionTimerPeriod = 500;
         int initializeTimerDelay = 0;
         Consumer<Exception> jsonParseExceptionHandler = Throwable::printStackTrace;
 
         Option() {
+        }
+
+        public Option enableAutoReload(boolean enableAutoReload) {
+            this.enableAutoReload = enableAutoReload;
+            return this;
         }
 
         public Option modifyDetectionTimerPeriod(int period) {
