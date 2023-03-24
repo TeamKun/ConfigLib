@@ -78,7 +78,21 @@ public abstract class Value<E, T extends Value<E, T>> {
      * Adds a listener triggered on value modified.
      */
     public final T onModify(Consumer<E> listener) {
+        return onModify(listener, false);
+    }
+
+    /**
+     * Adds a listener triggered on value modified.
+     * If triggeredOnInitialize is true, The listener also will be triggered after the value has been initialized.
+     *
+     * @see Value#onInitialize(Consumer)
+     */
+    public final T onModify(Consumer<E> listener, boolean triggeredOnInitialize) {
         modifyListeners.add(listener);
+        if (triggeredOnInitialize) {
+            onInitialize(listener);
+        }
+
         return ((T) this);
     }
 
