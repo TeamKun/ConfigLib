@@ -32,6 +32,11 @@ public final class TestPlugin extends JavaPlugin {
 
         CommandLib.register(this, new Command("configlibtest") {{
             addChildren(configCommand);
+            addChildren(new Command("addinitializelistener") {{
+                execute(ctx -> {
+                    config2.n.onInitialize(x -> Bukkit.broadcastMessage(x.toString()));
+                });
+            }});
 
             argument(new IntegerArgument("integer"), (integer, ctx) -> {
                 ctx.sendSuccess(config.strings);

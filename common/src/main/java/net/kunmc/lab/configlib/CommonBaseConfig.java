@@ -153,9 +153,14 @@ public abstract class CommonBaseConfig {
     }
 
     /**
-     * Add a listener fired on initialization.
+     * Adds a listener that will be triggered after the config has been initialized.
+     * If initialization has already been completed, the listener will be immediately triggered.
      */
-    protected final void onInitialize(Runnable onInitialize) {
+    public final void onInitialize(Runnable onInitialize) {
+        if (initialized) {
+            onInitialize.run();
+            return;
+        }
         onInitializeListeners.add(onInitialize);
     }
 
