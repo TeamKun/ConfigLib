@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib;
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.plexus.util.ReflectionUtils;
@@ -96,8 +95,8 @@ public abstract class CommonBaseConfig {
                         if (filePath.equals(getConfigFile().toPath())) {
                             try {
                                 loadConfig();
-                            } catch (JsonParseException ex) {
-                                option.jsonParseExceptionHandler.onException(ex);
+                            } catch (Exception ex) {
+                                option.jsonParseExceptionHandler.accept(ex);
                             }
                         }
                     }
@@ -356,7 +355,7 @@ public abstract class CommonBaseConfig {
         boolean makeConfigFile = true;
         int modifyDetectionTimerPeriod = 500;
         int initializeTimerDelay = 0;
-        JsonParseExceptionHandler jsonParseExceptionHandler = Throwable::printStackTrace;
+        Consumer<Exception> jsonParseExceptionHandler = Throwable::printStackTrace;
 
         Option() {
         }
@@ -378,14 +377,9 @@ public abstract class CommonBaseConfig {
             return this;
         }
 
-        public Option jsonParseExceptionHandler(JsonParseExceptionHandler handler) {
+        public Option jsonParseExceptionHandler(Consumer<Exception> handler) {
             this.jsonParseExceptionHandler = Objects.requireNonNull(handler);
             return this;
         }
-    }
-
-    @FunctionalInterface
-    public interface JsonParseExceptionHandler {
-        void onException(JsonParseException e);
     }
 }
