@@ -185,7 +185,7 @@ public abstract class CommonBaseConfig {
 
     protected abstract Gson gson();
 
-    abstract File getConfigFolder();
+    protected abstract File getConfigFolder();
 
     public final File getConfigFile() {
         return new File(getConfigFolder(), entryName() + ".json");

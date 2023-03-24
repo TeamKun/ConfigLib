@@ -86,7 +86,7 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
     }
 
     @Override
-    File getConfigFolder() {
+    protected File getConfigFolder() {
         return plugin.getDataFolder();
     }
 }

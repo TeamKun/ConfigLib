@@ -80,7 +80,7 @@ public abstract class BaseConfig extends CommonBaseConfig {
     }
 
     @Override
-    File getConfigFolder() {
+    protected File getConfigFolder() {
         return type.getConfigFolder(modId);
     }
 
