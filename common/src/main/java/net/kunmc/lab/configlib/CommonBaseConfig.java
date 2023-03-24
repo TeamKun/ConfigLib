@@ -57,9 +57,6 @@ public abstract class CommonBaseConfig {
         Option option = new Option();
         options.accept(option);
 
-        if (!option.makeConfigFile) {
-            return;
-        }
         getConfigFolder().mkdirs();
 
         // コンストラクタの処理内でシリアライズすると子クラスのフィールドの初期化が終わってない状態でシリアライズされるため別スレッドでループ待機させている.
@@ -352,17 +349,11 @@ public abstract class CommonBaseConfig {
     }
 
     public static final class Option {
-        boolean makeConfigFile = true;
         int modifyDetectionTimerPeriod = 500;
         int initializeTimerDelay = 0;
         Consumer<Exception> jsonParseExceptionHandler = Throwable::printStackTrace;
 
         Option() {
-        }
-
-        public Option makeConfigFile(boolean makeConfigFile) {
-            this.makeConfigFile = makeConfigFile;
-            return this;
         }
 
         public Option modifyDetectionTimerPeriod(int period) {
