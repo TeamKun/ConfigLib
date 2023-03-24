@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib;
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.plexus.util.ReflectionUtils;
@@ -79,7 +80,7 @@ public abstract class CommonBaseConfig {
                     cancel();
                 }
             }
-        }, 0, 1);
+        }, option.initializeTimerDelay, 1);
 
         try {
             watchService = FileSystems.getDefault()
@@ -93,7 +94,11 @@ public abstract class CommonBaseConfig {
                         Path filePath = getConfigFolder().toPath()
                                                          .resolve((Path) e.context());
                         if (filePath.equals(getConfigFile().toPath())) {
-                            loadConfig();
+                            try {
+                                loadConfig();
+                            } catch (JsonParseException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     }
                     watchKey.reset();
@@ -345,6 +350,7 @@ public abstract class CommonBaseConfig {
     public static final class Option {
         boolean makeConfigFile = true;
         int modifyDetectionTimerPeriod = 500;
+        int initializeTimerDelay = 0;
 
         Option() {
         }
@@ -357,6 +363,12 @@ public abstract class CommonBaseConfig {
         public Option modifyDetectionTimerPeriod(int period) {
             Preconditions.checkArgument(period > 0);
             this.modifyDetectionTimerPeriod = period;
+            return this;
+        }
+
+        public Option initializeTimerDelay(int delay) {
+            Preconditions.checkArgument(delay >= 0);
+            this.initializeTimerDelay = delay;
             return this;
         }
     }
