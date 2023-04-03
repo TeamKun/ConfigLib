@@ -53,6 +53,17 @@ public class StringValue extends SingleValue<String, StringValue> {
     @Override
     protected void appendArgument(ArgumentBuilder builder) {
         builder.stringArgument(name, type, suggestionAction);
+        builder.customArgument(new StringArgument(name, option -> {
+            option.suggestionAction(suggestionAction)
+                  .filter(x -> {
+                      if (allowableStringList.isEmpty()) {
+                          return true;
+                      }
+
+                      return allowableStringList.stream()
+                                                .anyMatch(s -> s.equals(x));
+                  });
+        }, type));
     }
 
     @Override

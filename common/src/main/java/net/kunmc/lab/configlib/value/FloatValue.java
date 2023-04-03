@@ -87,16 +87,6 @@ public class FloatValue extends NumericValue<Float, FloatValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不正な引数です.";
-    }
-
-    @Override
     protected Float argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((Float) argument.get(0));
     }

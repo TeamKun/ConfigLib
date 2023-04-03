@@ -32,16 +32,6 @@ public class ItemStackListValue extends ListValue<ItemStack, ItemStackListValue>
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected List<ItemStack> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         ItemStack item = ((ItemStack) argument.get(0));
         item.setAmount(((Integer) argument.get(1)));
@@ -64,16 +54,6 @@ public class ItemStackListValue extends ListValue<ItemStack, ItemStackListValue>
                                   .anyMatch(x::equals);
                   });
         }, StringArgument.Type.PHRASE));
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
     }
 
     @Override

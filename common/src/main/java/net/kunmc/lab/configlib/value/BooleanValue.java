@@ -70,28 +70,8 @@ public class BooleanValue extends SingleValue<Boolean, BooleanValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不正な引数です.";
-    }
-
-    @Override
     protected Boolean argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((Boolean) argument.get(0));
-    }
-
-    @Override
-    protected boolean validateOnSet(String entryName, Boolean newValue, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, Boolean newValue, CommandContext ctx) {
-        return newValue + "は不正な値です.";
     }
 
     @Override

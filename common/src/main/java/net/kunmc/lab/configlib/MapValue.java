@@ -36,19 +36,21 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     protected abstract void appendValueArgumentForPut(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandContext ctx);
+    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
+        return true;
+    }
 
-    protected abstract String incorrectKeyArgumentMessageForPut(String entryName,
-                                                                List<Object> argument,
-                                                                CommandContext ctx);
+    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
+        return "";
+    }
 
-    protected abstract boolean isCorrectValueArgumentForPut(String entryName,
-                                                            List<Object> argument,
-                                                            CommandContext ctx);
+    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
+        return true;
+    }
 
-    protected abstract String incorrectValueArgumentMessageForPut(String entryName,
-                                                                  List<Object> argument,
-                                                                  CommandContext ctx);
+    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
+        return "";
+    }
 
     protected abstract K argumentToKeyForPut(List<Object> argument, CommandContext ctx);
 
@@ -97,22 +99,22 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     protected abstract void appendKeyArgumentForRemove(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectKeyArgumentForRemove(String entryName,
-                                                             List<Object> argument,
-                                                             CommandContext ctx);
+    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
+        return true;
+    }
 
-    protected abstract String incorrectKeyArgumentMessageForRemove(String entryName,
-                                                                   List<Object> argument,
-                                                                   CommandContext ctx);
+    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
+        return "";
+    }
 
     protected abstract K argumentToKeyForRemove(List<Object> argument, CommandContext ctx);
 
     protected boolean validateKeyForRemove(String entryName, K k, CommandContext ctx) {
-        return value.containsKey(k);
+        return true;
     }
 
     protected String invalidKeyMessageForRemove(String entryName, K k, CommandContext ctx) {
-        return String.format("%sは%sに追加されていませんでした.", keyToString(k), entryName);
+        return "";
     }
 
     /**

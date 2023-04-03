@@ -23,28 +23,8 @@ public class VectorValue extends SingleValue<Vector, VectorValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Vector argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((Location) argument.get(0)).toVector();
-    }
-
-    @Override
-    protected boolean validateOnSet(String entryName, Vector newValue, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, Vector newValue, CommandContext ctx) {
-        return "";
     }
 
     @Override

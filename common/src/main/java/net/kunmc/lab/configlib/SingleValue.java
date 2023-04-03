@@ -79,15 +79,23 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
 
     protected abstract void appendArgument(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx);
+    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
+        return true;
+    }
 
-    protected abstract String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx);
+    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
+        return "";
+    }
 
     protected abstract E argumentToValue(List<Object> argument, CommandContext ctx);
 
-    protected abstract boolean validateOnSet(String entryName, E newValue, CommandContext ctx);
+    protected boolean validateOnSet(String entryName, E newValue, CommandContext ctx) {
+        return true;
+    }
 
-    protected abstract String invalidValueMessage(String entryName, E newValue, CommandContext ctx);
+    protected String invalidValueMessage(String entryName, E newValue, CommandContext ctx) {
+        return "";
+    }
 
     /**
      * Add a listener fired on modify command.

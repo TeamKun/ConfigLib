@@ -23,16 +23,6 @@ public class Enum2StringMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected String argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((String) argument.get(1));
     }

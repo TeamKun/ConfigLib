@@ -12,16 +12,6 @@ public class UUID2BooleanMapValue extends UUID2ObjectMapValue<Boolean, UUID2Bool
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Boolean argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((Boolean) argument.get(1));
     }

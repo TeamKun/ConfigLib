@@ -57,11 +57,6 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument + "は不正な引数です.";
-    }
-
-    @Override
     protected List<String> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return argument.stream()
                        .map(Object::toString)
@@ -78,20 +73,15 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
+        return argument + "は不正な引数です.";
+    }
+
+    @Override
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.stringArgument(name, sb -> {
             value.forEach(sb::suggest);
         });
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument + "は不正な引数です.";
     }
 
     @Override

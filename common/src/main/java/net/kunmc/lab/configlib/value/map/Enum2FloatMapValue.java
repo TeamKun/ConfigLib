@@ -22,16 +22,6 @@ public class Enum2FloatMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Float argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((Float) argument.get(1));
     }

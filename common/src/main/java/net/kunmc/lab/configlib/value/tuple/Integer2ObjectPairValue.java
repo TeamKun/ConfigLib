@@ -29,16 +29,6 @@ public abstract class Integer2ObjectPairValue<R, T extends Integer2ObjectPairVal
     }
 
     @Override
-    protected boolean isCorrectLeftArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectLeftArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Integer argumentToLeftValue(List<Object> argument, CommandContext ctx) {
         return ((Integer) argument.get(0));
     }

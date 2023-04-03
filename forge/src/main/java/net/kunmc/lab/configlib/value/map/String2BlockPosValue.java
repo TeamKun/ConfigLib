@@ -23,16 +23,6 @@ public class String2BlockPosValue extends String2ObjectMapValue<BlockPos, String
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected BlockPos argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((BlockPos) argument.get(1));
     }

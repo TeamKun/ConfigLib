@@ -40,23 +40,8 @@ public class NameableObjectSetValue<T extends Nameable> extends SetValue<T, Name
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Set<T> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet(((T) argument.get(0)));
-    }
-
-    @Override
-    protected boolean validateForRemove(String entryName, Set<T> value, CommandContext ctx) {
-        return true;
     }
 
     @Override
@@ -66,16 +51,6 @@ public class NameableObjectSetValue<T extends Nameable> extends SetValue<T, Name
                         .map(Nameable::tabCompleteName)
                         .anyMatch(y -> y.equals(x.tabCompleteName()));
         });
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
     }
 
     @Override

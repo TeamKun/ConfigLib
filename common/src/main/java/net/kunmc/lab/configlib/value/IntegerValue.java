@@ -88,16 +88,6 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不正な引数です.";
-    }
-
-    @Override
     protected Integer argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((Integer) argument.get(0));
     }

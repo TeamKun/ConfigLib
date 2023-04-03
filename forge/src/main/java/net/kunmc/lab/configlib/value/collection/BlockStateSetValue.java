@@ -33,16 +33,6 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Set<BlockState> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet(((BlockStateInput) argument.get(0)).getState());
     }
@@ -54,16 +44,6 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
                    .map(BlockState::toString)
                    .forEach(sb::suggest);
         });
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
     }
 
     @Override

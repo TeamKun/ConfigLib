@@ -29,16 +29,6 @@ public abstract class Double2ObjectPairValue<R, T extends Double2ObjectPairValue
     }
 
     @Override
-    protected boolean isCorrectLeftArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectLeftArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Double argumentToLeftValue(List<Object> argument, CommandContext ctx) {
         return ((Double) argument.get(0));
     }

@@ -63,17 +63,6 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return keySet().contains(argument.get(0)
-                                         .toString());
-    }
-
-    @Override
-    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は登録されていないキーです.";
-    }
-
-    @Override
     protected String argumentToKeyForRemove(List<Object> argument, CommandContext ctx) {
         return argument.get(0)
                        .toString();

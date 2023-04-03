@@ -39,28 +39,8 @@ public class NameableObjectValue<T extends Nameable> extends SingleValue<T, Name
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected T argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((T) argument.get(0));
-    }
-
-    @Override
-    protected boolean validateOnSet(String entryName, T newValue, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, T newValue, CommandContext ctx) {
-        return "";
     }
 
     @Override

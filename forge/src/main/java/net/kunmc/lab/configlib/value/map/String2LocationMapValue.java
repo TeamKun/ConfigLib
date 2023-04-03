@@ -23,16 +23,6 @@ public class String2LocationMapValue extends String2ObjectMapValue<Location, Str
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Location argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((Location) argument.get(1));
     }

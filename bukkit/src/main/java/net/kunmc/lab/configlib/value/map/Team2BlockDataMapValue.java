@@ -20,16 +20,6 @@ public class Team2BlockDataMapValue extends Team2ObjectMapValue<BlockData, Team2
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected BlockData argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((BlockData) argument.get(1));
     }

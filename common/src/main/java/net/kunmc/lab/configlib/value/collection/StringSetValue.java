@@ -73,16 +73,6 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument + "は不正な引数です";
-    }
-
-    @Override
     protected Set<String> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
         return Collections.singleton(argument.get(0)
                                              .toString());

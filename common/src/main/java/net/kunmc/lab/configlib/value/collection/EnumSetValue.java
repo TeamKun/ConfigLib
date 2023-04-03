@@ -32,16 +32,6 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不明な値です.";
-    }
-
-    @Override
     protected Set<T> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet(clazz.cast(argument.get(0)));
     }
@@ -49,16 +39,6 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
     @Override
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.enumArgument("name", clazz, x -> value.contains(x));
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不明な値です.";
     }
 
     @Override

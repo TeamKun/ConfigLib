@@ -29,16 +29,6 @@ public class Double2DoublePairValue extends Double2ObjectPairValue<Double, Doubl
     }
 
     @Override
-    protected boolean isCorrectRightArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectRightArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Double argumentToRightValue(List<Object> argument, CommandContext ctx) {
         return ((Double) argument.get(1));
     }

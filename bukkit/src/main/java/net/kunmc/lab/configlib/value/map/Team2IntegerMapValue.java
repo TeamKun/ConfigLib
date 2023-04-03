@@ -12,16 +12,6 @@ public class Team2IntegerMapValue extends Team2ObjectMapValue<Integer, Team2Inte
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Integer argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((Integer) argument.get(1));
     }

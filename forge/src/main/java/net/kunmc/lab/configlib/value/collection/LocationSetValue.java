@@ -25,16 +25,6 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不正な引数です.";
-    }
-
-    @Override
     public Set<Location> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet((Location) argument.get(0));
     }
@@ -67,16 +57,6 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
                         .map(Object::toString)
                         .forEach(sb::suggest);
                });
-    }
-
-    @Override
-    public boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument + "は不正な引数です.";
     }
 
     @Override

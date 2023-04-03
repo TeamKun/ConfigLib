@@ -31,16 +31,6 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不明な値です.";
-    }
-
-    @Override
     protected List<T> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return Collections.singletonList(clazz.cast(argument.get(0)));
     }
@@ -48,16 +38,6 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     @Override
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.enumArgument("name", clazz, x -> value.contains(x));
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不明な値です.";
     }
 
     @Override

@@ -12,16 +12,6 @@ public class UUID2IntegerMapValue extends UUID2ObjectMapValue<Integer, UUID2Inte
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Integer argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((Integer) argument.get(1));
     }

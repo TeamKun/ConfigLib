@@ -22,16 +22,6 @@ public class String2BooleanMapValue extends String2ObjectMapValue<Boolean, Strin
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Boolean argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((Boolean) argument.get(1));
     }

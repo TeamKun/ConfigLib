@@ -17,16 +17,6 @@ public class Location2LocationPairValue extends Location2ObjectPairValue<Locatio
     }
 
     @Override
-    protected boolean isCorrectRightArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectRightArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Location argumentToRightValue(List<Object> argument, CommandContext ctx) {
         return ((Location) argument.get(1));
     }

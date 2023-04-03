@@ -23,30 +23,10 @@ public class ItemStackValue extends SingleValue<ItemStack, ItemStackValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected ItemStack argumentToValue(List<Object> argument, CommandContext ctx) {
         ItemStack item = ((ItemStack) argument.get(0));
         item.setCount(((Integer) argument.get(1)));
         return item;
-    }
-
-    @Override
-    protected boolean validateOnSet(String entryName, ItemStack newValue, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, ItemStack newValue, CommandContext ctx) {
-        return "";
     }
 
     @Override

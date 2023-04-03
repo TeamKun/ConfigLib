@@ -1,40 +1,14 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.CollectionValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class ListValue<E, U extends ListValue<E, U>> extends CollectionValue<List<E>, E, U> implements Iterable<E> {
     public ListValue(List<E> value) {
         super(value);
-    }
-
-    @Override
-    protected boolean validateForAdd(String entryName, List<E> value, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String invalidValueMessageForAdd(String entryName, List<E> value, CommandContext ctx) {
-        return "This message can't be shown.";
-    }
-
-    @Override
-    protected boolean validateForRemove(String entryName, List<E> element, CommandContext ctx) {
-        return value.containsAll(element);
-    }
-
-    @Override
-    protected final String invalidValueMessageForRemove(String entryName, List<E> value, CommandContext ctx) {
-        return String.format("%sは%sに追加されていませんでした.",
-                             value.stream()
-                                  .map(this::elementToString)
-                                  .collect(Collectors.toList()),
-                             entryName);
     }
 
     public int size() {

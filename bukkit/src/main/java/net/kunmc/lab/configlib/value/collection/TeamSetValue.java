@@ -32,25 +32,17 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
 
     @Override
     protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.teamArgument("team", sb -> {
-            scoreboard.getTeams()
-                      .stream()
-                      .map(Team::getName)
-                      .filter(name -> value.stream()
-                                           .map(Team::getName)
-                                           .noneMatch(s -> s.equals(name)))
-                      .forEach(sb::suggest);
+        builder.teamArgumentWith("team", option -> {
+            option.suggestionAction(sb -> {
+                scoreboard.getTeams()
+                          .stream()
+                          .map(Team::getName)
+                          .filter(name -> value.stream()
+                                               .map(Team::getName)
+                                               .noneMatch(s -> s.equals(name)))
+                          .forEach(sb::suggest);
+            });
         });
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) != null;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return "指定されたチームは存在しません.";
     }
 
     @Override
@@ -65,16 +57,6 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
                  .map(Team::getName)
                  .forEach(sb::suggest);
         });
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) != null;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return "指定されたチームは存在しません.";
     }
 
     @Override

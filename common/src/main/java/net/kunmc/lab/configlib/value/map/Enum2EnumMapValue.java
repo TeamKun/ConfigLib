@@ -27,16 +27,6 @@ public class Enum2EnumMapValue<K extends Enum<K>, V extends Enum<V>> extends Enu
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(1) + "は不明な値です.";
-    }
-
-    @Override
     protected V argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return clazz.cast(argument.get(1));
     }

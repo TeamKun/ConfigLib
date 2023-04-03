@@ -24,16 +24,6 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) != null;
-    }
-
-    @Override
-    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "指定されたチームは存在しません.";
-    }
-
-    @Override
     protected ScorePlayerTeam argumentToKeyForPut(List<Object> argument, CommandContext ctx) {
         return ((ScorePlayerTeam) argument.get(0));
     }
@@ -51,16 +41,6 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     @Override
     protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
         builder.teamArgument("team");
-    }
-
-    @Override
-    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) != null;
-    }
-
-    @Override
-    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return "指定されたチームは存在しません.";
     }
 
     @Override

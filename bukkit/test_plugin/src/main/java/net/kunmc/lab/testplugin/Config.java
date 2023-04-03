@@ -2,6 +2,7 @@ package net.kunmc.lab.testplugin;
 
 import net.kunmc.lab.configlib.BaseConfig;
 import net.kunmc.lab.configlib.value.UUIDValue;
+import net.kunmc.lab.configlib.value.collection.TeamSetValue;
 import net.kunmc.lab.configlib.value.collection.UUIDSetValue;
 import net.kunmc.lab.configlib.value.map.UUID2LocationMapValue;
 import org.bukkit.Bukkit;
@@ -16,6 +17,7 @@ public class Config extends BaseConfig {
     public final UUIDSetValue uuidSetValue = new UUIDSetValue().onModify(TestPlugin::broadcast);
     public final UUID2LocationMapValue uuid2LocationMapValue = new UUID2LocationMapValue();
     public final List<String> strings = new ArrayList<>();
+    public final TeamSetValue teams = new TeamSetValue();
 
     public Config(@NotNull Plugin plugin) {
         super(plugin);

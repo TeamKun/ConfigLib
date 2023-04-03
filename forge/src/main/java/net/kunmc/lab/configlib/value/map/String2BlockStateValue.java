@@ -31,16 +31,6 @@ public class String2BlockStateValue extends String2ObjectMapValue<BlockState, St
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected BlockState argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((BlockStateInput) argument.get(1)).getState();
     }

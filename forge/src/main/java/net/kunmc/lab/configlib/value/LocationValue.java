@@ -31,28 +31,8 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不正な引数です.";
-    }
-
-    @Override
     protected Location argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((Location) argument.get(0));
-    }
-
-    @Override
-    protected boolean validateOnSet(String entryName, Location newValue, CommandContext ctx) {
-        return !newValue.equals(value);
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, Location newValue, CommandContext ctx) {
-        return valueToString(newValue) + "はすでに設定されている値です.";
     }
 
     @Override

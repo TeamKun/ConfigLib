@@ -46,28 +46,8 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
     protected UUID argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((UUID) argument.get(0));
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
-    protected boolean validateOnSet(String entryName, UUID newValue, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, UUID newValue, CommandContext ctx) {
-        return "";
     }
 
     @Override

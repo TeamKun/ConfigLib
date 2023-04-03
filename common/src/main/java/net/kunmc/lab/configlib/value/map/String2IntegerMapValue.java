@@ -22,16 +22,6 @@ public class String2IntegerMapValue extends String2ObjectMapValue<Integer, Strin
     }
 
     @Override
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected Integer argumentToValueForPut(List<Object> argument, CommandContext ctx) {
         return ((Integer) argument.get(1));
     }

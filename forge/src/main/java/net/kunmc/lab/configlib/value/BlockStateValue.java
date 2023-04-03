@@ -30,28 +30,8 @@ public class BlockStateValue extends SingleValue<BlockState, BlockStateValue> {
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
     protected BlockState argumentToValue(List<Object> argument, CommandContext ctx) {
         return ((BlockStateInput) argument.get(0)).getState();
-    }
-
-    @Override
-    protected boolean validateOnSet(String entryName, BlockState newValue, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, BlockState newValue, CommandContext ctx) {
-        return "";
     }
 
     @Override

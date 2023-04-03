@@ -42,19 +42,7 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) != null;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return "指定されたチームは存在しません.";
-    }
-
-    @Override
-    protected Set<ScorePlayerTeam> argumentToValueForAdd(String entryName,
-                                                         List<Object> argument,
-                                                         CommandContext ctx) {
+    protected Set<ScorePlayerTeam> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
         return Sets.newHashSet(((ScorePlayerTeam) argument.get(0)));
     }
 
@@ -65,16 +53,6 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
                  .map(Team::getName)
                  .forEach(suggestionBuilder::suggest);
         });
-    }
-
-    @Override
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) != null;
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return "指定されたチームは存在しません.";
     }
 
     @Override

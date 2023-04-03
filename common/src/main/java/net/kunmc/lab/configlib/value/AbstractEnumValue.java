@@ -43,28 +43,8 @@ public abstract class AbstractEnumValue<E extends Enum<E>, T extends AbstractEnu
     }
 
     @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不明な値です.";
-    }
-
-    @Override
     protected E argumentToValue(List<Object> argument, CommandContext ctx) {
         return clazz.cast(argument.get(0));
-    }
-
-    @Override
-    protected boolean validateOnSet(String entryName, E newValue, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, E newValue, CommandContext ctx) {
-        return newValue.name() + "は不正な値です.";
     }
 
     @Override

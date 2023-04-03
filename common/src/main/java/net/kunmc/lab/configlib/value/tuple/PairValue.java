@@ -74,20 +74,26 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
         return left && right;
     }
 
-    protected abstract boolean isCorrectLeftArgument(String entryName, List<Object> argument, CommandContext ctx);
+    protected boolean isCorrectLeftArgument(String entryName, List<Object> argument, CommandContext ctx) {
+        return true;
+    }
 
-    protected abstract boolean isCorrectRightArgument(String entryName, List<Object> argument, CommandContext ctx);
+    protected boolean isCorrectRightArgument(String entryName, List<Object> argument, CommandContext ctx) {
+        return true;
+    }
 
     @Override
     protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
 
-    protected abstract String incorrectLeftArgumentMessage(String entryName, List<Object> argument, CommandContext ctx);
+    protected String incorrectLeftArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
+        return "";
+    }
 
-    protected abstract String incorrectRightArgumentMessage(String entryName,
-                                                            List<Object> argument,
-                                                            CommandContext ctx);
+    protected String incorrectRightArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
+        return "";
+    }
 
     @Override
     protected MutablePair<L, R> argumentToValue(List<Object> argument, CommandContext ctx) {

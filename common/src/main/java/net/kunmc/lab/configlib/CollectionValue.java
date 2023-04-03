@@ -32,17 +32,23 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract void appendArgumentForAdd(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx);
+    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
+        return true;
+    }
 
-    protected abstract String incorrectArgumentMessageForAdd(String entryName,
-                                                             List<Object> argument,
-                                                             CommandContext ctx);
+    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
+        return "";
+    }
 
     protected abstract T argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx);
 
-    protected abstract boolean validateForAdd(String entryName, T value, CommandContext ctx);
+    protected boolean validateForAdd(String entryName, T value, CommandContext ctx) {
+        return true;
+    }
 
-    protected abstract String invalidValueMessageForAdd(String entryName, T value, CommandContext ctx);
+    protected String invalidValueMessageForAdd(String entryName, T value, CommandContext ctx) {
+        return "";
+    }
 
     /**
      * Add a listener fired on add command.
@@ -71,17 +77,23 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     protected abstract void appendArgumentForRemove(ArgumentBuilder builder);
 
-    protected abstract boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx);
+    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
+        return true;
+    }
 
-    protected abstract String incorrectArgumentMessageForRemove(String entryName,
-                                                                List<Object> argument,
-                                                                CommandContext ctx);
+    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
+        return "";
+    }
 
     protected abstract T argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx);
 
-    protected abstract boolean validateForRemove(String entryName, T value, CommandContext ctx);
+    protected boolean validateForRemove(String entryName, T value, CommandContext ctx) {
+        return true;
+    }
 
-    protected abstract String invalidValueMessageForRemove(String entryName, T value, CommandContext ctx);
+    protected String invalidValueMessageForRemove(String entryName, T value, CommandContext ctx) {
+        return "";
+    }
 
     /**
      * Add a listener fired on remove command.

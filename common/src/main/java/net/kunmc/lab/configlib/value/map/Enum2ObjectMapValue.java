@@ -30,16 +30,6 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     }
 
     @Override
-    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不明な値です.";
-    }
-
-    @Override
     protected T argumentToKeyForPut(List<Object> argument, CommandContext ctx) {
         return clazz.cast(argument.get(0));
     }
@@ -47,16 +37,6 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     @Override
     protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
         builder.enumArgument("name", clazz, x -> value.containsKey(x));
-    }
-
-    @Override
-    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不明な値です.";
     }
 
     @Override
