@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.codehaus.plexus:plexus-utils:3.5.0'
     implementation group: "com.google.guava", name: "guava", version: '30.0-android'
     implementation 'com.google.code.gson:gson:2.10'
-    compileOnly "com.github.TeamKun.CommandLib:forge:0.12.4"
+    compileOnly "com.github.TeamKun.CommandLib:forge:0.13.0"
 }
 
 shadowJar {

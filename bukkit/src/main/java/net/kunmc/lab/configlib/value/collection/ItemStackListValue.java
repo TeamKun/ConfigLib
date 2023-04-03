@@ -58,9 +58,11 @@ public class ItemStackListValue extends ListValue<ItemStack, ItemStackListValue>
                            .map(gson::toJson)
                            .forEach(sb::suggest);
                   })
-                  .filter(x -> value.stream()
-                                    .map(gson::toJson)
-                                    .anyMatch(x::equals));
+                  .filter(x -> {
+                      return value.stream()
+                                  .map(gson::toJson)
+                                  .anyMatch(x::equals);
+                  });
         }, StringArgument.Type.PHRASE));
     }
 

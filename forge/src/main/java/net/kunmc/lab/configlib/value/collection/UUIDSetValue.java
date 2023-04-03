@@ -66,7 +66,9 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     @Override
     protected void appendArgumentForRemove(ArgumentBuilder builder) {
         builder.uuidArgumentWith("target", option -> {
-            option.filter(x -> value.contains(x))
+            option.filter(x -> {
+                      return value.contains(x);
+                  })
                   .additionalSuggestionAction(sb -> {
                       value.stream()
                            .filter(x -> ServerLifecycleHooks.getCurrentServer()

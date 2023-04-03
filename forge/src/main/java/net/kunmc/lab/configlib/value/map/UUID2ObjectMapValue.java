@@ -53,7 +53,9 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
                            .map(Object::toString)
                            .forEach(sb::suggest);
                   })
-                  .filter(x -> value.containsKey(x));
+                  .filter(x -> {
+                      return value.containsKey(x);
+                  });
         });
     }
 
