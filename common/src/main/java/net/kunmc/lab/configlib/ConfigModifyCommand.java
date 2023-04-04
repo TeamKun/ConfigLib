@@ -4,6 +4,7 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.util.ConfigUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -43,7 +44,7 @@ class ConfigModifyCommand extends Command {
                 execute(ctx -> {
                     ctx.sendMessageWithOption(field.getName() + ": " + v.asString(ctx),
                                               option -> option.rgb(ChatColorUtil.GREEN.getRGB())
-                                                              .hoverText(v.description()));
+                                                              .hoverText(StringUtils.defaultString(v.description())));
                 });
                 applySet(this, field, v);
                 addChildren(new Command("set") {{
