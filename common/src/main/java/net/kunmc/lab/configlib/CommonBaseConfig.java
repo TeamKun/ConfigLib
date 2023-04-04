@@ -30,7 +30,7 @@ public abstract class CommonBaseConfig {
     protected transient boolean enableModify = true;
     protected transient boolean enableReload = true;
     private transient volatile boolean initialized = false;
-    private transient String entryName = "";
+    private transient String entryName;
     private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
     private final transient List<Runnable> onReloadListeners = new ArrayList<>();
     protected final transient Timer timer = new Timer();
@@ -43,6 +43,87 @@ public abstract class CommonBaseConfig {
         String s = getClass().getSimpleName();
         this.entryName = s.substring(0, 1)
                           .toLowerCase() + s.substring(1);
+    }
+
+    public static <T extends CommonBaseConfig> T newInstanceFrom(@NotNull File jsonFile,
+                                                                 @NotNull Constructor<T> constructor,
+                                                                 Object... arguments) {
+        String filename = jsonFile.getName();
+        String json = readJson(jsonFile);
+        Class<T> clazz = constructor.getDeclaringClass();
+
+        try {
+            T config = constructor.newInstance(arguments);
+            config.setEntryName(filename.substring(0, filename.lastIndexOf('.')));
+            replaceFields(clazz,
+                          config.gson()
+                                .fromJson(json, clazz),
+                          config);
+            return config;
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String readJson(File jsonFile) {
+        try {
+            return Files.readLines(jsonFile, StandardCharsets.UTF_8)
+                        .stream()
+                        .collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static void writeJson(File jsonFile, String json) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(java.nio.file.Files.newOutputStream(jsonFile.toPath()),
+                                                                StandardCharsets.UTF_8)) {
+            writer.write(json);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static void replaceFields(Class<?> clazz, Object src, Object dst) {
+        for (Field field : ReflectionUtils.getFieldsIncludingSuperclasses(clazz)) {
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+                continue;
+            }
+
+            try {
+                field.setAccessible(true);
+            } catch (Exception e) {
+                // InaccessibleObjectExceptionが発生した場合スルーする
+                continue;
+            }
+
+            try {
+                replaceField(field, src, dst);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
+        try {
+            List<Field> fieldList = ReflectionUtils.getFieldsIncludingSuperclasses(field.getType());
+            Object srcObj = field.get(src);
+            Object dstObj = field.get(dst);
+
+            // jsonにキーが存在しない場合nullになる
+            if (srcObj == null) {
+                return;
+            }
+
+            if (fieldList.isEmpty()) {
+                field.set(dst, srcObj);
+            } else {
+                replaceFields(field.getType(), srcObj, dstObj);
+            }
+        } catch (NullPointerException ignored) {
+            // 新しいフィールドが追加されるとNullPointerExceptionが発生するため握りつぶしている
+        }
     }
 
     protected void setEntryName(@NotNull String entryName) {
@@ -268,87 +349,6 @@ public abstract class CommonBaseConfig {
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
-        }
-    }
-
-    public static <T extends CommonBaseConfig> T newInstanceFrom(@NotNull File jsonFile,
-                                                                 @NotNull Constructor<T> constructor,
-                                                                 Object... arguments) {
-        String filename = jsonFile.getName();
-        String json = readJson(jsonFile);
-        Class<T> clazz = constructor.getDeclaringClass();
-
-        try {
-            T config = constructor.newInstance(arguments);
-            config.setEntryName(filename.substring(0, filename.lastIndexOf('.')));
-            replaceFields(clazz,
-                          config.gson()
-                                .fromJson(json, clazz),
-                          config);
-            return config;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static String readJson(File jsonFile) {
-        try {
-            return Files.readLines(jsonFile, StandardCharsets.UTF_8)
-                        .stream()
-                        .collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    private static void writeJson(File jsonFile, String json) {
-        try (OutputStreamWriter writer = new OutputStreamWriter(java.nio.file.Files.newOutputStream(jsonFile.toPath()),
-                                                                StandardCharsets.UTF_8)) {
-            writer.write(json);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    private static void replaceFields(Class<?> clazz, Object src, Object dst) {
-        for (Field field : ReflectionUtils.getFieldsIncludingSuperclasses(clazz)) {
-            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
-                continue;
-            }
-
-            try {
-                field.setAccessible(true);
-            } catch (Exception e) {
-                // InaccessibleObjectExceptionが発生した場合スルーする
-                continue;
-            }
-
-            try {
-                replaceField(field, src, dst);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private static void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
-        try {
-            List<Field> fieldList = ReflectionUtils.getFieldsIncludingSuperclasses(field.getType());
-            Object srcObj = field.get(src);
-            Object dstObj = field.get(dst);
-
-            // jsonにキーが存在しない場合nullになる
-            if (srcObj == null) {
-                return;
-            }
-
-            if (fieldList.isEmpty()) {
-                field.set(dst, srcObj);
-            } else {
-                replaceFields(field.getType(), srcObj, dstObj);
-            }
-        } catch (NullPointerException ignored) {
-            // 新しいフィールドが追加されるとNullPointerExceptionが発生するため握りつぶしている
         }
     }
 

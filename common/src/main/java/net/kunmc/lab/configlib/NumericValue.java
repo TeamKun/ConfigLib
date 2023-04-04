@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib;
 
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.exception.InvalidValueException;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class NumericValue<E extends Number & Comparable<E>, T extends NumericValue<E, T>> extends SingleValue<E, T> implements Comparable<E> {
@@ -12,6 +12,12 @@ public abstract class NumericValue<E extends Number & Comparable<E>, T extends N
 
         this.min = min;
         this.max = max;
+
+        addValidator(x -> {
+            if (x.compareTo(min) < 0 || x.compareTo(max) > 0) {
+                throw new InvalidValueException(min + "以上" + max + "以下の値を入力してください.");
+            }
+        });
     }
 
     public abstract E plus(Number other);
@@ -84,14 +90,4 @@ public abstract class NumericValue<E extends Number & Comparable<E>, T extends N
     protected abstract E copySub(Number amount);
 
     protected abstract int compare(Number n);
-
-    @Override
-    protected boolean validateOnSet(String entryName, E newValue, CommandContext ctx) {
-        return newValue.compareTo(min) != -1 && newValue.compareTo(max) != 1;
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, E argument, CommandContext ctx) {
-        return min + "以上" + max + "以下の値を入力してください.";
-    }
 }

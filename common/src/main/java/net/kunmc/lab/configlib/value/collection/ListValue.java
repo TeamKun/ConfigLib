@@ -48,7 +48,7 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
     }
 
     public boolean containsAll(@NotNull Collection<?> c) {
-        return value.containsAll(c);
+        return new HashSet<>(value).containsAll(c);
     }
 
     public boolean addAll(@NotNull Collection<? extends E> c) {

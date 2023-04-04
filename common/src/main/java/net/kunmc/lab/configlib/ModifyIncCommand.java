@@ -36,7 +36,7 @@ class ModifyIncCommand extends Command {
              .forEach(ctx::sendFailure);
             return;
         }
-       
+
         value.onModifyValueCommand(newValue);
         value.value(newValue);
 

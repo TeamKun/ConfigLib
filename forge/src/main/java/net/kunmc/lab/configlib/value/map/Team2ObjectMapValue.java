@@ -29,16 +29,6 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
     }
 
     @Override
-    protected boolean validateKeyForPut(String entryName, ScorePlayerTeam team, CommandContext ctx) {
-        return true;
-    }
-
-    @Override
-    protected String invalidKeyMessageForPut(String entryName, ScorePlayerTeam team, CommandContext ctx) {
-        return "This message can't be shown.";
-    }
-
-    @Override
     protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
         builder.teamArgument("team");
     }

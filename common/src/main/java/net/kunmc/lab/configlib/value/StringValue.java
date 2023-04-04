@@ -4,6 +4,7 @@ import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.SuggestionAction;
 import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
 import net.kunmc.lab.configlib.SingleValue;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,49 +53,27 @@ public class StringValue extends SingleValue<String, StringValue> {
 
     @Override
     protected void appendArgument(ArgumentBuilder builder) {
-        builder.stringArgument(name, type, suggestionAction);
         builder.customArgument(new StringArgument(name, option -> {
             option.suggestionAction(suggestionAction)
                   .filter(x -> {
-                      if (allowableStringList.isEmpty()) {
-                          return true;
+                      if (!allowableStringList.isEmpty()) {
+                          if (allowableStringList.stream()
+                                                 .noneMatch(s -> s.equals(x))) {
+                              throw new InvalidArgumentException(allowableStringList + "の中から文字列を入力してください");
+                          }
                       }
 
-                      return allowableStringList.stream()
-                                                .anyMatch(s -> s.equals(x));
+                      if (x.length() < min || x.length() > max) {
+                          throw new InvalidArgumentException(min + "以上" + max + "以下の文字数で入力してください");
+                      }
                   });
         }, type));
-    }
-
-    @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        if (allowableStringList.isEmpty()) {
-            return true;
-        }
-
-        return allowableStringList.stream()
-                                  .anyMatch(s -> s.equals(argument.get(0)));
-    }
-
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不正な引数です.";
     }
 
     @Override
     protected String argumentToValue(List<Object> argument, CommandContext ctx) {
         return argument.get(0)
                        .toString();
-    }
-
-    @Override
-    protected boolean validateOnSet(String entryName, String newValue, CommandContext ctx) {
-        return newValue.length() >= min && newValue.length() <= max;
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, String argument, CommandContext ctx) {
-        return entryName + "は" + min + "以上" + max + "以下の文字数で入力してください";
     }
 
     @Override

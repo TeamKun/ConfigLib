@@ -137,7 +137,7 @@ class ConfigModifyCommand extends Command {
 
                 value.onModifyValueCommand(newValue);
                 value.value(newValue);
-               
+
                 ctx.sendSuccess(value.succeedModifyMessage(entryName));
             });
         });

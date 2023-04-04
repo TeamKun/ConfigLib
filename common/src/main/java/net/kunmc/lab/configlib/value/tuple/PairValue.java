@@ -82,11 +82,6 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
         return true;
     }
 
-    @Override
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
     protected String incorrectLeftArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
         return "";
     }
@@ -130,11 +125,6 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
 
     protected boolean validateRight(String entryName, R newRight, CommandContext ctx, Pair<L, R> newPair) {
         return true;
-    }
-
-    @Override
-    protected String invalidValueMessage(String entryName, MutablePair<L, R> newValue, CommandContext ctx) {
-        return "";
     }
 
     protected String invalidLeftValueMessage(String entryName, L newLeft, CommandContext ctx) {

@@ -10,7 +10,7 @@ import java.util.List;
 
 public class LocationValue extends SingleValue<Location, LocationValue> {
     public LocationValue() {
-        this((Location) null);
+        this(null);
     }
 
     public LocationValue(Location value) {
