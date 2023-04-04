@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
+import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 
 import java.lang.reflect.Field;
@@ -125,9 +126,18 @@ class ConfigModifyCommand extends Command {
                     ctx.sendFailure(value.invalidValueMessage(entryName, newValue, ctx));
                     return;
                 }
-                value.onModifyValueCommand(newValue);
 
+                try {
+                    value.validate(newValue);
+                } catch (InvalidValueException e) {
+                    e.getMessages()
+                     .forEach(ctx::sendFailure);
+                    return;
+                }
+
+                value.onModifyValueCommand(newValue);
                 value.value(newValue);
+               
                 ctx.sendSuccess(value.succeedModifyMessage(entryName));
             });
         });

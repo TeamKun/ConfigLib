@@ -27,7 +27,9 @@ public final class TestPlugin extends JavaPlugin {
     public void onEnable() {
         Config config = new Config(this);
         Config2 config2 = new Config2(this);
+        AddValidatorTestConfig addValidatorTestConfig = new AddValidatorTestConfig(this);
         ConfigCommand configCommand = new ConfigCommandBuilder(config).addConfig(config2)
+                                                                      .addConfig(addValidatorTestConfig)
                                                                       .build();
 
         CommandLib.register(this, new Command("configlibtest") {{

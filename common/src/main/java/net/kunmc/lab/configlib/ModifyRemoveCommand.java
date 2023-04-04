@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.configlib.exception.InvalidValueException;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -25,6 +26,14 @@ class ModifyRemoveCommand extends Command {
                 Collection newValue = value.argumentToValueForRemove(entryName, argument, ctx);
                 if (!value.validateForRemove(entryName, newValue, ctx)) {
                     ctx.sendFailure(value.invalidValueMessageForRemove(entryName, newValue, ctx));
+                    return;
+                }
+
+                try {
+                    value.validate(newValue);
+                } catch (InvalidValueException e) {
+                    e.getMessages()
+                     .forEach(ctx::sendFailure);
                     return;
                 }
 

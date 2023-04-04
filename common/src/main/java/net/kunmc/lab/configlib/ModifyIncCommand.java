@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.DoubleArgument;
+import net.kunmc.lab.configlib.exception.InvalidValueException;
 
 import java.lang.reflect.Field;
 
@@ -20,7 +21,7 @@ class ModifyIncCommand extends Command {
         argument(new DoubleArgument("incValue"), this::exec);
     }
 
-    public void exec(double amount, CommandContext ctx) {
+    private void exec(double amount, CommandContext ctx) {
         String entryName = field.getName();
 
         if (value.compare(value.max.doubleValue() - amount) > 0) {
@@ -28,6 +29,14 @@ class ModifyIncCommand extends Command {
         }
 
         Number newValue = value.copyAdd(amount);
+        try {
+            value.validate(newValue);
+        } catch (InvalidValueException e) {
+            e.getMessages()
+             .forEach(ctx::sendFailure);
+            return;
+        }
+       
         value.onModifyValueCommand(newValue);
         value.value(newValue);
 

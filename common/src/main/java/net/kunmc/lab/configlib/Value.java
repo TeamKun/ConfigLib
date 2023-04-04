@@ -1,6 +1,8 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.util.function.Validator;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ public abstract class Value<E, T extends Value<E, T>> {
     private transient E initValue;
     private transient final List<Consumer<E>> initializeListeners = new ArrayList<>();
     private transient final List<Consumer<E>> modifyListeners = new ArrayList<>();
+    private transient Validator<E> validator = x -> {
+    };
 
     public Value(E value) {
         this.value = value;
@@ -98,6 +102,19 @@ public abstract class Value<E, T extends Value<E, T>> {
 
     final void onModifyValue(E newValue) {
         modifyListeners.forEach(x -> x.accept(newValue));
+    }
+
+    /**
+     * Validates values on executing modify command and loading config.<br>
+     * Throwing {@link net.kunmc.lab.configlib.exception.InvalidValueException}, you can customize the error message.
+     */
+    public final T addValidator(Validator<E> validator) {
+        this.validator = this.validator.and(validator);
+        return ((T) this);
+    }
+
+    final void validate(E value) throws InvalidValueException {
+        validator.validate(value);
     }
 
     protected abstract String asString(CommandContext ctx);
