@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.apache.commons.lang3.tuple.Pair;
-import org.bukkit.craftbukkit.libs.org.eclipse.aether.util.ConfigUtils;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.jetbrains.annotations.NotNull;
 
