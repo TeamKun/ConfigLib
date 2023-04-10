@@ -2,7 +2,9 @@ package net.kunmc.lab.testplugin;
 
 import net.kunmc.lab.commandlib.util.TextColorUtil;
 import net.kunmc.lab.configlib.BaseConfig;
+import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.value.IntegerValue;
+import net.kunmc.lab.configlib.value.StringValue;
 import net.kunmc.lab.configlib.value.collection.ItemStackListValue;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
@@ -15,6 +17,11 @@ public class Config2 extends BaseConfig {
     public final IntegerValue n = new IntegerValue(12).onInitialize(x -> TestPlugin.broadcast("n initialize"))
                                                       .onModify(x -> TestPlugin.broadcast(x.toString()));
     public final ItemStackListValue itemStacks = new ItemStackListValue();
+    public final StringValue str = new StringValue("hoge").addValidator(x -> {
+        if (!x.equals("hoge")) {
+            throw new InvalidValueException("only hoge");
+        }
+    });
 
     public Config2(@NotNull Plugin plugin) {
         super(plugin);

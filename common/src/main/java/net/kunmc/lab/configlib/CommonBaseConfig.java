@@ -3,8 +3,10 @@ package net.kunmc.lab.configlib;
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
+import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.craftbukkit.libs.org.eclipse.aether.util.ConfigUtils;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,6 +22,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
@@ -38,6 +42,7 @@ public abstract class CommonBaseConfig {
     private transient WatchKey watchKey;
     private final transient Object lock = new Object();
     private final transient Map<Field, Pair<Object, Integer>> fieldToObjectAndHashMap = new HashMap<>();
+    private final transient Logger logger = Logger.getLogger(getClass().getName());
 
     protected CommonBaseConfig() {
         String s = getClass().getSimpleName();
@@ -302,8 +307,27 @@ public abstract class CommonBaseConfig {
                 return false;
             }
 
-            CommonBaseConfig config = gson().fromJson(readJson(getConfigFile()), this.getClass());
-            replaceFields(this.getClass(), config, this);
+            CommonBaseConfig config = gson().fromJson(readJson(getConfigFile()), getClass());
+
+            for (Field field : ConfigUtil.getValueFields(this)) {
+               try {
+                   Value<?,?> loaded = ((Value<?,?>) field.get(config));
+                   if (loaded == null || loaded.value() == null) {
+                       continue;
+                   }
+
+                   Value current = ((Value<?,?>) field.get(this));
+                   current.validate(loaded.value());
+               } catch (IllegalAccessException e) {
+                   e.printStackTrace();
+               } catch (InvalidValueException e) {
+                   logger.log(Level.WARNING, String.format("\"%s\"'s validation failed.", field.getName()));
+                   e.printStackTrace();
+                   return false;
+               }
+            }
+
+            replaceFields(getClass(), config, this);
             if (!initialized) {
                 onInitializeListeners.forEach(Runnable::run);
 

@@ -35,9 +35,9 @@ class ConfigReloadCommand extends Command {
         String fileName = config.getConfigFile()
                                 .getName();
         if (config.loadConfig()) {
-            ctx.sendSuccess(fileName + "を再読み込みしました.");
+            ctx.sendSuccess(fileName + "を再読み込みしました");
         } else {
-            ctx.sendFailure(fileName + "の読み込みに失敗しました.ファイルが存在しません.");
+            ctx.sendFailure(fileName + "の読み込みに失敗しました");
         }
     }
 }
