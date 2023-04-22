@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.plexus.util.ReflectionUtils;
@@ -224,6 +225,12 @@ public abstract class CommonBaseConfig {
                         if (filePath.equals(getConfigFile().toPath())) {
                             try {
                                 loadConfig();
+                            } catch (LoadingConfigInvalidValueException ex) {
+                                logger.log(Level.WARNING,
+                                           String.format("\"%s\"'s validation failed.",
+                                                         ex.getValueField()
+                                                           .getName()),
+                                           ex);
                             } catch (Exception ex) {
                                 option.jsonParseExceptionHandler.accept(ex);
                             }
@@ -300,7 +307,7 @@ public abstract class CommonBaseConfig {
         }
     }
 
-    protected final boolean loadConfig() {
+    protected final boolean loadConfig() throws LoadingConfigInvalidValueException {
         synchronized (lock) {
             if (!getConfigFile().exists()) {
                 return false;
@@ -309,21 +316,19 @@ public abstract class CommonBaseConfig {
             CommonBaseConfig config = gson().fromJson(readJson(getConfigFile()), getClass());
 
             for (Field field : ConfigUtil.getValueFields(this)) {
-               try {
-                   Value<?,?> loaded = ((Value<?,?>) field.get(config));
-                   if (loaded == null || loaded.value() == null) {
-                       continue;
-                   }
+                try {
+                    Value<?, ?> loaded = ((Value<?, ?>) field.get(config));
+                    if (loaded == null || loaded.value() == null) {
+                        continue;
+                    }
 
-                   Value current = ((Value<?,?>) field.get(this));
-                   current.validate(loaded.value());
-               } catch (IllegalAccessException e) {
-                   e.printStackTrace();
-               } catch (InvalidValueException e) {
-                   logger.log(Level.WARNING, String.format("\"%s\"'s validation failed.", field.getName()));
-                   e.printStackTrace();
-                   return false;
-               }
+                    Value current = ((Value<?, ?>) field.get(this));
+                    current.validate(loaded.value());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvalidValueException e) {
+                    throw new LoadingConfigInvalidValueException(field, e);
+                }
             }
 
             replaceFields(getClass(), config, this);

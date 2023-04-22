@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -34,10 +35,15 @@ class ConfigReloadCommand extends Command {
     private void exec(CommandContext ctx, CommonBaseConfig config) {
         String fileName = config.getConfigFile()
                                 .getName();
-        if (config.loadConfig()) {
-            ctx.sendSuccess(fileName + "を再読み込みしました");
-        } else {
+        try {
+            if (config.loadConfig()) {
+                ctx.sendSuccess(fileName + "を再読み込みしました");
+            } else {
+                ctx.sendFailure(fileName + "の読み込みに失敗しました");
+            }
+        } catch (LoadingConfigInvalidValueException e) {
             ctx.sendFailure(fileName + "の読み込みに失敗しました");
+            e.printStackTrace();
         }
     }
 }
