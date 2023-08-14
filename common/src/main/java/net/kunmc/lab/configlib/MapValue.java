@@ -159,7 +159,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
     protected abstract String valueToString(V v);
 
     @Override
-    protected String asString(CommandContext ctx) {
+    protected String asString() {
         return "{" + value.entrySet()
                           .stream()
                           .map(entry -> String.format("%s:%s",

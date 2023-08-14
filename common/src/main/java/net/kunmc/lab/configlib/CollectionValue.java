@@ -135,7 +135,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
     protected abstract String elementToString(E e);
 
     @Override
-    protected String asString(CommandContext ctx) {
+    protected String asString() {
         return "[" + value.stream()
                           .map(this::elementToString)
                           .collect(Collectors.joining(", ")) + "]";

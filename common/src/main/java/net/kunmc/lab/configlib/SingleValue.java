@@ -114,7 +114,7 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
     }
 
     @Override
-    protected String asString(CommandContext ctx) {
+    protected String asString() {
         if (value() == null) {
             return "null";
         }

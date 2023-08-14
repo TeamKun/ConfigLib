@@ -51,7 +51,7 @@ class ConfigGetCommand extends Command {
                 }
 
                 command.addChildren(new Command(field.getName()) {{
-                    execute(ctx -> ctx.sendMessageWithOption(field.getName() + ": " + v.asString(ctx),
+                    execute(ctx -> ctx.sendMessageWithOption(field.getName() + ": " + v.asString(),
                                                              option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                              .hoverText(StringUtils.defaultString(v.description()))));
                 }});

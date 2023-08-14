@@ -1,6 +1,5 @@
 package net.kunmc.lab.configlib;
 
-import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.util.function.Validator;
 import org.jetbrains.annotations.Nullable;
@@ -117,5 +116,5 @@ public abstract class Value<E, T extends Value<E, T>> {
         validator.validate(value);
     }
 
-    protected abstract String asString(CommandContext ctx);
+    protected abstract String asString();
 }
