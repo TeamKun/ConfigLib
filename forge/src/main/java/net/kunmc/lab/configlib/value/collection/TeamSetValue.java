@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.util.SetUtil;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Team;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -43,7 +43,7 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
 
     @Override
     protected Set<ScorePlayerTeam> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(((ScorePlayerTeam) argument.get(0)));
+        return SetUtil.newHashSet(((ScorePlayerTeam) argument.get(0)));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     protected Set<ScorePlayerTeam> argumentToValueForRemove(String entryName,
                                                             List<Object> argument,
                                                             CommandContext ctx) {
-        return Sets.newHashSet(((ScorePlayerTeam) argument.get(0)));
+        return SetUtil.newHashSet(((ScorePlayerTeam) argument.get(0)));
     }
 
     @Override

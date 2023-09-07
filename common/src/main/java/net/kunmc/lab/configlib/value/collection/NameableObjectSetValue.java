@@ -1,10 +1,10 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.Nameable;
 import net.kunmc.lab.configlib.util.NameableSet;
+import net.kunmc.lab.configlib.util.SetUtil;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +41,7 @@ public class NameableObjectSetValue<T extends Nameable> extends SetValue<T, Name
 
     @Override
     protected Set<T> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(((T) argument.get(0)));
+        return SetUtil.newHashSet(((T) argument.get(0)));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class NameableObjectSetValue<T extends Nameable> extends SetValue<T, Name
 
     @Override
     protected Set<T> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(((T) argument.get(0)));
+        return SetUtil.newHashSet(((T) argument.get(0)));
     }
 
     @Override

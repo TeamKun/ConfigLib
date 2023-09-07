@@ -33,7 +33,6 @@ repositories {
 
 dependencies {
     compileOnly name: "patched_1.16.5"
-    implementation group: "com.google.guava", name: "guava", version: '30.0-android'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation "com.github.TeamKun.CommandLib:bukkit:0.14.1"

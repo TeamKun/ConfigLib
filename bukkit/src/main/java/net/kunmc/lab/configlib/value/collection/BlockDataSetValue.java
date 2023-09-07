@@ -1,9 +1,9 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.kunmc.lab.configlib.util.SetUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +35,7 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
 
     @Override
     protected Set<BlockData> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet((BlockData) argument.get(0));
+        return SetUtil.newHashSet(((BlockData) argument.get(0)));
     }
 
     @Override
@@ -65,8 +65,8 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
 
     @Override
     protected Set<BlockData> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(Bukkit.createBlockData(argument.get(0)
-                                                              .toString()));
+        return SetUtil.newHashSet(Bukkit.createBlockData(argument.get(0)
+                                                                 .toString()));
     }
 
     @Override

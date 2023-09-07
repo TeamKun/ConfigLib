@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.util.SetUtil;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     public UUIDSetValue(UUID... uuids) {
-        this(Sets.newHashSet(uuids));
+        this(SetUtil.newHashSet(uuids));
     }
 
     public UUIDSetValue(Collection<PlayerEntity> players) {
@@ -40,7 +40,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
     @Override
     protected Set<UUID> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(((List<UUID>) argument.get(0)));
+        return SetUtil.newHashSet(((List<UUID>) argument.get(0)));
     }
 
     @Override
@@ -70,7 +70,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
     @Override
     protected Set<UUID> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(((UUID) argument.get(0)));
+        return SetUtil.newHashSet(((UUID) argument.get(0)));
     }
 
     @Override

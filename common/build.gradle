@@ -13,7 +13,6 @@ repositories {
 
 dependencies {
     compileOnly 'org.apache.commons:commons-lang3:3.12.0'
-    compileOnly group: "com.google.guava", name: "guava", version: '30.0-android'
     compileOnly 'com.google.code.gson:gson:2.8.9'
     compileOnly 'org.jetbrains:annotations:20.1.0'
     // commonだとコマンド周りを上手く実装出来ないためbukkitを使う

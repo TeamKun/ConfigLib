@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.util.SetUtil;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class BlockPosSetValue extends SetValue<BlockPos, BlockPosSetValue> {
     public BlockPosSetValue(BlockPos... blockPoses) {
-        this(Sets.newHashSet(blockPoses));
+        this(SetUtil.newHashSet(blockPoses));
     }
 
     public BlockPosSetValue(@NotNull Set<BlockPos> value) {

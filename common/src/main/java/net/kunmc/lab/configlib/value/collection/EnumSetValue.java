@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.util.SetUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -33,7 +33,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
 
     @Override
     protected Set<T> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(clazz.cast(argument.get(0)));
+        return SetUtil.newHashSet(clazz.cast(argument.get(0)));
     }
 
     @Override
@@ -43,7 +43,7 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
 
     @Override
     protected Set<T> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(clazz.cast(argument.get(0)));
+        return SetUtil.newHashSet(clazz.cast(argument.get(0)));
     }
 
     @Override

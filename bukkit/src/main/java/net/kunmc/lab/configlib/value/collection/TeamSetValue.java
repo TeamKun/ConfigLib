@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.util.SetUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -47,7 +47,7 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
 
     @Override
     protected Set<Team> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(((Team) argument.get(0)));
+        return SetUtil.newHashSet(((Team) argument.get(0)));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
 
     @Override
     protected Set<Team> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(((Team) argument.get(0)));
+        return SetUtil.newHashSet(((Team) argument.get(0)));
     }
 
     @Override

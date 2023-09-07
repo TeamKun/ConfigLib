@@ -13,7 +13,6 @@ repositories {
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
     implementation project(":common")
-    implementation group: "com.google.guava", name: "guava", version: '30.0-android'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     compileOnly "com.github.TeamKun.CommandLib:bukkit:0.14.1"

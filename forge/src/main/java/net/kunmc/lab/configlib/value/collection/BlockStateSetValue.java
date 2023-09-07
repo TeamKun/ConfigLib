@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.util.SetUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.arguments.BlockStateInput;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +34,7 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
 
     @Override
     protected Set<BlockState> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(((BlockStateInput) argument.get(0)).getState());
+        return SetUtil.newHashSet(((BlockStateInput) argument.get(0)).getState());
     }
 
     @Override
@@ -48,7 +48,7 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
 
     @Override
     protected Set<BlockState> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet(((BlockStateInput) argument.get(0)).getState());
+        return SetUtil.newHashSet(((BlockStateInput) argument.get(0)).getState());
     }
 
     @Override

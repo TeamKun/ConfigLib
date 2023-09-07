@@ -1,9 +1,9 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import com.google.common.collect.Sets;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.util.Location;
+import net.kunmc.lab.configlib.util.SetUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     public LocationSetValue(Location... locations) {
-        this(Sets.newHashSet(locations));
+        this(SetUtil.newHashSet(locations));
     }
 
     public LocationSetValue(@NotNull Set<Location> value) {
@@ -26,7 +26,7 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
 
     @Override
     public Set<Location> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return Sets.newHashSet((Location) argument.get(0));
+        return SetUtil.newHashSet((Location) argument.get(0));
     }
 
     @Override
