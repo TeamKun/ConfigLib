@@ -6,8 +6,8 @@ import com.google.gson.Gson;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import net.kunmc.lab.configlib.util.ConfigUtil;
+import net.kunmc.lab.configlib.util.ReflectionUtil;
 import org.apache.commons.lang3.tuple.Pair;
-import org.codehaus.plexus.util.ReflectionUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -90,7 +90,7 @@ public abstract class CommonBaseConfig {
     }
 
     private static void replaceFields(Class<?> clazz, Object src, Object dst) {
-        for (Field field : ReflectionUtils.getFieldsIncludingSuperclasses(clazz)) {
+        for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(clazz)) {
             if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
@@ -112,7 +112,7 @@ public abstract class CommonBaseConfig {
 
     private static void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
         try {
-            List<Field> fieldList = ReflectionUtils.getFieldsIncludingSuperclasses(field.getType());
+            List<Field> fieldList = ReflectionUtil.getFieldsIncludingSuperclasses(field.getType());
             Object srcObj = field.get(src);
             Object dstObj = field.get(dst);
 

@@ -86,4 +86,7 @@ public class ConfigUtil {
                                         .map(x -> ((MapValue<?, ?, ?>) x))
                                         .collect(Collectors.toList());
     }
+
+    private ConfigUtil() {
+    }
 }

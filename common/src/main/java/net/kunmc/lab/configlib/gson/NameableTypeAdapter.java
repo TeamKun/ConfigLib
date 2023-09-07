@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib.gson;
 
 import com.google.gson.*;
 import net.kunmc.lab.commandlib.Nameable;
-import org.codehaus.plexus.util.ReflectionUtils;
+import net.kunmc.lab.configlib.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -16,18 +16,18 @@ public class NameableTypeAdapter implements JsonSerializer<Nameable>, JsonDeseri
                            src.getClass()
                               .getName());
 
-        ReflectionUtils.getFieldsIncludingSuperclasses(src.getClass())
-                       .stream()
-                       .peek(x -> x.setAccessible(true))
-                       .filter(x -> !Modifier.isTransient(x.getModifiers()))
-                       .filter(x -> !Modifier.isStatic((x.getModifiers())))
-                       .forEach(x -> {
-                           try {
-                               object.add(x.getName(), context.serialize(x.get(src)));
-                           } catch (IllegalAccessException e) {
-                               throw new RuntimeException(e);
-                           }
-                       });
+        ReflectionUtil.getFieldsIncludingSuperclasses(src.getClass())
+                      .stream()
+                      .peek(x -> x.setAccessible(true))
+                      .filter(x -> !Modifier.isTransient(x.getModifiers()))
+                      .filter(x -> !Modifier.isStatic((x.getModifiers())))
+                      .forEach(x -> {
+                          try {
+                              object.add(x.getName(), context.serialize(x.get(src)));
+                          } catch (IllegalAccessException e) {
+                              throw new RuntimeException(e);
+                          }
+                      });
 
         return object;
     }

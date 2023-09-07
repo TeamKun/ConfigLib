@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import net.kunmc.lab.configlib.Value;
-import org.codehaus.plexus.util.ReflectionUtils;
+import net.kunmc.lab.configlib.util.ReflectionUtil;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -20,22 +20,22 @@ public class ValueTypeAdapter implements JsonSerializer<Value<?, ?>> {
         object.addProperty("description", src.description());
         object.add("value", context.serialize(src.value()));
 
-        ReflectionUtils.getFieldsIncludingSuperclasses(src.getClass())
-                       .stream()
-                       .peek(x -> x.setAccessible(true))
-                       .filter(x -> !Modifier.isTransient(x.getModifiers()))
-                       .filter(x -> !Modifier.isStatic((x.getModifiers())))
-                       .filter(x -> !x.getName()
-                                      .equals("description"))
-                       .filter(x -> !x.getName()
-                                      .equals("value"))
-                       .forEach(x -> {
-                           try {
-                               object.add(x.getName(), context.serialize(x.get(src)));
-                           } catch (IllegalAccessException e) {
-                               throw new RuntimeException(e);
-                           }
-                       });
+        ReflectionUtil.getFieldsIncludingSuperclasses(src.getClass())
+                      .stream()
+                      .peek(x -> x.setAccessible(true))
+                      .filter(x -> !Modifier.isTransient(x.getModifiers()))
+                      .filter(x -> !Modifier.isStatic((x.getModifiers())))
+                      .filter(x -> !x.getName()
+                                     .equals("description"))
+                      .filter(x -> !x.getName()
+                                     .equals("value"))
+                      .forEach(x -> {
+                          try {
+                              object.add(x.getName(), context.serialize(x.get(src)));
+                          } catch (IllegalAccessException e) {
+                              throw new RuntimeException(e);
+                          }
+                      });
         return object;
     }
 }
