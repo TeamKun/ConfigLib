@@ -26,7 +26,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class BaseConfig extends CommonBaseConfig {
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting()
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting()
                                                       .enableComplexMapKeySerialization()
                                                       .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
                                                       .registerTypeHierarchyAdapter(BlockPos.class,
@@ -86,7 +86,7 @@ public abstract class BaseConfig extends CommonBaseConfig {
 
     @Override
     protected Gson gson() {
-        return gson;
+        return GSON;
     }
 
     public enum Type {

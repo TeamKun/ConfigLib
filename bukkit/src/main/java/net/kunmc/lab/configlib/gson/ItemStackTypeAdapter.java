@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ItemStackTypeAdapter extends TypeAdapter<ItemStack> {
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     @Override
     public void write(JsonWriter out, ItemStack itemStack) throws IOException {
@@ -25,12 +25,12 @@ public class ItemStackTypeAdapter extends TypeAdapter<ItemStack> {
             return meta;
         });
 
-        out.value(gson.toJson(map));
+        out.value(GSON.toJson(map));
     }
 
     @Override
     public ItemStack read(JsonReader in) throws IOException {
-        Map<String, Object> map = gson.fromJson(in.nextString(), new TypeToken<Map<String, Object>>() {
+        Map<String, Object> map = GSON.fromJson(in.nextString(), new TypeToken<Map<String, Object>>() {
         }.getType());
         map.computeIfPresent("meta", (k, v) -> ConfigurationSerialization.deserializeObject(((Map<String, Object>) v)));
 

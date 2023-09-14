@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemStackListValue extends ListValue<ItemStack, ItemStackListValue> {
-    private static final Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(ItemStack.class,
+    private static final Gson GSON = new GsonBuilder().registerTypeHierarchyAdapter(ItemStack.class,
                                                                                     new ItemStackTypeAdapter())
                                                       .create();
 
@@ -45,12 +45,12 @@ public class ItemStackListValue extends ListValue<ItemStack, ItemStackListValue>
             option.displayDefaultSuggestions(false)
                   .suggestionAction(sb -> {
                       value.stream()
-                           .map(gson::toJson)
+                           .map(GSON::toJson)
                            .forEach(sb::suggest);
                   })
                   .filter(x -> {
                       return value.stream()
-                                  .map(gson::toJson)
+                                  .map(GSON::toJson)
                                   .anyMatch(x::equals);
                   });
         }, StringArgument.Type.PHRASE));
@@ -58,11 +58,11 @@ public class ItemStackListValue extends ListValue<ItemStack, ItemStackListValue>
 
     @Override
     protected List<ItemStack> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return Lists.newArrayList(gson.fromJson(((String) argument.get(0)), ItemStack.class));
+        return Lists.newArrayList(GSON.fromJson(((String) argument.get(0)), ItemStack.class));
     }
 
     @Override
     protected String elementToString(ItemStack itemStack) {
-        return gson.toJson(itemStack);
+        return GSON.toJson(itemStack);
     }
 }

@@ -23,7 +23,7 @@ import java.util.TimerTask;
 import java.util.function.Consumer;
 
 public abstract class BaseConfig extends CommonBaseConfig implements Listener {
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting()
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting()
                                                       .enableComplexMapKeySerialization()
                                                       .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
                                                       .registerTypeAdapter(Pair.class, new PairTypeAdapter<>())
@@ -82,7 +82,7 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
 
     @Override
     protected Gson gson() {
-        return gson;
+        return GSON;
     }
 
     @Override
