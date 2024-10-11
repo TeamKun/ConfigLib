@@ -1,6 +1,5 @@
 package net.kunmc.lab.testplugin;
 
-import net.kunmc.lab.configlib.BaseConfig;
 import net.kunmc.lab.configlib.value.UUIDValue;
 import net.kunmc.lab.configlib.value.collection.TeamSetValue;
 import net.kunmc.lab.configlib.value.collection.UUIDSetValue;
@@ -12,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Config extends BaseConfig {
+public class Config extends AbstractConfig {
     public final UUIDValue uuidValue = new UUIDValue().description("test description");
     public final UUIDSetValue uuidSetValue = new UUIDSetValue().onModify(TestPlugin::broadcast);
     public final UUID2LocationMapValue uuid2LocationMapValue = new UUID2LocationMapValue();

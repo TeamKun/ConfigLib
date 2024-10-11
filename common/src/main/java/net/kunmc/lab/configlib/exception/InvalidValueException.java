@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib.exception;
 
-import com.google.common.collect.Lists;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +14,7 @@ public class InvalidValueException extends Exception {
     }
 
     public InvalidValueException(String message, String... messages) {
-        this(Lists.asList(message, messages));
+        this(ListUtil.asList(message, messages));
     }
 
     public InvalidValueException(List<String> messages) {

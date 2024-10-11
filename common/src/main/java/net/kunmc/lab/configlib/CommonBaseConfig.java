@@ -350,7 +350,7 @@ public abstract class CommonBaseConfig {
     }
 
     private void initializeHash() {
-        ConfigUtil.getFields(this, Object.class)
+        ConfigUtil.getObservedFields(this, Object.class)
                   .forEach(x -> {
                       try {
                           Object o = x.get(this);

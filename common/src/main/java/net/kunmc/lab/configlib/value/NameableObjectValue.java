@@ -1,10 +1,10 @@
 package net.kunmc.lab.configlib.value;
 
-import com.google.common.collect.Lists;
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.Nameable;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,11 +15,11 @@ public class NameableObjectValue<T extends Nameable> extends SingleValue<T, Name
     private transient final Predicate<? super T> filter;
 
     public NameableObjectValue(T initial, T candidate, T... candidates) {
-        this(initial, Lists.asList(candidate, candidates));
+        this(initial, ListUtil.asList(candidate, candidates));
     }
 
     public NameableObjectValue(T initial, Predicate<T> filter, T candidate, T... candidates) {
-        this(initial, Lists.asList(candidate, candidates), filter);
+        this(initial, ListUtil.asList(candidate, candidates), filter);
     }
 
     public NameableObjectValue(T initial, Collection<? extends T> candidates) {
