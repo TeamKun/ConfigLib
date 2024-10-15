@@ -25,7 +25,7 @@ shadowJar {
     relocate "org.apache", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org.apache"
     relocate "org.codehaus", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org.codehaus"
     relocate "org.checkerframework", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org.checkerframework"
-    relocate "com.google", "${project.group}.${rootProject.name.toLowerCase()}.shadow.com.google"
+    relocate "com.google.gson", "${project.group}.${rootProject.name.toLowerCase()}.shadow.com.google.gson"
     relocate "com.zaxxer", "${project.group}.${rootProject.name.toLowerCase()}.shadow.com.zaxxer"
 }
 tasks.build.dependsOn tasks.shadowJar
