@@ -12,20 +12,9 @@ repositories {
 
 dependencies {
     compileOnly "org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT"
-    compileOnly 'org.jetbrains:annotations:20.1.0'
-    implementation project(":common")
-    implementation 'com.google.code.gson:gson:2.10'
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
-    compileOnly "com.github.TeamKun.CommandLib:bukkit:0.16.1"
+    compileOnly "org.jetbrains:annotations:20.1.0"
+    api project(":common")
+    compileOnly "com.github.TeamKun.CommandLib:bukkit:0.16.3"
     compileOnly "com.mojang:brigadier:1.0.18"
 //    compileOnly fileTree(dir: "./libs/", include: "patched*.jar")
 }
-
-shadowJar {
-    relocate "org.apache", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org.apache"
-    relocate "org.codehaus", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org.codehaus"
-    relocate "org.checkerframework", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org.checkerframework"
-    relocate "com.google.gson", "${project.group}.${rootProject.name.toLowerCase()}.shadow.com.google.gson"
-    relocate "com.zaxxer", "${project.group}.${rootProject.name.toLowerCase()}.shadow.com.zaxxer"
-}
-tasks.build.dependsOn tasks.shadowJar

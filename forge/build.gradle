@@ -23,17 +23,6 @@ repositories {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.31'
-    implementation project(":common")
-    implementation 'com.google.code.gson:gson:2.10'
+    api project(":common")
     compileOnly "com.github.TeamKun.CommandLib:forge:0.14.1"
 }
-
-shadowJar {
-    dependencies {
-        include(dependency("com.google.code.gson:gson:.*"))
-        include(project(":common"))
-    }
-    relocate "org.codehaus", "${project.group}.${rootProject.name.toLowerCase()}.shadow.org.codehaus"
-    relocate "com.google", "${project.group}.${rootProject.name.toLowerCase()}.shadow.com.google"
-}
-jar.finalizedBy("shadowJar")

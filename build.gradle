@@ -14,9 +14,9 @@ allprojects {
 
 subprojects {
     apply plugin: "java"
+    apply plugin: "java-library"
     apply plugin: "maven-publish"
     apply plugin: "idea"
-    apply plugin: "com.github.johnrengelman.shadow"
 
     def targetJavaVersion = 8
     java {
@@ -65,9 +65,4 @@ subprojects {
             }
         }
     }
-
-    shadowJar {
-        archiveFileName = "${project.name}-${project.version}.jar"
-    }
-    tasks.build.dependsOn tasks.shadowJar
 }

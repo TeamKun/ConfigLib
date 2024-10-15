@@ -12,11 +12,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.apache.commons:commons-lang3:3.12.0'
-    compileOnly 'com.google.code.gson:gson:2.8.9'
+    api 'org.apache.commons:commons-lang3:3.12.0'
+    api 'com.google.code.gson:gson:2.10'
     compileOnly 'org.jetbrains:annotations:20.1.0'
     // commonだとコマンド周りを上手く実装出来ないためbukkitを使う
-    compileOnly "com.github.TeamKun.CommandLib:bukkit:0.16.1"
+    compileOnly "com.github.TeamKun.CommandLib:bukkit:0.16.3"
     // CommandContext#sendMessageを呼ぶ時にnet.md_5.bungee.api.chat.BaseComponentを見つけられずコンパイルが通らないため追加
     compileOnly "org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT"
 }
