@@ -187,7 +187,7 @@ public final class TestConfig extends BaseConfig {
     }
     ```
 2. Asynchronous Change Detection  
-   Change detection, including when modifying values with the `set` method, is handled asynchronously. Keep this in mid
+   Change detection, including when modifying values with the `set` method, is handled asynchronously. Keep this in mind
    to avoid race conditions in your application logic.
 
 ## Sample Projects
