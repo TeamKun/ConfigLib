@@ -173,8 +173,8 @@ public final class TestConfig extends BaseConfig {
 ## Usage Notes
 
 1. Asynchronous Config Loading  
-   Initial configuration loading is performed asynchronously.As a result, JSON values might not be immediately reflected
-   after creating an instance.If immediate reflection is required, call the `loadConfig` method within the constructor,
+   Initial configuration loading is performed asynchronously. As a result, JSON values might not be immediately reflected
+   after creating an instance. If immediate reflection is required, call the `loadConfig` method within the constructor,
    as shown in the example below:
     ```java
     public final class TestConfig extends BaseConfig {
