@@ -291,7 +291,7 @@ public final class TestClassListValue extends ListValue<TestClass, TestClassList
 }
 ```
 
-These custom value classes can be used in the same way as built-in Value classes.
+These custom Value classes can be used in the same way as built-in Value classes.
 
 ```java
 public final class TestConfig extends BaseConfig {
