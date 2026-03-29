@@ -1,10 +1,12 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.EnumArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 public class UUID2EnumMapValue<T extends Enum<T>> extends UUID2ObjectMapValue<T, UUID2EnumMapValue<T>> {
@@ -24,13 +26,13 @@ public class UUID2EnumMapValue<T extends Enum<T>> extends UUID2ObjectMapValue<T,
     }
 
     @Override
-    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.enumArgument("name", clazz, filter);
-    }
-
-    @Override
-    protected T argumentToValueForPut(List<Object> argument, CommandContext ctx) {
-        return clazz.cast(argument.get(1));
+    protected List<PutArgumentDefinition<UUID, T>> argumentDefinitionsForPut() {
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new EnumArgument<>("name",
+                                                                                                   clazz,
+                                                                                                   opt -> opt.filter(
+                                                                                                           filter)),
+                                                                                (t, ctx) -> t)));
     }
 
     @Override

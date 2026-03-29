@@ -1,7 +1,9 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.UUIDArgument;
+import net.kunmc.lab.commandlib.argument.UUIDsArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.SetUtil;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import net.minecraft.entity.Entity;
@@ -30,17 +32,10 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.uuidsArgumentWith("targets", option -> {
-            option.filter(x -> {
-                return x.size() > 1 || !value.contains(x.get(0));
-            });
-        });
-    }
-
-    @Override
-    protected Set<UUID> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return SetUtil.newHashSet(((List<UUID>) argument.get(0)));
+    protected List<ArgumentDefinition<Set<UUID>>> argumentDefinitionsForAdd() {
+        return ListUtil.of(new ArgumentDefinition<>(new UUIDsArgument("targets", opt -> {
+            opt.filter(x -> x.size() > 1 || !value.contains(x.get(0)));
+        }), (targets, ctx) -> SetUtil.newHashSet(targets)));
     }
 
     @Override
@@ -53,24 +48,19 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     }
 
     @Override
-    protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.uuidArgumentWith("target", option -> {
-            option.filter(x -> {
-                      return value.contains(x);
-                  })
-                  .additionalSuggestionAction(sb -> {
-                      value.stream()
-                           .filter(x -> ServerLifecycleHooks.getCurrentServer()
-                                                            .getPlayerProfileCache()
-                                                            .getProfileByUUID(x) == null)
-                           .forEach(x -> sb.suggest(x.toString()));
-                  });
-        });
-    }
-
-    @Override
-    protected Set<UUID> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return SetUtil.newHashSet(((UUID) argument.get(0)));
+    protected List<ArgumentDefinition<Set<UUID>>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new UUIDArgument("target", opt -> {
+            opt.filter(x -> {
+                   return value.contains(x);
+               })
+               .additionalSuggestionAction(sb -> {
+                   value.stream()
+                        .filter(x -> ServerLifecycleHooks.getCurrentServer()
+                                                         .getPlayerProfileCache()
+                                                         .getProfileByUUID(x) == null)
+                        .forEach(x -> sb.suggest(x.toString()));
+               });
+        }), (target, ctx) -> SetUtil.newHashSet(target)));
     }
 
     @Override

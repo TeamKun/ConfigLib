@@ -1,9 +1,10 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -22,50 +23,35 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
         return ((T) this);
     }
 
+    protected ArgumentDefinition<String> keyArgumentDefinitionForPut() {
+        return new ArgumentDefinition<>(new StringArgument("string", opt -> {
+            opt.suggestionAction(sb -> {
+                   if (allowableKeyStringList.isEmpty()) {
+                       keySet().forEach(sb::suggest);
+                   } else {
+                       allowableKeyStringList.forEach(sb::suggest);
+                   }
+               })
+               .filter(x -> {
+                   if (allowableKeyStringList.stream()
+                                             .noneMatch(s -> s.equals(x))) {
+                       throw new InvalidArgumentException(x + "は不正な引数です.");
+                   }
+               });
+        }, StringArgument.Type.PHRASE_QUOTED), (name, ctx) -> {
+            return name;
+        });
+    }
+
     @Override
-    protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
-        builder.stringArgument("string", StringArgument.Type.PHRASE_QUOTED, sb -> {
-            if (allowableKeyStringList.isEmpty()) {
+    protected List<ArgumentDefinition<String>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new StringArgument("string", opt -> {
+            opt.suggestionAction(sb -> {
                 keySet().forEach(sb::suggest);
-            } else {
-                allowableKeyStringList.forEach(sb::suggest);
-            }
-        });
-    }
-
-    @Override
-    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        if (allowableKeyStringList.isEmpty()) {
-            return true;
-        }
-
-        return allowableKeyStringList.stream()
-                                     .anyMatch(s -> s.equals(argument.get(0)
-                                                                     .toString()));
-    }
-
-    @Override
-    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.get(0) + "は不正な引数です.";
-    }
-
-    @Override
-    protected String argumentToKeyForPut(List<Object> argument, CommandContext ctx) {
-        return argument.get(0)
-                       .toString();
-    }
-
-    @Override
-    protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
-        builder.stringArgument("string", StringArgument.Type.PHRASE, sb -> {
-            keySet().forEach(sb::suggest);
-        });
-    }
-
-    @Override
-    protected String argumentToKeyForRemove(List<Object> argument, CommandContext ctx) {
-        return argument.get(0)
-                       .toString();
+            });
+        }, StringArgument.Type.PHRASE), (name, ctx) -> {
+            return name;
+        }));
     }
 
     @Override

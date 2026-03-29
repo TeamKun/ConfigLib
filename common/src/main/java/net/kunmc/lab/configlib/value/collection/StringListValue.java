@@ -1,13 +1,13 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,55 +41,31 @@ public class StringListValue extends ListValue<String, StringListValue> {
     }
 
     @Override
-    protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.stringArgument(name, type, sb -> {
-            allowableStringList.forEach(sb::suggest);
-        });
+    protected List<ArgumentDefinition<List<String>>> argumentDefinitionsForAdd() {
+        return ListUtil.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
+            opt.suggestionAction(sb -> {
+                   allowableStringList.forEach(sb::suggest);
+               })
+               .filter(x -> {
+                   if (allowableStringList.stream()
+                                          .noneMatch(s -> s.equals(x))) {
+                       throw new InvalidArgumentException(x + "は不正な引数です");
+                   }
+               });
+        }, type), (s, ctx) -> {
+            return ListUtil.of(s);
+        }));
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        if (allowableStringList.isEmpty()) {
-            return true;
-        }
-
-        return allowableStringList.stream()
-                                  .anyMatch(s -> s.equals(argument.get(0)));
-    }
-
-    @Override
-    protected List<String> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.stream()
-                       .map(Object::toString)
-                       .collect(Collectors.toList());
-    }
-
-    @Override
-    protected boolean validateForAdd(String entryName, List<String> newValue, CommandContext ctx) {
-        if (allowableStringList.isEmpty()) {
-            return true;
-        }
-
-        return !new HashSet<>(value).containsAll(newValue);
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument + "は不正な引数です.";
-    }
-
-    @Override
-    protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.stringArgument(name, sb -> {
-            value.forEach(sb::suggest);
-        });
-    }
-
-    @Override
-    protected List<String> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument.stream()
-                       .map(Object::toString)
-                       .collect(Collectors.toList());
+    protected List<ArgumentDefinition<List<String>>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
+            opt.suggestionAction(sb -> {
+                value.forEach(sb::suggest);
+            });
+        }), (s, ctx) -> {
+            return ListUtil.of(s);
+        }));
     }
 
     @Override

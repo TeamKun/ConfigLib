@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.IntegerArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.NumericValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 
@@ -83,13 +84,10 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.integerArgument("Integer", min, max);
-    }
-
-    @Override
-    protected Integer argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((Integer) argument.get(0));
+    protected List<ArgumentDefinition<Integer>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new IntegerArgument("Integer", min, max), (n, ctx) -> {
+            return n;
+        }));
     }
 
     @Override

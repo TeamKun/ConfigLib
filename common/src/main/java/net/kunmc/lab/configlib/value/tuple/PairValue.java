@@ -2,17 +2,17 @@ package net.kunmc.lab.configlib.value.tuple;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.function.ArgumentApplier;
+import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.List;
-import java.util.function.Function;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends SingleValue<MutablePair<L, R>, T> {
-    private transient Function<Pair<L, R>, Boolean> validator = pair -> true;
-    private transient Function<Pair<L, R>, String> invalidMessageSupplier = pair -> "引数の値が不正です.";
-
     public PairValue(L left, R right) {
         this(MutablePair.of(left, right));
     }
@@ -37,104 +37,6 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
         value.setRight(right);
     }
 
-    public T setValidator(Function<Pair<L, R>, Boolean> validator) {
-        this.validator = validator;
-        return ((T) this);
-    }
-
-    public T setValidator(Function<Pair<L, R>, Boolean> validator,
-                          Function<Pair<L, R>, String> invalidMessageSupplier) {
-        this.validator = validator;
-        this.invalidMessageSupplier = invalidMessageSupplier;
-        return ((T) this);
-    }
-
-    @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        appendLeftArgument(builder);
-        appendRightArgument(builder);
-    }
-
-    protected abstract void appendLeftArgument(ArgumentBuilder builder);
-
-    protected abstract void appendRightArgument(ArgumentBuilder builder);
-
-    @Override
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        boolean left = isCorrectLeftArgument(entryName, argument, ctx);
-        if (!left) {
-            ctx.sendFailure(incorrectLeftArgumentMessage(entryName, argument, ctx));
-        }
-
-        boolean right = isCorrectRightArgument(entryName, argument, ctx);
-        if (!right) {
-            ctx.sendFailure(incorrectRightArgumentMessage(entryName, argument, ctx));
-        }
-
-        return left && right;
-    }
-
-    protected boolean isCorrectLeftArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    protected boolean isCorrectRightArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    protected String incorrectLeftArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    protected String incorrectRightArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    @Override
-    protected MutablePair<L, R> argumentToValue(List<Object> argument, CommandContext ctx) {
-        return MutablePair.of(argumentToLeftValue(argument, ctx), argumentToRightValue(argument, ctx));
-    }
-
-    protected abstract L argumentToLeftValue(List<Object> argument, CommandContext ctx);
-
-    protected abstract R argumentToRightValue(List<Object> argument, CommandContext ctx);
-
-    @Override
-    protected boolean validateOnSet(String entryName, MutablePair<L, R> newValue, CommandContext ctx) {
-        if (!validator.apply(newValue)) {
-            ctx.sendFailure(invalidMessageSupplier.apply(newValue));
-            return false;
-        }
-
-        boolean left = validateLeft(entryName, newValue.getLeft(), ctx, newValue);
-        if (!left) {
-            ctx.sendFailure(invalidLeftValueMessage(entryName, newValue.getLeft(), ctx));
-        }
-
-        boolean right = validateRight(entryName, newValue.getRight(), ctx, newValue);
-        if (!right) {
-            ctx.sendFailure(invalidRightValueMessage(entryName, newValue.getRight(), ctx));
-        }
-
-        return left && right;
-    }
-
-    protected boolean validateLeft(String entryName, L newLeft, CommandContext ctx, Pair<L, R> newPair) {
-        return true;
-    }
-
-    protected boolean validateRight(String entryName, R newRight, CommandContext ctx, Pair<L, R> newPair) {
-        return true;
-    }
-
-    protected String invalidLeftValueMessage(String entryName, L newLeft, CommandContext ctx) {
-        return "";
-    }
-
-    protected String invalidRightValueMessage(String entryName, R newRight, CommandContext ctx) {
-        return "";
-    }
-
     @Override
     protected String valueToString(MutablePair<L, R> pair) {
         String leftName = "null";
@@ -153,4 +55,39 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
     protected abstract String leftToString(L left);
 
     protected abstract String rightToString(R right);
+
+    /**
+     * Defines how arguments are applied to a builder and mapped to a value.
+     * The mapper may throw {@link net.kunmc.lab.commandlib.exception.InvalidArgumentException}
+     * to send an error message to the command executor.
+     */
+    public static class PairArgumentDefinition<L, R> implements ArgumentApplier, ArgumentMapper<MutablePair<L, R>> {
+        private final ArgumentDefinition<L> left;
+        private final ArgumentDefinition<R> right;
+        private Consumer<Pair<L, R>> validator = (p) -> {
+        };
+
+        public PairArgumentDefinition(ArgumentDefinition<L> left, ArgumentDefinition<R> right) {
+            this.left = left;
+            this.right = right;
+        }
+
+        public PairArgumentDefinition<L, R> validator(Consumer<Pair<L, R>> validator) {
+            this.validator = Objects.requireNonNull(validator);
+            return this;
+        }
+
+        @Override
+        public void applyArgument(ArgumentBuilder builder) {
+            left.applyArgument(builder);
+            right.applyArgument(builder);
+        }
+
+        @Override
+        public MutablePair<L, R> mapArgument(CommandContext ctx) {
+            MutablePair<L, R> value = MutablePair.of(left.mapArgument(ctx), right.mapArgument(ctx));
+            validator.accept(value);
+            return value;
+        }
+    }
 }

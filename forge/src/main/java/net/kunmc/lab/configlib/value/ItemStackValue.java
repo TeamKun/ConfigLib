@@ -1,8 +1,10 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.IntegerArgument;
+import net.kunmc.lab.commandlib.argument.ItemStackArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.item.ItemStack;
 
 import java.util.List;
@@ -17,16 +19,13 @@ public class ItemStackValue extends SingleValue<ItemStack, ItemStackValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.itemStackArgument("item")
-               .integerArgument("amount", 1, Integer.MAX_VALUE);
-    }
-
-    @Override
-    protected ItemStack argumentToValue(List<Object> argument, CommandContext ctx) {
-        ItemStack item = ((ItemStack) argument.get(0));
-        item.setCount(((Integer) argument.get(1)));
-        return item;
+    protected List<ArgumentDefinition<ItemStack>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new ItemStackArgument("item"),
+                                                    new IntegerArgument("amount", 1, Integer.MAX_VALUE),
+                                                    (item, amount, ctx) -> {
+                                                        item.setCount(amount);
+                                                        return item;
+                                                    }));
     }
 
     @Override

@@ -1,24 +1,16 @@
 package net.kunmc.lab.configlib.value.tuple;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.LocationArgument;
 import net.kunmc.lab.commandlib.util.Location;
-
-import java.util.List;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 
 public abstract class Location2ObjectPairValue<R, T extends Location2ObjectPairValue<R, T>> extends PairValue<Location, R, T> {
     public Location2ObjectPairValue(Location left, R right) {
         super(left, right);
     }
 
-    @Override
-    protected void appendLeftArgument(ArgumentBuilder builder) {
-        builder.locationArgument("location");
-    }
-
-    @Override
-    protected Location argumentToLeftValue(List<Object> argument, CommandContext ctx) {
-        return ((Location) argument.get(0));
+    protected ArgumentDefinition<Location> leftArgumentDefinition() {
+        return new ArgumentDefinition<>(new LocationArgument("location"), (loc, ctx) -> loc);
     }
 
     @Override

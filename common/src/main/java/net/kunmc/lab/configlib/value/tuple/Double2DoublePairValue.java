@@ -1,7 +1,8 @@
 package net.kunmc.lab.configlib.value.tuple;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.DoubleArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 
@@ -24,13 +25,13 @@ public class Double2DoublePairValue extends Double2ObjectPairValue<Double, Doubl
     }
 
     @Override
-    protected void appendRightArgument(ArgumentBuilder builder) {
-        builder.doubleArgument("double2", min, max);
-    }
-
-    @Override
-    protected Double argumentToRightValue(List<Object> argument, CommandContext ctx) {
-        return ((Double) argument.get(1));
+    protected List<PairArgumentDefinition<Double, Double>> argumentDefinitions() {
+        return ListUtil.of(new PairArgumentDefinition<>(leftArgumentDefinition(),
+                                                        new ArgumentDefinition<>(new DoubleArgument("double2",
+                                                                                                    min,
+                                                                                                    max), (d, ctx) -> {
+                                                            return d;
+                                                        })));
     }
 
     @Override

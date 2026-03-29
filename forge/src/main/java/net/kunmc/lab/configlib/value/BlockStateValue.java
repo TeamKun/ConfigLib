@@ -1,10 +1,10 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.BlockStateArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.block.BlockState;
-import net.minecraft.command.arguments.BlockStateInput;
 
 import java.util.List;
 
@@ -25,13 +25,8 @@ public class BlockStateValue extends SingleValue<BlockState, BlockStateValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.blockStateArgument("name");
-    }
-
-    @Override
-    protected BlockState argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((BlockStateInput) argument.get(0)).getState();
+    protected List<ArgumentDefinition<BlockState>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new BlockStateArgument("state"), (state, ctx) -> state.getState()));
     }
 
     @Override

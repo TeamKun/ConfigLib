@@ -1,19 +1,18 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.IntegerArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.List;
 
 public class Team2IntegerMapValue extends Team2ObjectMapValue<Integer, Team2IntegerMapValue> {
     @Override
-    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.integerArgument("integer");
-    }
-
-    @Override
-    protected Integer argumentToValueForPut(List<Object> argument, CommandContext ctx) {
-        return ((Integer) argument.get(1));
+    protected List<PutArgumentDefinition<ScorePlayerTeam, Integer>> argumentDefinitionsForPut() {
+        return ListUtil.of(new PutArgumentDefinition<>(
+                keyArgumentDefinitionForPut(),
+                new ArgumentDefinition<>(new IntegerArgument("integer"), (n, ctx) -> n)));
     }
 
     @Override

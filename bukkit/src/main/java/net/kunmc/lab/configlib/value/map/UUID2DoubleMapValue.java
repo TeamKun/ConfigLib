@@ -1,19 +1,18 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.DoubleArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
+import java.util.UUID;
 
 public class UUID2DoubleMapValue extends UUID2ObjectMapValue<Double, UUID2DoubleMapValue> {
     @Override
-    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.doubleArgument("double");
-    }
-
-    @Override
-    protected Double argumentToValueForPut(List<Object> argument, CommandContext ctx) {
-        return ((Double) argument.get(1));
+    protected List<PutArgumentDefinition<UUID, Double>> argumentDefinitionsForPut() {
+        return ListUtil.of(new PutArgumentDefinition<>(
+                keyArgumentDefinitionForPut(),
+                new ArgumentDefinition<>(new DoubleArgument("double"), (d, ctx) -> d)));
     }
 
     @Override

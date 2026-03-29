@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.UUIDArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -19,38 +20,27 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
         super(value);
     }
 
-    @Override
-    protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
-        builder.uuidArgument("target");
+    protected ArgumentDefinition<UUID> keyArgumentDefinitionForPut() {
+        return new ArgumentDefinition<>(new UUIDArgument("key"), (uuid, ctx) -> uuid);
     }
 
     @Override
-    protected UUID argumentToKeyForPut(List<Object> argument, CommandContext ctx) {
-        return ((UUID) argument.get(0));
-    }
-
-    @Override
-    protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
-        builder.uuidArgumentWith("target", option -> {
+    protected List<ArgumentDefinition<UUID>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new UUIDArgument("key", opt -> {
             List<UUID> offlinePlayerUUIDs = Arrays.stream(Bukkit.getOfflinePlayers())
                                                   .map(OfflinePlayer::getUniqueId)
                                                   .collect(Collectors.toList());
-            option.filter(x -> {
-                      return value.containsKey(x);
-                  })
-                  .additionalSuggestionAction(sb -> {
-                      value.keySet()
-                           .stream()
-                           .filter(x -> !offlinePlayerUUIDs.contains(x))
-                           .map(Object::toString)
-                           .forEach(sb::suggest);
-                  });
-        });
-    }
-
-    @Override
-    protected UUID argumentToKeyForRemove(List<Object> argument, CommandContext ctx) {
-        return (UUID) argument.get(0);
+            opt.filter(x -> {
+                   return value.containsKey(x);
+               })
+               .additionalSuggestionAction(sb -> {
+                   value.keySet()
+                        .stream()
+                        .filter(x -> !offlinePlayerUUIDs.contains(x))
+                        .map(Object::toString)
+                        .forEach(sb::suggest);
+               });
+        }), (uuid, ctx) -> uuid));
     }
 
     @Override

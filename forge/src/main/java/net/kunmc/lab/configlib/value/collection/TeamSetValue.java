@@ -1,7 +1,8 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.TeamArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.SetUtil;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Team;
@@ -27,39 +28,31 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     }
 
     @Override
-    protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.teamArgument("name", sb -> {
-            ServerLifecycleHooks.getCurrentServer()
-                                .getScoreboard()
-                                .getTeams()
-                                .stream()
-                                .map(Team::getName)
-                                .filter(name -> value.stream()
-                                                     .map(Team::getName)
-                                                     .noneMatch(s -> s.equals(name)))
-                                .forEach(sb::suggest);
-        });
+    protected List<ArgumentDefinition<Set<ScorePlayerTeam>>> argumentDefinitionsForAdd() {
+        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
+            opt.suggestionAction(sb -> {
+                ServerLifecycleHooks.getCurrentServer()
+                                    .getScoreboard()
+                                    .getTeams()
+                                    .stream()
+                                    .map(Team::getName)
+                                    .filter(name -> value.stream()
+                                                         .map(Team::getName)
+                                                         .noneMatch(s -> s.equals(name)))
+                                    .forEach(sb::suggest);
+            });
+        }), (team, ctx) -> SetUtil.newHashSet(team)));
     }
 
     @Override
-    protected Set<ScorePlayerTeam> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return SetUtil.newHashSet(((ScorePlayerTeam) argument.get(0)));
-    }
-
-    @Override
-    protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.teamArgument("team", suggestionBuilder -> {
-            value.stream()
-                 .map(Team::getName)
-                 .forEach(suggestionBuilder::suggest);
-        });
-    }
-
-    @Override
-    protected Set<ScorePlayerTeam> argumentToValueForRemove(String entryName,
-                                                            List<Object> argument,
-                                                            CommandContext ctx) {
-        return SetUtil.newHashSet(((ScorePlayerTeam) argument.get(0)));
+    protected List<ArgumentDefinition<Set<ScorePlayerTeam>>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
+            opt.suggestionAction(sb -> {
+                value.stream()
+                     .map(Team::getName)
+                     .forEach(sb::suggest);
+            });
+        }), (team, ctx) -> SetUtil.newHashSet(team)));
     }
 
     @Override

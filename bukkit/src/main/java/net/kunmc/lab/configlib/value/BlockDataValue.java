@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.BlockDataArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.block.data.BlockData;
 
 import java.util.List;
@@ -20,13 +21,8 @@ public class BlockDataValue extends SingleValue<BlockData, BlockDataValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.blockDataArgument("name");
-    }
-
-    @Override
-    protected BlockData argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((BlockData) argument.get(0));
+    protected List<ArgumentDefinition<BlockData>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new BlockDataArgument("data"), (data, ctx) -> data));
     }
 
     @Override

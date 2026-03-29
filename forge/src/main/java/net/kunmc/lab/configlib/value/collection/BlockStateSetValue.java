@@ -1,10 +1,10 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.BlockStateArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.SetUtil;
 import net.minecraft.block.BlockState;
-import net.minecraft.command.arguments.BlockStateInput;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -28,27 +28,20 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
     }
 
     @Override
-    protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.blockStateArgument("name");
+    protected List<ArgumentDefinition<Set<BlockState>>> argumentDefinitionsForAdd() {
+        return ListUtil.of(new ArgumentDefinition<>(new BlockStateArgument("state"),
+                                                    (state, ctx) -> SetUtil.newHashSet(state.getState())));
     }
 
     @Override
-    protected Set<BlockState> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return SetUtil.newHashSet(((BlockStateInput) argument.get(0)).getState());
-    }
-
-    @Override
-    protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.blockStateArgument("name", sb -> {
-            value().stream()
-                   .map(BlockState::toString)
-                   .forEach(sb::suggest);
-        });
-    }
-
-    @Override
-    protected Set<BlockState> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return SetUtil.newHashSet(((BlockStateInput) argument.get(0)).getState());
+    protected List<ArgumentDefinition<Set<BlockState>>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new BlockStateArgument("state", opt -> {
+            opt.suggestionAction(sb -> {
+                value().stream()
+                       .map(BlockState::toString)
+                       .forEach(sb::suggest);
+            });
+        }), (state, ctx) -> SetUtil.newHashSet(state.getState())));
     }
 
     @Override

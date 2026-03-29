@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.Nameable;
+import net.kunmc.lab.commandlib.argument.NameableObjectArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.NameableSet;
 import net.kunmc.lab.configlib.util.SetUtil;
 
@@ -27,35 +28,33 @@ public class NameableObjectSetValue<T extends Nameable> extends SetValue<T, Name
     }
 
     @Override
-    protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.nameableObjectArgument("name", candidates, x -> {
-            if (value.stream()
-                     .map(Nameable::tabCompleteName)
-                     .anyMatch(y -> y.equals(x.tabCompleteName()))) {
-                return false;
-            }
+    protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForAdd() {
+        return ListUtil.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name", candidates, opt -> {
+            opt.filter(x -> {
+                if (value.stream()
+                         .map(Nameable::tabCompleteName)
+                         .anyMatch(y -> y.equals(x.tabCompleteName()))) {
+                    return false;
+                }
 
-            return filter == null || filter.test(x);
-        });
+                return filter == null || filter.test(x);
+            });
+        }), (name, ctx) -> {
+            return SetUtil.newHashSet(name);
+        }));
     }
 
     @Override
-    protected Set<T> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return SetUtil.newHashSet(((T) argument.get(0)));
-    }
-
-    @Override
-    protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.nameableObjectArgument("name", candidates, x -> {
-            return value.stream()
-                        .map(Nameable::tabCompleteName)
-                        .anyMatch(y -> y.equals(x.tabCompleteName()));
-        });
-    }
-
-    @Override
-    protected Set<T> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return SetUtil.newHashSet(((T) argument.get(0)));
+    protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name", candidates, opt -> {
+            opt.filter(x -> {
+                return value.stream()
+                            .map(Nameable::tabCompleteName)
+                            .anyMatch(y -> y.equals(x.tabCompleteName()));
+            });
+        }), (name, ctx) -> {
+            return SetUtil.newHashSet(name);
+        }));
     }
 
     @Override

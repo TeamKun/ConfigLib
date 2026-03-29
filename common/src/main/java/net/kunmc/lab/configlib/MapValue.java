@@ -1,7 +1,5 @@
 package net.kunmc.lab.configlib;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,45 +30,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return puttable;
     }
 
-    protected abstract void appendKeyArgumentForPut(ArgumentBuilder builder);
-
-    protected abstract void appendValueArgumentForPut(ArgumentBuilder builder);
-
-    protected boolean isCorrectKeyArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    protected String incorrectKeyArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    protected boolean isCorrectValueArgumentForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    protected String incorrectValueArgumentMessageForPut(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    protected abstract K argumentToKeyForPut(List<Object> argument, CommandContext ctx);
-
-    protected abstract V argumentToValueForPut(List<Object> argument, CommandContext ctx);
-
-    protected boolean validateKeyForPut(String entryName, K k, CommandContext ctx) {
-        return true;
-    }
-
-    protected String invalidKeyMessageForPut(String entryName, K k, CommandContext ctx) {
-        return "";
-    }
-
-    protected boolean validateValueForPut(String entryName, V v, CommandContext ctx) {
-        return true;
-    }
-
-    protected String invalidValueMessageForPut(String entryName, V v, CommandContext ctx) {
-        return "";
-    }
+    protected abstract List<PutArgumentDefinition<K, V>> argumentDefinitionsForPut();
 
     /**
      * Add a listener fired on put command.
@@ -97,25 +57,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return removable;
     }
 
-    protected abstract void appendKeyArgumentForRemove(ArgumentBuilder builder);
-
-    protected boolean isCorrectKeyArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    protected String incorrectKeyArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    protected abstract K argumentToKeyForRemove(List<Object> argument, CommandContext ctx);
-
-    protected boolean validateKeyForRemove(String entryName, K k, CommandContext ctx) {
-        return true;
-    }
-
-    protected String invalidKeyMessageForRemove(String entryName, K k, CommandContext ctx) {
-        return "";
-    }
+    protected abstract List<ArgumentDefinition<K>> argumentDefinitionsForRemove();
 
     /**
      * Add a listener fired on remove command.
@@ -260,5 +202,23 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     public V merge(K key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
         return this.value.merge(key, value, remappingFunction);
+    }
+
+    public static class PutArgumentDefinition<K, V> {
+        private final ArgumentDefinition<K> keyDefinition;
+        private final ArgumentDefinition<V> valueDefinition;
+
+        public PutArgumentDefinition(ArgumentDefinition<K> k, ArgumentDefinition<V> v) {
+            this.keyDefinition = k;
+            this.valueDefinition = v;
+        }
+
+        public ArgumentDefinition<K> keyDefinition() {
+            return keyDefinition;
+        }
+
+        public ArgumentDefinition<V> valueDefinition() {
+            return valueDefinition;
+        }
     }
 }

@@ -1,10 +1,12 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.EnumArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.SetUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,23 +29,23 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
     }
 
     @Override
-    protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.enumArgument("name", clazz, x -> !value.contains(x) && filter.test(x));
+    protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForAdd() {
+        List<ArgumentDefinition<Set<T>>> definitions = new ArrayList<>();
+        definitions.add(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> {
+            opt.filter(x -> !value.contains(x) && filter.test(x));
+        }), (name, ctx) -> {
+            return SetUtil.newHashSet(clazz.cast(name));
+        }));
+        return definitions;
     }
 
     @Override
-    protected Set<T> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return SetUtil.newHashSet(clazz.cast(argument.get(0)));
-    }
-
-    @Override
-    protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.enumArgument("name", clazz, x -> value.contains(x));
-    }
-
-    @Override
-    protected Set<T> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return SetUtil.newHashSet(clazz.cast(argument.get(0)));
+    protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.filter(x -> {
+            return value.contains(x);
+        })), (name, ctx) -> {
+            return SetUtil.newHashSet(name);
+        }));
     }
 
     @Override

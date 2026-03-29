@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.FloatArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.NumericValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 
@@ -82,13 +83,10 @@ public class FloatValue extends NumericValue<Float, FloatValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.floatArgument("float", min, max);
-    }
-
-    @Override
-    protected Float argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((Float) argument.get(0));
+    protected List<ArgumentDefinition<Float>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new FloatArgument("float", min, max), (n, ctx) -> {
+            return n;
+        }));
     }
 
     @Override

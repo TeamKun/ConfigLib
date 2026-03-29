@@ -1,9 +1,10 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.LocationArgument;
 import net.kunmc.lab.commandlib.util.Location;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.block.BlockState;
 
 import java.util.List;
@@ -26,13 +27,8 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.locationArgument("location");
-    }
-
-    @Override
-    protected Location argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((Location) argument.get(0));
+    protected List<ArgumentDefinition<Location>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new LocationArgument("location"), (loc, ctx) -> loc));
     }
 
     @Override

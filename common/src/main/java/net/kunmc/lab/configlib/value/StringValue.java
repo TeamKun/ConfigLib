@@ -1,11 +1,12 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.SuggestionAction;
 import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -52,28 +53,24 @@ public class StringValue extends SingleValue<String, StringValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.customArgument(new StringArgument(name, option -> {
-            option.suggestionAction(suggestionAction)
-                  .filter(x -> {
-                      if (!allowableStringList.isEmpty()) {
-                          if (allowableStringList.stream()
-                                                 .noneMatch(s -> s.equals(x))) {
-                              throw new InvalidArgumentException(allowableStringList + "の中から文字列を入力してください");
-                          }
-                      }
+    protected List<ArgumentDefinition<String>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
+            opt.suggestionAction(suggestionAction)
+               .filter(x -> {
+                   if (!allowableStringList.isEmpty()) {
+                       if (allowableStringList.stream()
+                                              .noneMatch(s -> s.equals(x))) {
+                           throw new InvalidArgumentException(allowableStringList + "の中から文字列を入力してください");
+                       }
+                   }
 
-                      if (x.length() < min || x.length() > max) {
-                          throw new InvalidArgumentException(min + "以上" + max + "以下の文字数で入力してください");
-                      }
-                  });
-        }, type));
-    }
-
-    @Override
-    protected String argumentToValue(List<Object> argument, CommandContext ctx) {
-        return argument.get(0)
-                       .toString();
+                   if (x.length() < min || x.length() > max) {
+                       throw new InvalidArgumentException(min + "以上" + max + "以下の文字数で入力してください");
+                   }
+               });
+        }, type), (s, ctx) -> {
+            return s;
+        }));
     }
 
     @Override

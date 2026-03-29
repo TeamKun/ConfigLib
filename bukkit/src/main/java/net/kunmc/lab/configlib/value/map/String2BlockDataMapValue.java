@@ -1,7 +1,8 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.BlockDataArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.block.data.BlockData;
 
 import java.util.HashMap;
@@ -25,13 +26,10 @@ public class String2BlockDataMapValue extends String2ObjectMapValue<BlockData, S
     }
 
     @Override
-    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.blockDataArgument("name");
-    }
-
-    @Override
-    protected BlockData argumentToValueForPut(List<Object> argument, CommandContext ctx) {
-        return ((BlockData) argument.get(1));
+    protected List<PutArgumentDefinition<String, BlockData>> argumentDefinitionsForPut() {
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new BlockDataArgument("data"),
+                                                                                (data, ctx) -> data)));
     }
 
     @Override

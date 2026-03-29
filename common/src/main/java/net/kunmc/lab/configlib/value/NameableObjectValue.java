@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.Nameable;
+import net.kunmc.lab.commandlib.argument.NameableObjectArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
 import net.kunmc.lab.configlib.util.ListUtil;
 
@@ -34,13 +34,13 @@ public class NameableObjectValue<T extends Nameable> extends SingleValue<T, Name
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.nameableObjectArgument("name", candidates, filter);
-    }
-
-    @Override
-    protected T argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((T) argument.get(0));
+    protected List<ArgumentDefinition<T>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name",
+                                                                                 candidates,
+                                                                                 opt -> opt.filter(filter)),
+                                                    (name, ctx) -> {
+                                                        return name;
+                                                    }));
     }
 
     @Override

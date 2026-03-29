@@ -1,7 +1,9 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.DoubleArgument;
+import net.kunmc.lab.commandlib.argument.LocationArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.SetUtil;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
@@ -20,56 +22,47 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     }
 
     @Override
-    public void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.locationArgument("location");
+    protected List<ArgumentDefinition<Set<Location>>> argumentDefinitionsForAdd() {
+        return ListUtil.of(new ArgumentDefinition<>(new LocationArgument("location"),
+                                                    (loc, ctx) -> SetUtil.newHashSet(loc)));
     }
 
     @Override
-    public Set<Location> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return SetUtil.newHashSet(((Location) argument.get(0)));
-    }
-
-    @Override
-    public void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.doubleArgument("x", sb -> {
-                   value.stream()
-                        .map(Location::getX)
-                        .map(Object::toString)
-                        .forEach(sb::suggest);
-               })
-               .doubleArgument("y", sb -> {
-                   double x = ((double) sb.getParsedArgs()
-                                          .get(0));
-                   value.stream()
-                        .filter(l -> l.getX() == x)
-                        .map(Location::getY)
-                        .map(Object::toString)
-                        .forEach(sb::suggest);
-               })
-               .doubleArgument("z", sb -> {
-                   double x = ((double) sb.getParsedArgs()
-                                          .get(0));
-                   double y = ((double) sb.getParsedArgs()
-                                          .get(1));
-                   value.stream()
-                        .filter(l -> l.getX() == x && l.getY() == y)
-                        .map(Location::getZ)
-                        .map(Object::toString)
-                        .forEach(sb::suggest);
-               });
-    }
-
-    @Override
-    public Set<Location> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        double x = ((Double) argument.get(0));
-        double y = ((Double) argument.get(1));
-        double z = ((Double) argument.get(2));
-
-        return value.stream()
-                    .filter(l -> l.getX() == x)
-                    .filter(l -> l.getY() == y)
-                    .filter(l -> l.getZ() == z)
-                    .collect(Collectors.toSet());
+    protected List<ArgumentDefinition<Set<Location>>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new DoubleArgument("x", opt -> {
+            opt.suggestionAction(sb -> {
+                value.stream()
+                     .map(Location::getX)
+                     .map(Object::toString)
+                     .forEach(sb::suggest);
+            });
+        }), new DoubleArgument("y", opt -> {
+            opt.suggestionAction(sb -> {
+                double x = (Double) sb.getParsedArgs()
+                                      .get(0);
+                value.stream()
+                     .filter(l -> l.getX() == x)
+                     .map(Location::getY)
+                     .map(Object::toString)
+                     .forEach(sb::suggest);
+            });
+        }), new DoubleArgument("z", opt -> {
+            opt.suggestionAction(sb -> {
+                double x = (Double) sb.getParsedArgs()
+                                      .get(0);
+                double y = (Double) sb.getParsedArgs()
+                                      .get(1);
+                value.stream()
+                     .filter(l -> l.getX() == x && l.getY() == y)
+                     .map(Location::getZ)
+                     .map(Object::toString)
+                     .forEach(sb::suggest);
+            });
+        }), (x, y, z, ctx) -> {
+            return value.stream()
+                        .filter(l -> l.getX() == x && l.getY() == y && l.getZ() == z)
+                        .collect(Collectors.toSet());
+        }));
     }
 
     @Override

@@ -1,20 +1,19 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
+import java.util.UUID;
 
 public class UUID2StringMapValue extends UUID2ObjectMapValue<String, UUID2StringMapValue> {
     @Override
-    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.stringArgument("string", StringArgument.Type.PHRASE);
-    }
-
-    @Override
-    protected String argumentToValueForPut(List<Object> argument, CommandContext ctx) {
-        return ((String) argument.get(1));
+    protected List<PutArgumentDefinition<UUID, String>> argumentDefinitionsForPut() {
+        return ListUtil.of(new PutArgumentDefinition<>(
+                keyArgumentDefinitionForPut(),
+                new ArgumentDefinition<>(new StringArgument("string", StringArgument.Type.PHRASE),
+                                         (s, ctx) -> s)));
     }
 
     @Override

@@ -1,8 +1,10 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
+import net.kunmc.lab.configlib.util.SetUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -36,46 +38,33 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     }
 
     @Override
-    protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.stringArgument(name, type, sb -> {
-            allowableStringList.stream()
-                               .filter(s -> !value.contains(s))
-                               .forEach(sb::suggest);
-        });
+    protected List<ArgumentDefinition<Set<String>>> argumentDefinitionsForAdd() {
+        return ListUtil.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
+            opt.suggestionAction(sb -> {
+                   allowableStringList.stream()
+                                      .filter(s -> !value.contains(s))
+                                      .forEach(sb::suggest);
+               })
+               .filter(x -> {
+                   if (allowableStringList.stream()
+                                          .noneMatch(s -> s.equals(x))) {
+                       throw new InvalidArgumentException(x + "は不正な引数です");
+                   }
+               });
+        }, type), (s, ctx) -> {
+            return SetUtil.newHashSet(s);
+        }));
     }
 
     @Override
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        if (allowableStringList.isEmpty()) {
-            return true;
-        }
-
-        return allowableStringList.stream()
-                                  .anyMatch(s -> s.equals(argument.get(0)));
-    }
-
-    @Override
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return argument + "は不正な引数です";
-    }
-
-    @Override
-    protected Set<String> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return Collections.singleton(argument.get(0)
-                                             .toString());
-    }
-
-    @Override
-    protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.stringArgument(name, sb -> {
-            value.forEach(sb::suggest);
-        });
-    }
-
-    @Override
-    protected Set<String> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return Collections.singleton(argument.get(0)
-                                             .toString());
+    protected List<ArgumentDefinition<Set<String>>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
+            opt.suggestionAction(sb -> {
+                value.forEach(sb::suggest);
+            });
+        }), (s, ctx) -> {
+            return SetUtil.newHashSet(s);
+        }));
     }
 
     @Override

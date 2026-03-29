@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.TeamArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.HashMap;
@@ -18,24 +19,13 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
         super(map);
     }
 
-    @Override
-    protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
-        builder.teamArgument("team");
+    protected ArgumentDefinition<ScorePlayerTeam> keyArgumentDefinitionForPut() {
+        return new ArgumentDefinition<>(new TeamArgument("team"), (team, ctx) -> team);
     }
 
     @Override
-    protected ScorePlayerTeam argumentToKeyForPut(List<Object> argument, CommandContext ctx) {
-        return ((ScorePlayerTeam) argument.get(0));
-    }
-
-    @Override
-    protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
-        builder.teamArgument("team");
-    }
-
-    @Override
-    protected ScorePlayerTeam argumentToKeyForRemove(List<Object> argument, CommandContext ctx) {
-        return ((ScorePlayerTeam) argument.get(0));
+    protected List<ArgumentDefinition<ScorePlayerTeam>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team"), (team, ctx) -> team));
     }
 
     @Override

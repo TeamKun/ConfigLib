@@ -1,9 +1,10 @@
 package net.kunmc.lab.configlib.value.map;
 
-import com.mojang.authlib.GameProfile;
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.GameProfileArgument;
+import net.kunmc.lab.commandlib.argument.UUIDArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
@@ -21,37 +22,26 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
         super(value);
     }
 
-    @Override
-    protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
-        builder.gameProfileArgument("player");
+    protected ArgumentDefinition<UUID> keyArgumentDefinitionForPut() {
+        return new ArgumentDefinition<>(new GameProfileArgument("player"), (p, ctx) -> p.getId());
     }
 
     @Override
-    protected UUID argumentToKeyForPut(List<Object> argument, CommandContext ctx) {
-        return ((GameProfile) argument.get(0)).getId();
-    }
-
-    @Override
-    protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
-        builder.uuidArgumentWith("target", option -> {
-            option.additionalSuggestionAction(sb -> {
-                      value.keySet()
-                           .stream()
-                           .filter(x -> ServerLifecycleHooks.getCurrentServer()
-                                                            .getPlayerProfileCache()
-                                                            .getProfileByUUID(x) == null)
-                           .map(Object::toString)
-                           .forEach(sb::suggest);
-                  })
-                  .filter(x -> {
-                      return value.containsKey(x);
-                  });
-        });
-    }
-
-    @Override
-    protected UUID argumentToKeyForRemove(List<Object> argument, CommandContext ctx) {
-        return ((UUID) argument.get(0));
+    protected List<ArgumentDefinition<UUID>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new UUIDArgument("uuid", opt -> {
+            opt.additionalSuggestionAction(sb -> {
+                   value.keySet()
+                        .stream()
+                        .filter(x -> ServerLifecycleHooks.getCurrentServer()
+                                                         .getPlayerProfileCache()
+                                                         .getProfileByUUID(x) == null)
+                        .map(Object::toString)
+                        .forEach(sb::suggest);
+               })
+               .filter(x -> {
+                   return value.containsKey(x);
+               });
+        }), (uuid, ctx) -> uuid));
     }
 
     @Override

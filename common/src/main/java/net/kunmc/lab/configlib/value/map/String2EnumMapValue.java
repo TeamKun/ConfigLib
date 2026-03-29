@@ -1,7 +1,8 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.EnumArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,13 +25,15 @@ public class String2EnumMapValue<T extends Enum<T>> extends String2ObjectMapValu
     }
 
     @Override
-    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.enumArgument("name", clazz, filter);
-    }
-
-    @Override
-    protected T argumentToValueForPut(List<Object> argument, CommandContext ctx) {
-        return clazz.cast(argument.get(0));
+    protected List<PutArgumentDefinition<String, T>> argumentDefinitionsForPut() {
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new EnumArgument<>("name",
+                                                                                                   clazz,
+                                                                                                   opt -> {
+                                                                                                       opt.filter(filter);
+                                                                                                   }), (name, ctx) -> {
+                                                           return name;
+                                                       })));
     }
 
     @Override

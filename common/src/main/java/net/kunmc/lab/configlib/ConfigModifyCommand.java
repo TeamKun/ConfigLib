@@ -1,13 +1,15 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.util.ConfigUtil;
+import net.kunmc.lab.configlib.util.function.ArgumentApplier;
+import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Set;
 
 class ConfigModifyCommand extends Command {
@@ -110,37 +112,35 @@ class ConfigModifyCommand extends Command {
     }
 
     private static void applySet(Command command, Field field, SingleValue value) {
-        command.argument(builder -> {
-            value.appendArgument(builder);
+        String entryName = field.getName();
+        for (Object definition : (value.argumentDefinitions())) {
+            command.argument(builder -> {
+                ((ArgumentApplier) definition).applyArgument(builder);
 
-            builder.execute(ctx -> {
-                String entryName = field.getName();
+                builder.execute(ctx -> {
+                    Object newValue;
+                    try {
+                        newValue = ((ArgumentMapper) definition).mapArgument(ctx);
+                    } catch (InvalidArgumentException e) {
+                        e.toIncorrectArgumentInputException()
+                         .sendMessage(ctx);
+                        return;
+                    }
 
-                List<Object> argument = ctx.getParsedArgs();
-                if (!value.isCorrectArgument(entryName, argument, ctx)) {
-                    ctx.sendFailure(value.incorrectArgumentMessage(entryName, argument, ctx));
-                    return;
-                }
+                    try {
+                        value.validate(newValue);
+                    } catch (InvalidValueException e) {
+                        e.getMessages()
+                         .forEach(ctx::sendFailure);
+                        return;
+                    }
 
-                Object newValue = value.argumentToValue(argument, ctx);
-                if (!value.validateOnSet(entryName, newValue, ctx)) {
-                    ctx.sendFailure(value.invalidValueMessage(entryName, newValue, ctx));
-                    return;
-                }
+                    value.onModifyValueCommand(newValue);
+                    value.value(newValue);
 
-                try {
-                    value.validate(newValue);
-                } catch (InvalidValueException e) {
-                    e.getMessages()
-                     .forEach(ctx::sendFailure);
-                    return;
-                }
-
-                value.onModifyValueCommand(newValue);
-                value.value(newValue);
-
-                ctx.sendSuccess(value.succeedModifyMessage(entryName));
+                    ctx.sendSuccess(value.succeedModifyMessage(entryName));
+                });
             });
-        });
+        }
     }
 }

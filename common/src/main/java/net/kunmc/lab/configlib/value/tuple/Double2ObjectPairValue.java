@@ -1,9 +1,7 @@
 package net.kunmc.lab.configlib.value.tuple;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
-
-import java.util.List;
+import net.kunmc.lab.commandlib.argument.DoubleArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 
 public abstract class Double2ObjectPairValue<R, T extends Double2ObjectPairValue<R, T>> extends PairValue<Double, R, T> {
     private transient double min = -Double.MAX_VALUE;
@@ -23,14 +21,10 @@ public abstract class Double2ObjectPairValue<R, T extends Double2ObjectPairValue
         return ((T) this);
     }
 
-    @Override
-    protected void appendLeftArgument(ArgumentBuilder builder) {
-        builder.doubleArgument("double", min, max);
-    }
-
-    @Override
-    protected Double argumentToLeftValue(List<Object> argument, CommandContext ctx) {
-        return ((Double) argument.get(0));
+    protected ArgumentDefinition<Double> leftArgumentDefinition() {
+        return new ArgumentDefinition<>(new DoubleArgument("double", min, max), (d, ctx) -> {
+            return d;
+        });
     }
 
     @Override

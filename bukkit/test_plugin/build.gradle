@@ -35,7 +35,7 @@ dependencies {
     compileOnly name: "patched_1.16.5"
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation "com.github.TeamKun.CommandLib:bukkit:0.16.1"
+    implementation "com.github.TeamKun.CommandLib:bukkit:0.16.3"
 }
 
 def targetJavaVersion = 8
@@ -93,16 +93,6 @@ task copyToServer(group: "copy", type: Copy) {
     mustRunAfter build
     from new File(buildDir.absolutePath, "libs/${rootProject.name}-${version}.jar")
     into "./server/plugins"
-}
-
-task copyProtocolLibToServer(group: "copy", type: Copy) {
-    configurations.compileClasspath.getFiles().stream()
-            .filter(x -> x.getName().matches(".*ProtocolLib.*.jar"))
-            .findFirst()
-            .ifPresent(x -> {
-                from x
-                into "server/plugins"
-            })
 }
 
 task buildAndCopy(group: "build") {

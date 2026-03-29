@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.TeamArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -28,13 +29,8 @@ public class TeamValue extends SingleValue<Team, TeamValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.teamArgument("team");
-    }
-
-    @Override
-    protected Team argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((Team) argument.get(0));
+    protected List<ArgumentDefinition<Team>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team"), (team, ctx) -> team));
     }
 
     @Override

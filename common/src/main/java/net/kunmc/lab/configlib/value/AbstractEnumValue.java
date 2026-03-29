@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.EnumArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -38,13 +39,11 @@ public abstract class AbstractEnumValue<E extends Enum<E>, T extends AbstractEnu
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.enumArgument("name", clazz, filter);
-    }
-
-    @Override
-    protected E argumentToValue(List<Object> argument, CommandContext ctx) {
-        return clazz.cast(argument.get(0));
+    protected List<ArgumentDefinition<E>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.filter(filter)),
+                                                    (name, ctx) -> {
+                                                        return name;
+                                                    }));
     }
 
     @Override

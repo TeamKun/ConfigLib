@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.BlockPosArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
@@ -17,13 +18,8 @@ public class BlockPosValue extends SingleValue<BlockPos, BlockPosValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.blockPosArgument("pos");
-    }
-
-    @Override
-    protected BlockPos argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((BlockPos) argument.get(0));
+    protected List<ArgumentDefinition<BlockPos>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new BlockPosArgument("pos"), (pos, ctx) -> pos));
     }
 
     @Override

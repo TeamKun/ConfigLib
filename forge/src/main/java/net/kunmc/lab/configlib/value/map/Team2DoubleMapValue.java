@@ -1,19 +1,19 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.DoubleArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.List;
 
 public class Team2DoubleMapValue extends Team2ObjectMapValue<Double, Team2DoubleMapValue> {
     @Override
-    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.doubleArgument("double", -Double.MAX_VALUE, Double.MAX_VALUE);
-    }
-
-    @Override
-    protected Double argumentToValueForPut(List<Object> argument, CommandContext ctx) {
-        return ((Double) argument.get(1));
+    protected List<PutArgumentDefinition<ScorePlayerTeam, Double>> argumentDefinitionsForPut() {
+        return ListUtil.of(new PutArgumentDefinition<>(
+                keyArgumentDefinitionForPut(),
+                new ArgumentDefinition<>(new DoubleArgument("double", -Double.MAX_VALUE, Double.MAX_VALUE),
+                                         (d, ctx) -> d)));
     }
 
     @Override

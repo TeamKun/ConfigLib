@@ -11,8 +11,6 @@
                     externalProjectPath="$PROJECT_DIR$/bukkit/test_plugin" vmOptions="" scriptParameters=""/>
             <option name="Gradle.BeforeRunTask" enabled="true" tasks="build"
                     externalProjectPath="$PROJECT_DIR$/bukkit/test_plugin" vmOptions="" scriptParameters=""/>
-            <option name="Gradle.BeforeRunTask" enabled="true" tasks="copyProtocolLibToServer"
-                    externalProjectPath="$PROJECT_DIR$/bukkit/test_plugin" vmOptions="" scriptParameters=""/>
             <option name="Gradle.BeforeRunTask" enabled="true" tasks="copyToServer"
                     externalProjectPath="$PROJECT_DIR$/bukkit/test_plugin" vmOptions="" scriptParameters=""/>
         </method>

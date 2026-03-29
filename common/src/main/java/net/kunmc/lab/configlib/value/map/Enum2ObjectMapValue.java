@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.EnumArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -24,24 +25,19 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
         return ((U) this);
     }
 
-    @Override
-    protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
-        builder.enumArgument("name", clazz, filter);
+    protected ArgumentDefinition<T> keyArgumentDefinitionForPut() {
+        return new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.filter(filter)), (name, ctx) -> {
+            return name;
+        });
     }
 
     @Override
-    protected T argumentToKeyForPut(List<Object> argument, CommandContext ctx) {
-        return clazz.cast(argument.get(0));
-    }
-
-    @Override
-    protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
-        builder.enumArgument("name", clazz, x -> value.containsKey(x));
-    }
-
-    @Override
-    protected T argumentToKeyForRemove(List<Object> argument, CommandContext ctx) {
-        return clazz.cast(argument.get(0));
+    protected List<ArgumentDefinition<T>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.filter(x -> {
+            return value.containsKey(x);
+        })), (name, ctx) -> {
+            return name;
+        }));
     }
 
     @Override

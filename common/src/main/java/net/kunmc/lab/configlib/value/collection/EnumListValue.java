@@ -1,11 +1,11 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.EnumArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -26,23 +26,20 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     }
 
     @Override
-    protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.enumArgument("name", clazz, filter);
+    protected List<ArgumentDefinition<List<T>>> argumentDefinitionsForAdd() {
+        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.filter(filter)),
+                                                    (name, ctx) -> {
+                                                        return ListUtil.of(name);
+                                                    }));
     }
 
     @Override
-    protected List<T> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return Collections.singletonList(clazz.cast(argument.get(0)));
-    }
-
-    @Override
-    protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.enumArgument("name", clazz, x -> value.contains(x));
-    }
-
-    @Override
-    protected List<T> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return Collections.singletonList(clazz.cast(argument.get(0)));
+    protected List<ArgumentDefinition<List<T>>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.filter(x -> {
+            return value.contains(x);
+        })), (name, ctx) -> {
+            return ListUtil.of(name);
+        }));
     }
 
     @Override

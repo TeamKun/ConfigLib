@@ -198,6 +198,8 @@ class TestClass {
 #### `SingleValue` Implementation
 
 ```java
+import java.util.List;
+
 // Custom SingleValue implementation for TestClass.
 // Allows storing and manipulating a single instance of TestClass in configurations.
 public final class TestClassValue extends SingleValue<TestClass, TestClassValue> {
@@ -205,19 +207,17 @@ public final class TestClassValue extends SingleValue<TestClass, TestClassValue>
         super(initialValue);
     }
 
-    // Defines the arguments required to construct a TestClass instance.
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.integerArgument("n");
-        builder.stringArgument("s");
-    }
+    protected List<ArgumentDefinition<TestClass>> argumentDefinitions() {
+        List<ArgumentDefinition<TestClass>> res = new ArrayList<>();
 
-    // Converts command arguments to a TestClass instance.
-    @Override
-    protected TestClass argumentToValue(List<Object> args, CommandContext ctx) {
-        Integer n = ((Integer) args.get(0));
-        String s = ((String) args.get(1));
-        return new TestClass(n, s);
+        // Defines the arguments required to construct a TestClass instance.
+        res.add(new ArgumentDefinition(new IntegerArgument("n"), new StringArgument("s"), (n, s, ctx) -> {
+            // Converts command arguments to a TestClass instance.
+            return new TestClass(n, s);
+        }));
+
+        return res;
     }
 
     // Converts a TestClass instance to its string representation.
@@ -239,47 +239,43 @@ public final class TestClassListValue extends ListValue<TestClass, TestClassList
         super(initialValue);
     }
 
-    // Defines the arguments required for the Add command.
-    // These arguments will be used to construct a new TestClass instance and add it to the list.
     @Override
-    protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.integerArgument("n");
-        builder.stringArgument("s");
+    protected List<ArgumentDefinition<List<TestClass>>> argumentDefinitionsForAdd() {
+        List<ArgumentDefinition<List<TestClass>>> res = new ArrayList<>();
+
+        // Defines the arguments required for the Add command.
+        // These arguments will be used to construct a new TestClass instance and add it to the list.
+        res.add(new ArgumentDefinition(new IntegerArgument("n"), new StringArgument("s"), (n, s, ctx) -> {
+            // Converts command arguments to a new TestClass instance and adds it to the list.
+            return Collections.singletonList(new TestClass(n, s));
+        }));
+
+        return res;
     }
 
-    // Converts command arguments to a new TestClass instance and adds it to the list.
     @Override
-    protected List<TestClass> argumentToValueForAdd(String entryName, List<Object> args, CommandContext ctx) {
-        Integer n = ((Integer) args.get(0));
-        String s = ((String) args.get(1));
-        return Collections.singletonList(new TestClass(n, s));
-    }
+    protected List<ArgumentDefinition<List<TestClass>>> argumentDefinitionsForRemove() {
+        List<ArgumentDefinition<List<TestClass>>> res = new ArrayList<>();
 
-    // Defines the arguments required for the Remove command.
-    // These arguments will be used to identify which TestClass instance to remove from the list.
-    @Override
-    protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.stringArgumentWith("target", option -> {
-            option.suggestionAction(sb -> {
+        // Defines the arguments required for the Remove command.
+        // These arguments will be used to identify which TestClass instance to remove from the list.
+        res.add(new ArgumentDefinition(new StringArgument("target", opt -> {
+            opt.suggestionAction(sb -> {
                 for (TestClass v : value) {
                     sb.suggest(v.toString());
                 }
             });
-        }, StringArgument.Type.PHRASE_QUOTED);
-    }
+        }, StringArgument.Type.PHRASE_QUOTED), (input, ctx) -> {
+            // Finds a TestClass instance to remove based on user input.
+            TestClass target = value.stream()
+                                    .filter(x -> x.toString()
+                                                  .equals(input))
+                                    .findFirst()
+                                    .orElseThrow(() -> new InvalidArgumentException(input + " is invalid"));
+            return Collections.singletonList(target);
+        }));
 
-    // Finds and returns a TestClass instance to remove based on user input.
-    @Override
-    protected List<TestClass> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        String input = ((String) argument.get(0));
-        TestClass target = value.stream()
-                                .filter(x -> {
-                                    return x.toString()
-                                            .equals(input);
-                                })
-                                .findFirst()
-                                .orElseThrow(RuntimeException::new);
-        return Collections.singletonList(target);
+        return res;
     }
 
     // Converts a TestClass instance to its string representation.
@@ -309,7 +305,8 @@ public final class TestConfig extends BaseConfig {
 ## Usage Notes
 
 1. Asynchronous Config Loading  
-   Initial configuration loading is performed asynchronously. As a result, JSON values might not be immediately reflected
+   Initial configuration loading is performed asynchronously. As a result, JSON values might not be immediately
+   reflected
    after creating an instance. If immediate reflection is required, call the `loadConfig` method within the constructor,
    as shown in the example below:
     ```java

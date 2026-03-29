@@ -1,20 +1,19 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.LocationArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.Location;
+import org.bukkit.scoreboard.Team;
 
 import java.util.List;
 
 public class Team2LocationMapValue extends Team2ObjectMapValue<Location, Team2LocationMapValue> {
     @Override
-    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.locationArgument("location");
-    }
-
-    @Override
-    protected Location argumentToValueForPut(List<Object> argument, CommandContext ctx) {
-        return ((Location) argument.get(1));
+    protected List<PutArgumentDefinition<Team, Location>> argumentDefinitionsForPut() {
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new LocationArgument("location"),
+                                                                                (loc, ctx) -> loc)));
     }
 
     @Override

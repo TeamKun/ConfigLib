@@ -1,7 +1,8 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.BlockPosArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.HashMap;
@@ -18,13 +19,10 @@ public class String2BlockPosValue extends String2ObjectMapValue<BlockPos, String
     }
 
     @Override
-    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.blockPosArgument("pos");
-    }
-
-    @Override
-    protected BlockPos argumentToValueForPut(List<Object> argument, CommandContext ctx) {
-        return ((BlockPos) argument.get(1));
+    protected List<PutArgumentDefinition<String, BlockPos>> argumentDefinitionsForPut() {
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new BlockPosArgument("pos"),
+                                                                                (pos, ctx) -> pos)));
     }
 
     @Override

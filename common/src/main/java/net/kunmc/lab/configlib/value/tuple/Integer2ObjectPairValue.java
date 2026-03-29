@@ -1,9 +1,7 @@
 package net.kunmc.lab.configlib.value.tuple;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
-
-import java.util.List;
+import net.kunmc.lab.commandlib.argument.IntegerArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 
 public abstract class Integer2ObjectPairValue<R, T extends Integer2ObjectPairValue<R, T>> extends PairValue<Integer, R, T> {
     private transient int min = Integer.MIN_VALUE;
@@ -23,14 +21,10 @@ public abstract class Integer2ObjectPairValue<R, T extends Integer2ObjectPairVal
         return ((T) this);
     }
 
-    @Override
-    protected void appendLeftArgument(ArgumentBuilder builder) {
-        builder.integerArgument("integer", min, max);
-    }
-
-    @Override
-    protected Integer argumentToLeftValue(List<Object> argument, CommandContext ctx) {
-        return ((Integer) argument.get(0));
+    protected ArgumentDefinition<Integer> leftArgumentDefinition() {
+        return new ArgumentDefinition<>(new IntegerArgument("integer", min, max), (n, ctx) -> {
+            return n;
+        });
     }
 
     @Override

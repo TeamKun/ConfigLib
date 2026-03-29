@@ -1,7 +1,8 @@
 package net.kunmc.lab.configlib.value.tuple;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.IntegerArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 
@@ -24,13 +25,13 @@ public class Integer2IntegerPairValue extends Integer2ObjectPairValue<Integer, I
     }
 
     @Override
-    protected void appendRightArgument(ArgumentBuilder builder) {
-        builder.integerArgument("integer2", min, max);
-    }
-
-    @Override
-    protected Integer argumentToRightValue(List<Object> argument, CommandContext ctx) {
-        return ((Integer) argument.get(1));
+    protected List<PairArgumentDefinition<Integer, Integer>> argumentDefinitions() {
+        return ListUtil.of(new PairArgumentDefinition<>(leftArgumentDefinition(),
+                                                        new ArgumentDefinition<>(new IntegerArgument("integer2",
+                                                                                                     min,
+                                                                                                     max), (n, ctx) -> {
+                                                            return n;
+                                                        })));
     }
 
     @Override

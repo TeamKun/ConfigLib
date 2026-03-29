@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.UUIDArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -41,13 +42,8 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.uuidArgument("target");
-    }
-
-    @Override
-    protected UUID argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((UUID) argument.get(0));
+    protected List<ArgumentDefinition<UUID>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new UUIDArgument("target"), (target, ctx) -> target));
     }
 
     @Override

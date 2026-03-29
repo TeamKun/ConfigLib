@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.DoubleArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.NumericValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 
@@ -82,13 +83,10 @@ public class DoubleValue extends NumericValue<Double, DoubleValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.doubleArgument("Double", min, max);
-    }
-
-    @Override
-    protected Double argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((Double) argument.get(0));
+    protected List<ArgumentDefinition<Double>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new DoubleArgument("Double", min, max), (d, ctx) -> {
+            return d;
+        }));
     }
 
     @Override

@@ -1,9 +1,10 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.BlockStateArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.block.BlockState;
-import net.minecraft.command.arguments.BlockStateInput;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.List;
 
@@ -16,13 +17,10 @@ public class Team2BlockStateMapValue extends Team2ObjectMapValue<BlockState, Tea
     }
 
     @Override
-    protected void appendValueArgumentForPut(ArgumentBuilder builder) {
-        builder.blockStateArgument("name");
-    }
-
-    @Override
-    protected BlockState argumentToValueForPut(List<Object> argument, CommandContext ctx) {
-        return ((BlockStateInput) argument.get(1)).getState();
+    protected List<PutArgumentDefinition<ScorePlayerTeam, BlockState>> argumentDefinitionsForPut() {
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new BlockStateArgument("state"),
+                                                                                (state, ctx) -> state.getState())));
     }
 
     @Override

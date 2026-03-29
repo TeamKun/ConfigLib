@@ -1,8 +1,5 @@
 package net.kunmc.lab.configlib;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,25 +27,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return addable;
     }
 
-    protected abstract void appendArgumentForAdd(ArgumentBuilder builder);
-
-    protected boolean isCorrectArgumentForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    protected String incorrectArgumentMessageForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    protected abstract T argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx);
-
-    protected boolean validateForAdd(String entryName, T value, CommandContext ctx) {
-        return true;
-    }
-
-    protected String invalidValueMessageForAdd(String entryName, T value, CommandContext ctx) {
-        return "";
-    }
+    protected abstract List<ArgumentDefinition<T>> argumentDefinitionsForAdd();
 
     /**
      * Add a listener fired on add command.
@@ -75,25 +54,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return removable;
     }
 
-    protected abstract void appendArgumentForRemove(ArgumentBuilder builder);
-
-    protected boolean isCorrectArgumentForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    protected String incorrectArgumentMessageForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    protected abstract T argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx);
-
-    protected boolean validateForRemove(String entryName, T value, CommandContext ctx) {
-        return true;
-    }
-
-    protected String invalidValueMessageForRemove(String entryName, T value, CommandContext ctx) {
-        return "";
-    }
+    protected abstract List<ArgumentDefinition<T>> argumentDefinitionsForRemove();
 
     /**
      * Add a listener fired on remove command.

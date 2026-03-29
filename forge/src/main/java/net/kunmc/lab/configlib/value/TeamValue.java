@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.TeamArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.List;
@@ -17,13 +18,8 @@ public class TeamValue extends SingleValue<ScorePlayerTeam, TeamValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.teamArgument("team");
-    }
-
-    @Override
-    protected ScorePlayerTeam argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((ScorePlayerTeam) argument.get(0));
+    protected List<ArgumentDefinition<ScorePlayerTeam>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team"), (team, ctx) -> team));
     }
 
     @Override

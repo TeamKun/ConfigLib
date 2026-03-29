@@ -1,9 +1,9 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.LocationArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
-import org.bukkit.Location;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -18,13 +18,8 @@ public class VectorValue extends SingleValue<Vector, VectorValue> {
     }
 
     @Override
-    protected void appendArgument(ArgumentBuilder builder) {
-        builder.locationArgument("location");
-    }
-
-    @Override
-    protected Vector argumentToValue(List<Object> argument, CommandContext ctx) {
-        return ((Location) argument.get(0)).toVector();
+    protected List<ArgumentDefinition<Vector>> argumentDefinitions() {
+        return ListUtil.of(new ArgumentDefinition<>(new LocationArgument("location"), (loc, ctx) -> (loc).toVector()));
     }
 
     @Override

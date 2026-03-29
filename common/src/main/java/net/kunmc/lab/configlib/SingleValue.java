@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.util.function.ArgumentApplier;
+import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,25 +77,7 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
         return writable;
     }
 
-    protected abstract void appendArgument(ArgumentBuilder builder);
-
-    protected boolean isCorrectArgument(String entryName, List<Object> argument, CommandContext ctx) {
-        return true;
-    }
-
-    protected String incorrectArgumentMessage(String entryName, List<Object> argument, CommandContext ctx) {
-        return "";
-    }
-
-    protected abstract E argumentToValue(List<Object> argument, CommandContext ctx);
-
-    protected boolean validateOnSet(String entryName, E newValue, CommandContext ctx) {
-        return true;
-    }
-
-    protected String invalidValueMessage(String entryName, E newValue, CommandContext ctx) {
-        return "";
-    }
+    protected abstract <A extends ArgumentApplier & ArgumentMapper<E>> List<A> argumentDefinitions();
 
     /**
      * Add a listener fired on modify command.

@@ -1,8 +1,9 @@
 package net.kunmc.lab.configlib.value.map;
 
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.TeamArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.scoreboard.Team;
 
 import java.util.HashMap;
@@ -18,24 +19,13 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
         super(map);
     }
 
-    @Override
-    protected void appendKeyArgumentForPut(ArgumentBuilder builder) {
-        builder.teamArgument("team");
+    protected ArgumentDefinition<Team> keyArgumentDefinitionForPut() {
+        return new ArgumentDefinition<>(new TeamArgument("team"), (team, ctx) -> team);
     }
 
     @Override
-    protected Team argumentToKeyForPut(List<Object> argument, CommandContext ctx) {
-        return ((Team) argument.get(0));
-    }
-
-    @Override
-    protected void appendKeyArgumentForRemove(ArgumentBuilder builder) {
-        builder.teamArgument("team");
-    }
-
-    @Override
-    protected Team argumentToKeyForRemove(List<Object> argument, CommandContext ctx) {
-        return ((Team) argument.get(0));
+    protected List<ArgumentDefinition<Team>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team"), (team, ctx) -> team));
     }
 
     @Override

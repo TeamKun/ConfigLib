@@ -3,10 +3,12 @@ package net.kunmc.lab.configlib.value.collection;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.kunmc.lab.commandlib.ArgumentBuilder;
-import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.argument.IntegerArgument;
+import net.kunmc.lab.commandlib.argument.ItemStackArgument;
 import net.kunmc.lab.commandlib.argument.StringArgument;
+import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.gson.ItemStackTypeAdapter;
+import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -26,39 +28,30 @@ public class ItemStackListValue extends ListValue<ItemStack, ItemStackListValue>
     }
 
     @Override
-    protected void appendArgumentForAdd(ArgumentBuilder builder) {
-        builder.itemStackArgument("item")
-               .integerArgument("amount", 1, Integer.MAX_VALUE);
+    protected List<ArgumentDefinition<List<ItemStack>>> argumentDefinitionsForAdd() {
+        return ListUtil.of(new ArgumentDefinition<>(new ItemStackArgument("item"),
+                                                    new IntegerArgument("amount", 1, Integer.MAX_VALUE),
+                                                    (item, amount, ctx) -> {
+                                                        item.setAmount(amount);
+                                                        return ListUtil.of(item);
+                                                    }));
     }
 
     @Override
-    protected List<ItemStack> argumentToValueForAdd(String entryName, List<Object> argument, CommandContext ctx) {
-        ItemStack item = ((ItemStack) argument.get(0));
-        item.setAmount(((Integer) argument.get(1)));
-        System.out.println(item.getItemMeta());
-        return Lists.newArrayList(item);
-    }
-
-    @Override
-    protected void appendArgumentForRemove(ArgumentBuilder builder) {
-        builder.customArgument(new StringArgument("item", option -> {
-            option.displayDefaultSuggestions(false)
-                  .suggestionAction(sb -> {
-                      value.stream()
-                           .map(GSON::toJson)
-                           .forEach(sb::suggest);
-                  })
-                  .filter(x -> {
-                      return value.stream()
-                                  .map(GSON::toJson)
-                                  .anyMatch(x::equals);
-                  });
-        }, StringArgument.Type.PHRASE));
-    }
-
-    @Override
-    protected List<ItemStack> argumentToValueForRemove(String entryName, List<Object> argument, CommandContext ctx) {
-        return Lists.newArrayList(GSON.fromJson(((String) argument.get(0)), ItemStack.class));
+    protected List<ArgumentDefinition<List<ItemStack>>> argumentDefinitionsForRemove() {
+        return ListUtil.of(new ArgumentDefinition<>(new StringArgument("item", opt -> {
+            opt.displayDefaultSuggestions(false)
+               .suggestionAction(sb -> {
+                   value.stream()
+                        .map(GSON::toJson)
+                        .forEach(sb::suggest);
+               })
+               .filter(x -> {
+                   return value.stream()
+                               .map(GSON::toJson)
+                               .anyMatch(x::equals);
+               });
+        }, StringArgument.Type.PHRASE), (item, ctx) -> Lists.newArrayList(GSON.fromJson(item, ItemStack.class))));
     }
 
     @Override

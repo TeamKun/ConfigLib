@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 
 import java.lang.reflect.Field;
@@ -12,49 +13,42 @@ class ModifyMapPutCommand extends Command {
     public ModifyMapPutCommand(Field field, MapValue value) {
         super("put");
 
-        argument(builder -> {
-            String entryName = field.getName();
+        String entryName = field.getName();
+        for (MapValue.PutArgumentDefinition<?, ?> definition : ((List<MapValue.PutArgumentDefinition<?, ?>>) value.argumentDefinitionsForPut())) {
+            argument(builder -> {
+                ArgumentDefinition<?> keyDefinition = definition.keyDefinition();
+                ArgumentDefinition<?> valueDefinition = definition.valueDefinition();
+                keyDefinition.applyArgument(builder);
+                valueDefinition.applyArgument(builder);
 
-            value.appendKeyArgumentForPut(builder);
-            value.appendValueArgumentForPut(builder);
+                builder.execute(ctx -> {
+                    Object k;
+                    Object v;
+                    try {
+                        k = keyDefinition.mapArgument(ctx);
+                        v = valueDefinition.mapArgument(ctx);
+                    } catch (InvalidArgumentException e) {
+                        e.toIncorrectArgumentInputException()
+                         .sendMessage(ctx);
+                        return;
+                    }
 
-            builder.execute(ctx -> {
-                List<Object> argument = ctx.getParsedArgs();
-                if (!value.isCorrectKeyArgumentForPut(entryName, argument, ctx)) {
-                    ctx.sendFailure(value.incorrectKeyArgumentMessageForPut(entryName, argument, ctx));
-                    return;
-                }
-                if (!value.isCorrectValueArgumentForPut(entryName, argument, ctx)) {
-                    ctx.sendFailure((value.incorrectValueArgumentMessageForPut(entryName, argument, ctx)));
-                    return;
-                }
+                    try {
+                        Map map = new HashMap<>();
+                        map.put(k, v);
+                        value.validate(map);
+                    } catch (InvalidValueException e) {
+                        e.getMessages()
+                         .forEach(ctx::sendFailure);
+                        return;
+                    }
 
-                Object k = value.argumentToKeyForPut(argument, ctx);
-                Object v = value.argumentToValueForPut(argument, ctx);
-                if (!value.validateKeyForPut(entryName, k, ctx)) {
-                    ctx.sendFailure(value.invalidKeyMessageForPut(entryName, k, ctx));
-                    return;
-                }
-                if (!value.validateValueForPut(entryName, v, ctx)) {
-                    ctx.sendFailure(value.invalidValueMessageForPut(entryName, v, ctx));
-                    return;
-                }
+                    value.onPutValue(k, v);
+                    value.put(k, v);
 
-                try {
-                    Map map = new HashMap<>();
-                    map.put(k, v);
-                    value.validate(map);
-                } catch (InvalidValueException e) {
-                    e.getMessages()
-                     .forEach(ctx::sendFailure);
-                    return;
-                }
-
-                value.onPutValue(k, v);
-                value.put(k, v);
-
-                ctx.sendSuccess(value.succeedMessageForPut(entryName, k, v));
+                    ctx.sendSuccess(value.succeedMessageForPut(entryName, k, v));
+                });
             });
-        });
+        }
     }
 }
