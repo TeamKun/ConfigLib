@@ -29,9 +29,7 @@ import java.util.stream.Collectors;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public abstract class CommonBaseConfig {
-    protected transient boolean enableGet = true;
     protected transient boolean enableList = true;
-    protected transient boolean enableModify = true;
     protected transient boolean enableReload = true;
     private transient volatile boolean initialized = false;
     private transient String entryName;
@@ -231,16 +229,8 @@ public abstract class CommonBaseConfig {
         onReloadListeners.add(onReload);
     }
 
-    final boolean isGetEnabled() {
-        return enableGet;
-    }
-
     final boolean isListEnabled() {
         return enableList;
-    }
-
-    final boolean isModifyEnabled() {
-        return enableModify;
     }
 
     final boolean isReloadEnabled() {

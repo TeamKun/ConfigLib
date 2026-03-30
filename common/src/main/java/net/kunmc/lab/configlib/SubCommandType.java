@@ -28,28 +28,7 @@ enum SubCommandType {
                                                                            .stream())
                                                              .reduce(Stream::concat)
                                                              .orElseGet(Stream::empty)
-                                                             .anyMatch(Value::listable), ConfigListCommand::new),
-    Modify("modify",
-           CommonBaseConfig::isModifyEnabled,
-           x -> ConfigUtil.getSingleValues(x)
-                          .stream()
-                          .anyMatch(SingleValue::writableByCommand) || ConfigUtil.getCollectionValues(x)
-                                                                                 .stream()
-                                                                                 .anyMatch(v -> v.addableByCommand() || v.removableByCommand() || v.clearableByCommand()) || ConfigUtil.getMapValues(
-                                                                                                                                                                                               x)
-                                                                                                                                                                                       .stream()
-                                                                                                                                                                                       .anyMatch(
-                                                                                                                                                                                               v -> v.puttableByCommand() || v.removableByCommand() || v.clearableByCommand()),
-           ConfigModifyCommand::new),
-    Get("get", CommonBaseConfig::isGetEnabled, x -> Stream.of(ConfigUtil.getSingleValues(x)
-                                                                        .stream(),
-                                                              ConfigUtil.getCollectionValues(x)
-                                                                        .stream(),
-                                                              ConfigUtil.getMapValues(x)
-                                                                        .stream())
-                                                          .reduce(Stream::concat)
-                                                          .orElseGet(Stream::empty)
-                                                          .anyMatch(Value::listable), ConfigGetCommand::new);
+                                                             .anyMatch(Value::listable), ConfigListCommand::new);
 
     public final String name;
     private final Predicate<CommonBaseConfig> isEnabledFor;

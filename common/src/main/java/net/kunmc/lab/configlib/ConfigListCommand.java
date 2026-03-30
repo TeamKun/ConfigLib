@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
+import net.kunmc.lab.commandlib.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -17,20 +18,34 @@ class ConfigListCommand extends Command {
             throw new IllegalArgumentException("configs is empty");
         }
 
-        if (configs.size() == 1) {
-            configs.forEach(config -> {
-                execute(ctx -> exec(ctx, config));
-            });
-        } else {
+        execute(ctx -> configs.forEach(config -> {
+            listFields(ctx, config);
+        }));
+
+        if (configs.size() > 1) {
             configs.forEach(config -> {
                 addChildren(new Command(config.entryName()) {{
-                    execute(ctx -> exec(ctx, config));
+                    execute(ctx -> {
+                        listFields(ctx, config);
+                    });
                 }});
             });
         }
     }
 
-    private void exec(CommandContext ctx, CommonBaseConfig config) {
+    private static String header(CommonBaseConfig config) {
+        String name = config.entryName();
+        int totalDashes = Math.max(4, 46 - name.length());
+        int leftDashes = totalDashes / 2;
+        int rightDashes = totalDashes - leftDashes;
+        return ChatColorUtil.GRAY + StringUtil.repeat("-",
+                                                      leftDashes) + "[ " + ChatColorUtil.GOLD + ChatColorUtil.BOLD + name + ChatColorUtil.GRAY + " ]" + StringUtil.repeat(
+                "-",
+                rightDashes);
+    }
+
+    static void listFields(CommandContext ctx, CommonBaseConfig config) {
+        ctx.sendMessage(header(config));
         for (Field field : config.getClass()
                                  .getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) {

@@ -1,41 +1,43 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.configlib.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigCommandBuilder {
     private final List<CommonBaseConfig> configs = new ArrayList<>();
-    private final Map<SubCommandType, Boolean> subCommandTypeEnabledMap = new HashMap<>();
     private String name = "config";
+    private boolean listEnabled = true;
+    private boolean reloadEnabled = true;
+    private boolean getEnabled = true;
+    private boolean modifyEnabled = true;
 
     public ConfigCommandBuilder(@NotNull CommonBaseConfig config) {
         configs.add(config);
-
-        for (SubCommandType subCommand : SubCommandType.values()) {
-            subCommandTypeEnabledMap.put(subCommand, true);
-        }
     }
 
     public ConfigCommandBuilder disableListCommand() {
-        subCommandTypeEnabledMap.put(SubCommandType.List, false);
-        return this;
-    }
-
-    public ConfigCommandBuilder disableModifyCommand() {
-        subCommandTypeEnabledMap.put(SubCommandType.Modify, false);
+        listEnabled = false;
         return this;
     }
 
     public ConfigCommandBuilder disableReloadCommand() {
-        subCommandTypeEnabledMap.put(SubCommandType.Reload, false);
+        reloadEnabled = false;
         return this;
     }
 
     public ConfigCommandBuilder disableGetCommand() {
-        subCommandTypeEnabledMap.put(SubCommandType.Get, false);
+        getEnabled = false;
+        return this;
+    }
+
+    public ConfigCommandBuilder disableModifyCommand() {
+        modifyEnabled = false;
         return this;
     }
 
@@ -60,34 +62,119 @@ public class ConfigCommandBuilder {
 
     public ConfigCommand build() {
         ConfigCommand configCommand = new ConfigCommand(name);
-        createSubCommands().forEach(configCommand::addChildren);
+
+        if (listEnabled) {
+            createSubCommand(SubCommandType.List).ifPresent(configCommand::addChildren);
+        }
+        if (reloadEnabled) {
+            createSubCommand(SubCommandType.Reload).ifPresent(configCommand::addChildren);
+        }
+
+        Set<String> conflictingFieldNames = detectConflictingFieldNames();
+        configs.forEach(config -> addFieldCommandsFor(configCommand, config, conflictingFieldNames));
+
         return configCommand;
     }
 
-    private Set<Command> createSubCommands() {
-        Set<Command> subCommands = new HashSet<>();
-
-        for (Map.Entry<SubCommandType, Boolean> entry : subCommandTypeEnabledMap.entrySet()) {
-            SubCommandType type = entry.getKey();
-            Set<CommonBaseConfig> usedConfigs = type.hasEntryFor(configs)
-                                                    .entrySet()
-                                                    .stream()
-                                                    .filter(x -> x.getValue() && type.isEnabledFor(x.getKey()))
-                                                    .map(Map.Entry::getKey)
-                                                    .collect(Collectors.toCollection(LinkedHashSet::new));
-
-            if (entry.getValue()) {
-                createSubCommand(usedConfigs, type).ifPresent(subCommands::add);
-            }
-        }
-
-        return subCommands;
-    }
-
-    private Optional<Command> createSubCommand(Set<CommonBaseConfig> configs, SubCommandType type) {
-        if (configs.size() == 0) {
+    private Optional<Command> createSubCommand(SubCommandType type) {
+        Set<CommonBaseConfig> applicable = configs.stream()
+                                                  .filter(type::isEnabledFor)
+                                                  .filter(type::hasEntryFor)
+                                                  .collect(Collectors.toCollection(LinkedHashSet::new));
+        if (applicable.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(type.of(configs));
+        return Optional.of(type.of(applicable));
+    }
+
+    /**
+     * Returns field names that appear in more than one config and would generate a command.
+     */
+    private Set<String> detectConflictingFieldNames() {
+        Map<String, Integer> nameCount = new HashMap<>();
+        for (CommonBaseConfig config : configs) {
+            getCommandFields(config).stream()
+                                    .map(Field::getName)
+                                    .forEach(n -> nameCount.merge(n, 1, Integer::sum));
+        }
+        return nameCount.entrySet()
+                        .stream()
+                        .filter(e -> e.getValue() > 1)
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toSet());
+    }
+
+    private List<Field> getCommandFields(CommonBaseConfig config) {
+        List<Field> result = new ArrayList<>();
+        ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())
+                      .stream()
+                      .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                      .filter(f -> !Modifier.isTransient(f.getModifiers()))
+                      .forEach(field -> {
+                          field.setAccessible(true);
+                          Object obj;
+                          try {
+                              obj = field.get(config);
+                          } catch (IllegalAccessException e) {
+                              throw new RuntimeException(e);
+                          }
+                          if ((getEnabled && isDisplayable(obj)) || (modifyEnabled && isModifiable(obj))) {
+                              result.add(field);
+                          }
+                      });
+        return result;
+    }
+
+    private void addFieldCommandsFor(ConfigCommand configCommand,
+                                     CommonBaseConfig config,
+                                     Set<String> conflictingFieldNames) {
+        configCommand.addChildren(new Command(config.entryName()) {{
+            execute(ctx -> ConfigListCommand.listFields(ctx, config));
+        }});
+        configCommand.addChildren(new Command(config.entryName() + ".") {{
+            execute(ctx -> ConfigListCommand.listFields(ctx, config));
+        }});
+
+        for (Field field : getCommandFields(config)) {
+            Object obj;
+            try {
+                obj = field.get(config);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+
+            String fieldName = field.getName();
+            String prefixedName = config.entryName() + "." + fieldName;
+
+            // Prefixed command is always available
+            configCommand.addChildren(new ConfigFieldCommand(prefixedName, field, obj, getEnabled, modifyEnabled));
+
+            // Non-prefixed command only when no conflict
+            if (!conflictingFieldNames.contains(fieldName)) {
+                configCommand.addChildren(new ConfigFieldCommand(fieldName, field, obj, getEnabled, modifyEnabled));
+            }
+        }
+    }
+
+    private static boolean isDisplayable(Object obj) {
+        if (obj instanceof Value) {
+            return ((Value<?, ?>) obj).listable();
+        }
+        return true;
+    }
+
+    private static boolean isModifiable(Object obj) {
+        if (obj instanceof SingleValue) {
+            return ((SingleValue<?, ?>) obj).writableByCommand();
+        }
+        if (obj instanceof CollectionValue) {
+            CollectionValue<?, ?, ?> v = (CollectionValue<?, ?, ?>) obj;
+            return v.addableByCommand() || v.removableByCommand() || v.clearableByCommand();
+        }
+        if (obj instanceof MapValue) {
+            MapValue<?, ?, ?> v = (MapValue<?, ?, ?>) obj;
+            return v.puttableByCommand() || v.removableByCommand() || v.clearableByCommand();
+        }
+        return false;
     }
 }

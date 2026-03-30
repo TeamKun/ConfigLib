@@ -19,6 +19,7 @@ public class Config2 extends AbstractConfig {
             throw new InvalidValueException("only hoge");
         }
     });
+    public final IntegerValue conflict = new IntegerValue(1);
 
     public Config2(@NotNull Plugin plugin) {
         super(plugin);

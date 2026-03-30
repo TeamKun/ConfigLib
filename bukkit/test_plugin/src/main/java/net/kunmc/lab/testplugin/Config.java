@@ -1,5 +1,6 @@
 package net.kunmc.lab.testplugin;
 
+import net.kunmc.lab.configlib.value.IntegerValue;
 import net.kunmc.lab.configlib.value.UUIDValue;
 import net.kunmc.lab.configlib.value.collection.TeamSetValue;
 import net.kunmc.lab.configlib.value.collection.UUIDSetValue;
@@ -16,6 +17,7 @@ public class Config extends AbstractConfig {
     public final UUID2LocationMapValue uuid2LocationMapValue = new UUID2LocationMapValue();
     public final List<String> strings = new ArrayList<>();
     public final TeamSetValue teams = new TeamSetValue();
+    public final IntegerValue conflict = new IntegerValue(1);
 
     public Config(@NotNull Plugin plugin) {
         super(plugin);
