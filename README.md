@@ -103,6 +103,7 @@ public final class TestConfig extends BaseConfig {
 
     public TestConfig(Plugin plugin) {
         super(plugin);
+        initialize();
     }
 }
 ```
@@ -164,6 +165,7 @@ public final class TestConfig extends BaseConfig {
 
     public TestConfig(Plugin plugin) {
         super(plugin);
+        initialize();
     }
 }
 ```
@@ -296,6 +298,7 @@ public final class TestConfig extends BaseConfig {
 
     public TestConfig(Plugin plugin) {
         super(plugin);
+        initialize();
     }
 }
 ```
@@ -304,22 +307,21 @@ public final class TestConfig extends BaseConfig {
 
 ## Usage Notes
 
-1. Asynchronous Config Loading  
-   Initial configuration loading is performed asynchronously. As a result, JSON values might not be immediately
-   reflected
-   after creating an instance. If immediate reflection is required, call the `loadConfig` method within the constructor,
-   as shown in the example below:
+1. Calling `initialize()`
+   `initialize()` must be called at the end of the concrete config class constructor, after all fields have been
+   assigned. This ensures that the initial config load and file watching start only after the subclass is fully
+   constructed.
     ```java
     public final class TestConfig extends BaseConfig {
         public final IntegerValue integerValue = new IntegerValue(10);
 
         public TestConfig(Plugin plugin) {
             super(plugin);
-            loadConfig();
+            initialize(); // Must be the last statement
         }
     }
     ```
-2. Asynchronous Change Detection  
+2. Asynchronous Change Detection
    Change detection, including when modifying values with the `set` method, is handled asynchronously. Keep this in mind
    to avoid race conditions in your application logic.
 

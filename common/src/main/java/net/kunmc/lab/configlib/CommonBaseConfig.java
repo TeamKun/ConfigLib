@@ -35,14 +35,13 @@ public abstract class CommonBaseConfig {
     protected transient boolean enableReload = true;
     private transient volatile boolean initialized = false;
     private transient String entryName;
-    private final transient List<Runnable> onInitializeListeners = new ArrayList<>();
     private final transient List<Runnable> onReloadListeners = new ArrayList<>();
     protected final transient Timer timer = new Timer();
     private transient WatchService watchService;
     private transient WatchKey watchKey;
     private final transient Object lock = new Object();
     private final transient Map<Field, Pair<Object, Integer>> fieldToObjectAndHashMap = new HashMap<>();
-    private final transient Logger logger = Logger.getLogger(getClass().getName());
+    protected final transient Logger logger = Logger.getLogger(getClass().getName());
 
     protected CommonBaseConfig() {
         String s = getClass().getSimpleName();
@@ -139,7 +138,7 @@ public abstract class CommonBaseConfig {
         return entryName;
     }
 
-    final void init(Consumer<Option> options, Thread.UncaughtExceptionHandler onInitExceptionHandler) {
+    final void init(Consumer<Option> options) {
         Option option = new Option();
         options.accept(option);
 
@@ -188,28 +187,12 @@ public abstract class CommonBaseConfig {
             }
         }, 0, option.modifyDetectionTimerPeriod);
 
-        if (!option.enableAutoReload) {
-            return;
+        try {
+            saveConfigIfAbsent();
+            loadConfig();
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
-
-        // コンストラクタの処理内でシリアライズすると子クラスのフィールドの初期化が終わってない状態でシリアライズされるため別スレッドでループ待機させている.
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    List<Value<?, ?>> values = ConfigUtil.getValues(CommonBaseConfig.this);
-                    if (values.stream()
-                              .allMatch(Objects::nonNull)) {
-                        saveConfigIfAbsent();
-                        loadConfig();
-                        cancel();
-                    }
-                } catch (Throwable e) {
-                    onInitExceptionHandler.uncaughtException(Thread.currentThread(), e);
-                    cancel();
-                }
-            }
-        }, option.initializeTimerDelay, 1);
 
         try {
             watchService = FileSystems.getDefault()
@@ -242,18 +225,6 @@ public abstract class CommonBaseConfig {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-    }
-
-    /**
-     * Adds a listener that will be triggered after the config has been initialized.
-     * If initialization has already been completed, the listener will be immediately triggered.
-     */
-    public final void onInitialize(Runnable onInitialize) {
-        if (initialized) {
-            onInitialize.run();
-            return;
-        }
-        onInitializeListeners.add(onInitialize);
     }
 
     public final void onReload(Runnable onReload) {
@@ -333,8 +304,6 @@ public abstract class CommonBaseConfig {
 
             replaceFields(getClass(), config, this);
             if (!initialized) {
-                onInitializeListeners.forEach(Runnable::run);
-
                 ConfigUtil.getValues(this)
                           .stream()
                           .map(Value.class::cast)
@@ -381,28 +350,15 @@ public abstract class CommonBaseConfig {
     }
 
     public static final class Option {
-        boolean enableAutoReload = true;
         int modifyDetectionTimerPeriod = 500;
-        int initializeTimerDelay = 0;
         Consumer<Exception> jsonParseExceptionHandler = Throwable::printStackTrace;
 
         Option() {
         }
 
-        public Option enableAutoReload(boolean enableAutoReload) {
-            this.enableAutoReload = enableAutoReload;
-            return this;
-        }
-
         public Option modifyDetectionTimerPeriod(int period) {
             Preconditions.checkArgument(period > 0);
             this.modifyDetectionTimerPeriod = period;
-            return this;
-        }
-
-        public Option initializeTimerDelay(int delay) {
-            Preconditions.checkArgument(delay >= 0);
-            this.initializeTimerDelay = delay;
             return this;
         }
 

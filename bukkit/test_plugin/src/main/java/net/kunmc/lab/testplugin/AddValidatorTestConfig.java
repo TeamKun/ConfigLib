@@ -30,5 +30,6 @@ public class AddValidatorTestConfig extends BaseConfig {
 
     public AddValidatorTestConfig(@NotNull Plugin plugin) {
         super(plugin);
+        initialize();
     }
 }

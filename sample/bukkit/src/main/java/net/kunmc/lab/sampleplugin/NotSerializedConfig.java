@@ -33,5 +33,6 @@ public class NotSerializedConfig extends BaseConfig {
 
     public NotSerializedConfig(@NotNull Plugin plugin) {
         super(plugin, option -> option.makeConfigFile(false));
+        initialize();
     }
 }

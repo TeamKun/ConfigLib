@@ -33,5 +33,6 @@ public class Config extends BaseConfig {
 
     public Config(@NotNull Plugin plugin) {
         super(plugin);
+        initialize();
     }
 }

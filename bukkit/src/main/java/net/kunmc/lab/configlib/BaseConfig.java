@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.Set;
-import java.util.TimerTask;
 import java.util.function.Consumer;
 
 public abstract class BaseConfig extends CommonBaseConfig implements Listener {
@@ -40,6 +39,7 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
                                                       .registerTypeHierarchyAdapter(Set.class, new SetTypeAdapter())
                                                       .create();
     private final transient Plugin plugin;
+    private final transient Consumer<Option> options;
 
     public BaseConfig(@NotNull Plugin plugin) {
         this(plugin, option -> {
@@ -48,32 +48,25 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
 
     public BaseConfig(@NotNull Plugin plugin, Consumer<Option> options) {
         this.plugin = plugin;
-        init(options, (t, e) -> {
-            e.printStackTrace();
-            close();
-            Bukkit.getPluginManager()
-                  .disablePlugin(plugin);
-        });
+        this.options = options;
+    }
 
-        // Pluginがenabledになっていない状態でregisterすると例外が発生するため遅延,ループさせている
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager()
-                          .registerEvents(new Listener() {
-                              @EventHandler
-                              public void onPluginDisable(PluginDisableEvent e) {
-                                  if (e.getPlugin() == plugin) {
-                                      close();
-                                  }
-                              }
-                          }, plugin);
-
-                    cancel();
-                }
-            }
-        }, 100, 100);
+    /**
+     * Starts the automatic config synchronization. Must be called at the end of the subclass constructor.
+     * The plugin must already be enabled (i.e., called from {@code onEnable}).
+     */
+    public BaseConfig initialize() {
+        Bukkit.getPluginManager()
+              .registerEvents(new Listener() {
+                  @EventHandler
+                  public void onPluginDisable(PluginDisableEvent e) {
+                      if (e.getPlugin() == plugin) {
+                          close();
+                      }
+                  }
+              }, plugin);
+        init(options);
+        return this;
     }
 
     public Plugin plugin() {

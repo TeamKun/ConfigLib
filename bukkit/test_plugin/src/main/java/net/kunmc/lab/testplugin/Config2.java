@@ -25,5 +25,6 @@ public class Config2 extends AbstractConfig {
         ItemStack item = new ItemStack(Material.JUNGLE_LOG);
         item.editMeta(meta -> meta.displayName(Component.text("aiueo")));
         itemStacks.add(item);
+        initialize();
     }
 }
