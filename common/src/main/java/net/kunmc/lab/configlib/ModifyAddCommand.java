@@ -29,7 +29,8 @@ class ModifyAddCommand extends Command {
                     }
 
                     try {
-                        value.validate(newValue);
+                        Collection result = value.toAdded(newValue.toArray());
+                        value.validate(result);
                     } catch (InvalidValueException e) {
                         e.getMessages()
                          .forEach(ctx::sendFailure);

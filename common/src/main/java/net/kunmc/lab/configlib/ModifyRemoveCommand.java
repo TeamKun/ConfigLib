@@ -19,9 +19,9 @@ class ModifyRemoveCommand extends Command {
                 ((ArgumentApplier) definition).applyArgument(builder);
 
                 builder.execute(ctx -> {
-                    Collection newValue;
+                    Collection removeValue;
                     try {
-                        newValue = ((ArgumentMapper<Collection>) definition).mapArgument(ctx);
+                        removeValue = ((ArgumentMapper<Collection>) definition).mapArgument(ctx);
                     } catch (InvalidArgumentException e) {
                         e.toIncorrectArgumentInputException()
                          .sendMessage(ctx);
@@ -29,17 +29,18 @@ class ModifyRemoveCommand extends Command {
                     }
 
                     try {
-                        value.validate(newValue);
+                        Collection remaining = value.toRemoved(removeValue.toArray());
+                        value.validate(remaining);
                     } catch (InvalidValueException e) {
                         e.getMessages()
                          .forEach(ctx::sendFailure);
                         return;
                     }
 
-                    value.onRemoveValue(newValue);
-                    ((Collection) value.value()).removeAll(newValue);
+                    value.onRemoveValue(removeValue);
+                    ((Collection) value.value()).removeAll(removeValue);
 
-                    ctx.sendSuccess(value.succeedMessageForRemove(entryName, newValue));
+                    ctx.sendSuccess(value.succeedMessageForRemove(entryName, removeValue));
                 });
             });
         }

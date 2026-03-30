@@ -81,4 +81,22 @@ public abstract class SetValue<E, U extends SetValue<E, U>> extends CollectionVa
     public Spliterator<E> spliterator() {
         return Spliterators.spliterator(value, 0);
     }
+
+    @SafeVarargs
+    @Override
+    public final Set<E> toAdded(E... elements) {
+        Set<E> res = new HashSet<>(value);
+        Collections.addAll(res, elements);
+        return res;
+    }
+
+    @SafeVarargs
+    @Override
+    public final Set<E> toRemoved(E... elements) {
+        Set<E> res = new HashSet<>(value);
+        for (E element : elements) {
+            res.remove(element);
+        }
+        return res;
+    }
 }

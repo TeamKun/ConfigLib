@@ -34,9 +34,9 @@ class ModifyMapPutCommand extends Command {
                     }
 
                     try {
-                        Map map = new HashMap<>();
-                        map.put(k, v);
-                        value.validate(map);
+                        Map result = new HashMap<>((Map) value.value());
+                        result.put(k, v);
+                        value.validate(result);
                     } catch (InvalidValueException e) {
                         e.getMessages()
                          .forEach(ctx::sendFailure);

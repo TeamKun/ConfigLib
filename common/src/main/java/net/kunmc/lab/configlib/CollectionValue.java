@@ -93,6 +93,10 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         clearListeners.forEach(Runnable::run);
     }
 
+    public abstract T toAdded(E... elements);
+
+    public abstract T toRemoved(E... elements);
+
     protected abstract String elementToString(E e);
 
     @Override

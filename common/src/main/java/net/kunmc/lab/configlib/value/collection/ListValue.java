@@ -117,4 +117,22 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
     public Spliterator<E> spliterator() {
         return value.spliterator();
     }
+
+    @SafeVarargs
+    @Override
+    public final List<E> toAdded(E... elements) {
+        List<E> res = new ArrayList<>(value);
+        res.addAll(Arrays.asList(elements));
+        return res;
+    }
+
+    @SafeVarargs
+    @Override
+    public final List<E> toRemoved(E... elements) {
+        List<E> res = new ArrayList<>(value);
+        for (E element : elements) {
+            res.remove(element);
+        }
+        return res;
+    }
 }
