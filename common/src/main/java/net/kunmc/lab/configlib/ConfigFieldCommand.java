@@ -12,8 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.lang.reflect.Field;
 
 class ConfigFieldCommand extends Command {
-    ConfigFieldCommand(String commandName, Field field, Object obj, boolean getEnabled, boolean modifyEnabled) {
-        super(commandName);
+    ConfigFieldCommand(String entryName, Field field, Object obj, boolean getEnabled, boolean modifyEnabled) {
+        super(entryName);
 
         if (obj instanceof SingleValue) {
             initSingleValue(field, (SingleValue<?, ?>) obj, getEnabled, modifyEnabled);
@@ -28,7 +28,7 @@ class ConfigFieldCommand extends Command {
 
     private void initSingleValue(Field field, SingleValue<?, ?> v, boolean getEnabled, boolean modifyEnabled) {
         if (getEnabled && v.listable()) {
-            execute(ctx -> ctx.sendMessageWithOption(field.getName() + ": " + v.format(),
+            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
         }
@@ -51,7 +51,7 @@ class ConfigFieldCommand extends Command {
                                      boolean getEnabled,
                                      boolean modifyEnabled) {
         if (getEnabled && v.listable()) {
-            execute(ctx -> ctx.sendMessageWithOption(field.getName() + ": " + v.format(),
+            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
         }
@@ -71,7 +71,7 @@ class ConfigFieldCommand extends Command {
 
     private void initMapValue(Field field, MapValue<?, ?, ?> v, boolean getEnabled, boolean modifyEnabled) {
         if (getEnabled && v.listable()) {
-            execute(ctx -> ctx.sendMessageWithOption(field.getName() + ": " + v.format(),
+            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
         }
@@ -90,7 +90,7 @@ class ConfigFieldCommand extends Command {
     }
 
     static void applySet(Command command, Field field, SingleValue value) {
-        String entryName = field.getName();
+        String entryName = value.resolveEntryName(field.getName());
         for (Object definition : value.argumentDefinitions()) {
             command.argument(builder -> {
                 ((ArgumentApplier) definition).applyArgument(builder);

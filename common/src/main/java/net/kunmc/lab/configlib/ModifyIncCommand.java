@@ -23,7 +23,7 @@ class ModifyIncCommand extends Command {
     }
 
     private void exec(double amount, CommandContext ctx) {
-        String entryName = field.getName();
+        String entryName = value.resolveEntryName(field.getName());
 
         if (value.compare(value.max.doubleValue() - amount) > 0) {
             amount = value.max.doubleValue() - ((Number) value.value).doubleValue();

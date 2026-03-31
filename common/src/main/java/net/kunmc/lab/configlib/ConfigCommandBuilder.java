@@ -93,15 +93,27 @@ public class ConfigCommandBuilder {
     private Set<String> detectConflictingFieldNames() {
         Map<String, Integer> nameCount = new HashMap<>();
         for (CommonBaseConfig config : configs) {
-            getCommandFields(config).stream()
-                                    .map(Field::getName)
-                                    .forEach(n -> nameCount.merge(n, 1, Integer::sum));
+            for (Field field : getCommandFields(config)) {
+                try {
+                    String name = resolveEntryName(field, field.get(config));
+                    nameCount.merge(name, 1, Integer::sum);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         return nameCount.entrySet()
                         .stream()
                         .filter(e -> e.getValue() > 1)
                         .map(Map.Entry::getKey)
                         .collect(Collectors.toSet());
+    }
+
+    private static String resolveEntryName(Field field, Object obj) {
+        if (obj instanceof Value) {
+            return ((Value<?, ?>) obj).resolveEntryName(field.getName());
+        }
+        return field.getName();
     }
 
     private List<Field> getCommandFields(CommonBaseConfig config) {
@@ -143,15 +155,19 @@ public class ConfigCommandBuilder {
                 throw new RuntimeException(e);
             }
 
-            String fieldName = field.getName();
-            String prefixedName = config.entryName() + "." + fieldName;
+            String valueEntryName = resolveEntryName(field, obj);
+            String prefixedName = config.entryName() + "." + valueEntryName;
 
             // Prefixed command is always available
             configCommand.addChildren(new ConfigFieldCommand(prefixedName, field, obj, getEnabled, modifyEnabled));
 
             // Non-prefixed command only when no conflict
-            if (!conflictingFieldNames.contains(fieldName)) {
-                configCommand.addChildren(new ConfigFieldCommand(fieldName, field, obj, getEnabled, modifyEnabled));
+            if (!conflictingFieldNames.contains(valueEntryName)) {
+                configCommand.addChildren(new ConfigFieldCommand(valueEntryName,
+                                                                 field,
+                                                                 obj,
+                                                                 getEnabled,
+                                                                 modifyEnabled));
             }
         }
     }

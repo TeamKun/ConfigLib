@@ -14,7 +14,7 @@ class ModifyAddCommand extends Command {
     public ModifyAddCommand(Field field, CollectionValue value) {
         super("add");
 
-        String entryName = field.getName();
+        String entryName = value.resolveEntryName(field.getName());
         for (Object definition : value.argumentDefinitionsForAdd()) {
             argument(builder -> {
                 ((ArgumentApplier) definition).applyArgument(builder);

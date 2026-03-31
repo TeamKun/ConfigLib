@@ -20,6 +20,7 @@ public abstract class Value<E, T extends Value<E, T>> {
     private transient Validator<E> validator = x -> {
     };
     private transient Function<E, String> formatter;
+    private transient String entryName;
 
     public Value(E value) {
         this.value = value;
@@ -49,6 +50,15 @@ public abstract class Value<E, T extends Value<E, T>> {
 
     public final T listable(boolean listable) {
         this.listable = listable;
+        return ((T) this);
+    }
+
+    /**
+     * Sets a custom entry name used when registering this value's command.
+     * By default, the field name is used.
+     */
+    public final T entryName(String entryName) {
+        this.entryName = entryName;
         return ((T) this);
     }
 
@@ -130,6 +140,13 @@ public abstract class Value<E, T extends Value<E, T>> {
 
     final void validate(E value) throws InvalidValueException {
         validator.validate(value);
+    }
+
+    final String resolveEntryName(String fieldName) {
+        if (entryName != null) {
+            return entryName;
+        }
+        return fieldName;
     }
 
     final String format() {

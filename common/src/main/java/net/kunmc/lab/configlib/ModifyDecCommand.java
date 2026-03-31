@@ -23,7 +23,7 @@ class ModifyDecCommand extends Command {
     }
 
     private void exec(double amount, CommandContext ctx) {
-        String entryName = field.getName();
+        String entryName = value.resolveEntryName(field.getName());
 
         if (value.compare(value.min.doubleValue() + amount) < 0) {
             amount = ((Number) value.value).doubleValue() - value.min.doubleValue();

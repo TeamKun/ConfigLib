@@ -14,7 +14,7 @@ class ModifyRemoveCommand extends Command {
     public ModifyRemoveCommand(Field field, CollectionValue value) {
         super("remove");
 
-        String entryName = field.getName();
+        String entryName = value.resolveEntryName(field.getName());
         for (Object definition : value.argumentDefinitionsForRemove()) {
             argument(builder -> {
                 ((ArgumentApplier) definition).applyArgument(builder);

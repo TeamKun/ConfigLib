@@ -14,7 +14,7 @@ class ModifyMapRemoveCommand extends Command {
     public ModifyMapRemoveCommand(Field field, MapValue value) {
         super("remove");
 
-        String entryName = field.getName();
+        String entryName = value.resolveEntryName(field.getName());
         for (ArgumentDefinition<?> definition : ((List<ArgumentDefinition<?>>) value.argumentDefinitionsForRemove())) {
             argument(builder -> {
                 definition.applyArgument(builder);

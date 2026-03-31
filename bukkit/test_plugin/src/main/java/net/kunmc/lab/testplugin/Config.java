@@ -16,7 +16,7 @@ public class Config extends AbstractConfig {
     public final UUIDSetValue uuidSetValue = new UUIDSetValue().onModify(TestPlugin::broadcast);
     public final UUID2LocationMapValue uuid2LocationMapValue = new UUID2LocationMapValue();
     public final List<String> strings = new ArrayList<>();
-    public final TeamSetValue teams = new TeamSetValue();
+    public final TeamSetValue teams = new TeamSetValue().entryName("チーム");
     public final IntegerValue conflict = new IntegerValue(1);
 
     public Config(@NotNull Plugin plugin) {

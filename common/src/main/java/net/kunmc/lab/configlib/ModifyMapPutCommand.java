@@ -14,7 +14,7 @@ class ModifyMapPutCommand extends Command {
     public ModifyMapPutCommand(Field field, MapValue value) {
         super("put");
 
-        String entryName = field.getName();
+        String entryName = value.resolveEntryName(field.getName());
         for (MapValue.PutArgumentDefinition<?, ?> definition : ((List<MapValue.PutArgumentDefinition<?, ?>>) value.argumentDefinitionsForPut())) {
             argument(builder -> {
                 ArgumentDefinition<?> keyDefinition = definition.keyDefinition();
