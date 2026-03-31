@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.configlib.command.MapValuePutCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 
 import java.lang.reflect.Field;
@@ -46,7 +47,10 @@ class ModifyMapPutCommand extends Command {
                     value.onPutValue(k, v);
                     value.put(k, v);
 
-                    ctx.sendSuccess(value.succeedMessageForPut(entryName, k, v));
+                    ctx.sendSuccess(value.succeedMessageForPut(new MapValuePutCommandMessageParameter<>(entryName,
+                                                                                                        ctx,
+                                                                                                        k,
+                                                                                                        v)));
                 });
             });
         }

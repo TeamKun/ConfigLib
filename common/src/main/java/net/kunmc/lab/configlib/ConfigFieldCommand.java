@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
+import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
@@ -115,7 +116,8 @@ class ConfigFieldCommand extends Command {
                     value.onModifyValueCommand(newValue);
                     value.value(newValue);
 
-                    ctx.sendSuccess(value.succeedModifyMessage(entryName));
+                    ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(entryName,
+                                                                                                            ctx)));
                 });
             });
         }

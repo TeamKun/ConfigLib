@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.configlib.command.CollectionValueClearCommandMessageParameter;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -13,7 +14,8 @@ class ModifyClearCommand extends Command {
             value.onClearValue();
             ((Collection) value.value()).clear();
 
-            ctx.sendSuccess(field.getName() + "をクリアしました");
+            ctx.sendSuccess(value.succeedMessageForClear(new CollectionValueClearCommandMessageParameter(field.getName(),
+                                                                                                         ctx)));
         });
     }
 }

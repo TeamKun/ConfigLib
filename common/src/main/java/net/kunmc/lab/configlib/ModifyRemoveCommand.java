@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.configlib.command.CollectionValueRemoveCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
@@ -40,7 +41,10 @@ class ModifyRemoveCommand extends Command {
                     value.onRemoveValue(removeValue);
                     ((Collection) value.value()).removeAll(removeValue);
 
-                    ctx.sendSuccess(value.succeedMessageForRemove(entryName, removeValue));
+                    ctx.sendSuccess(value.succeedMessageForRemove(new CollectionValueRemoveCommandMessageParameter<>(
+                            entryName,
+                            ctx,
+                            removeValue)));
                 });
             });
         }

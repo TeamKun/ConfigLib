@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.configlib.command.MapValueClearCommandMessageParameter;
 
 import java.lang.reflect.Field;
 
@@ -12,7 +13,8 @@ class ModifyMapClearCommand extends Command {
             value.onClearMap();
             value.clear();
 
-            ctx.sendSuccess(field.getName() + "をクリアしました");
+            ctx.sendSuccess(value.succeedMessageForClear(new MapValueClearCommandMessageParameter(field.getName(),
+                                                                                                  ctx)));
         });
     }
 }

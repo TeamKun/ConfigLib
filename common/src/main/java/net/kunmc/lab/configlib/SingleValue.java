@@ -1,5 +1,6 @@
 package net.kunmc.lab.configlib;
 
+import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 
@@ -13,6 +14,7 @@ import java.util.function.Supplier;
 public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<E, T> {
     private transient final List<Consumer<E>> modifyCommandListeners = new ArrayList<>();
     private transient boolean writable = true;
+    private transient Function<SingleValueModifyCommandMessageParameter, String> successMessage;
 
     public SingleValue(E value) {
         super(value);
@@ -91,8 +93,23 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
         modifyCommandListeners.forEach(x -> x.accept(newValue));
     }
 
-    protected String succeedModifyMessage(String entryName) {
-        return entryName + "の値を" + valueToString(value()) + "に変更しました.";
+    /**
+     * Sets a custom success message shown after the value is modified via command.
+     *
+     * <pre>{@code
+     * new IntegerValue(10).successMessage(p -> p.entryName() + " set to " + value())
+     * }</pre>
+     */
+    public final T successMessage(Function<SingleValueModifyCommandMessageParameter, String> successMessage) {
+        this.successMessage = successMessage;
+        return (T) this;
+    }
+
+    protected String succeedModifyMessage(SingleValueModifyCommandMessageParameter param) {
+        if (successMessage != null) {
+            return successMessage.apply(param);
+        }
+        return param.entryName() + "の値を" + valueToString(value()) + "に変更しました.";
     }
 
     @Override

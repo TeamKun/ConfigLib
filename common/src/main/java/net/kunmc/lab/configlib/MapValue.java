@@ -1,5 +1,8 @@
 package net.kunmc.lab.configlib;
 
+import net.kunmc.lab.configlib.command.MapValueClearCommandMessageParameter;
+import net.kunmc.lab.configlib.command.MapValuePutCommandMessageParameter;
+import net.kunmc.lab.configlib.command.MapValueRemoveCommandMessageParameter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +19,9 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
     private transient boolean puttable = true;
     private transient boolean removable = true;
     private transient boolean clearable = true;
+    private transient Function<MapValuePutCommandMessageParameter<K, V>, String> successMessageForPut;
+    private transient Function<MapValueRemoveCommandMessageParameter<K, V>, String> successMessageForRemove;
+    private transient Function<MapValueClearCommandMessageParameter, String> successMessageForClear;
 
     public MapValue(Map<K, V> value) {
         super(value);
@@ -44,8 +50,22 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         putListeners.forEach(x -> x.accept(k, v));
     }
 
-    protected String succeedMessageForPut(String entryName, K k, V v) {
-        return String.format("%sに{%s:%s}を追加しました.", entryName, keyToString(k), valueToString(v));
+    /**
+     * Sets a custom success message shown after an entry is put via command.
+     */
+    public final T successMessageForPut(Function<MapValuePutCommandMessageParameter<K, V>, String> successMessage) {
+        this.successMessageForPut = successMessage;
+        return (T) this;
+    }
+
+    protected String succeedMessageForPut(MapValuePutCommandMessageParameter<K, V> param) {
+        if (successMessageForPut != null) {
+            return successMessageForPut.apply(param);
+        }
+        return String.format("%sに{%s:%s}を追加しました.",
+                             param.entryName(),
+                             keyToString(param.key()),
+                             valueToString(param.value()));
     }
 
     public final T removableByCommand(boolean removable) {
@@ -71,8 +91,22 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         removeListeners.forEach(x -> x.accept(k, v));
     }
 
-    protected String succeedMessageForRemove(String entryName, K k, V v) {
-        return String.format("%sから{%s:%s}を削除しました.", entryName, keyToString(k), valueToString(v));
+    /**
+     * Sets a custom success message shown after an entry is removed via command.
+     */
+    public final T successMessageForRemove(Function<MapValueRemoveCommandMessageParameter<K, V>, String> successMessage) {
+        this.successMessageForRemove = successMessage;
+        return (T) this;
+    }
+
+    protected String succeedMessageForRemove(MapValueRemoveCommandMessageParameter<K, V> param) {
+        if (successMessageForRemove != null) {
+            return successMessageForRemove.apply(param);
+        }
+        return String.format("%sから{%s:%s}を削除しました.",
+                             param.entryName(),
+                             keyToString(param.key()),
+                             valueToString(param.value()));
     }
 
     public final T clearableByCommand(boolean clearable) {
@@ -94,6 +128,21 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
 
     final void onClearMap() {
         clearListeners.forEach(Runnable::run);
+    }
+
+    /**
+     * Sets a custom success message shown after the map is cleared via command.
+     */
+    public final T successMessageForClear(Function<MapValueClearCommandMessageParameter, String> successMessage) {
+        this.successMessageForClear = successMessage;
+        return (T) this;
+    }
+
+    protected String succeedMessageForClear(MapValueClearCommandMessageParameter param) {
+        if (successMessageForClear != null) {
+            return successMessageForClear.apply(param);
+        }
+        return param.entryName() + "をクリアしました";
     }
 
     protected abstract String keyToString(K k);

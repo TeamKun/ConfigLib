@@ -1,9 +1,14 @@
 package net.kunmc.lab.configlib;
 
+import net.kunmc.lab.configlib.command.CollectionValueAddCommandMessageParameter;
+import net.kunmc.lab.configlib.command.CollectionValueClearCommandMessageParameter;
+import net.kunmc.lab.configlib.command.CollectionValueRemoveCommandMessageParameter;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class CollectionValue<T extends Collection<E>, E, U extends CollectionValue<T, E, U>> extends Value<T, U> {
@@ -13,6 +18,9 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
     private transient boolean addable = true;
     private transient boolean removable = true;
     private transient boolean clearable = true;
+    private transient Function<CollectionValueAddCommandMessageParameter<T>, String> successMessageForAdd;
+    private transient Function<CollectionValueRemoveCommandMessageParameter<T>, String> successMessageForRemove;
+    private transient Function<CollectionValueClearCommandMessageParameter, String> successMessageForClear;
 
     public CollectionValue(T value) {
         super(value);
@@ -41,8 +49,22 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         addListeners.forEach(x -> x.accept(newValue));
     }
 
-    protected String succeedMessageForAdd(String entryName, T value) {
-        return String.format("%sに%sを追加しました.", entryName, elementToString(((E[]) value.toArray())[0]));
+    /**
+     * Sets a custom success message shown after an element is added via command.
+     */
+    public final U successMessageForAdd(Function<CollectionValueAddCommandMessageParameter<T>, String> successMessage) {
+        this.successMessageForAdd = successMessage;
+        return (U) this;
+    }
+
+    protected String succeedMessageForAdd(CollectionValueAddCommandMessageParameter<T> param) {
+        if (successMessageForAdd != null) {
+            return successMessageForAdd.apply(param);
+        }
+        return String.format("%sに%sを追加しました.",
+                             param.entryName(),
+                             elementToString(((E[]) param.added()
+                                                         .toArray())[0]));
     }
 
     public final U removableByCommand(boolean removable) {
@@ -68,8 +90,22 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         removeListeners.forEach(x -> x.accept(newValue));
     }
 
-    protected String succeedMessageForRemove(String entryName, T value) {
-        return String.format("%sから%sを削除しました.", entryName, elementToString(((E[]) value.toArray())[0]));
+    /**
+     * Sets a custom success message shown after an element is removed via command.
+     */
+    public final U successMessageForRemove(Function<CollectionValueRemoveCommandMessageParameter<T>, String> successMessage) {
+        this.successMessageForRemove = successMessage;
+        return (U) this;
+    }
+
+    protected String succeedMessageForRemove(CollectionValueRemoveCommandMessageParameter<T> param) {
+        if (successMessageForRemove != null) {
+            return successMessageForRemove.apply(param);
+        }
+        return String.format("%sから%sを削除しました.",
+                             param.entryName(),
+                             elementToString(((E[]) param.removed()
+                                                         .toArray())[0]));
     }
 
     public final U clearableByCommand(boolean clearable) {
@@ -91,6 +127,21 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
 
     final void onClearValue() {
         clearListeners.forEach(Runnable::run);
+    }
+
+    /**
+     * Sets a custom success message shown after the collection is cleared via command.
+     */
+    public final U successMessageForClear(Function<CollectionValueClearCommandMessageParameter, String> successMessage) {
+        this.successMessageForClear = successMessage;
+        return (U) this;
+    }
+
+    protected String succeedMessageForClear(CollectionValueClearCommandMessageParameter param) {
+        if (successMessageForClear != null) {
+            return successMessageForClear.apply(param);
+        }
+        return param.entryName() + "をクリアしました";
     }
 
     public abstract T toAdded(E... elements);

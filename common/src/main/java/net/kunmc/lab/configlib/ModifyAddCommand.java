@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.configlib.command.CollectionValueAddCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
@@ -40,7 +41,9 @@ class ModifyAddCommand extends Command {
                     value.onAddValue(newValue);
                     ((Collection) value.value()).addAll(newValue);
 
-                    ctx.sendSuccess(value.succeedMessageForAdd(entryName, newValue));
+                    ctx.sendSuccess(value.succeedMessageForAdd(new CollectionValueAddCommandMessageParameter<>(entryName,
+                                                                                                               ctx,
+                                                                                                               newValue)));
                 });
             });
         }

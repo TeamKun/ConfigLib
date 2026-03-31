@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.DoubleArgument;
+import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 
 import java.lang.reflect.Field;
@@ -40,6 +41,6 @@ class ModifyDecCommand extends Command {
         value.onModifyValueCommand(newValue);
         value.value(newValue);
 
-        ctx.sendSuccess(value.succeedModifyMessage(entryName));
+        ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(entryName, ctx)));
     }
 }

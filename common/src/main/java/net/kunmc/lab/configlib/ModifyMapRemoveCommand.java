@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.configlib.command.MapValueRemoveCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 
 import java.lang.reflect.Field;
@@ -43,7 +44,10 @@ class ModifyMapRemoveCommand extends Command {
                     value.remove(k);
                     value.onRemoveKey(k, v);
 
-                    ctx.sendSuccess(value.succeedMessageForRemove(entryName, k, v));
+                    ctx.sendSuccess(value.succeedMessageForRemove(new MapValueRemoveCommandMessageParameter<>(entryName,
+                                                                                                              ctx,
+                                                                                                              k,
+                                                                                                              v)));
                 });
             });
         }

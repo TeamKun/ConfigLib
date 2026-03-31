@@ -29,6 +29,20 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
     public UUIDSetValue(Set<UUID> value) {
         super(value);
+        successMessageForAdd((param) -> {
+            if (param.added()
+                     .size() == 1) {
+                UUID uuid = param.added()
+                                 .toArray(new UUID[0])[0];
+                return param.entryName() + "に" + elementToString(uuid) + "を追加しました.";
+            }
+            return param.entryName() + "に" + param.added()
+                                                   .size() + "個のUUIDを追加しました.";
+        });
+        successMessageForRemove((param) -> {
+            return param.entryName() + "から" + elementToString(param.removed()
+                                                                     .toArray(new UUID[0])[0]) + "を削除しました.";
+        });
     }
 
     @Override
@@ -36,15 +50,6 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
         return ListUtil.of(new ArgumentDefinition<>(new UUIDsArgument("targets", opt -> {
             opt.filter(x -> x.size() > 1 || !value.contains(x.get(0)));
         }), (targets, ctx) -> SetUtil.newHashSet(targets)));
-    }
-
-    @Override
-    protected String succeedMessageForAdd(String entryName, Set<UUID> element) {
-        if (element.size() == 1) {
-            UUID uuid = element.toArray(new UUID[0])[0];
-            return entryName + "に" + elementToString(uuid) + "を追加しました.";
-        }
-        return entryName + "に" + element.size() + "個のUUIDを追加しました.";
     }
 
     @Override
@@ -61,11 +66,6 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
                         .forEach(x -> sb.suggest(x.toString()));
                });
         }), (target, ctx) -> SetUtil.newHashSet(target)));
-    }
-
-    @Override
-    protected String succeedMessageForRemove(String entryName, Set<UUID> element) {
-        return entryName + "から" + elementToString(element.toArray(new UUID[0])[0]) + "を削除しました.";
     }
 
     @Override
