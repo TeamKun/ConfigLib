@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class Value<E, T extends Value<E, T>> {
     protected E value;
@@ -18,6 +19,7 @@ public abstract class Value<E, T extends Value<E, T>> {
     private transient final List<Consumer<E>> modifyListeners = new ArrayList<>();
     private transient Validator<E> validator = x -> {
     };
+    private transient Function<E, String> formatter;
 
     public Value(E value) {
         this.value = value;
@@ -48,6 +50,20 @@ public abstract class Value<E, T extends Value<E, T>> {
     public final T listable(boolean listable) {
         this.listable = listable;
         return ((T) this);
+    }
+
+    /**
+     * Sets a custom formatter for converting this value to a display string.
+     * The formatter takes precedence over the default {@link #asString()} implementation
+     * and is used wherever the value is displayed as text (e.g. list and get commands).
+     *
+     * <pre>{@code
+     * new IntegerValue(10).formatter(n -> n + " items")
+     * }</pre>
+     */
+    public final T formatter(Function<@Nullable E, String> formatter) {
+        this.formatter = formatter;
+        return (T) this;
     }
 
     final int valueHashCode() {
@@ -114,6 +130,13 @@ public abstract class Value<E, T extends Value<E, T>> {
 
     final void validate(E value) throws InvalidValueException {
         validator.validate(value);
+    }
+
+    final String format() {
+        if (formatter != null) {
+            return formatter.apply(value);
+        }
+        return asString();
     }
 
     protected abstract String asString();

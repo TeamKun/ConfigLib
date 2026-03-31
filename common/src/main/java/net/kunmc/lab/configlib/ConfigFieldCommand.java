@@ -27,7 +27,7 @@ class ConfigFieldCommand extends Command {
 
     private void initSingleValue(Field field, SingleValue<?, ?> v, boolean getEnabled, boolean modifyEnabled) {
         if (getEnabled && v.listable()) {
-            execute(ctx -> ctx.sendMessageWithOption(field.getName() + ": " + v.asString(),
+            execute(ctx -> ctx.sendMessageWithOption(field.getName() + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
         }
@@ -45,9 +45,12 @@ class ConfigFieldCommand extends Command {
         }
     }
 
-    private void initCollectionValue(Field field, CollectionValue<?, ?, ?> v, boolean getEnabled, boolean modifyEnabled) {
+    private void initCollectionValue(Field field,
+                                     CollectionValue<?, ?, ?> v,
+                                     boolean getEnabled,
+                                     boolean modifyEnabled) {
         if (getEnabled && v.listable()) {
-            execute(ctx -> ctx.sendMessageWithOption(field.getName() + ": " + v.asString(),
+            execute(ctx -> ctx.sendMessageWithOption(field.getName() + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
         }
@@ -67,7 +70,7 @@ class ConfigFieldCommand extends Command {
 
     private void initMapValue(Field field, MapValue<?, ?, ?> v, boolean getEnabled, boolean modifyEnabled) {
         if (getEnabled && v.listable()) {
-            execute(ctx -> ctx.sendMessageWithOption(field.getName() + ": " + v.asString(),
+            execute(ctx -> ctx.sendMessageWithOption(field.getName() + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
         }
