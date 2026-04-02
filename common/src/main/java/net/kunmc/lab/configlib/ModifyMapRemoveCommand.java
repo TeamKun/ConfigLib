@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
-import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.command.MapValueRemoveCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 
@@ -23,9 +23,8 @@ class ModifyMapRemoveCommand extends Command {
                     Object k;
                     try {
                         k = definition.mapArgument(ctx);
-                    } catch (InvalidArgumentException e) {
-                        e.toIncorrectArgumentInputException()
-                         .sendMessage(ctx);
+                    } catch (ArgumentValidationException e) {
+                        e.sendMessage(ctx);
                         return;
                     }
 

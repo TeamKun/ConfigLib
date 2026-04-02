@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
-import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.command.MapValuePutCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 
@@ -28,9 +28,8 @@ class ModifyMapPutCommand extends Command {
                     try {
                         k = keyDefinition.mapArgument(ctx);
                         v = valueDefinition.mapArgument(ctx);
-                    } catch (InvalidArgumentException e) {
-                        e.toIncorrectArgumentInputException()
-                         .sendMessage(ctx);
+                    } catch (ArgumentValidationException e) {
+                        e.sendMessage(ctx);
                         return;
                     }
 

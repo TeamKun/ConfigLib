@@ -37,7 +37,7 @@ public class NameableObjectValue<T extends Nameable> extends SingleValue<T, Name
     protected List<ArgumentDefinition<T>> argumentDefinitions() {
         return ListUtil.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name",
                                                                                  candidates,
-                                                                                 opt -> opt.filter(filter)),
+                                                                                 opt -> opt.validator(filter)),
                                                     (name, ctx) -> {
                                                         return name;
                                                     }));

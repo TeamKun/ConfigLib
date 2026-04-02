@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.argument.StringArgument;
-import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
 import net.kunmc.lab.configlib.util.ListUtil;
@@ -32,10 +32,10 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
                        allowableKeyStringList.forEach(sb::suggest);
                    }
                })
-               .filter(x -> {
+               .validator((x, ctx) -> {
                    if (allowableKeyStringList.stream()
                                              .noneMatch(s -> s.equals(x))) {
-                       throw new InvalidArgumentException(x + "は不正な引数です.");
+                       throw new ArgumentValidationException(x + "は不正な引数です.");
                    }
                });
         }, StringArgument.Type.PHRASE_QUOTED), (name, ctx) -> {

@@ -48,14 +48,14 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     @Override
     protected List<ArgumentDefinition<Set<UUID>>> argumentDefinitionsForAdd() {
         return ListUtil.of(new ArgumentDefinition<>(new UUIDsArgument("targets", opt -> {
-            opt.filter(x -> x.size() > 1 || !value.contains(x.get(0)));
+            opt.validator(x -> x.size() > 1 || !value.contains(x.get(0)));
         }), (targets, ctx) -> SetUtil.newHashSet(targets)));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<UUID>>> argumentDefinitionsForRemove() {
         return ListUtil.of(new ArgumentDefinition<>(new UUIDArgument("target", opt -> {
-            opt.filter(x -> {
+            opt.validator(x -> {
                    return value.contains(x);
                })
                .additionalSuggestionAction(sb -> {

@@ -27,7 +27,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
 
     @Override
     protected List<ArgumentDefinition<List<T>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.filter(filter)),
+        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(filter)),
                                                     (name, ctx) -> {
                                                         return ListUtil.of(name);
                                                     }));
@@ -35,7 +35,7 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
 
     @Override
     protected List<ArgumentDefinition<List<T>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.filter(x -> {
+        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(x -> {
             return value.contains(x);
         })), (name, ctx) -> {
             return ListUtil.of(name);

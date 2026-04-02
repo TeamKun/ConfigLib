@@ -30,7 +30,7 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
         return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
                                                        new ArgumentDefinition<>(new EnumArgument<>("name",
                                                                                                    clazz,
-                                                                                                   opt -> opt.filter(
+                                                                                                   opt -> opt.validator(
                                                                                                            filter)),
                                                                                 (t, ctx) -> t)));
     }

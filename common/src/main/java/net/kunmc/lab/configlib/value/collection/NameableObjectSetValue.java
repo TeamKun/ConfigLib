@@ -30,7 +30,7 @@ public class NameableObjectSetValue<T extends Nameable> extends SetValue<T, Name
     @Override
     protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForAdd() {
         return ListUtil.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name", candidates, opt -> {
-            opt.filter(x -> {
+            opt.validator(x -> {
                 if (value.stream()
                          .map(Nameable::tabCompleteName)
                          .anyMatch(y -> y.equals(x.tabCompleteName()))) {
@@ -47,7 +47,7 @@ public class NameableObjectSetValue<T extends Nameable> extends SetValue<T, Name
     @Override
     protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForRemove() {
         return ListUtil.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name", candidates, opt -> {
-            opt.filter(x -> {
+            opt.validator(x -> {
                 return value.stream()
                             .map(Nameable::tabCompleteName)
                             .anyMatch(y -> y.equals(x.tabCompleteName()));

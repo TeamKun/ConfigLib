@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.value.tuple;
 
 import net.kunmc.lab.commandlib.ArgumentBuilder;
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
@@ -58,7 +59,7 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
 
     /**
      * Defines how arguments are applied to a builder and mapped to a value.
-     * The mapper may throw {@link net.kunmc.lab.commandlib.exception.InvalidArgumentException}
+     * The mapper may throw {@link net.kunmc.lab.commandlib.exception.ArgumentValidationException}
      * to send an error message to the command executor.
      */
     public static class PairArgumentDefinition<L, R> implements ArgumentApplier, ArgumentMapper<MutablePair<L, R>> {
@@ -84,7 +85,7 @@ public abstract class PairValue<L, R, T extends PairValue<L, R, T>> extends Sing
         }
 
         @Override
-        public MutablePair<L, R> mapArgument(CommandContext ctx) {
+        public MutablePair<L, R> mapArgument(CommandContext ctx) throws ArgumentValidationException {
             MutablePair<L, R> value = MutablePair.of(left.mapArgument(ctx), right.mapArgument(ctx));
             validator.accept(value);
             return value;

@@ -3,7 +3,7 @@ package net.kunmc.lab.configlib.value;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.SuggestionAction;
 import net.kunmc.lab.commandlib.argument.StringArgument;
-import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
 import net.kunmc.lab.configlib.util.ListUtil;
@@ -56,16 +56,16 @@ public class StringValue extends SingleValue<String, StringValue> {
     protected List<ArgumentDefinition<String>> argumentDefinitions() {
         return ListUtil.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
             opt.suggestionAction(suggestionAction)
-               .filter(x -> {
+               .validator((x, ctx) -> {
                    if (!allowableStringList.isEmpty()) {
                        if (allowableStringList.stream()
                                               .noneMatch(s -> s.equals(x))) {
-                           throw new InvalidArgumentException(allowableStringList + "の中から文字列を入力してください");
+                           throw new ArgumentValidationException(allowableStringList + "の中から文字列を入力してください");
                        }
                    }
 
                    if (x.length() < min || x.length() > max) {
-                       throw new InvalidArgumentException(min + "以上" + max + "以下の文字数で入力してください");
+                       throw new ArgumentValidationException(min + "以上" + max + "以下の文字数で入力してください");
                    }
                });
         }, type), (s, ctx) -> {

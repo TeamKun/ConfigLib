@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib.value.collection;
 
 import net.kunmc.lab.commandlib.argument.BlockDataArgument;
 import net.kunmc.lab.commandlib.argument.StringArgument;
-import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.SetUtil;
@@ -48,7 +48,7 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
             try {
                 return SetUtil.newHashSet(Bukkit.createBlockData(data));
             } catch (IllegalArgumentException e) {
-                throw new InvalidArgumentException(data + "はブロック化出来ない値です.");
+                throw new ArgumentValidationException(data + "はブロック化出来ない値です.");
             }
         }));
     }

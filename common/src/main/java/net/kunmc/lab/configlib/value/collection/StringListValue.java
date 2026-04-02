@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.value.collection;
 
 import net.kunmc.lab.commandlib.argument.StringArgument;
-import net.kunmc.lab.commandlib.exception.InvalidArgumentException;
+import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.util.ListUtil;
 import org.jetbrains.annotations.NotNull;
@@ -46,10 +46,10 @@ public class StringListValue extends ListValue<String, StringListValue> {
             opt.suggestionAction(sb -> {
                    allowableStringList.forEach(sb::suggest);
                })
-               .filter(x -> {
+               .validator((x, ctx) -> {
                    if (allowableStringList.stream()
                                           .noneMatch(s -> s.equals(x))) {
-                       throw new InvalidArgumentException(x + "は不正な引数です");
+                       throw new ArgumentValidationException(x + "は不正な引数です");
                    }
                });
         }, type), (s, ctx) -> {

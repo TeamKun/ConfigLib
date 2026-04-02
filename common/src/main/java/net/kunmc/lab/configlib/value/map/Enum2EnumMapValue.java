@@ -28,7 +28,8 @@ public class Enum2EnumMapValue<K extends Enum<K>, V extends Enum<V>> extends Enu
                                                        new ArgumentDefinition<>(new EnumArgument<>("value",
                                                                                                    clazz,
                                                                                                    opt -> {
-                                                                                                       opt.filter(filter);
+                                                                                                       opt.validator(
+                                                                                                               filter);
                                                                                                    }), (v, ctx) -> {
                                                            return v;
                                                        })));

@@ -30,7 +30,7 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
             List<UUID> offlinePlayerUUIDs = Arrays.stream(Bukkit.getOfflinePlayers())
                                                   .map(OfflinePlayer::getUniqueId)
                                                   .collect(Collectors.toList());
-            opt.filter(x -> {
+            opt.validator(x -> {
                    return value.containsKey(x);
                })
                .additionalSuggestionAction(sb -> {

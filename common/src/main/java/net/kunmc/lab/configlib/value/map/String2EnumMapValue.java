@@ -30,7 +30,8 @@ public class String2EnumMapValue<T extends Enum<T>> extends String2ObjectMapValu
                                                        new ArgumentDefinition<>(new EnumArgument<>("name",
                                                                                                    clazz,
                                                                                                    opt -> {
-                                                                                                       opt.filter(filter);
+                                                                                                       opt.validator(
+                                                                                                               filter);
                                                                                                    }), (name, ctx) -> {
                                                            return name;
                                                        })));

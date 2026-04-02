@@ -46,7 +46,7 @@ public class ItemStackListValue extends ListValue<ItemStack, ItemStackListValue>
                         .map(GSON::toJson)
                         .forEach(sb::suggest);
                })
-               .filter(x -> {
+               .validator(x -> {
                    return value.stream()
                                .map(GSON::toJson)
                                .anyMatch(x::equals);

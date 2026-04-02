@@ -23,6 +23,7 @@ repositories {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.31'
+    compileOnly 'org.jetbrains:annotations:20.1.0'
     api project(":common")
-    compileOnly "com.github.TeamKun.CommandLib:forge:0.14.1"
+    compileOnly "com.github.TeamKun.CommandLib:forge:0.17.1"
 }
