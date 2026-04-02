@@ -16,12 +16,12 @@ public class AddValidatorTestConfig extends BaseConfig {
             throw new InvalidValueException("cannot set air");
         }
     });
-    public final EnumSetValue<EntityType> entityTypes = new EnumSetValue<EntityType>().addValidator(x -> {
+    public final EnumSetValue<EntityType> entityTypes = new EnumSetValue<>(EntityType.class).addValidator(x -> {
         if (x.contains(EntityType.BOAT)) {
             throw new InvalidValueException();
         }
     });
-    public final Enum2IntegerMapValue<EntityType> entityType2IntegerMapValue = new Enum2IntegerMapValue<EntityType>().addValidator(
+    public final Enum2IntegerMapValue<EntityType> entityType2IntegerMapValue = new Enum2IntegerMapValue<>(EntityType.class).addValidator(
             x -> {
                 if (x.containsKey(EntityType.BOAT)) {
                     throw new InvalidValueException();

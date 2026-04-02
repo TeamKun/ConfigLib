@@ -14,27 +14,21 @@ public abstract class AbstractEnumValue<E extends Enum<E>, T extends AbstractEnu
     private final transient Predicate<E> filter;
 
     public AbstractEnumValue(@NotNull E value) {
-        this(value,
-             value.getDeclaringClass()
-                  .getEnumConstants());
+        this(value, value.getDeclaringClass());
     }
 
-    public AbstractEnumValue(@NotNull E value, E[] constants) {
-        this(value, constants, x -> true);
+    public AbstractEnumValue(@NotNull E value, Class<E> clazz) {
+        this(value, clazz, x -> true);
     }
 
     public AbstractEnumValue(@NotNull E value, Predicate<E> filter) {
-        this(value,
-             value.getDeclaringClass()
-                  .getEnumConstants(),
-             filter);
+        this(value, value.getDeclaringClass(), filter);
     }
 
-    public AbstractEnumValue(@NotNull E value, E[] constants, Predicate<E> filter) {
+    public AbstractEnumValue(@NotNull E value, Class<E> clazz, Predicate<E> filter) {
         super(value);
 
-        this.clazz = ((Class<E>) constants.getClass()
-                                          .getComponentType());
+        this.clazz = clazz;
         this.filter = filter;
     }
 

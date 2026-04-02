@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Map;
 
 public class Enum2StringMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T, String, Enum2StringMapValue<T>> {
-    public Enum2StringMapValue(T... t) {
-        this(new HashMap<>(), t);
+    public Enum2StringMapValue(Class<T> kClass) {
+        this(kClass, new HashMap<>());
     }
 
-    public Enum2StringMapValue(Map<T, String> value, T... t) {
-        super(value, t);
+    public Enum2StringMapValue(Class<T> kClass, Map<T, String> value) {
+        super(kClass, value);
     }
 
     @Override

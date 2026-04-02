@@ -13,15 +13,14 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
     private final transient Class<T> clazz;
     private final transient Predicate<T> filter;
 
-    public EnumListValue(T... values) {
-        this(x -> true, values);
+    public EnumListValue(Class<T> clazz) {
+        this(clazz, x -> true);
     }
 
-    public EnumListValue(@NotNull Predicate<T> filter, T... values) {
+    public EnumListValue(Class<T> clazz, @NotNull Predicate<T> filter) {
         super(new ArrayList<>());
 
-        this.clazz = ((Class<T>) values.getClass()
-                                       .getComponentType());
+        this.clazz = clazz;
         this.filter = filter;
     }
 

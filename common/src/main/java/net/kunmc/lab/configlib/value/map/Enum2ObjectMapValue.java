@@ -13,11 +13,10 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     private transient final Class<T> clazz;
     private transient Predicate<T> filter = x -> true;
 
-    public Enum2ObjectMapValue(Map<T, V> value, T... t) {
+    public Enum2ObjectMapValue(Class<T> clazz, Map<T, V> value) {
         super(value);
 
-        clazz = ((Class<T>) t.getClass()
-                             .getComponentType());
+        this.clazz = clazz;
     }
 
     public U setKeyFilter(Predicate<T> filter) {

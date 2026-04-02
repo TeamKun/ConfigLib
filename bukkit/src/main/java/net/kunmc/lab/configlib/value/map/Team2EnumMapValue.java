@@ -13,15 +13,14 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
     private final transient Class<T> clazz;
     private final transient Predicate<T> filter;
 
-    public Team2EnumMapValue(T... e) {
-        this(x -> true, e);
+    public Team2EnumMapValue(Class<T> clazz) {
+        this(clazz, x -> true);
     }
 
-    public Team2EnumMapValue(Predicate<T> filter, T... e) {
+    public Team2EnumMapValue(Class<T> clazz, Predicate<T> filter) {
         super(new HashMap<>());
 
-        this.clazz = ((Class<T>) e.getClass()
-                                  .getComponentType());
+        this.clazz = clazz;
         this.filter = filter;
     }
 

@@ -16,15 +16,14 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
     private final transient Class<T> clazz;
     private final transient Predicate<T> filter;
 
-    public EnumSetValue(T... values) {
-        this(x -> true, values);
+    public EnumSetValue(Class<T> clazz) {
+        this(clazz, x -> true);
     }
 
-    public EnumSetValue(@NotNull Predicate<T> filter, T... values) {
+    public EnumSetValue(Class<T> clazz, @NotNull Predicate<T> filter) {
         super(new HashSet<>());
 
-        this.clazz = ((Class<T>) values.getClass()
-                                       .getComponentType());
+        this.clazz = clazz;
         this.filter = filter;
     }
 

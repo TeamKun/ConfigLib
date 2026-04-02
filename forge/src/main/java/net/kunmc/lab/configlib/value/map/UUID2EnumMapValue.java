@@ -13,15 +13,14 @@ public class UUID2EnumMapValue<T extends Enum<T>> extends UUID2ObjectMapValue<T,
     private final transient Class<T> clazz;
     private final transient Predicate<T> filter;
 
-    public UUID2EnumMapValue(T... t) {
-        this(x -> true, t);
+    public UUID2EnumMapValue(Class<T> clazz) {
+        this(clazz, x -> true);
     }
 
-    public UUID2EnumMapValue(Predicate<T> filter, T... t) {
+    public UUID2EnumMapValue(Class<T> clazz, Predicate<T> filter) {
         super(new HashMap<>());
 
-        this.clazz = ((Class<T>) t.getClass()
-                                  .getComponentType());
+        this.clazz = clazz;
         this.filter = filter;
     }
 

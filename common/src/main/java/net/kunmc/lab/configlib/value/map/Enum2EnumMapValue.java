@@ -13,7 +13,7 @@ public class Enum2EnumMapValue<K extends Enum<K>, V extends Enum<V>> extends Enu
     private transient Predicate<V> filter = x -> true;
 
     public Enum2EnumMapValue(Class<K> keyClass, Class<V> valueClass) {
-        super(new HashMap<>(), keyClass.getEnumConstants());
+        super(keyClass, new HashMap<>());
         this.clazz = valueClass;
     }
 

@@ -12,15 +12,14 @@ public class String2EnumMapValue<T extends Enum<T>> extends String2ObjectMapValu
     private final transient Class<T> clazz;
     private final transient Predicate<T> filter;
 
-    public String2EnumMapValue(T... t) {
-        this(x -> true, t);
+    public String2EnumMapValue(Class<T> clazz) {
+        this(clazz, x -> true);
     }
 
-    public String2EnumMapValue(Predicate<T> filter, T... t) {
+    public String2EnumMapValue(Class<T> clazz, Predicate<T> filter) {
         super(new HashMap<>());
 
-        this.clazz = ((Class<T>) t.getClass()
-                                  .getComponentType());
+        this.clazz = clazz;
         this.filter = filter;
     }
 

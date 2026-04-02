@@ -9,15 +9,15 @@ public final class EnumValue<T extends Enum<T>> extends AbstractEnumValue<T, Enu
         super(value);
     }
 
-    public EnumValue(@NotNull T value, T[] constants) {
-        super(value, constants);
+    public EnumValue(@NotNull T value, Class<T> clazz) {
+        super(value, clazz);
     }
 
     public EnumValue(@NotNull T value, Predicate<T> filter) {
         super(value, filter);
     }
 
-    public EnumValue(@NotNull T value, T[] constants, Predicate<T> filter) {
-        super(value, constants, filter);
+    public EnumValue(@NotNull T value, Class<T> clazz, Predicate<T> filter) {
+        super(value, clazz, filter);
     }
 }

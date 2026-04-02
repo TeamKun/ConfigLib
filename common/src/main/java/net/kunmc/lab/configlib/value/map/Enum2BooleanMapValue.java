@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Map;
 
 public class Enum2BooleanMapValue<T extends Enum<T>> extends Enum2ObjectMapValue<T, Boolean, Enum2BooleanMapValue<T>> {
-    public Enum2BooleanMapValue(T... t) {
-        this(new HashMap<>(), t);
+    public Enum2BooleanMapValue(Class<T> kClass) {
+        this(kClass, new HashMap<>());
     }
 
-    public Enum2BooleanMapValue(Map<T, Boolean> value, T... t) {
-        super(value, t);
+    public Enum2BooleanMapValue(Class<T> kClass, Map<T, Boolean> value) {
+        super(kClass, value);
     }
 
     @Override
