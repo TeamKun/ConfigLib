@@ -10,10 +10,11 @@ import java.util.List;
 public class Team2FloatMapValue extends Team2ObjectMapValue<Float, Team2FloatMapValue> {
     @Override
     protected List<PutArgumentDefinition<ScorePlayerTeam, Float>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(
-                keyArgumentDefinitionForPut(),
-                new ArgumentDefinition<>(new FloatArgument("float", -Float.MAX_VALUE, Float.MAX_VALUE),
-                                         (f, ctx) -> f)));
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new FloatArgument("float",
+                                                                                                  -Float.MAX_VALUE,
+                                                                                                  Float.MAX_VALUE),
+                                                                                (f, ctx) -> f)));
     }
 
     @Override

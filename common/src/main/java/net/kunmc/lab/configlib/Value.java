@@ -1,6 +1,9 @@
 package net.kunmc.lab.configlib;
 
+import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.commandlib.exception.CommandPrerequisiteException;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.util.function.ExecutionCondition;
 import net.kunmc.lab.configlib.util.function.Validator;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,19 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public abstract class Value<E, T extends Value<E, T>> {
+    private transient final List<Consumer<E>> initializeListeners = new ArrayList<>();
+    private transient final List<Consumer<E>> modifyListeners = new ArrayList<>();
     protected E value;
     private String description;
     private transient boolean listable = true;
     private transient volatile boolean initialized = false;
     private transient E initValue;
-    private transient final List<Consumer<E>> initializeListeners = new ArrayList<>();
-    private transient final List<Consumer<E>> modifyListeners = new ArrayList<>();
     private transient Validator<E> validator = x -> {
     };
     private transient Function<E, String> formatter;
     private transient String entryName;
+    private transient ExecutionCondition executableIf;
 
     public Value(E value) {
         this.value = value;
@@ -147,6 +152,38 @@ public abstract class Value<E, T extends Value<E, T>> {
             return entryName;
         }
         return fieldName;
+    }
+
+    /**
+     * Sets a condition for this value's command execution.
+     * Throw {@link net.kunmc.lab.commandlib.exception.CommandPrerequisiteException} to deny execution.
+     *
+     * <pre>{@code
+     * new IntegerValue(10).executableIf(ctx -> {
+     *     if (!ctx.getSender().isOp()) throw new CommandPrerequisiteException(c -> c.sendFailure("Ops only."));
+     * })
+     * }</pre>
+     */
+    public final T executableIf(ExecutionCondition condition) {
+        this.executableIf = condition;
+        return (T) this;
+    }
+
+    /**
+     * Sets a simple boolean condition. Uses a default error message when denied.
+     */
+    public final T executableIf(Predicate<CommandContext> condition) {
+        return executableIf(ctx -> {
+            if (!condition.test(ctx)) {
+                throw new CommandPrerequisiteException(c -> c.sendFailure("このコマンドを実行できません"));
+            }
+        });
+    }
+
+    final void checkExecutable(CommandContext ctx) throws CommandPrerequisiteException {
+        if (executableIf != null) {
+            executableIf.check(ctx);
+        }
     }
 
     final String format() {

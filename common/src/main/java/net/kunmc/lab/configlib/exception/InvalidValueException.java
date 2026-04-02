@@ -1,13 +1,13 @@
 package net.kunmc.lab.configlib.exception;
 
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.util.ListUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class InvalidValueException extends Exception {
-    private final List<String> messages = new ArrayList<>();
+    private final Consumer<CommandContext> messageSender;
 
     public InvalidValueException() {
         this("不正な値です");
@@ -18,11 +18,16 @@ public class InvalidValueException extends Exception {
     }
 
     public InvalidValueException(List<String> messages) {
-        super(String.join("", messages));
-        this.messages.addAll(messages);
+        this(ctx -> {
+            messages.forEach(ctx::sendFailure);
+        });
     }
 
-    public List<String> getMessages() {
-        return Collections.unmodifiableList(messages);
+    public InvalidValueException(Consumer<CommandContext> messageSender) {
+        this.messageSender = messageSender;
+    }
+
+    public void sendMessage(CommandContext ctx) {
+        this.messageSender.accept(ctx);
     }
 }

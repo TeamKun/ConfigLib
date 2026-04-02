@@ -10,9 +10,9 @@ import java.util.List;
 public class Team2DoubleMapValue extends Team2ObjectMapValue<Double, Team2DoubleMapValue> {
     @Override
     protected List<PutArgumentDefinition<Team, Double>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(
-                keyArgumentDefinitionForPut(),
-                new ArgumentDefinition<>(new DoubleArgument("double"), (d, ctx) -> d)));
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new DoubleArgument("double"),
+                                                                                (d, ctx) -> d)));
     }
 
     @Override

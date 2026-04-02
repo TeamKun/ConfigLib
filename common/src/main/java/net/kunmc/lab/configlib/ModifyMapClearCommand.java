@@ -9,6 +9,8 @@ class ModifyMapClearCommand extends Command {
     public ModifyMapClearCommand(Field field, MapValue value) {
         super("clear");
 
+        addPrerequisite(value::checkExecutable);
+
         execute(ctx -> {
             value.onClearMap();
             value.clear();

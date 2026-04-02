@@ -14,6 +14,8 @@ class ModifyMapRemoveCommand extends Command {
     public ModifyMapRemoveCommand(Field field, MapValue value) {
         super("remove");
 
+        addPrerequisite(value::checkExecutable);
+
         String entryName = value.resolveEntryName(field.getName());
         for (ArgumentDefinition<?> definition : ((List<ArgumentDefinition<?>>) value.argumentDefinitionsForRemove())) {
             argument(builder -> {
@@ -35,8 +37,7 @@ class ModifyMapRemoveCommand extends Command {
                         remaining.remove(k);
                         value.validate(remaining);
                     } catch (InvalidValueException e) {
-                        e.getMessages()
-                         .forEach(ctx::sendFailure);
+                        e.sendMessage(ctx);
                         return;
                     }
 

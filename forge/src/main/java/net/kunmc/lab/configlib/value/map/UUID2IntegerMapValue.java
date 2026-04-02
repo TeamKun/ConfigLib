@@ -10,9 +10,9 @@ import java.util.UUID;
 public class UUID2IntegerMapValue extends UUID2ObjectMapValue<Integer, UUID2IntegerMapValue> {
     @Override
     protected List<PutArgumentDefinition<UUID, Integer>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(
-                keyArgumentDefinitionForPut(),
-                new ArgumentDefinition<>(new IntegerArgument("integer"), (n, ctx) -> n)));
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new IntegerArgument("integer"),
+                                                                                (n, ctx) -> n)));
     }
 
     @Override

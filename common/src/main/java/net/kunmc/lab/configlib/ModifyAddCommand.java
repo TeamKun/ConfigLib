@@ -19,6 +19,8 @@ class ModifyAddCommand extends Command {
             argument(builder -> {
                 ((ArgumentApplier) definition).applyArgument(builder);
 
+                addPrerequisite(value::checkExecutable);
+
                 builder.execute(ctx -> {
                     Collection newValue;
                     try {
@@ -32,8 +34,7 @@ class ModifyAddCommand extends Command {
                         Collection result = value.toAdded(newValue.toArray());
                         value.validate(result);
                     } catch (InvalidValueException e) {
-                        e.getMessages()
-                         .forEach(ctx::sendFailure);
+                        e.sendMessage(ctx);
                         return;
                     }
 

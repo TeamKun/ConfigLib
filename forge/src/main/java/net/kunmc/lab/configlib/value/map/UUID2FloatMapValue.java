@@ -10,10 +10,11 @@ import java.util.UUID;
 public class UUID2FloatMapValue extends UUID2ObjectMapValue<Float, UUID2FloatMapValue> {
     @Override
     protected List<PutArgumentDefinition<UUID, Float>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(
-                keyArgumentDefinitionForPut(),
-                new ArgumentDefinition<>(new FloatArgument("float", -Float.MAX_VALUE, Float.MAX_VALUE),
-                                         (f, ctx) -> f)));
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new FloatArgument("float",
+                                                                                                  -Float.MAX_VALUE,
+                                                                                                  Float.MAX_VALUE),
+                                                                                (f, ctx) -> f)));
     }
 
     @Override

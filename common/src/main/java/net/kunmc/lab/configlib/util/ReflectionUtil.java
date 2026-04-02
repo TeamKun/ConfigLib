@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ReflectionUtil {
+    private ReflectionUtil() {
+    }
+
     public static List<Field> getFieldsIncludingSuperclasses(Class<?> clazz) {
         List<Field> fields = new ArrayList<>(Arrays.asList(clazz.getDeclaredFields()));
         if (clazz.getSuperclass() != null) {
@@ -13,8 +16,5 @@ public class ReflectionUtil {
         }
 
         return fields;
-    }
-
-    private ReflectionUtil() {
     }
 }

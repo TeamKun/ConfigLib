@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ConfigUtil {
+    private ConfigUtil() {
+    }
+
     public static List<Field> getObservedFields(CommonBaseConfig config, Class<?> targetClass) {
         List<Field> fields = ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())
                                            .stream()
@@ -85,8 +88,5 @@ public class ConfigUtil {
                                         })
                                         .map(x -> ((MapValue<?, ?, ?>) x))
                                         .collect(Collectors.toList());
-    }
-
-    private ConfigUtil() {
     }
 }

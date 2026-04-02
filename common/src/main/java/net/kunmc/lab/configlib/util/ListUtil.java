@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class ListUtil {
+    private ListUtil() {
+    }
+
     public static <E> List<E> asList(@Nullable E first, E[] rest) {
         List<E> list = new ArrayList<>();
         list.add(first);
@@ -21,8 +24,5 @@ public class ListUtil {
         List<E> list = new ArrayList<>(elements.length);
         Collections.addAll(list, elements);
         return list;
-    }
-
-    private ListUtil() {
     }
 }

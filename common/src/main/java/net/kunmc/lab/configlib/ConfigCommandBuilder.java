@@ -21,6 +21,35 @@ public class ConfigCommandBuilder {
         configs.add(config);
     }
 
+    private static String resolveEntryName(Field field, Object obj) {
+        if (obj instanceof Value) {
+            return ((Value<?, ?>) obj).resolveEntryName(field.getName());
+        }
+        return field.getName();
+    }
+
+    private static boolean isDisplayable(Object obj) {
+        if (obj instanceof Value) {
+            return ((Value<?, ?>) obj).listable();
+        }
+        return true;
+    }
+
+    private static boolean isModifiable(Object obj) {
+        if (obj instanceof SingleValue) {
+            return ((SingleValue<?, ?>) obj).writableByCommand();
+        }
+        if (obj instanceof CollectionValue) {
+            CollectionValue<?, ?, ?> v = (CollectionValue<?, ?, ?>) obj;
+            return v.addableByCommand() || v.removableByCommand() || v.clearableByCommand();
+        }
+        if (obj instanceof MapValue) {
+            MapValue<?, ?, ?> v = (MapValue<?, ?, ?>) obj;
+            return v.puttableByCommand() || v.removableByCommand() || v.clearableByCommand();
+        }
+        return false;
+    }
+
     public ConfigCommandBuilder disableListCommand() {
         listEnabled = false;
         return this;
@@ -109,13 +138,6 @@ public class ConfigCommandBuilder {
                         .collect(Collectors.toSet());
     }
 
-    private static String resolveEntryName(Field field, Object obj) {
-        if (obj instanceof Value) {
-            return ((Value<?, ?>) obj).resolveEntryName(field.getName());
-        }
-        return field.getName();
-    }
-
     private List<Field> getCommandFields(CommonBaseConfig config) {
         List<Field> result = new ArrayList<>();
         ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())
@@ -170,27 +192,5 @@ public class ConfigCommandBuilder {
                                                                  modifyEnabled));
             }
         }
-    }
-
-    private static boolean isDisplayable(Object obj) {
-        if (obj instanceof Value) {
-            return ((Value<?, ?>) obj).listable();
-        }
-        return true;
-    }
-
-    private static boolean isModifiable(Object obj) {
-        if (obj instanceof SingleValue) {
-            return ((SingleValue<?, ?>) obj).writableByCommand();
-        }
-        if (obj instanceof CollectionValue) {
-            CollectionValue<?, ?, ?> v = (CollectionValue<?, ?, ?>) obj;
-            return v.addableByCommand() || v.removableByCommand() || v.clearableByCommand();
-        }
-        if (obj instanceof MapValue) {
-            MapValue<?, ?, ?> v = (MapValue<?, ?, ?>) obj;
-            return v.puttableByCommand() || v.removableByCommand() || v.clearableByCommand();
-        }
-        return false;
     }
 }

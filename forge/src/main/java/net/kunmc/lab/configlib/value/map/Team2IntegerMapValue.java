@@ -10,9 +10,9 @@ import java.util.List;
 public class Team2IntegerMapValue extends Team2ObjectMapValue<Integer, Team2IntegerMapValue> {
     @Override
     protected List<PutArgumentDefinition<ScorePlayerTeam, Integer>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(
-                keyArgumentDefinitionForPut(),
-                new ArgumentDefinition<>(new IntegerArgument("integer"), (n, ctx) -> n)));
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new IntegerArgument("integer"),
+                                                                                (n, ctx) -> n)));
     }
 
     @Override

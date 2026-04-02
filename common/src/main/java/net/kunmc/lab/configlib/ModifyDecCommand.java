@@ -18,6 +18,7 @@ class ModifyDecCommand extends Command {
         this.field = field;
         this.value = value;
 
+        addPrerequisite(value::checkExecutable);
         execute(ctx -> exec(1.0, ctx));
         argument(new DoubleArgument("decValue"), this::exec);
     }
@@ -33,8 +34,7 @@ class ModifyDecCommand extends Command {
         try {
             value.validate(newValue);
         } catch (InvalidValueException e) {
-            e.getMessages()
-             .forEach(ctx::sendFailure);
+            e.sendMessage(ctx);
             return;
         }
 

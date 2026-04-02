@@ -10,9 +10,9 @@ import java.util.UUID;
 public class UUID2DoubleMapValue extends UUID2ObjectMapValue<Double, UUID2DoubleMapValue> {
     @Override
     protected List<PutArgumentDefinition<UUID, Double>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(
-                keyArgumentDefinitionForPut(),
-                new ArgumentDefinition<>(new DoubleArgument("double"), (d, ctx) -> d)));
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new DoubleArgument("double"),
+                                                                                (d, ctx) -> d)));
     }
 
     @Override

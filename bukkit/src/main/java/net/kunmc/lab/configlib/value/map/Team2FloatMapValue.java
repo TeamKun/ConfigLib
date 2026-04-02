@@ -10,9 +10,9 @@ import java.util.List;
 public class Team2FloatMapValue extends Team2ObjectMapValue<Float, Team2FloatMapValue> {
     @Override
     protected List<PutArgumentDefinition<Team, Float>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(
-                keyArgumentDefinitionForPut(),
-                new ArgumentDefinition<>(new FloatArgument("float"), (f, ctx) -> f)));
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new FloatArgument("float"),
+                                                                                (f, ctx) -> f)));
     }
 
     @Override

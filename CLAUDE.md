@@ -25,6 +25,7 @@ Gradle daemon is disabled (`gradle.properties`). The project targets Java 8.
 ## Project Overview
 
 ConfigLib is a type-safe configuration management library for Minecraft servers (Bukkit/Paper and Forge). It provides:
+
 - Reflection-based discovery of config fields (no manual registration)
 - GSON-based JSON serialization with custom type adapters
 - File watching and auto-reload on change
@@ -34,8 +35,10 @@ ConfigLib is a type-safe configuration management library for Minecraft servers 
 
 ## Module Structure
 
-- **`common/`** — Platform-agnostic core: `CommonBaseConfig`, all `Value` types, command generation, GSON adapters, utilities
-- **`bukkit/`** — Bukkit/Paper implementation: `BaseConfig` extending common, Bukkit-specific Value types (`LocationValue`, `ItemStackValue`, etc.) and GSON adapters
+- **`common/`** — Platform-agnostic core: `CommonBaseConfig`, all `Value` types, command generation, GSON adapters,
+  utilities
+- **`bukkit/`** — Bukkit/Paper implementation: `BaseConfig` extending common, Bukkit-specific Value types (
+  `LocationValue`, `ItemStackValue`, etc.) and GSON adapters
 - **`forge/`** — Forge implementation: `BaseConfig` extending common, Forge-specific Value types and adapters
 - **`sample/bukkit/`**, **`sample/forge/`** — Example plugin/mod demonstrating usage
 - **`bukkit/test_plugin/`** — Internal test plugin
@@ -70,17 +73,21 @@ Value<E, T>
 
 ### Adding a New Value Type
 
-1. Extend `SingleValue`, `ListValue`, `SetValue`, or `MapValue` in the appropriate module (`common` for generic types, `bukkit`/`forge` for platform-specific)
+1. Extend `SingleValue`, `ListValue`, `SetValue`, or `MapValue` in the appropriate module (`common` for generic types,
+   `bukkit`/`forge` for platform-specific)
 2. Add a corresponding GSON type adapter in the `gson/` package if serialization isn't handled by GSON defaults
 3. If the value should support command modification, implement the relevant `SubCommandType` strategy
 
 ### Command Generation
 
-`ConfigCommandBuilder` produces a `ConfigCommand` by inspecting the config's fields. Sub-commands (`get`, `list`, `modify`, `reload`) are generated per `SubCommandType` enum strategies. Modify sub-commands (`add`, `remove`, `clear`, `inc`, `dec`, etc.) are generated based on the value type.
+`ConfigCommandBuilder` produces a `ConfigCommand` by inspecting the config's fields. Sub-commands (`get`, `list`,
+`modify`, `reload`) are generated per `SubCommandType` enum strategies. Modify sub-commands (`add`, `remove`, `clear`,
+`inc`, `dec`, etc.) are generated based on the value type.
 
 ### Platform Abstraction
 
 `CommonBaseConfig` contains all core logic. Platform `BaseConfig` classes handle:
+
 - Plugin/mod lifecycle integration (enable/disable hooks)
 - Config file directory resolution
 - Registering platform-specific GSON adapters
@@ -102,6 +109,7 @@ CommandLib.register(this, cmd);
 ```
 
 Values support fluent configuration:
+
 ```java
 new IntegerValue(50)
     .description("Spawn radius")

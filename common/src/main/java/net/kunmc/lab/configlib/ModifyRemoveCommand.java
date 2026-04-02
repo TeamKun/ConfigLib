@@ -14,6 +14,8 @@ class ModifyRemoveCommand extends Command {
     public ModifyRemoveCommand(Field field, CollectionValue value) {
         super("remove");
 
+        addPrerequisite(value::checkExecutable);
+
         String entryName = value.resolveEntryName(field.getName());
         for (Object definition : value.argumentDefinitionsForRemove()) {
             argument(builder -> {
@@ -32,8 +34,7 @@ class ModifyRemoveCommand extends Command {
                         Collection remaining = value.toRemoved(removeValue.toArray());
                         value.validate(remaining);
                     } catch (InvalidValueException e) {
-                        e.getMessages()
-                         .forEach(ctx::sendFailure);
+                        e.sendMessage(ctx);
                         return;
                     }
 

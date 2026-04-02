@@ -20,8 +20,7 @@ public class ArgumentDefinition<T> implements ArgumentApplier, ArgumentMapper<T>
         this.mapper = mapper;
     }
 
-    public <A1> ArgumentDefinition(CommonArgument<A1, CommandContext> argument1,
-                                   BiArgumentMapper<A1, T> mapper) {
+    public <A1> ArgumentDefinition(CommonArgument<A1, CommandContext> argument1, BiArgumentMapper<A1, T> mapper) {
         this(b -> {
             b.customArgument(argument1);
         }, (ctx) -> {

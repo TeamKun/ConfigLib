@@ -10,6 +10,8 @@ class ModifyClearCommand extends Command {
     public ModifyClearCommand(Field field, CollectionValue value) {
         super("clear");
 
+        addPrerequisite(value::checkExecutable);
+
         execute(ctx -> {
             value.onClearValue();
             ((Collection) value.value()).clear();

@@ -10,9 +10,9 @@ import java.util.UUID;
 public class UUID2BooleanMapValue extends UUID2ObjectMapValue<Boolean, UUID2BooleanMapValue> {
     @Override
     protected List<PutArgumentDefinition<UUID, Boolean>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(
-                keyArgumentDefinitionForPut(),
-                new ArgumentDefinition<>(new BooleanArgument("bool"), (b, ctx) -> b)));
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new BooleanArgument("bool"),
+                                                                                (b, ctx) -> b)));
     }
 
     @Override

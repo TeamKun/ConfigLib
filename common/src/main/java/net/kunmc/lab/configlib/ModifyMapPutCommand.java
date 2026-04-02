@@ -14,6 +14,8 @@ class ModifyMapPutCommand extends Command {
     public ModifyMapPutCommand(Field field, MapValue value) {
         super("put");
 
+        addPrerequisite(value::checkExecutable);
+
         String entryName = value.resolveEntryName(field.getName());
         for (MapValue.PutArgumentDefinition<?, ?> definition : ((List<MapValue.PutArgumentDefinition<?, ?>>) value.argumentDefinitionsForPut())) {
             argument(builder -> {
@@ -38,8 +40,7 @@ class ModifyMapPutCommand extends Command {
                         result.put(k, v);
                         value.validate(result);
                     } catch (InvalidValueException e) {
-                        e.getMessages()
-                         .forEach(ctx::sendFailure);
+                        e.sendMessage(ctx);
                         return;
                     }
 

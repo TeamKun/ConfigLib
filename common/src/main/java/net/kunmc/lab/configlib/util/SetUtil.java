@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SetUtil {
+    private SetUtil() {
+    }
+
     @SafeVarargs
     public static <T> Set<T> newHashSet(T... elements) {
         Set<T> set = new HashSet<>(elements.length);
@@ -17,8 +20,5 @@ public class SetUtil {
         Set<T> set = new HashSet<>(collection.size());
         set.addAll(collection);
         return set;
-    }
-
-    private SetUtil() {
     }
 }

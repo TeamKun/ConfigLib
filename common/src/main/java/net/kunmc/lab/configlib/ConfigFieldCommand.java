@@ -26,7 +26,41 @@ class ConfigFieldCommand extends Command {
         }
     }
 
+    static void applySet(Command command, Field field, SingleValue value) {
+        String entryName = value.resolveEntryName(field.getName());
+        for (Object definition : value.argumentDefinitions()) {
+            command.argument(builder -> {
+                ((ArgumentApplier) definition).applyArgument(builder);
+
+                builder.execute(ctx -> {
+                    Object newValue;
+                    try {
+                        newValue = ((ArgumentMapper<?>) definition).mapArgument(ctx);
+                    } catch (ArgumentValidationException e) {
+                        e.sendMessage(ctx);
+                        return;
+                    }
+
+                    try {
+                        value.validate(newValue);
+                    } catch (InvalidValueException e) {
+                        e.sendMessage(ctx);
+                        return;
+                    }
+
+                    value.onModifyValueCommand(newValue);
+                    value.value(newValue);
+
+                    ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(entryName,
+                                                                                                            ctx)));
+                });
+            });
+        }
+    }
+
     private void initSingleValue(Field field, SingleValue<?, ?> v, boolean getEnabled, boolean modifyEnabled) {
+        addPrerequisite(v::checkExecutable);
+
         if (getEnabled && v.listable()) {
             execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
@@ -50,6 +84,8 @@ class ConfigFieldCommand extends Command {
                                      CollectionValue<?, ?, ?> v,
                                      boolean getEnabled,
                                      boolean modifyEnabled) {
+        addPrerequisite(v::checkExecutable);
+
         if (getEnabled && v.listable()) {
             execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
@@ -70,6 +106,8 @@ class ConfigFieldCommand extends Command {
     }
 
     private void initMapValue(Field field, MapValue<?, ?, ?> v, boolean getEnabled, boolean modifyEnabled) {
+        addPrerequisite(v::checkExecutable);
+
         if (getEnabled && v.listable()) {
             execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
@@ -86,39 +124,6 @@ class ConfigFieldCommand extends Command {
             if (v.clearableByCommand()) {
                 addChildren(new ModifyMapClearCommand(field, v));
             }
-        }
-    }
-
-    static void applySet(Command command, Field field, SingleValue value) {
-        String entryName = value.resolveEntryName(field.getName());
-        for (Object definition : value.argumentDefinitions()) {
-            command.argument(builder -> {
-                ((ArgumentApplier) definition).applyArgument(builder);
-
-                builder.execute(ctx -> {
-                    Object newValue;
-                    try {
-                        newValue = ((ArgumentMapper) definition).mapArgument(ctx);
-                    } catch (ArgumentValidationException e) {
-                        e.sendMessage(ctx);
-                        return;
-                    }
-
-                    try {
-                        value.validate(newValue);
-                    } catch (InvalidValueException e) {
-                        e.getMessages()
-                         .forEach(ctx::sendFailure);
-                        return;
-                    }
-
-                    value.onModifyValueCommand(newValue);
-                    value.value(newValue);
-
-                    ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(entryName,
-                                                                                                            ctx)));
-                });
-            });
         }
     }
 }

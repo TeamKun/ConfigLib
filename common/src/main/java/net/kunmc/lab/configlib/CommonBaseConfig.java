@@ -29,17 +29,17 @@ import java.util.stream.Collectors;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public abstract class CommonBaseConfig {
+    protected final transient Timer timer = new Timer();
+    protected final transient Logger logger = Logger.getLogger(getClass().getName());
+    private final transient List<Runnable> onReloadListeners = new ArrayList<>();
+    private final transient Object lock = new Object();
+    private final transient Map<Field, Pair<Object, Integer>> fieldToObjectAndHashMap = new HashMap<>();
     protected transient boolean enableList = true;
     protected transient boolean enableReload = true;
     private transient volatile boolean initialized = false;
     private transient String entryName;
-    private final transient List<Runnable> onReloadListeners = new ArrayList<>();
-    protected final transient Timer timer = new Timer();
     private transient WatchService watchService;
     private transient WatchKey watchKey;
-    private final transient Object lock = new Object();
-    private final transient Map<Field, Pair<Object, Integer>> fieldToObjectAndHashMap = new HashMap<>();
-    protected final transient Logger logger = Logger.getLogger(getClass().getName());
 
     protected CommonBaseConfig() {
         String s = getClass().getSimpleName();

@@ -10,10 +10,10 @@ import java.util.UUID;
 public class UUID2StringMapValue extends UUID2ObjectMapValue<String, UUID2StringMapValue> {
     @Override
     protected List<PutArgumentDefinition<UUID, String>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(
-                keyArgumentDefinitionForPut(),
-                new ArgumentDefinition<>(new StringArgument("string", StringArgument.Type.PHRASE),
-                                         (s, ctx) -> s)));
+        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                       new ArgumentDefinition<>(new StringArgument("string",
+                                                                                                   StringArgument.Type.PHRASE),
+                                                                                (s, ctx) -> s)));
     }
 
     @Override
