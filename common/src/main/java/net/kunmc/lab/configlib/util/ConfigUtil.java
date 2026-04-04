@@ -11,6 +11,48 @@ public class ConfigUtil {
     private ConfigUtil() {
     }
 
+    public static void replaceFields(Class<?> clazz, Object src, Object dst) {
+        for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(clazz)) {
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+                continue;
+            }
+
+            try {
+                field.setAccessible(true);
+            } catch (Exception e) {
+                // InaccessibleObjectExceptionが発生した場合スルーする
+                continue;
+            }
+
+            try {
+                replaceField(field, src, dst);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
+        try {
+            Object srcObj = field.get(src);
+            Object dstObj = field.get(dst);
+
+            // jsonにキーが存在しない場合nullになる
+            if (srcObj == null) {
+                return;
+            }
+
+            if (ReflectionUtil.getFieldsIncludingSuperclasses(field.getType())
+                              .isEmpty()) {
+                field.set(dst, srcObj);
+            } else {
+                replaceFields(field.getType(), srcObj, dstObj);
+            }
+        } catch (NullPointerException ignored) {
+            // 新しいフィールドが追加されるとNullPointerExceptionが発生するため握りつぶしている
+        }
+    }
+
     public static List<Field> getObservedFields(CommonBaseConfig config, Class<?> targetClass) {
         List<Field> fields = ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())
                                            .stream()
