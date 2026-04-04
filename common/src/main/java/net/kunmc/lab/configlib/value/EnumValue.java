@@ -2,8 +2,6 @@ package net.kunmc.lab.configlib.value;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Predicate;
-
 public final class EnumValue<T extends Enum<T>> extends AbstractEnumValue<T, EnumValue<T>> {
     public EnumValue(@NotNull T value) {
         super(value);
@@ -11,13 +9,5 @@ public final class EnumValue<T extends Enum<T>> extends AbstractEnumValue<T, Enu
 
     public EnumValue(@NotNull T value, Class<T> clazz) {
         super(value, clazz);
-    }
-
-    public EnumValue(@NotNull T value, Predicate<T> filter) {
-        super(value, filter);
-    }
-
-    public EnumValue(@NotNull T value, Class<T> clazz, Predicate<T> filter) {
-        super(value, clazz, filter);
     }
 }

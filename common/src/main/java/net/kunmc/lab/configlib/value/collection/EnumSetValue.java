@@ -1,37 +1,36 @@
 package net.kunmc.lab.configlib.value.collection;
 
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.EnumArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.SetUtil;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 
 public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>> {
     private final transient Class<T> clazz;
-    private final transient Predicate<T> filter;
+    private transient BiFunction<T, CommandContext, Boolean> filterForAdd = (x, ctx) -> true;
 
     public EnumSetValue(Class<T> clazz) {
-        this(clazz, x -> true);
+        super(new HashSet<>());
+        this.clazz = clazz;
     }
 
-    public EnumSetValue(Class<T> clazz, @NotNull Predicate<T> filter) {
-        super(new HashSet<>());
-
-        this.clazz = clazz;
-        this.filter = filter;
+    public EnumSetValue<T> filterForAdd(BiFunction<T, CommandContext, Boolean> filter) {
+        this.filterForAdd = filter;
+        return this;
     }
 
     @Override
     protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForAdd() {
         List<ArgumentDefinition<Set<T>>> definitions = new ArrayList<>();
         definitions.add(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> {
-            opt.validator(x -> !value.contains(x) && filter.test(x));
+            opt.validator((x, ctx) -> !value.contains(x) && filterForAdd.apply(x, ctx));
         }), (name, ctx) -> {
             return SetUtil.newHashSet(clazz.cast(name));
         }));

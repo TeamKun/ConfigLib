@@ -1,5 +1,6 @@
 package net.kunmc.lab.configlib.value.map;
 
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.EnumArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.util.ListUtil;
@@ -7,21 +8,20 @@ import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 
 public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T, Team2EnumMapValue<T>> {
     private final transient Class<T> clazz;
-    private final transient Predicate<T> filter;
+    private transient BiFunction<T, CommandContext, Boolean> valueFilter = (x, ctx) -> true;
 
     public Team2EnumMapValue(Class<T> clazz) {
-        this(clazz, x -> true);
+        super(new HashMap<>());
+        this.clazz = clazz;
     }
 
-    public Team2EnumMapValue(Class<T> clazz, Predicate<T> filter) {
-        super(new HashMap<>());
-
-        this.clazz = clazz;
-        this.filter = filter;
+    public Team2EnumMapValue<T> filterForValue(BiFunction<T, CommandContext, Boolean> filter) {
+        this.valueFilter = filter;
+        return this;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
                                                        new ArgumentDefinition<>(new EnumArgument<>("name",
                                                                                                    clazz,
                                                                                                    opt -> opt.validator(
-                                                                                                           filter)),
+                                                                                                           valueFilter)),
                                                                                 (t, ctx) -> t)));
     }
 

@@ -1,5 +1,6 @@
 package net.kunmc.lab.configlib.value;
 
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.EnumArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
@@ -7,29 +8,24 @@ import net.kunmc.lab.configlib.util.ListUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 
 public abstract class AbstractEnumValue<E extends Enum<E>, T extends AbstractEnumValue<E, T>> extends SingleValue<E, T> {
     private final transient Class<E> clazz;
-    private final transient Predicate<E> filter;
+    private transient BiFunction<E, CommandContext, Boolean> filter = (x, ctx) -> true;
 
     public AbstractEnumValue(@NotNull E value) {
         this(value, value.getDeclaringClass());
     }
 
     public AbstractEnumValue(@NotNull E value, Class<E> clazz) {
-        this(value, clazz, x -> true);
-    }
-
-    public AbstractEnumValue(@NotNull E value, Predicate<E> filter) {
-        this(value, value.getDeclaringClass(), filter);
-    }
-
-    public AbstractEnumValue(@NotNull E value, Class<E> clazz, Predicate<E> filter) {
         super(value);
-
         this.clazz = clazz;
+    }
+
+    public T filter(BiFunction<E, CommandContext, Boolean> filter) {
         this.filter = filter;
+        return ((T) this);
     }
 
     @Override

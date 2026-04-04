@@ -1,26 +1,26 @@
 package net.kunmc.lab.configlib.value.map;
 
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.EnumArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 
 public class String2EnumMapValue<T extends Enum<T>> extends String2ObjectMapValue<T, String2EnumMapValue<T>> {
     private final transient Class<T> clazz;
-    private final transient Predicate<T> filter;
+    private transient BiFunction<T, CommandContext, Boolean> valueFilter = (x, ctx) -> true;
 
     public String2EnumMapValue(Class<T> clazz) {
-        this(clazz, x -> true);
+        super(new HashMap<>());
+        this.clazz = clazz;
     }
 
-    public String2EnumMapValue(Class<T> clazz, Predicate<T> filter) {
-        super(new HashMap<>());
-
-        this.clazz = clazz;
-        this.filter = filter;
+    public String2EnumMapValue<T> filterForValue(BiFunction<T, CommandContext, Boolean> filter) {
+        this.valueFilter = filter;
+        return this;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class String2EnumMapValue<T extends Enum<T>> extends String2ObjectMapValu
                                                                                                    clazz,
                                                                                                    opt -> {
                                                                                                        opt.validator(
-                                                                                                               filter);
+                                                                                                               valueFilter);
                                                                                                    }), (name, ctx) -> {
                                                            return name;
                                                        })));
