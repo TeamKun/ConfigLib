@@ -31,7 +31,7 @@ public abstract class CommonBaseConfig {
     protected final transient Timer timer = new Timer();
     protected final transient Logger logger = Logger.getLogger(getClass().getName());
     private final transient List<Runnable> onReloadListeners = new CopyOnWriteArrayList<>();
-    private final transient Object lock = new Object();
+    final transient Object ioLock = new Object();
     private final transient ConfigModificationDetector modificationDetector = new ConfigModificationDetector(this);
     protected transient boolean enableList = true;
     protected transient boolean enableReload = true;
@@ -119,7 +119,7 @@ public abstract class CommonBaseConfig {
     protected abstract ConfigStore createConfigStore();
 
     protected void saveConfig() {
-        synchronized (lock) {
+        synchronized (ioLock) {
             configStore.write(this);
         }
     }
@@ -137,32 +137,33 @@ public abstract class CommonBaseConfig {
     }
 
     void pushHistory() {
-        synchronized (lock) {
+        synchronized (ioLock) {
             configStore.pushHistory(this);
         }
     }
 
     public boolean applyUndo(int stepsBack) {
-        synchronized (lock) {
+        synchronized (ioLock) {
             if (!configStore.canUndo(stepsBack)) {
                 return false;
             }
             CommonBaseConfig historical = configStore.undo(getClass(), migrations, stepsBack);
             ConfigUtil.replaceFields(getClass(), historical, this);
             configStore.write(this);
+            modificationDetector.initializeHash();
             onReloadListeners.forEach(Runnable::run);
             return true;
         }
     }
 
     public List<HistoryEntry> readHistory() {
-        synchronized (lock) {
+        synchronized (ioLock) {
             return configStore.readHistory(getClass(), migrations);
         }
     }
 
     protected final boolean loadConfig() throws LoadingConfigInvalidValueException {
-        synchronized (lock) {
+        synchronized (ioLock) {
             if (!configStore.exists()) {
                 return false;
             }
