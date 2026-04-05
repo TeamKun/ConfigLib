@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 class CommonBaseConfigTest {
     private TestConfig config;
@@ -164,6 +164,71 @@ class CommonBaseConfigTest {
 
         assertEquals(1, a.get());
         assertEquals(1, b.get());
+    }
+
+    // ---- 履歴管理 ----
+
+    @Test
+    void initialHistoryHasExactlyOneEntry() {
+        TestConfig cfg = init(new TestConfig());
+        assertEquals(1,
+                     cfg.readHistory()
+                        .size());
+    }
+
+    @Test
+    void noAdditionalHistoryPushWhenHistoryAlreadyExists() {
+        TestConfig cfg = new TestConfig();
+        // 履歴が既存（サーバー再起動前の状態を模擬）
+        cfg.store.pushHistory(cfg);
+        init(cfg);
+
+        assertEquals(1,
+                     cfg.readHistory()
+                        .size());
+    }
+
+    @Test
+    void applyUndoRevertsToHistoricalValue() {
+        TestConfig cfg = init(new TestConfig()); // history: [value=0]
+        cfg.value = 10;
+        cfg.pushHistory();                        // history: [value=10, value=0]
+
+        assertTrue(cfg.applyUndo(1));
+        assertEquals(0, cfg.value);
+    }
+
+    @Test
+    void applyUndoCalledTwiceKeepsGoingBack() {
+        TestConfig cfg = init(new TestConfig()); // history: [value=0]
+        cfg.value = 10;
+        cfg.pushHistory();                        // history: [value=10, value=0]
+        cfg.value = 20;
+        cfg.pushHistory();                        // history: [value=20, value=10, value=0]
+
+        assertTrue(cfg.applyUndo(1));
+        assertEquals(10, cfg.value);
+
+        assertTrue(cfg.applyUndo(1));
+        assertEquals(0, cfg.value);
+    }
+
+    @Test
+    void applyUndoWithStepsBack2() {
+        TestConfig cfg = init(new TestConfig()); // history: [value=0]
+        cfg.value = 10;
+        cfg.pushHistory();                        // history: [value=10, value=0]
+        cfg.value = 20;
+        cfg.pushHistory();                        // history: [value=20, value=10, value=0]
+
+        assertTrue(cfg.applyUndo(2));
+        assertEquals(0, cfg.value);
+    }
+
+    @Test
+    void applyUndoReturnsFalseWhenOnlyOneHistoryEntry() {
+        TestConfig cfg = init(new TestConfig()); // history: [value=0] — 1件のみ
+        assertFalse(cfg.applyUndo(1));
     }
 
     // ---- saveConfigIfAbsent / Present ----

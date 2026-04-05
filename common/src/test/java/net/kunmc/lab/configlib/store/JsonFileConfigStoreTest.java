@@ -213,7 +213,101 @@ class JsonFileConfigStoreTest {
         assertEquals(42, (int) loaded.scores.get("bob"));
     }
 
-    // ---- SimpleConfig / ObjectConfig / GenericConfig / MapConfig ----
+    // ---- history: pushHistory / readHistory ----
+
+    @Test
+    void pushHistoryStoresEntry() {
+        store.pushHistory(new ValueConfig(5));
+
+        assertEquals(1, store.readHistory(ValueConfig.class, noMigrations()).size());
+    }
+
+    @Test
+    void pushHistoryEmbeddsTimestamp() {
+        long before = System.currentTimeMillis();
+        store.pushHistory(new ValueConfig(0));
+        long after = System.currentTimeMillis();
+
+        HistoryEntry entry = store.readHistory(ValueConfig.class, noMigrations()).get(0);
+        assertTrue(entry.timestamp() >= before && entry.timestamp() <= after);
+    }
+
+    @Test
+    void readHistoryReturnsNewestFirst() {
+        store.pushHistory(new ValueConfig(1));
+        store.pushHistory(new ValueConfig(2));
+
+        List<HistoryEntry> history = store.readHistory(ValueConfig.class, noMigrations());
+        assertEquals(2, ((ValueConfig) history.get(0).config()).value);
+        assertEquals(1, ((ValueConfig) history.get(1).config()).value);
+    }
+
+    @Test
+    void historyCapAtMaxSize() {
+        JsonFileConfigStore capped = new JsonFileConfigStore(configFile, gson, Throwable::printStackTrace, 3);
+        for (int i = 0; i < 5; i++) {
+            capped.pushHistory(new ValueConfig(i));
+        }
+
+        assertEquals(3, capped.readHistory(ValueConfig.class, noMigrations()).size());
+    }
+
+    // ---- history: canUndo ----
+
+    @Test
+    void canUndoReturnsFalseWhenHistoryFileAbsent() {
+        assertFalse(store.canUndo(1));
+    }
+
+    @Test
+    void canUndoReturnsFalseWithSingleEntry() {
+        store.pushHistory(new ValueConfig(0));
+        assertFalse(store.canUndo(1));
+    }
+
+    @Test
+    void canUndoReturnsTrueWithTwoEntries() {
+        store.pushHistory(new ValueConfig(0));
+        store.pushHistory(new ValueConfig(1));
+        assertTrue(store.canUndo(1));
+    }
+
+    @Test
+    void canUndoRespectsStepsBack() {
+        store.pushHistory(new ValueConfig(0));
+        store.pushHistory(new ValueConfig(1));
+        assertFalse(store.canUndo(2));
+        store.pushHistory(new ValueConfig(2));
+        assertTrue(store.canUndo(2));
+    }
+
+    // ---- history: undo ----
+
+    @Test
+    void undoRemovesTopAndReturnsNewTop() {
+        store.pushHistory(new ValueConfig(10)); // old
+        store.pushHistory(new ValueConfig(20)); // current
+
+        ValueConfig restored = (ValueConfig) store.undo(ValueConfig.class, noMigrations(), 1);
+
+        assertEquals(10, restored.value);
+        assertEquals(1, store.readHistory(ValueConfig.class, noMigrations()).size());
+    }
+
+    @Test
+    void undoWithStepsBack2() {
+        store.pushHistory(new ValueConfig(0));
+        store.pushHistory(new ValueConfig(10));
+        store.pushHistory(new ValueConfig(20));
+        // history: [20, 10, 0]
+
+        ValueConfig restored = (ValueConfig) store.undo(ValueConfig.class, noMigrations(), 2);
+
+        assertEquals(0, restored.value);
+        assertEquals(1, store.readHistory(ValueConfig.class, noMigrations()).size());
+    }
+
+    // ---- SimpleConfig / ObjectConfig / GenericConfig / MapConfig / ValueConfig ----
 
     static class SimpleConfig extends CommonBaseConfig {
         int value = 0;
@@ -253,6 +347,21 @@ class JsonFileConfigStoreTest {
 
     static class MapConfig extends CommonBaseConfig {
         Map<String, Integer> scores = new java.util.LinkedHashMap<>();
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return new InMemoryConfigStore(new Gson());
+        }
+    }
+
+    static class ValueConfig extends CommonBaseConfig {
+        int value;
+
+        ValueConfig() {}
+
+        ValueConfig(int value) {
+            this.value = value;
+        }
 
         @Override
         protected ConfigStore createConfigStore() {
