@@ -27,9 +27,10 @@ class ConfigHistoryCommand extends Command {
         }
 
         if (configs.size() > 1) {
-            // /config history <index>        — show detail for all configs
-            // /config history <name>         — list entries for that config
-            // /config history <name> <index> — show detail for that config
+            // /config history <index>             — show detail for all configs
+            // /config history <name>              — list entries for that config
+            // /config history <name> <index>      — show detail for that config
+            // /config history <name> diff <index> — diff current vs history[index]
             argument(new IntegerArgument("index", 0, Integer.MAX_VALUE), (index, ctx) -> {
                 configs.forEach(config -> execDetail(ctx, config, index));
             });
@@ -38,16 +39,37 @@ class ConfigHistoryCommand extends Command {
                 argument(new IntegerArgument("index", 0, Integer.MAX_VALUE), (index, ctx) -> {
                     execDetail(ctx, config, index);
                 });
+                addChildren(new Command("diff") {{
+                    argument(new IntegerArgument("index", 1, Integer.MAX_VALUE), (index, ctx) -> {
+                        ConfigDiffCommand.execDiff(ctx, config, 0, index);
+                    });
+                    argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
+                             new IntegerArgument("index2", 0, Integer.MAX_VALUE),
+                             (index1, index2, ctx) -> {
+                                 ConfigDiffCommand.execDiff(ctx, config, index1, index2);
+                             });
+                }});
             }}));
         } else {
-            // /config history         — list all entries
-            // /config history <index> — show detail
+            // /config history              — list all entries
+            // /config history <index>      — show detail
+            // /config history diff <index> — diff current vs history[index]
             CommonBaseConfig config = configs.iterator()
                                              .next();
             execute(ctx -> execList(ctx, config));
             argument(new IntegerArgument("index", 0, Integer.MAX_VALUE), (index, ctx) -> {
                 execDetail(ctx, config, index);
             });
+            addChildren(new Command("diff") {{
+                argument(new IntegerArgument("index", 1, Integer.MAX_VALUE), (index, ctx) -> {
+                    ConfigDiffCommand.execDiff(ctx, config, 0, index);
+                });
+                argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
+                         new IntegerArgument("index2", 0, Integer.MAX_VALUE),
+                         (index1, index2, ctx) -> {
+                             ConfigDiffCommand.execDiff(ctx, config, index1, index2);
+                         });
+            }});
         }
     }
 
@@ -75,7 +97,11 @@ class ConfigHistoryCommand extends Command {
 
     private static void execDetail(CommandContext ctx, CommonBaseConfig config, int index) {
         List<HistoryEntry> history = config.readHistory();
-        if (index < 0 || index >= history.size()) {
+        if (history.isEmpty()) {
+            ctx.sendFailure(config.entryName() + "の変更履歴がありません");
+            return;
+        }
+        if (index >= history.size()) {
             ctx.sendFailure("インデックス " + index + " は範囲外です (0–" + (history.size() - 1) + ")");
             return;
         }

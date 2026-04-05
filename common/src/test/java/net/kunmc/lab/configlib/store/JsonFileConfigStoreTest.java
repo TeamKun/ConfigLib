@@ -219,7 +219,9 @@ class JsonFileConfigStoreTest {
     void pushHistoryStoresEntry() {
         store.pushHistory(new ValueConfig(5));
 
-        assertEquals(1, store.readHistory(ValueConfig.class, noMigrations()).size());
+        assertEquals(1,
+                     store.readHistory(ValueConfig.class, noMigrations())
+                          .size());
     }
 
     @Test
@@ -228,7 +230,8 @@ class JsonFileConfigStoreTest {
         store.pushHistory(new ValueConfig(0));
         long after = System.currentTimeMillis();
 
-        HistoryEntry entry = store.readHistory(ValueConfig.class, noMigrations()).get(0);
+        HistoryEntry entry = store.readHistory(ValueConfig.class, noMigrations())
+                                  .get(0);
         assertTrue(entry.timestamp() >= before && entry.timestamp() <= after);
     }
 
@@ -238,8 +241,12 @@ class JsonFileConfigStoreTest {
         store.pushHistory(new ValueConfig(2));
 
         List<HistoryEntry> history = store.readHistory(ValueConfig.class, noMigrations());
-        assertEquals(2, ((ValueConfig) history.get(0).config()).value);
-        assertEquals(1, ((ValueConfig) history.get(1).config()).value);
+        assertEquals(2,
+                     ((ValueConfig) history.get(0)
+                                           .config()).value);
+        assertEquals(1,
+                     ((ValueConfig) history.get(1)
+                                           .config()).value);
     }
 
     @Test
@@ -249,7 +256,9 @@ class JsonFileConfigStoreTest {
             capped.pushHistory(new ValueConfig(i));
         }
 
-        assertEquals(3, capped.readHistory(ValueConfig.class, noMigrations()).size());
+        assertEquals(3,
+                     capped.readHistory(ValueConfig.class, noMigrations())
+                           .size());
     }
 
     // ---- history: canUndo ----
@@ -291,7 +300,9 @@ class JsonFileConfigStoreTest {
         ValueConfig restored = (ValueConfig) store.undo(ValueConfig.class, noMigrations(), 1);
 
         assertEquals(10, restored.value);
-        assertEquals(1, store.readHistory(ValueConfig.class, noMigrations()).size());
+        assertEquals(1,
+                     store.readHistory(ValueConfig.class, noMigrations())
+                          .size());
     }
 
     @Test
@@ -304,7 +315,9 @@ class JsonFileConfigStoreTest {
         ValueConfig restored = (ValueConfig) store.undo(ValueConfig.class, noMigrations(), 2);
 
         assertEquals(0, restored.value);
-        assertEquals(1, store.readHistory(ValueConfig.class, noMigrations()).size());
+        assertEquals(1,
+                     store.readHistory(ValueConfig.class, noMigrations())
+                          .size());
     }
 
     // ---- SimpleConfig / ObjectConfig / GenericConfig / MapConfig / ValueConfig ----
@@ -357,7 +370,8 @@ class JsonFileConfigStoreTest {
     static class ValueConfig extends CommonBaseConfig {
         int value;
 
-        ValueConfig() {}
+        ValueConfig() {
+        }
 
         ValueConfig(int value) {
             this.value = value;

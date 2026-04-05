@@ -109,6 +109,7 @@ public class ConfigCommandBuilder {
         if (historyEnabled) {
             createSubCommand(SubCommandType.History).ifPresent(configCommand::addChildren);
             createSubCommand(SubCommandType.Undo).ifPresent(configCommand::addChildren);
+            createSubCommand(SubCommandType.Diff).ifPresent(configCommand::addChildren);
         }
 
         Set<String> conflictingFieldNames = detectConflictingFieldNames();

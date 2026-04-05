@@ -28,6 +28,7 @@ enum SubCommandType {
           ConfigResetCommand::new),
     History("history", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigHistoryCommand::new),
     Undo("undo", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigUndoCommand::new),
+    Diff("diff", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigDiffCommand::new),
     List("list",
          CommonBaseConfig::isListEnabled,
          x -> !(ConfigUtil.getSingleValueFields(x)
