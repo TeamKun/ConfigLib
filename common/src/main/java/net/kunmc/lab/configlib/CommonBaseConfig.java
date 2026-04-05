@@ -89,7 +89,7 @@ public abstract class CommonBaseConfig {
                                            .getName()),
                            ex);
             }
-        });
+        }, option.fileWatchTimerPeriod);
     }
 
     public final void onChange(Runnable listener) {
@@ -218,7 +218,8 @@ public abstract class CommonBaseConfig {
     }
 
     public static class Option {
-        int modifyDetectionTimerPeriod = 500;
+        int modifyDetectionTimerPeriod = 100;
+        int fileWatchTimerPeriod = 100;
         final TreeMap<Integer, Consumer<MigrationContext>> migrations = new TreeMap<>();
 
         public Option() {
@@ -227,6 +228,12 @@ public abstract class CommonBaseConfig {
         public Option modifyDetectionTimerPeriod(int period) {
             Preconditions.checkArgument(period > 0);
             this.modifyDetectionTimerPeriod = period;
+            return this;
+        }
+
+        public Option fileWatchTimerPeriod(int period) {
+            Preconditions.checkArgument(period > 0);
+            this.fileWatchTimerPeriod = period;
             return this;
         }
 

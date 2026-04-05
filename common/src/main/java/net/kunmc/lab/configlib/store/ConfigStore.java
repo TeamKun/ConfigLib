@@ -19,7 +19,7 @@ public interface ConfigStore {
      * The returned {@link Closeable} stops watching when closed.
      * {@code onChanged} is called when a change is detected.
      */
-    Closeable startWatching(Timer timer, Runnable onChanged);
+    Closeable startWatching(Timer timer, Runnable onChanged, int periodMs);
 
     /**
      * Save the current config state to history.

@@ -102,7 +102,7 @@ public class InMemoryConfigStore implements ConfigStore {
     }
 
     @Override
-    public Closeable startWatching(Timer timer, Runnable onChanged) {
+    public Closeable startWatching(Timer timer, Runnable onChanged, int periodMs) {
         return () -> {
         };
     }

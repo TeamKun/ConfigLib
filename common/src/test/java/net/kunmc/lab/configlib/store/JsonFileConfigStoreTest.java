@@ -143,7 +143,7 @@ class JsonFileConfigStoreTest {
         Timer timer = new Timer();
         try {
             assertDoesNotThrow(() -> store.startWatching(timer, () -> {
-                                          })
+                                          }, 100)
                                           .close());
         } finally {
             timer.cancel();
@@ -157,7 +157,7 @@ class JsonFileConfigStoreTest {
         Timer timer = new Timer();
 
         try {
-            store.startWatching(timer, () -> called.set(true));
+            store.startWatching(timer, () -> called.set(true), 100);
 
             // ファイルを変更してウォッチャーが検知するのを待つ
             Thread.sleep(200);

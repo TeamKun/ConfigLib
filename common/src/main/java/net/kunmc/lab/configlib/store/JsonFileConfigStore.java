@@ -154,7 +154,7 @@ public class JsonFileConfigStore implements ConfigStore {
     }
 
     @Override
-    public Closeable startWatching(Timer timer, Runnable onChanged) {
+    public Closeable startWatching(Timer timer, Runnable onChanged, int periodMs) {
         try {
             file.getParentFile()
                 .mkdirs();
@@ -182,7 +182,7 @@ public class JsonFileConfigStore implements ConfigStore {
                     watchKey.reset();
                 }
             };
-            timer.scheduleAtFixedRate(task, 0, 500);
+            timer.scheduleAtFixedRate(task, 0, periodMs);
 
             return () -> {
                 task.cancel();
