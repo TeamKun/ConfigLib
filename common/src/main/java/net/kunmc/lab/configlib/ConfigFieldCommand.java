@@ -48,7 +48,7 @@ class ConfigFieldCommand extends Command {
                         return;
                     }
 
-                    value.onModifyValueCommand(newValue);
+                    value.dispatchModifyCommand(newValue);
                     value.value(newValue);
 
                     ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(entryName,

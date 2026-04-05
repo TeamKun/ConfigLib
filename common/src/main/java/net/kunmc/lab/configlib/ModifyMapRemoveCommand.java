@@ -42,7 +42,7 @@ class ModifyMapRemoveCommand extends Command {
                     }
 
                     value.remove(k);
-                    value.onRemoveKey(k, v);
+                    value.dispatchRemove(k, v);
 
                     ctx.sendSuccess(value.succeedMessageForRemove(new MapValueRemoveCommandMessageParameter<>(entryName,
                                                                                                               ctx,

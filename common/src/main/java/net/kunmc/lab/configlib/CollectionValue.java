@@ -45,7 +45,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return ((U) this);
     }
 
-    protected final void onAddValue(T newValue) {
+    protected final void dispatchAdd(T newValue) {
         addListeners.forEach(x -> x.accept(newValue));
     }
 
@@ -86,7 +86,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return ((U) this);
     }
 
-    final void onRemoveValue(T newValue) {
+    final void dispatchRemove(T newValue) {
         removeListeners.forEach(x -> x.accept(newValue));
     }
 
@@ -125,7 +125,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         return ((U) this);
     }
 
-    final void onClearValue() {
+    final void dispatchClear() {
         clearListeners.forEach(Runnable::run);
     }
 

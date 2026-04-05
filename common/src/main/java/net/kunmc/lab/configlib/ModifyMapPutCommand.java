@@ -44,7 +44,7 @@ class ModifyMapPutCommand extends Command {
                         return;
                     }
 
-                    value.onPutValue(k, v);
+                    value.dispatchPut(k, v);
                     value.put(k, v);
 
                     ctx.sendSuccess(value.succeedMessageForPut(new MapValuePutCommandMessageParameter<>(entryName,

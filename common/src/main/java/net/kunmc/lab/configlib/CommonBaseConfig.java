@@ -191,7 +191,7 @@ public abstract class CommonBaseConfig {
                 ConfigUtil.getValues(this)
                           .stream()
                           .map(Value.class::cast)
-                          .forEach(x -> x.onInitializeValue(x.value()));
+                          .forEach(x -> x.dispatchInitialize(x.value()));
                 modificationDetector.initializeHash();
                 initialized = true;
                 return true;

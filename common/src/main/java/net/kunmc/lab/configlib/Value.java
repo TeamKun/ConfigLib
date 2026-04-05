@@ -105,7 +105,7 @@ public abstract class Value<E, T extends Value<E, T>> {
         return ((T) this);
     }
 
-    final void onInitializeValue(E initValue) {
+    final void dispatchInitialize(E initValue) {
         initializeListeners.forEach(x -> x.accept(initValue));
         this.initialized = true;
         this.initValue = initValue;
@@ -133,7 +133,7 @@ public abstract class Value<E, T extends Value<E, T>> {
         return ((T) this);
     }
 
-    final void onModifyValue(E newValue) {
+    final void dispatchModify(E newValue) {
         modifyListeners.forEach(x -> x.accept(newValue));
     }
 

@@ -51,7 +51,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return ((T) this);
     }
 
-    final void onPutValue(K k, V v) {
+    final void dispatchPut(K k, V v) {
         putListeners.forEach(x -> x.accept(k, v));
     }
 
@@ -92,7 +92,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return ((T) this);
     }
 
-    final void onRemoveKey(K k, V v) {
+    final void dispatchRemove(K k, V v) {
         removeListeners.forEach(x -> x.accept(k, v));
     }
 
@@ -131,7 +131,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return ((T) this);
     }
 
-    final void onClearMap() {
+    final void dispatchClear() {
         clearListeners.forEach(Runnable::run);
     }
 

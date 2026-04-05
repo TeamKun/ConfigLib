@@ -89,7 +89,7 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
         return ((T) this);
     }
 
-    final void onModifyValueCommand(E newValue) {
+    final void dispatchModifyCommand(E newValue) {
         modifyCommandListeners.forEach(x -> x.accept(newValue));
     }
 

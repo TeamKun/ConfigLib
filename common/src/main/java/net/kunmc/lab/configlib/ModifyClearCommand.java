@@ -13,7 +13,7 @@ class ModifyClearCommand extends Command {
         addPrerequisite(value::checkExecutable);
 
         execute(ctx -> {
-            value.onClearValue();
+            value.dispatchClear();
             ((Collection) value.value()).clear();
 
             ctx.sendSuccess(value.succeedMessageForClear(new CollectionValueClearCommandMessageParameter(field.getName(),

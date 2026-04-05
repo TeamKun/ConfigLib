@@ -38,7 +38,7 @@ class ModifyRemoveCommand extends Command {
                         return;
                     }
 
-                    value.onRemoveValue(removeValue);
+                    value.dispatchRemove(removeValue);
                     ((Collection) value.value()).removeAll(removeValue);
 
                     ctx.sendSuccess(value.succeedMessageForRemove(new CollectionValueRemoveCommandMessageParameter<>(

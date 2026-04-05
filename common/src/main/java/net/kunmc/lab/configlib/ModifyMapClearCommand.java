@@ -12,7 +12,7 @@ class ModifyMapClearCommand extends Command {
         addPrerequisite(value::checkExecutable);
 
         execute(ctx -> {
-            value.onClearMap();
+            value.dispatchClear();
             value.clear();
 
             ctx.sendSuccess(value.succeedMessageForClear(new MapValueClearCommandMessageParameter(field.getName(),
