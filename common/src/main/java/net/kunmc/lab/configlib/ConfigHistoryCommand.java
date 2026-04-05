@@ -6,6 +6,7 @@ import net.kunmc.lab.commandlib.argument.IntegerArgument;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.store.HistoryEntry;
 import net.kunmc.lab.configlib.util.ConfigUtil;
+import net.kunmc.lab.configlib.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -87,8 +88,7 @@ class ConfigHistoryCommand extends Command {
 
     private static String buildFieldsText(CommonBaseConfig liveConfig, CommonBaseConfig histConfig) {
         StringBuilder sb = new StringBuilder();
-        for (Field field : liveConfig.getClass()
-                                     .getDeclaredFields()) {
+        for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(liveConfig.getClass())) {
             if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
@@ -116,8 +116,7 @@ class ConfigHistoryCommand extends Command {
     }
 
     private static void listFields(CommandContext ctx, CommonBaseConfig liveConfig, CommonBaseConfig histConfig) {
-        for (Field field : liveConfig.getClass()
-                                     .getDeclaredFields()) {
+        for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(liveConfig.getClass())) {
             if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
                 continue;
             }

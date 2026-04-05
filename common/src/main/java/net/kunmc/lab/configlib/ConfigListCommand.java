@@ -4,6 +4,7 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.util.ConfigUtil;
+import net.kunmc.lab.configlib.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -35,9 +36,8 @@ class ConfigListCommand extends Command {
 
     static void listFields(CommandContext ctx, CommonBaseConfig config) {
         ctx.sendMessage(ConfigUtil.configHeader(config));
-        for (Field field : config.getClass()
-                                 .getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers())) {
+        for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())) {
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
             field.setAccessible(true);
