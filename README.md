@@ -409,6 +409,8 @@ History uses **0-based indexing** where `[0]` is the current (latest) state:
 `diff` only shows fields that actually differ, formatted as `fieldName: <old> → <new>`.
 It is also accessible as `/config history diff <index>` and `/config history diff <index1> <index2>`.
 
+`undo` is also accessible as `/config history undo` and `/config history undo <N>`.
+
 When there are multiple configs registered under one command, prefix with the config name:
 `/config history myConfig`, `/config history myConfig 2`, `/config undo myConfig 2`,
 `/config diff myConfig 2`, `/config diff myConfig 1 3`.

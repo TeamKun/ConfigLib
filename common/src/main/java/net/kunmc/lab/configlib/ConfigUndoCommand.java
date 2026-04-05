@@ -35,7 +35,7 @@ class ConfigUndoCommand extends Command {
         }
     }
 
-    private void exec(CommandContext ctx, CommonBaseConfig config, int stepsBack) {
+    static void exec(CommandContext ctx, CommonBaseConfig config, int stepsBack) {
         if (config.applyUndo(stepsBack)) {
             ctx.sendSuccess(config.entryName() + "を" + stepsBack + "つ前の状態に戻しました");
             ConfigListCommand.listFields(ctx, config);

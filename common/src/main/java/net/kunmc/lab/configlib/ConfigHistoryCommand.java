@@ -27,10 +27,12 @@ class ConfigHistoryCommand extends Command {
         }
 
         if (configs.size() > 1) {
-            // /config history <index>             — show detail for all configs
-            // /config history <name>              — list entries for that config
-            // /config history <name> <index>      — show detail for that config
-            // /config history <name> diff <index> — diff current vs history[index]
+            // /config history <index>              — show detail for all configs
+            // /config history <name>               — list entries for that config
+            // /config history <name> <index>       — show detail for that config
+            // /config history <name> diff <index>  — diff current vs history[index]
+            // /config history <name> undo          — undo 1 step
+            // /config history <name> undo <N>      — undo N steps
             argument(new IntegerArgument("index", 0, Integer.MAX_VALUE), (index, ctx) -> {
                 configs.forEach(config -> execDetail(ctx, config, index));
             });
@@ -49,11 +51,19 @@ class ConfigHistoryCommand extends Command {
                                  ConfigDiffCommand.execDiff(ctx, config, index1, index2);
                              });
                 }});
+                addChildren(new Command("undo") {{
+                    execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1));
+                    argument(new IntegerArgument("steps", 1, Integer.MAX_VALUE), (steps, ctx) -> {
+                        ConfigUndoCommand.exec(ctx, config, steps);
+                    });
+                }});
             }}));
         } else {
             // /config history              — list all entries
             // /config history <index>      — show detail
             // /config history diff <index> — diff current vs history[index]
+            // /config history undo         — undo 1 step
+            // /config history undo <N>     — undo N steps
             CommonBaseConfig config = configs.iterator()
                                              .next();
             execute(ctx -> execList(ctx, config));
@@ -69,6 +79,12 @@ class ConfigHistoryCommand extends Command {
                          (index1, index2, ctx) -> {
                              ConfigDiffCommand.execDiff(ctx, config, index1, index2);
                          });
+            }});
+            addChildren(new Command("undo") {{
+                execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1));
+                argument(new IntegerArgument("steps", 1, Integer.MAX_VALUE), (steps, ctx) -> {
+                    ConfigUndoCommand.exec(ctx, config, steps);
+                });
             }});
         }
     }
