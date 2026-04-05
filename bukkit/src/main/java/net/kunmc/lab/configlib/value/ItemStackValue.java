@@ -19,6 +19,11 @@ public class ItemStackValue extends SingleValue<ItemStack, ItemStackValue> {
     }
 
     @Override
+    protected ItemStack copyValue(ItemStack value) {
+        return new ItemStack(value);
+    }
+
+    @Override
     protected List<ArgumentDefinition<ItemStack>> argumentDefinitions() {
         return ListUtil.of(new ArgumentDefinition<>(new ItemStackArgument("item"),
                                                     new IntegerArgument("amount", 1, Integer.MAX_VALUE),

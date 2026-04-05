@@ -12,6 +12,11 @@ public abstract class SetValue<E, U extends SetValue<E, U>> extends CollectionVa
         super(value);
     }
 
+    @Override
+    protected Set<E> copyValue(Set<E> value) {
+        return new LinkedHashSet<>(value);
+    }
+
     public int size() {
         return value.size();
     }

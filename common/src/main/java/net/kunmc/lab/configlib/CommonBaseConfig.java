@@ -34,6 +34,7 @@ public abstract class CommonBaseConfig {
     private final transient ConfigModificationDetector modificationDetector = new ConfigModificationDetector(this);
     protected transient boolean enableList = true;
     protected transient boolean enableReload = true;
+    protected transient boolean enableReset = true;
     transient volatile boolean initialized = false;
     private transient String entryName;
     private transient Migrations migrations;
@@ -58,6 +59,10 @@ public abstract class CommonBaseConfig {
         migrations = new Migrations(option.migrations);
         schemaVersion = migrations.latestVersion();
         configStore = createConfigStore();
+
+        for (Value<?, ?> v : ConfigUtil.getValues(this)) {
+            v.snapshotDefault();
+        }
 
         try {
             saveConfigIfAbsent();
@@ -90,6 +95,10 @@ public abstract class CommonBaseConfig {
 
     final boolean isReloadEnabled() {
         return enableReload;
+    }
+
+    final boolean isResetEnabled() {
+        return enableReset;
     }
 
     /**

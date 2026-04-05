@@ -18,6 +18,11 @@ public class VectorValue extends SingleValue<Vector, VectorValue> {
     }
 
     @Override
+    protected Vector copyValue(Vector value) {
+        return value.clone();
+    }
+
+    @Override
     protected List<ArgumentDefinition<Vector>> argumentDefinitions() {
         return ListUtil.of(new ArgumentDefinition<>(new LocationArgument("location"), (loc, ctx) -> (loc).toVector()));
     }

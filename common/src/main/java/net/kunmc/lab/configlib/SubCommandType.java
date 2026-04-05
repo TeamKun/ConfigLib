@@ -20,6 +20,13 @@ enum SubCommandType {
                                                     .isEmpty() && ConfigUtil.getMapValueFields(x)
                                                                             .isEmpty()),
            ConfigReloadCommand::new),
+    Reset("reset",
+          CommonBaseConfig::isResetEnabled,
+          x -> !(ConfigUtil.getSingleValueFields(x)
+                           .isEmpty() && ConfigUtil.getCollectionValueFields(x)
+                                                   .isEmpty() && ConfigUtil.getMapValueFields(x)
+                                                                           .isEmpty()),
+          ConfigResetCommand::new),
     List("list", CommonBaseConfig::isListEnabled, x -> Stream.of(ConfigUtil.getSingleValues(x)
                                                                            .stream(),
                                                                  ConfigUtil.getCollectionValues(x)

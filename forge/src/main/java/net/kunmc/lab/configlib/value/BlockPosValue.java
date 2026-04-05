@@ -18,6 +18,11 @@ public class BlockPosValue extends SingleValue<BlockPos, BlockPosValue> {
     }
 
     @Override
+    protected BlockPos copyValue(BlockPos value) {
+        return new BlockPos(value);
+    }
+
+    @Override
     protected List<ArgumentDefinition<BlockPos>> argumentDefinitions() {
         return ListUtil.of(new ArgumentDefinition<>(new BlockPosArgument("pos"), (pos, ctx) -> pos));
     }

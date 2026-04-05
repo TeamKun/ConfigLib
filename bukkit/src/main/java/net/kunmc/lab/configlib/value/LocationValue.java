@@ -19,6 +19,11 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
         super(value);
     }
 
+    @Override
+    protected Location copyValue(Location value) {
+        return value.clone();
+    }
+
     public Block getBlock() {
         if (value == null) {
             return null;

@@ -14,6 +14,7 @@ public class ConfigCommandBuilder {
     private String name = "config";
     private boolean listEnabled = true;
     private boolean reloadEnabled = true;
+    private boolean resetEnabled = true;
     private boolean getEnabled = true;
     private boolean modifyEnabled = true;
 
@@ -60,6 +61,11 @@ public class ConfigCommandBuilder {
         return this;
     }
 
+    public ConfigCommandBuilder disableResetCommand() {
+        resetEnabled = false;
+        return this;
+    }
+
     public ConfigCommandBuilder disableGetCommand() {
         getEnabled = false;
         return this;
@@ -97,6 +103,9 @@ public class ConfigCommandBuilder {
         }
         if (reloadEnabled) {
             createSubCommand(SubCommandType.Reload).ifPresent(configCommand::addChildren);
+        }
+        if (resetEnabled) {
+            createSubCommand(SubCommandType.Reset).ifPresent(configCommand::addChildren);
         }
 
         Set<String> conflictingFieldNames = detectConflictingFieldNames();

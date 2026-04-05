@@ -27,6 +27,11 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
     }
 
     @Override
+    protected Location copyValue(Location value) {
+        return value.clone();
+    }
+
+    @Override
     protected List<ArgumentDefinition<Location>> argumentDefinitions() {
         return ListUtil.of(new ArgumentDefinition<>(new LocationArgument("location"), (loc, ctx) -> loc));
     }

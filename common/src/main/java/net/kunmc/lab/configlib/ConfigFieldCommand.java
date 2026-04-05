@@ -77,6 +77,14 @@ class ConfigFieldCommand extends Command {
                 addChildren(new ModifyIncCommand(field, (NumericValue<?, ?>) v));
                 addChildren(new ModifyDecCommand(field, (NumericValue<?, ?>) v));
             }
+
+            String entryName = v.resolveEntryName(field.getName());
+            addChildren(new Command("reset") {{
+                execute(ctx -> {
+                    v.resetToDefault();
+                    ctx.sendSuccess(entryName + "をデフォルト値(" + v.format() + ")にリセットしました");
+                });
+            }});
         }
     }
 
@@ -102,6 +110,14 @@ class ConfigFieldCommand extends Command {
             if (v.clearableByCommand()) {
                 addChildren(new ModifyClearCommand(field, v));
             }
+
+            String entryName = v.resolveEntryName(field.getName());
+            addChildren(new Command("reset") {{
+                execute(ctx -> {
+                    v.resetToDefault();
+                    ctx.sendSuccess(entryName + "をデフォルト値(" + v.format() + ")にリセットしました");
+                });
+            }});
         }
     }
 
@@ -124,6 +140,14 @@ class ConfigFieldCommand extends Command {
             if (v.clearableByCommand()) {
                 addChildren(new ModifyMapClearCommand(field, v));
             }
+
+            String entryName = v.resolveEntryName(field.getName());
+            addChildren(new Command("reset") {{
+                execute(ctx -> {
+                    v.resetToDefault();
+                    ctx.sendSuccess(entryName + "をデフォルト値(" + v.format() + ")にリセットしました");
+                });
+            }});
         }
     }
 }

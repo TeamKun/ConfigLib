@@ -11,6 +11,11 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
         super(value);
     }
 
+    @Override
+    protected List<E> copyValue(List<E> value) {
+        return new ArrayList<>(value);
+    }
+
     public int size() {
         return value.size();
     }

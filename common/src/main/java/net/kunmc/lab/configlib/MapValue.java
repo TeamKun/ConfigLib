@@ -27,6 +27,11 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         super(value);
     }
 
+    @Override
+    protected Map<K, V> copyValue(Map<K, V> value) {
+        return new LinkedHashMap<>(value);
+    }
+
     public final T puttableByCommand(boolean puttable) {
         this.puttable = puttable;
         return ((T) this);
