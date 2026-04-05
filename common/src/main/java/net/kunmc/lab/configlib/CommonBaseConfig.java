@@ -7,6 +7,7 @@ import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import net.kunmc.lab.configlib.migration.MigrationContext;
 import net.kunmc.lab.configlib.migration.Migrations;
 import net.kunmc.lab.configlib.store.ConfigStore;
+import net.kunmc.lab.configlib.store.HistoryEntry;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +36,7 @@ public abstract class CommonBaseConfig {
     protected transient boolean enableList = true;
     protected transient boolean enableReload = true;
     protected transient boolean enableReset = true;
+    protected transient boolean enableHistory = true;
     transient volatile boolean initialized = false;
     private transient String entryName;
     private transient Migrations migrations;
@@ -71,6 +73,11 @@ public abstract class CommonBaseConfig {
             throw new RuntimeException(e);
         }
 
+        if (configStore.readHistory(getClass(), migrations)
+                       .isEmpty()) {
+            configStore.pushHistory(this);
+        }
+
         modificationDetector.start(timer, option.modifyDetectionTimerPeriod);
         configStoreWatcher = configStore.startWatching(timer, () -> {
             try {
@@ -101,6 +108,10 @@ public abstract class CommonBaseConfig {
         return enableReset;
     }
 
+    final boolean isHistoryEnabled() {
+        return enableHistory;
+    }
+
     /**
      * Creates the {@link ConfigStore} used for reading and writing this config.
      * Called once during {@link #init}.
@@ -122,6 +133,31 @@ public abstract class CommonBaseConfig {
     protected void saveConfigIfPresent() {
         if (configStore.exists()) {
             saveConfig();
+        }
+    }
+
+    void pushHistory() {
+        synchronized (lock) {
+            configStore.pushHistory(this);
+        }
+    }
+
+    public boolean applyUndo(int stepsBack) {
+        synchronized (lock) {
+            if (!configStore.canUndo(stepsBack)) {
+                return false;
+            }
+            CommonBaseConfig historical = configStore.undo(getClass(), migrations, stepsBack);
+            ConfigUtil.replaceFields(getClass(), historical, this);
+            configStore.write(this);
+            onReloadListeners.forEach(Runnable::run);
+            return true;
+        }
+    }
+
+    public List<HistoryEntry> readHistory() {
+        synchronized (lock) {
+            return configStore.readHistory(getClass(), migrations);
         }
     }
 

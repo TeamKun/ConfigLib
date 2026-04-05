@@ -61,7 +61,7 @@ class ConfigFieldCommand extends Command {
     private void initSingleValue(Field field, SingleValue<?, ?> v, boolean getEnabled, boolean modifyEnabled) {
         addPrerequisite(v::checkExecutable);
 
-        if (getEnabled && v.listable()) {
+        if (getEnabled) {
             execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
@@ -94,7 +94,7 @@ class ConfigFieldCommand extends Command {
                                      boolean modifyEnabled) {
         addPrerequisite(v::checkExecutable);
 
-        if (getEnabled && v.listable()) {
+        if (getEnabled) {
             execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
@@ -124,7 +124,7 @@ class ConfigFieldCommand extends Command {
     private void initMapValue(Field field, MapValue<?, ?, ?> v, boolean getEnabled, boolean modifyEnabled) {
         addPrerequisite(v::checkExecutable);
 
-        if (getEnabled && v.listable()) {
+        if (getEnabled) {
             execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));

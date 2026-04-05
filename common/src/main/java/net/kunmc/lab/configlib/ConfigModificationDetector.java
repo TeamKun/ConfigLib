@@ -53,6 +53,7 @@ class ConfigModificationDetector {
                     Value value = (Value) o;
                     int newHash = value.valueHashCode();
                     if (newHash != oldHash) {
+                        config.pushHistory();
                         value.onModifyValue(value.value());
                         fieldToObjectAndHashMap.put(field, Pair.of(value, newHash));
                         modified = true;

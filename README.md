@@ -23,6 +23,9 @@ developers.
 6. **Schema Migration**  
    Built-in versioned migration system allows safe evolution of configuration structure across releases — handling field
    renames, type changes, and validation constraint changes without breaking existing user data.
+7. **Change History & Undo**  
+   Every configuration change is automatically recorded with a timestamp. You can browse the history via command and
+   revert to any previous state.
 
 ## Installation
 
@@ -382,6 +385,40 @@ skip all migrations.
 2. Asynchronous Change Detection
    Change detection, including when modifying values with the `set` method, is handled asynchronously. Keep this in mind
    to avoid race conditions in your application logic.
+
+## Change History & Undo
+
+Every time a configuration value is modified, the new state is automatically saved to a history file
+(`<configName>.history.json`) alongside the config file. The history persists across server restarts and is capped at
+50 entries by default (override `createConfigStore()` to change this).
+
+History uses **0-based indexing** where `[0]` is the current (latest) state:
+
+| Command                   | Description                                                              |
+|---------------------------|--------------------------------------------------------------------------|
+| `/config history`         | List all history entries with timestamps (hover to preview field values) |
+| `/config history <index>` | Show field values at a specific history index                            |
+| `/config undo`            | Revert to the previous state (equivalent to `undo 1`)                    |
+| `/config undo <N>`        | Revert to history index N                                                |
+
+`/config history N` and `/config undo N` refer to the same index, so you can inspect a snapshot with
+`history N` before reverting with `undo N`.
+
+When there are multiple configs registered under one command, prefix with the config name:
+`/config history myConfig`, `/config history myConfig 2`, `/config undo myConfig 2`.
+
+### Hiding history commands
+
+To hide the `history` and `undo` subcommands from the generated command tree:
+
+```java
+public final class MyConfig extends BaseConfig {
+    {
+        enableHistory = false;
+    }
+    // ...
+}
+```
 
 ## Sample Projects
 

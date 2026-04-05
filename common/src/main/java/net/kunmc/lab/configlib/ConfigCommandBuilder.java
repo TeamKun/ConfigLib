@@ -15,6 +15,7 @@ public class ConfigCommandBuilder {
     private boolean listEnabled = true;
     private boolean reloadEnabled = true;
     private boolean resetEnabled = true;
+    private boolean historyEnabled = true;
     private boolean getEnabled = true;
     private boolean modifyEnabled = true;
 
@@ -27,13 +28,6 @@ public class ConfigCommandBuilder {
             return ((Value<?, ?>) obj).resolveEntryName(field.getName());
         }
         return field.getName();
-    }
-
-    private static boolean isDisplayable(Object obj) {
-        if (obj instanceof Value) {
-            return ((Value<?, ?>) obj).listable();
-        }
-        return true;
     }
 
     private static boolean isModifiable(Object obj) {
@@ -63,6 +57,11 @@ public class ConfigCommandBuilder {
 
     public ConfigCommandBuilder disableResetCommand() {
         resetEnabled = false;
+        return this;
+    }
+
+    public ConfigCommandBuilder disableHistoryCommand() {
+        historyEnabled = false;
         return this;
     }
 
@@ -106,6 +105,10 @@ public class ConfigCommandBuilder {
         }
         if (resetEnabled) {
             createSubCommand(SubCommandType.Reset).ifPresent(configCommand::addChildren);
+        }
+        if (historyEnabled) {
+            createSubCommand(SubCommandType.History).ifPresent(configCommand::addChildren);
+            createSubCommand(SubCommandType.Undo).ifPresent(configCommand::addChildren);
         }
 
         Set<String> conflictingFieldNames = detectConflictingFieldNames();
@@ -161,7 +164,7 @@ public class ConfigCommandBuilder {
                           } catch (IllegalAccessException e) {
                               throw new RuntimeException(e);
                           }
-                          if ((getEnabled && isDisplayable(obj)) || (modifyEnabled && isModifiable(obj))) {
+                          if (getEnabled || (modifyEnabled && isModifiable(obj))) {
                               result.add(field);
                           }
                       });

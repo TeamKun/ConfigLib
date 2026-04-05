@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.store;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.kunmc.lab.configlib.CommonBaseConfig;
@@ -10,6 +11,8 @@ import net.kunmc.lab.configlib.migration.Migrations;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
@@ -20,15 +23,21 @@ public class JsonFileConfigStore implements ConfigStore {
     private final File file;
     private final Gson gson;
     private final Consumer<Exception> exceptionHandler;
+    private final int maxHistorySize;
 
     public JsonFileConfigStore(File file, Gson gson) {
-        this(file, gson, Throwable::printStackTrace);
+        this(file, gson, Throwable::printStackTrace, 50);
     }
 
     public JsonFileConfigStore(File file, Gson gson, Consumer<Exception> exceptionHandler) {
+        this(file, gson, exceptionHandler, 50);
+    }
+
+    public JsonFileConfigStore(File file, Gson gson, Consumer<Exception> exceptionHandler, int maxHistorySize) {
         this.file = file;
         this.gson = gson;
         this.exceptionHandler = exceptionHandler;
+        this.maxHistorySize = maxHistorySize;
     }
 
     public File file() {
@@ -63,6 +72,85 @@ public class JsonFileConfigStore implements ConfigStore {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    @Override
+    public void pushHistory(CommonBaseConfig config) {
+        File hf = historyFile();
+        JsonArray array = hf.exists() ? JsonParser.parseString(readString(hf))
+                                                  .getAsJsonArray() : new JsonArray();
+        JsonObject newEntry = JsonParser.parseString(gson.toJson(config))
+                                        .getAsJsonObject();
+        newEntry.addProperty("_ts_", System.currentTimeMillis());
+        // keep most recent at index 0 — insert at front by rebuilding
+        JsonArray reordered = new JsonArray();
+        reordered.add(newEntry);
+        for (int i = 0; i < array.size() && i < maxHistorySize - 1; i++) {
+            reordered.add(array.get(i));
+        }
+        try {
+            hf.getParentFile()
+              .mkdirs();
+            hf.createNewFile();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        writeString(hf, gson.toJson(reordered));
+    }
+
+    @Override
+    public boolean canUndo(int stepsBack) {
+        File hf = historyFile();
+        if (!hf.exists()) {
+            return false;
+        }
+        JsonArray array = JsonParser.parseString(readString(hf))
+                                    .getAsJsonArray();
+        return array.size() >= stepsBack + 1;
+    }
+
+    @Override
+    public CommonBaseConfig undo(Class<? extends CommonBaseConfig> clazz, Migrations migrations, int stepsBack) {
+        File hf = historyFile();
+        JsonArray array = JsonParser.parseString(readString(hf))
+                                    .getAsJsonArray();
+
+        // 上位 stepsBack エントリを捨て、新しい先頭を現在の状態とする
+        JsonObject snapshot = array.get(stepsBack)
+                                   .getAsJsonObject();
+
+        JsonArray remaining = new JsonArray();
+        for (int i = stepsBack; i < array.size(); i++) {
+            remaining.add(array.get(i));
+        }
+        writeString(hf, gson.toJson(remaining));
+
+        return gson.fromJson(snapshot, clazz);
+    }
+
+    @Override
+    public List<HistoryEntry> readHistory(Class<? extends CommonBaseConfig> clazz, Migrations migrations) {
+        File hf = historyFile();
+        if (!hf.exists()) {
+            return new ArrayList<>();
+        }
+        JsonArray array = JsonParser.parseString(readString(hf))
+                                    .getAsJsonArray();
+        List<HistoryEntry> result = new ArrayList<>();
+        for (int i = 0; i < array.size(); i++) {
+            JsonObject obj = array.get(i)
+                                  .getAsJsonObject();
+            long ts = obj.has("_ts_") ? obj.get("_ts_")
+                                           .getAsLong() : 0L;
+            result.add(new HistoryEntry(ts, gson.fromJson(obj, clazz)));
+        }
+        return result;
+    }
+
+    private File historyFile() {
+        String name = file.getName();
+        String base = name.endsWith(".json") ? name.substring(0, name.length() - 5) : name;
+        return new File(file.getParentFile(), base + ".history.json");
     }
 
     @Override

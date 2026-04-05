@@ -46,9 +46,6 @@ public class BlockStateValue extends SingleValue<BlockState, BlockStateValue> {
 
     @Override
     public String toString() {
-        return String.format("BlockDataValue{value=%s,listable=%b,writable=%b}",
-                             value(),
-                             listable(),
-                             writableByCommand());
+        return String.format("BlockDataValue{value=%s,writable=%b}", value(), writableByCommand());
     }
 }

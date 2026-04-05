@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 enum SubCommandType {
     Reload("reload",
@@ -27,15 +26,15 @@ enum SubCommandType {
                                                    .isEmpty() && ConfigUtil.getMapValueFields(x)
                                                                            .isEmpty()),
           ConfigResetCommand::new),
-    List("list", CommonBaseConfig::isListEnabled, x -> Stream.of(ConfigUtil.getSingleValues(x)
-                                                                           .stream(),
-                                                                 ConfigUtil.getCollectionValues(x)
-                                                                           .stream(),
-                                                                 ConfigUtil.getMapValues(x)
-                                                                           .stream())
-                                                             .reduce(Stream::concat)
-                                                             .orElseGet(Stream::empty)
-                                                             .anyMatch(Value::listable), ConfigListCommand::new);
+    History("history", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigHistoryCommand::new),
+    Undo("undo", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigUndoCommand::new),
+    List("list",
+         CommonBaseConfig::isListEnabled,
+         x -> !(ConfigUtil.getSingleValueFields(x)
+                          .isEmpty() && ConfigUtil.getCollectionValueFields(x)
+                                                  .isEmpty() && ConfigUtil.getMapValueFields(x)
+                                                                          .isEmpty()),
+         ConfigListCommand::new);
 
     public final String name;
     private final Predicate<CommonBaseConfig> isEnabledFor;

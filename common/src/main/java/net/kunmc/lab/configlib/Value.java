@@ -19,7 +19,6 @@ public abstract class Value<E, T extends Value<E, T>> {
     protected E value;
     private transient E defaultValue;
     private String description;
-    private transient boolean listable = true;
     private transient volatile boolean initialized = false;
     private transient E initValue;
     private transient Validator<E> validator = x -> {
@@ -59,15 +58,6 @@ public abstract class Value<E, T extends Value<E, T>> {
 
     public final T description(String description) {
         this.description = description;
-        return ((T) this);
-    }
-
-    protected final boolean listable() {
-        return listable;
-    }
-
-    public final T listable(boolean listable) {
-        this.listable = listable;
         return ((T) this);
     }
 

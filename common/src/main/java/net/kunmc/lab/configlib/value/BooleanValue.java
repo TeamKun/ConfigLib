@@ -79,6 +79,6 @@ public class BooleanValue extends SingleValue<Boolean, BooleanValue> {
 
     @Override
     public String toString() {
-        return String.format("BooleanValue{value=%b,listable=%b,writable=%b}", value, listable(), writableByCommand());
+        return String.format("BooleanValue{value=%b,writable=%b}", value, writableByCommand());
     }
 }

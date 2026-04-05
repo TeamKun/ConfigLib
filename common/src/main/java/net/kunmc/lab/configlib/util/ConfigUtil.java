@@ -1,5 +1,7 @@
 package net.kunmc.lab.configlib.util;
 
+import net.kunmc.lab.commandlib.util.ChatColorUtil;
+import net.kunmc.lab.commandlib.util.StringUtil;
 import net.kunmc.lab.configlib.*;
 
 import java.lang.reflect.Field;
@@ -9,6 +11,17 @@ import java.util.stream.Collectors;
 
 public class ConfigUtil {
     private ConfigUtil() {
+    }
+
+    public static String configHeader(CommonBaseConfig config) {
+        String name = config.entryName();
+        int totalDashes = Math.max(4, 46 - name.length());
+        int left = totalDashes / 2;
+        int right = totalDashes - left;
+        return ChatColorUtil.GRAY + StringUtil.repeat("-",
+                                                      left) + "[ " + ChatColorUtil.GOLD + ChatColorUtil.BOLD + name + ChatColorUtil.GRAY + " ]" + StringUtil.repeat(
+                "-",
+                right);
     }
 
     public static void replaceFields(Class<?> clazz, Object src, Object dst) {

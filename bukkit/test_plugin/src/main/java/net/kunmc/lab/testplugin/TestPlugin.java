@@ -32,7 +32,7 @@ public final class TestPlugin extends JavaPlugin {
                                                                       .addConfig(addValidatorTestConfig)
                                                                       .build();
 
-        CommandLib.register(this, new Command("configlibtest") {{
+        CommandLib.register(this, new Command("test") {{
             addChildren(configCommand);
             addChildren(new Command("addinitializelistener") {{
                 execute(ctx -> {
@@ -44,6 +44,8 @@ public final class TestPlugin extends JavaPlugin {
                 ctx.sendSuccess(config.strings);
                 config.strings.add(integer.toString());
             });
+        }}, new Command("testsingle") {{
+            addChildren(new ConfigCommandBuilder(config).build());
         }});
     }
 
