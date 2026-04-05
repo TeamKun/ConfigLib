@@ -1,61 +1,49 @@
 package net.kunmc.lab.configlib;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
+import net.kunmc.lab.configlib.migration.MigrationContext;
+import net.kunmc.lab.configlib.migration.Migrations;
+import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
+import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class CommonBaseConfig {
+    @SuppressWarnings("unused")
+    @SerializedName("_version_")
+    private int schemaVersion = 0;
     protected final transient Timer timer = new Timer();
     protected final transient Logger logger = Logger.getLogger(getClass().getName());
     private final transient List<Runnable> onReloadListeners = new CopyOnWriteArrayList<>();
     private final transient Object lock = new Object();
     private final transient ConfigModificationDetector modificationDetector = new ConfigModificationDetector(this);
-    private final transient ConfigFileWatcher fileWatcher = new ConfigFileWatcher(this);
     protected transient boolean enableList = true;
     protected transient boolean enableReload = true;
     transient volatile boolean initialized = false;
     private transient String entryName;
+    private transient Migrations migrations;
+    private transient ConfigStore configStore;
+    private transient Closeable configStoreWatcher;
 
     protected CommonBaseConfig() {
         String s = getClass().getSimpleName();
         this.entryName = s.substring(0, 1)
                           .toLowerCase() + s.substring(1);
-    }
-
-    public static <T extends CommonBaseConfig> T newInstanceFrom(@NotNull File jsonFile,
-                                                                 @NotNull Constructor<T> constructor,
-                                                                 Object... arguments) {
-        String filename = jsonFile.getName();
-        String json = ConfigFileIO.readJson(jsonFile);
-        Class<T> clazz = constructor.getDeclaringClass();
-
-        try {
-            T config = constructor.newInstance(arguments);
-            config.entryName(filename.substring(0, filename.lastIndexOf('.')));
-            ConfigUtil.replaceFields(clazz,
-                                     config.gson()
-                                           .fromJson(json, clazz),
-                                     config);
-            return config;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     protected void entryName(@NotNull String entryName) {
@@ -66,10 +54,10 @@ public abstract class CommonBaseConfig {
         return entryName;
     }
 
-    final void init(Consumer<Option> options) {
-        Option option = new Option();
-        options.accept(option);
-        getConfigFolder().mkdirs();
+    final void init(Option option) {
+        migrations = new Migrations(option.migrations);
+        schemaVersion = migrations.latestVersion();
+        configStore = createConfigStore();
 
         try {
             saveConfigIfAbsent();
@@ -79,7 +67,17 @@ public abstract class CommonBaseConfig {
         }
 
         modificationDetector.start(timer, option.modifyDetectionTimerPeriod);
-        fileWatcher.start(timer, option.jsonParseExceptionHandler);
+        configStoreWatcher = configStore.startWatching(timer, () -> {
+            try {
+                loadConfig();
+            } catch (LoadingConfigInvalidValueException ex) {
+                logger.log(Level.WARNING,
+                           String.format("\"%s\"'s validation failed.",
+                                         ex.getValueField()
+                                           .getName()),
+                           ex);
+            }
+        });
     }
 
     public final void onReload(Runnable onReload) {
@@ -94,44 +92,37 @@ public abstract class CommonBaseConfig {
         return enableReload;
     }
 
-    protected abstract Gson gson();
-
-    protected abstract File getConfigFolder();
-
-    public final File getConfigFile() {
-        return new File(getConfigFolder(), entryName() + ".json");
-    }
+    /**
+     * Creates the {@link ConfigStore} used for reading and writing this config.
+     * Called once during {@link #init}.
+     */
+    protected abstract ConfigStore createConfigStore();
 
     protected void saveConfig() {
         synchronized (lock) {
-            try {
-                getConfigFile().createNewFile();
-                ConfigFileIO.writeJson(getConfigFile(), gson().toJson(this));
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            configStore.write(this);
         }
     }
 
     protected void saveConfigIfAbsent() {
-        if (!getConfigFile().exists()) {
+        if (!configStore.exists()) {
             saveConfig();
         }
     }
 
     protected void saveConfigIfPresent() {
-        if (getConfigFile().exists()) {
+        if (configStore.exists()) {
             saveConfig();
         }
     }
 
     protected final boolean loadConfig() throws LoadingConfigInvalidValueException {
         synchronized (lock) {
-            if (!getConfigFile().exists()) {
+            if (!configStore.exists()) {
                 return false;
             }
 
-            CommonBaseConfig config = gson().fromJson(ConfigFileIO.readJson(getConfigFile()), getClass());
+            CommonBaseConfig config = configStore.read(getClass(), migrations);
 
             for (Field field : ConfigUtil.getValueFields(this)) {
                 try {
@@ -167,14 +158,20 @@ public abstract class CommonBaseConfig {
 
     protected final void close() {
         timer.cancel();
-        fileWatcher.close();
+        try {
+            if (configStoreWatcher != null) {
+                configStoreWatcher.close();
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
-    public static final class Option {
+    public static class Option {
         int modifyDetectionTimerPeriod = 500;
-        Consumer<Exception> jsonParseExceptionHandler = Throwable::printStackTrace;
+        final TreeMap<Integer, Consumer<MigrationContext>> migrations = new TreeMap<>();
 
-        Option() {
+        public Option() {
         }
 
         public Option modifyDetectionTimerPeriod(int period) {
@@ -183,8 +180,9 @@ public abstract class CommonBaseConfig {
             return this;
         }
 
-        public Option jsonParseExceptionHandler(Consumer<Exception> handler) {
-            this.jsonParseExceptionHandler = Objects.requireNonNull(handler);
+        public Option migration(int version, Consumer<MigrationContext> migration) {
+            Preconditions.checkArgument(version > 0, "version must be positive");
+            migrations.put(version, Objects.requireNonNull(migration));
             return this;
         }
     }

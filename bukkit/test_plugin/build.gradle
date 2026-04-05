@@ -35,7 +35,7 @@ dependencies {
     compileOnly name: "patched_1.16.5"
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation "com.github.TeamKun.CommandLib:bukkit:0.16.3"
+    implementation "com.github.TeamKun.CommandLib:bukkit:0.17.1"
 }
 
 def targetJavaVersion = 8
@@ -53,6 +53,10 @@ tasks.withType(JavaCompile).configureEach {
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
         options.release = targetJavaVersion
     }
+    // patched_1.16.5 内の古い GSON より implementation の GSON を優先する
+    def implJars = configurations.compileClasspath
+            .filter { it.name.startsWith("gson") }
+    classpath = implJars + classpath
 }
 
 jar {
@@ -77,6 +81,7 @@ shadowJar {
     archiveFileName = "${rootProject.name}-${project.version}.jar"
     relocate "net.kunmc.lab.commandlib", "${project.group}.${project.name.toLowerCase()}.commandlib"
     relocate "net.kunmc.lab.configlib", "${project.group}.${project.name.toLowerCase()}.configlib"
+    relocate "com.google.gson", "${project.group}.${project.name.toLowerCase()}.gson"
 }
 tasks.build.dependsOn tasks.shadowJar
 

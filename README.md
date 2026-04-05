@@ -20,6 +20,9 @@ developers.
    Automatically saves updated configuration values to disk, preventing data loss and ensuring persistence.
 5. **Command Generation for Configuration Management**  
    Seamlessly integrates with CommandLib to generate commands for managing configurations via the command line.
+6. **Schema Migration**  
+   Built-in versioned migration system allows safe evolution of configuration structure across releases — handling field
+   renames, type changes, and validation constraint changes without breaking existing user data.
 
 ## Installation
 
@@ -302,6 +305,61 @@ public final class TestConfig extends BaseConfig {
     }
 }
 ```
+
+</details>
+
+<details>
+<summary>Schema Migration</summary>
+
+ConfigLib provides a versioned migration system to evolve your configuration schema safely across releases.
+Migrations are registered via `Option` and run automatically when an older config file is loaded.
+The current version is stored as `_version_` in the JSON file.
+
+```java
+public final class MyConfig extends BaseConfig {
+    public final StringValue message = new StringValue("hello");
+    public final EnumSetValue<EntityType> spawnTypes = new EnumSetValue<>(EntityType.class);
+
+    public MyConfig(Plugin plugin) {
+        super(plugin, opt -> opt
+                // Version 1: rename field
+                .migration(1, ctx -> {
+                    ctx.rename("msg", "message");
+                })
+                // Version 2: type change (IntegerValue -> StringValue)
+                .migration(2, ctx -> {
+                    if (ctx.has("cooldown")) {
+                        ctx.setString("cooldown", String.valueOf(ctx.getInt("cooldown")));
+                    }
+                })
+                // Version 3: remove value that no longer passes validation
+                .migration(3, ctx -> {
+                    EnumSetValue<EntityType> types = ctx.getObject("spawnTypes",
+                                                                   new TypeToken<EnumSetValue<EntityType>>() {
+                                                                   }.getType());
+                    types.remove(EntityType.GIANT);
+                    ctx.setObject("spawnTypes", types);
+                }));
+        initialize();
+    }
+}
+```
+
+`MigrationContext` provides the following operations:
+
+| Method                                                                  | Description                                          |
+|-------------------------------------------------------------------------|------------------------------------------------------|
+| `has(key)`                                                              | Check if a key exists                                |
+| `getString(key)` / `getInt(key)` / `getDouble(key)` / `getBoolean(key)` | Read primitive values                                |
+| `getObject(key, Class<T>)`                                              | Read a complex value by class                        |
+| `getObject(key, Type)`                                                  | Read a generic complex value (e.g. with `TypeToken`) |
+| `setString(key, value)` / `setInt` / `setDouble` / `setBoolean`         | Write primitive values                               |
+| `setObject(key, value)`                                                 | Write a complex value                                |
+| `rename(from, to)`                                                      | Rename a field                                       |
+| `remove(key)`                                                           | Remove a field                                       |
+
+Migrations only run on existing files that have an older version. New installations start at the latest version and
+skip all migrations.
 
 </details>
 

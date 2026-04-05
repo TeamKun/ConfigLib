@@ -33,16 +33,14 @@ class ConfigReloadCommand extends Command {
     }
 
     private void exec(CommandContext ctx, CommonBaseConfig config) {
-        String fileName = config.getConfigFile()
-                                .getName();
         try {
             if (config.loadConfig()) {
-                ctx.sendSuccess(fileName + "を再読み込みしました");
+                ctx.sendSuccess(config.entryName() + "を再読み込みしました");
             } else {
-                ctx.sendFailure(fileName + "の読み込みに失敗しました");
+                ctx.sendFailure(config.entryName() + "の読み込みに失敗しました");
             }
         } catch (LoadingConfigInvalidValueException e) {
-            ctx.sendFailure(fileName + "の読み込みに失敗しました");
+            ctx.sendFailure(config.entryName() + "の読み込みに失敗しました");
             e.printStackTrace();
         }
     }

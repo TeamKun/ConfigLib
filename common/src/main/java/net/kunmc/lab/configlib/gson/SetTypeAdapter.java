@@ -16,12 +16,12 @@ public class SetTypeAdapter implements JsonDeserializer<Set<?>> {
                               JsonDeserializationContext context) throws JsonParseException {
         JsonArray jsonArray = json.getAsJsonArray();
         Set<?> set = new LinkedHashSet<>();
-        Class<?> clazz = ((Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0]);
+        Type elementType = ((ParameterizedType) type).getActualTypeArguments()[0];
         for (JsonElement jsonElement : jsonArray) {
-            set.add(context.deserialize(jsonElement, clazz));
+            set.add(context.deserialize(jsonElement, elementType));
         }
 
-        if (Nameable.class.isAssignableFrom(clazz)) {
+        if (elementType instanceof Class && Nameable.class.isAssignableFrom((Class<?>) elementType)) {
             return new NameableSet<>(((Set<Nameable>) set));
         }
         return set;

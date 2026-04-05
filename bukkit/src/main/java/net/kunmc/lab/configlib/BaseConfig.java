@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.kunmc.lab.commandlib.Nameable;
 import net.kunmc.lab.configlib.gson.*;
+import net.kunmc.lab.configlib.store.ConfigStore;
+import net.kunmc.lab.configlib.store.JsonFileConfigStore;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,24 +24,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public abstract class BaseConfig extends CommonBaseConfig implements Listener {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting()
-                                                      .enableComplexMapKeySerialization()
-                                                      .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
-                                                      .registerTypeAdapter(Pair.class, new PairTypeAdapter<>())
-                                                      .registerTypeHierarchyAdapter(Team.class, new TeamTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(BlockData.class,
-                                                                                    new BlockDataTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(ItemStack.class,
-                                                                                    new ItemStackTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(Location.class,
-                                                                                    new LocationTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(Nameable.class,
-                                                                                    new NameableTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(Set.class, new SetTypeAdapter())
-                                                      .create();
     private final transient Plugin plugin;
     private final transient Consumer<Option> options;
+    private transient Gson gson;
+    private transient Consumer<Exception> exceptionHandler;
 
     public BaseConfig(@NotNull Plugin plugin) {
         this(plugin, option -> {
@@ -65,7 +53,11 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
                       }
                   }
               }, plugin);
-        init(options);
+        Option opt = new Option();
+        options.accept(opt);
+        gson = opt.buildGson();
+        exceptionHandler = opt.exceptionHandler;
+        init(opt);
         return this;
     }
 
@@ -73,13 +65,52 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
         return plugin;
     }
 
-    @Override
-    protected Gson gson() {
-        return GSON;
+    protected File getConfigFolder() {
+        return plugin.getDataFolder();
+    }
+
+    public File getConfigFile() {
+        return new File(getConfigFolder(), entryName() + ".json");
     }
 
     @Override
-    protected File getConfigFolder() {
-        return plugin.getDataFolder();
+    protected ConfigStore createConfigStore() {
+        return new JsonFileConfigStore(getConfigFile(), gson, exceptionHandler);
+    }
+
+    public static final class Option extends CommonBaseConfig.Option {
+        private Consumer<GsonBuilder> gsonCustomizer = builder -> {
+        };
+        private Consumer<Exception> exceptionHandler = Throwable::printStackTrace;
+
+        public Option gsonCustomizer(Consumer<GsonBuilder> gsonCustomizer) {
+            this.gsonCustomizer = gsonCustomizer;
+            return this;
+        }
+
+        public Option exceptionHandler(Consumer<Exception> exceptionHandler) {
+            this.exceptionHandler = exceptionHandler;
+            return this;
+        }
+
+        private Gson buildGson() {
+            GsonBuilder builder = new GsonBuilder().setPrettyPrinting()
+                                                   .enableComplexMapKeySerialization()
+                                                   .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
+                                                   .registerTypeAdapter(Pair.class, new PairTypeAdapter<>())
+                                                   .registerTypeHierarchyAdapter(Team.class, new TeamTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(BlockData.class,
+                                                                                 new BlockDataTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(ItemStack.class,
+                                                                                 new ItemStackTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(Location.class,
+                                                                                 new LocationTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(Nameable.class,
+                                                                                 new NameableTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(Set.class, new SetTypeAdapter());
+            gsonCustomizer.accept(builder);
+            return builder.create();
+        }
     }
 }

@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import net.kunmc.lab.commandlib.Nameable;
 import net.kunmc.lab.commandlib.util.Location;
 import net.kunmc.lab.configlib.gson.*;
+import net.kunmc.lab.configlib.store.ConfigStore;
+import net.kunmc.lab.configlib.store.JsonFileConfigStore;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.ScorePlayerTeam;
@@ -26,27 +28,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class BaseConfig extends CommonBaseConfig {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting()
-                                                      .enableComplexMapKeySerialization()
-                                                      .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
-                                                      .registerTypeHierarchyAdapter(BlockPos.class,
-                                                                                    new BlockPosTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(BlockState.class,
-                                                                                    new BlockStateTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(Location.class,
-                                                                                    new LocationTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(ItemStack.class,
-                                                                                    new ItemStackTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(ScorePlayerTeam.class,
-                                                                                    new ScorePlayerTeamAdapter())
-                                                      .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(Nameable.class,
-                                                                                    new NameableTypeAdapter())
-                                                      .registerTypeHierarchyAdapter(Set.class, new SetTypeAdapter())
-                                                      .create();
     private final transient String modId;
     private final transient Type type;
     private final transient Consumer<Option> options;
+    private transient Gson gson;
+    private transient Consumer<Exception> exceptionHandler;
 
     public BaseConfig(@NotNull String modId, @NotNull Type type) {
         this(modId, type, option -> {
@@ -64,7 +50,11 @@ public abstract class BaseConfig extends CommonBaseConfig {
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent e) {
         if (type.isCorrectSide()) {
-            init(options);
+            Option opt = new Option();
+            options.accept(opt);
+            gson = opt.buildGson();
+            exceptionHandler = opt.exceptionHandler;
+            init(opt);
         }
     }
 
@@ -75,14 +65,55 @@ public abstract class BaseConfig extends CommonBaseConfig {
         }
     }
 
-    @Override
     protected File getConfigFolder() {
         return type.getConfigFolder(modId);
     }
 
+    public File getConfigFile() {
+        return new File(getConfigFolder(), entryName() + ".json");
+    }
+
     @Override
-    protected Gson gson() {
-        return GSON;
+    protected ConfigStore createConfigStore() {
+        return new JsonFileConfigStore(getConfigFile(), gson, exceptionHandler);
+    }
+
+    public static final class Option extends CommonBaseConfig.Option {
+        private Consumer<GsonBuilder> gsonCustomizer = builder -> {
+        };
+        private Consumer<Exception> exceptionHandler = Throwable::printStackTrace;
+
+        public Option gsonCustomizer(Consumer<GsonBuilder> gsonCustomizer) {
+            this.gsonCustomizer = gsonCustomizer;
+            return this;
+        }
+
+        public Option exceptionHandler(Consumer<Exception> exceptionHandler) {
+            this.exceptionHandler = exceptionHandler;
+            return this;
+        }
+
+        private Gson buildGson() {
+            GsonBuilder builder = new GsonBuilder().setPrettyPrinting()
+                                                   .enableComplexMapKeySerialization()
+                                                   .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC)
+                                                   .registerTypeHierarchyAdapter(BlockPos.class,
+                                                                                 new BlockPosTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(BlockState.class,
+                                                                                 new BlockStateTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(Location.class,
+                                                                                 new LocationTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(ItemStack.class,
+                                                                                 new ItemStackTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(ScorePlayerTeam.class,
+                                                                                 new ScorePlayerTeamAdapter())
+                                                   .registerTypeHierarchyAdapter(Value.class, new ValueTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(Nameable.class,
+                                                                                 new NameableTypeAdapter())
+                                                   .registerTypeHierarchyAdapter(Set.class, new SetTypeAdapter());
+            gsonCustomizer.accept(builder);
+            return builder.create();
+        }
     }
 
     public enum Type {
