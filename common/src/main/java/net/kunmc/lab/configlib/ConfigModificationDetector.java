@@ -76,6 +76,7 @@ class ConfigModificationDetector {
 
                 if (modified) {
                     config.saveConfigIfPresent();
+                    config.dispatchOnChange();
                 }
             }
         }

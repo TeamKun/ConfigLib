@@ -30,7 +30,7 @@ public abstract class CommonBaseConfig {
     private int schemaVersion = 0;
     protected final transient Timer timer = new Timer();
     protected final transient Logger logger = Logger.getLogger(getClass().getName());
-    private final transient List<Runnable> onReloadListeners = new CopyOnWriteArrayList<>();
+    private final transient List<Runnable> onChangeListeners = new CopyOnWriteArrayList<>();
     final transient Object ioLock = new Object();
     private final transient ConfigModificationDetector modificationDetector = new ConfigModificationDetector(this);
     protected transient boolean enableList = true;
@@ -92,8 +92,12 @@ public abstract class CommonBaseConfig {
         });
     }
 
-    public final void onReload(Runnable onReload) {
-        onReloadListeners.add(onReload);
+    public final void onChange(Runnable listener) {
+        onChangeListeners.add(listener);
+    }
+
+    final void dispatchOnChange() {
+        onChangeListeners.forEach(Runnable::run);
     }
 
     final boolean isListEnabled() {
@@ -151,7 +155,7 @@ public abstract class CommonBaseConfig {
             ConfigUtil.replaceFields(getClass(), historical, this);
             configStore.write(this);
             modificationDetector.initializeHash();
-            onReloadListeners.forEach(Runnable::run);
+            dispatchOnChange();
             return true;
         }
     }
@@ -197,7 +201,7 @@ public abstract class CommonBaseConfig {
                 return true;
             }
 
-            onReloadListeners.forEach(Runnable::run);
+            dispatchOnChange();
             return true;
         }
     }

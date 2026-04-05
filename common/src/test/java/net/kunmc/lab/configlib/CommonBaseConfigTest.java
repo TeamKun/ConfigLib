@@ -121,13 +121,13 @@ class CommonBaseConfigTest {
         assertEquals(10, cfg.value);
     }
 
-    // ---- onReload ----
+    // ---- onChange ----
 
     @Test
-    void onReloadNotCalledOnFirstLoad() {
+    void onChangeNotCalledOnFirstLoad() {
         TestConfig cfg = new TestConfig();
         AtomicInteger count = new AtomicInteger();
-        cfg.onReload(count::incrementAndGet);
+        cfg.onChange(count::incrementAndGet);
 
         init(cfg);
 
@@ -135,13 +135,13 @@ class CommonBaseConfigTest {
     }
 
     @Test
-    void onReloadCalledOnSubsequentLoad() throws LoadingConfigInvalidValueException {
+    void onChangeCalledOnSubsequentLoad() throws LoadingConfigInvalidValueException {
         TestConfig cfg = new TestConfig();
         cfg.store.writeRaw("{\"value\":1,\"_version_\":0}");
         init(cfg);
 
         AtomicInteger count = new AtomicInteger();
-        cfg.onReload(count::incrementAndGet);
+        cfg.onChange(count::incrementAndGet);
 
         cfg.store.writeRaw("{\"value\":2,\"_version_\":0}");
         cfg.loadConfig();
@@ -157,8 +157,8 @@ class CommonBaseConfigTest {
 
         AtomicInteger a = new AtomicInteger();
         AtomicInteger b = new AtomicInteger();
-        cfg.onReload(a::incrementAndGet);
-        cfg.onReload(b::incrementAndGet);
+        cfg.onChange(a::incrementAndGet);
+        cfg.onChange(b::incrementAndGet);
 
         cfg.loadConfig();
 
