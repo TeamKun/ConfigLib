@@ -428,6 +428,20 @@ public final class MyConfig extends BaseConfig {
 }
 ```
 
+## Claude Code Integration
+
+If you use [Claude Code](https://claude.ai/code), a `/configlib` skill is available to help you write ConfigLib code.
+It loads the API into context and provides usage conventions tailored to library consumers.
+
+**Setup:** Copy `.claude/skills/configlib/` from this repository into your project's `.claude/skills/` directory.
+
+**Usage:**
+
+```
+/configlib How do I define a config with an IntegerValue and a StringValue?
+/configlib Write a custom SingleValue for org.bukkit.World
+```
+
 ## Sample Projects
 
 [Bukkit](./sample/bukkit/src/main/java/net/kunmc/lab/sampleplugin)  
