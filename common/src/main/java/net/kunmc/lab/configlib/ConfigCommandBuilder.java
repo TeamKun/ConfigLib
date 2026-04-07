@@ -177,6 +177,14 @@ public class ConfigCommandBuilder {
                                      Set<String> conflictingFieldNames) {
         configCommand.addChildren(new Command(config.entryName()) {{
             execute(ctx -> ConfigListCommand.listFields(ctx, config));
+            if (configs.size() > 1) {
+                Set<CommonBaseConfig> singleton = Collections.singleton(config);
+                if (historyEnabled && config.isHistoryEnabled()) {
+                    addChildren(new ConfigHistoryCommand(singleton));
+                    addChildren(new ConfigUndoCommand(singleton));
+                    addChildren(new ConfigDiffCommand(singleton));
+                }
+            }
         }});
         configCommand.addChildren(new Command(config.entryName() + ".") {{
             execute(ctx -> ConfigListCommand.listFields(ctx, config));
