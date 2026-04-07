@@ -386,38 +386,136 @@ skip all migrations.
    Change detection, including when modifying values with the `set` method, is handled asynchronously. Keep this in mind
    to avoid race conditions in your application logic.
 
-## Change History & Undo
+## Generated Commands
+
+`ConfigCommandBuilder` automatically generates a command tree from your config classes.
+The examples below use `/config` as the root command name (set via `.name("config")`).
+
+<details>
+<summary>Config-level subcommands</summary>
+
+These subcommands operate on the config as a whole.
+
+| Command          | Description                              |
+|------------------|------------------------------------------|
+| `/config list`   | Show all field values                    |
+| `/config reload` | Reload from file                         |
+| `/config reset`  | Reset all fields to their default values |
+
+Use `disableListCommand()` / `disableReloadCommand()` / `disableResetCommand()` on `ConfigCommandBuilder` to suppress
+any of these.
+
+**With multiple configs**, each subcommand also accepts a config name:
+
+| Command                       | Description                         |
+|-------------------------------|-------------------------------------|
+| `/config list <configName>`   | List fields for that config         |
+| `/config reload <configName>` | Reload that config                  |
+| `/config reset <configName>`  | Reset that config                   |
+| `/config <configName>`        | List fields for that config (alias) |
+
+</details>
+
+<details>
+<summary>Per-field subcommands</summary>
+
+These subcommands are generated for each `Value` field.
+`<field>` is the Java field name, or the name set via `.entryName()`.
+
+**Get**
+
+| Command                        | Description                                       |
+|--------------------------------|---------------------------------------------------|
+| `/config <field>`              | Show the current value (hover for description)    |
+| `/config <configName>.<field>` | Same, always available even with multiple configs |
+
+**SingleValue — set**
+
+| Command                       | Description                |
+|-------------------------------|----------------------------|
+| `/config <field> <value>`     | Set the value (shorthand)  |
+| `/config <field> set <value>` | Set the value              |
+| `/config <field> reset`       | Reset to the default value |
+
+**NumericValue — arithmetic** (IntegerValue, DoubleValue, FloatValue) — extends SingleValue, so `set` and `reset` also apply
+
+| Command                        | Description                          |
+|--------------------------------|--------------------------------------|
+| `/config <field> inc`          | Increment by 1                       |
+| `/config <field> inc <amount>` | Increment by amount (capped at max)  |
+| `/config <field> dec`          | Decrement by 1                       |
+| `/config <field> dec <amount>` | Decrement by amount (floored at min) |
+
+**CollectionValue — add / remove / clear** (ListValue, SetValue)
+
+| Command                            | Description                |
+|------------------------------------|----------------------------|
+| `/config <field> add <element>`    | Add an element             |
+| `/config <field> remove <element>` | Remove an element          |
+| `/config <field> clear`            | Remove all elements        |
+| `/config <field> reset`            | Reset to the default value |
+
+Disable individual operations with `.addableByCommand(false)` / `.removableByCommand(false)` /
+`.clearableByCommand(false)`.
+
+**MapValue — put / remove / clear**
+
+| Command                             | Description                |
+|-------------------------------------|----------------------------|
+| `/config <field> put <key> <value>` | Add or update an entry     |
+| `/config <field> remove <key>`      | Remove an entry            |
+| `/config <field> clear`             | Remove all entries         |
+| `/config <field> reset`             | Reset to the default value |
+
+Disable individual operations with `.puttableByCommand(false)` / `.removableByCommand(false)` /
+`.clearableByCommand(false)`.
+
+Use `disableGetCommand()` / `disableModifyCommand()` on `ConfigCommandBuilder` to suppress get or modify commands
+globally.
+
+</details>
+
+<details>
+<summary>Change history, undo, and diff</summary>
 
 Every time a configuration value is modified, the new state is automatically saved to a history file
 (`<configName>.history.json`) alongside the config file. The history persists across server restarts and is capped at
 50 entries by default (override `createConfigStore()` to change this).
 
-History uses **0-based indexing** where `[0]` is the current (latest) state:
+History uses **0-based indexing** where `[0]` is the current (latest) state.
 
-| Command                          | Description                                                              |
-|----------------------------------|--------------------------------------------------------------------------|
-| `/config history`                | List all history entries with timestamps (hover to preview field values) |
-| `/config history <index>`        | Show field values at a specific history index                            |
-| `/config undo`                   | Revert to the previous state (equivalent to `undo 1`)                    |
-| `/config undo <N>`               | Revert to history index N                                                |
-| `/config diff <index>`           | Show what changed between the current state and history index N          |
-| `/config diff <index1> <index2>` | Show what changed between two history entries                            |
+**Single config**
 
-`/config history N` and `/config undo N` refer to the same index, so you can inspect a snapshot with
-`history N` before reverting with `undo N`.
+| Command                                  | Description                                                |
+|------------------------------------------|------------------------------------------------------------|
+| `/config history`                        | List all entries with timestamps (hover to preview values) |
+| `/config history <index>`                | Show field values at that index                            |
+| `/config history diff <index>`           | Diff current state vs history entry                        |
+| `/config history diff <index1> <index2>` | Diff between two history entries                           |
+| `/config history undo`                   | Revert to the previous state                               |
+| `/config history undo <N>`               | Revert N steps back                                        |
+| `/config undo`                           | Revert to the previous state                               |
+| `/config undo <N>`                       | Revert N steps back                                        |
+| `/config diff <index>`                   | Diff current state vs history entry                        |
+| `/config diff <index1> <index2>`         | Diff between two history entries                           |
 
-`diff` only shows fields that actually differ, formatted as `fieldName: <old> → <new>`.
-It is also accessible as `/config history diff <index>` and `/config history diff <index1> <index2>`.
+**Multiple configs** — prefix with the config name using either order:
 
-`undo` is also accessible as `/config history undo` and `/config history undo <N>`.
+| Command                                     | Description                     |
+|---------------------------------------------|---------------------------------|
+| `/config history <configName>`              | List entries for that config    |
+| `/config history <configName> <index>`      | Show field values at that index |
+| `/config history <configName> diff <index>` | Diff for that config            |
+| `/config history <configName> undo [N]`     | Undo for that config            |
+| `/config undo <configName> [N]`             | Undo for that config            |
+| `/config diff <configName> <index>`         | Diff for that config            |
+| `/config <configName> history [index]`      | Alternative prefix order        |
+| `/config <configName> undo [N]`             | Alternative prefix order        |
+| `/config <configName> diff <index>`         | Alternative prefix order        |
 
-When there are multiple configs registered under one command, prefix with the config name:
-`/config history myConfig`, `/config history myConfig 2`, `/config undo myConfig 2`,
-`/config diff myConfig 2`, `/config diff myConfig 1 3`.
+`diff` shows only fields that differ, formatted as `fieldName: <old> → <new>`.
 
-### Hiding history commands
-
-To hide the `history` and `undo` subcommands from the generated command tree:
+To hide history commands from the generated command tree:
 
 ```java
 public final class MyConfig extends BaseConfig {
@@ -427,6 +525,10 @@ public final class MyConfig extends BaseConfig {
     // ...
 }
 ```
+
+Use `disableHistoryCommand()` on `ConfigCommandBuilder` to suppress history commands globally.
+
+</details>
 
 ## Claude Code Integration
 
