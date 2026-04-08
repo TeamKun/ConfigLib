@@ -20,7 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew clean
 ```
 
-Gradle daemon is disabled (`gradle.properties`). The project targets Java 8.
+Gradle daemon is disabled (`gradle.properties`). The project targets Java 11.
 
 ## Project Overview
 

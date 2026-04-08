@@ -27,6 +27,10 @@ developers.
    Every configuration change is automatically recorded with a timestamp. You can browse the history via command and
    revert to any previous state.
 
+## Requirements
+
+- Java 11 or later
+
 ## Installation
 
 To ensure stability, we recommend replacing `latest.release` with a specific version such as `0.16.0`.  
