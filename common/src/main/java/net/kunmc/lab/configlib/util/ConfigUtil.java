@@ -7,9 +7,12 @@ import net.kunmc.lab.configlib.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class ConfigUtil {
+    private static final Logger logger = Logger.getLogger(ConfigUtil.class.getName());
+
     private ConfigUtil() {
     }
 
@@ -30,10 +33,9 @@ public class ConfigUtil {
                 continue;
             }
 
-            try {
-                field.setAccessible(true);
-            } catch (Exception e) {
-                // InaccessibleObjectExceptionが発生した場合スルーする
+            if (!field.trySetAccessible()) {
+                logger.fine("Skipping inaccessible field: " + field.getDeclaringClass()
+                                                                   .getName() + "#" + field.getName());
                 continue;
             }
 
@@ -55,11 +57,10 @@ public class ConfigUtil {
                 return;
             }
 
-            if (ReflectionUtil.getFieldsIncludingSuperclasses(field.getType())
-                              .isEmpty()) {
-                field.set(dst, srcObj);
-            } else {
+            if (Value.class.isAssignableFrom(field.getType())) {
                 replaceFields(field.getType(), srcObj, dstObj);
+            } else {
+                field.set(dst, srcObj);
             }
         } catch (NullPointerException ignored) {
             // 新しいフィールドが追加されるとNullPointerExceptionが発生するため握りつぶしている
