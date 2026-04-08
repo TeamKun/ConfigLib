@@ -1,0 +1,30 @@
+plugins {
+    java
+}
+
+val commandLibVersion: String by project
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "spigotmc-repo"
+        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    }
+    maven { url = uri("https://jitpack.io") }
+}
+
+dependencies {
+    api("org.apache.commons:commons-lang3:3.12.0")
+    api("com.google.code.gson:gson:2.10")
+    compileOnly("org.jetbrains:annotations:20.1.0")
+    // commonだとコマンド周りを上手く実装出来ないためbukkitを使う
+    compileOnly("com.github.TeamKun.CommandLib:bukkit:$commandLibVersion")
+    // CommandContext#sendMessageを呼ぶ時にnet.md_5.bungee.api.chat.BaseComponentを見つけられずコンパイルが通らないため追加
+    compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation("com.google.guava:guava:27.0-jre")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
