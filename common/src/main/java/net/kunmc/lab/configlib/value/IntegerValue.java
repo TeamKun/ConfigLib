@@ -95,11 +95,4 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
         return integer.toString();
     }
 
-    public String toString() {
-        return String.format("IntegerValue{value=%d,min=%d,max=%d,modifyEnabled=%b}",
-                             value,
-                             min,
-                             max,
-                             isModifyEnabled());
-    }
 }

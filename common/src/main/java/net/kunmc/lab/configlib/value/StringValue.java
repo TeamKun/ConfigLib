@@ -78,12 +78,4 @@ public class StringValue extends SingleValue<String, StringValue> {
         return s;
     }
 
-    @Override
-    public String toString() {
-        return String.format("StringValue{value=%s,min=%d,max=%d,modifyEnabled=%b}",
-                             value,
-                             min,
-                             max,
-                             isModifyEnabled());
-    }
 }

@@ -35,8 +35,4 @@ public class BlockDataValue extends SingleValue<BlockData, BlockDataValue> {
         }
     }
 
-    @Override
-    public String toString() {
-        return String.format("BlockDataValue{value=%s,modifyEnabled=%b}", value(), isModifyEnabled());
-    }
 }

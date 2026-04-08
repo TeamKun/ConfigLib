@@ -94,8 +94,4 @@ public class FloatValue extends NumericValue<Float, FloatValue> {
         return f.toString();
     }
 
-    @Override
-    public String toString() {
-        return String.format("FloatValue{value=%f,min=%f,max=%f,modifyEnabled=%b}", value, min, max, isModifyEnabled());
-    }
 }

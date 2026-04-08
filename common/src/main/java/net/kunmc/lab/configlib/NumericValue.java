@@ -90,4 +90,9 @@ public abstract class NumericValue<E extends Number & Comparable<E>, T extends N
     protected abstract E copySub(Number amount);
 
     protected abstract int compare(Number n);
+
+    @Override
+    public String toString() {
+        return String.format("%s{value=%s,min=%s,max=%s}", getClass().getSimpleName(), asString(), min, max);
+    }
 }

@@ -77,8 +77,4 @@ public class BooleanValue extends SingleValue<Boolean, BooleanValue> {
         return bool.toString();
     }
 
-    @Override
-    public String toString() {
-        return String.format("BooleanValue{value=%b,modifyEnabled=%b}", value, isModifyEnabled());
-    }
 }

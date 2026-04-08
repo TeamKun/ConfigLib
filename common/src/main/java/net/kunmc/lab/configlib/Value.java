@@ -197,4 +197,9 @@ public abstract class Value<E, T extends Value<E, T>> {
     }
 
     protected abstract String asString();
+
+    @Override
+    public String toString() {
+        return String.format("%s{value=%s}", getClass().getSimpleName(), asString());
+    }
 }

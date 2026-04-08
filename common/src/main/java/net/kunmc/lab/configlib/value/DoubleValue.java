@@ -94,12 +94,4 @@ public class DoubleValue extends NumericValue<Double, DoubleValue> {
         return d.toString();
     }
 
-    @Override
-    public String toString() {
-        return String.format("DoubleValue{value=%f,min=%f,max=%f,modifyEnabled=%b}",
-                             value,
-                             min,
-                             max,
-                             isModifyEnabled());
-    }
 }

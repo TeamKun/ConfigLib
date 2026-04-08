@@ -51,8 +51,4 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
         return UUIDUtil.getNameOrUuid(uuid);
     }
 
-    @Override
-    public String toString() {
-        return String.format("UUIDValue{value=%s}", value, isModifyEnabled());
-    }
 }

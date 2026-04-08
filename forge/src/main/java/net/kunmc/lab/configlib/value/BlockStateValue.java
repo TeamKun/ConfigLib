@@ -44,8 +44,4 @@ public class BlockStateValue extends SingleValue<BlockState, BlockStateValue> {
         }
     }
 
-    @Override
-    public String toString() {
-        return String.format("BlockDataValue{value=%s,modifyEnabled=%b}", value(), isModifyEnabled());
-    }
 }
