@@ -138,37 +138,34 @@ public final IntegerValue spawnRadius = new IntegerValue(50, 1, 500).description
 ## Reading values
 
 ```java
-// .value() returns the raw wrapped type
-int r = config.spawnRadius.value();
+class Example {
+    void test() {
+        // .value() returns the raw wrapped type
+        int r = config.spawnRadius.value();
 
-// SingleValue has Optional-style helpers
-config.welcomeMessage.
+        // SingleValue has Optional-style helpers
+        config.welcomeMessage.ifPresent(msg -> player.sendMessage(msg));
+        String msg = config.welcomeMessage.orElse("Welcome!");
 
-ifPresent(msg ->player.
+        // BooleanValue shortcuts
+        config.enabled.isTrue();
+        config.enabled.ifTrue(() -> doSomething());
 
-sendMessage(msg));
-String msg = config.welcomeMessage.orElse("Welcome!");
+        // NumericValue arithmetic (returns the result, does not mutate)
+        int doubled = config.cooldown.multiply(2);
+    }
+}
 
-// BooleanValue shortcuts
-config.enabled.
-
-isTrue();
-config.enabled.
-
-ifTrue(() ->
-
-doSomething());
-
-// NumericValue arithmetic (returns the result, does not mutate)
-int doubled = config.cooldown.multiply(2);
 ```
 
 ## Listening for any config change
 
 ```java
-config.onChange(() ->
-
-rebuildCache());
+class Example {
+    void test() {
+        config.onChange(() -> rebuildCache());
+    }
+}
 ```
 
 `onChange` fires after every successful reload (from file or command), after undo, after command modify, and after any
