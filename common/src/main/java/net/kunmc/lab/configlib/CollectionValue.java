@@ -26,12 +26,12 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         super(value);
     }
 
-    public final U addableByCommand(boolean addable) {
-        this.addable = addable;
+    public final U disableAdd() {
+        this.addable = false;
         return ((U) this);
     }
 
-    protected final boolean addableByCommand() {
+    protected final boolean isAddEnabled() {
         return addable;
     }
 
@@ -67,12 +67,12 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
                                                          .toArray())[0]));
     }
 
-    public final U removableByCommand(boolean removable) {
-        this.removable = removable;
+    public final U disableRemove() {
+        this.removable = false;
         return ((U) this);
     }
 
-    protected final boolean removableByCommand() {
+    protected final boolean isRemoveEnabled() {
         return removable;
     }
 
@@ -108,12 +108,12 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
                                                          .toArray())[0]));
     }
 
-    public final U clearableByCommand(boolean clearable) {
-        this.clearable = clearable;
+    public final U disableClear() {
+        this.clearable = false;
         return ((U) this);
     }
 
-    protected final boolean clearableByCommand() {
+    protected final boolean isClearEnabled() {
         return clearable;
     }
 

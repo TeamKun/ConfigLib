@@ -53,6 +53,6 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
 
     @Override
     public String toString() {
-        return String.format("UUIDValue{value=%s,writable=%b}", value, writableByCommand());
+        return String.format("UUIDValue{value=%s}", value, isModifyEnabled());
     }
 }

@@ -80,6 +80,10 @@ public class StringValue extends SingleValue<String, StringValue> {
 
     @Override
     public String toString() {
-        return String.format("StringValue{value=%s,min=%d,max=%d,writable=%b}", value, min, max, writableByCommand());
+        return String.format("StringValue{value=%s,min=%d,max=%d,modifyEnabled=%b}",
+                             value,
+                             min,
+                             max,
+                             isModifyEnabled());
     }
 }

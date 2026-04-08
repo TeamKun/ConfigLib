@@ -32,12 +32,12 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         return new LinkedHashMap<>(value);
     }
 
-    public final T puttableByCommand(boolean puttable) {
-        this.puttable = puttable;
+    public final T disablePut() {
+        this.puttable = false;
         return ((T) this);
     }
 
-    protected final boolean puttableByCommand() {
+    protected final boolean isPutEnabled() {
         return puttable;
     }
 
@@ -73,12 +73,12 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
                              valueToString(param.value()));
     }
 
-    public final T removableByCommand(boolean removable) {
-        this.removable = removable;
+    public final T disableRemove() {
+        this.removable = false;
         return ((T) this);
     }
 
-    protected final boolean removableByCommand() {
+    protected final boolean isRemoveEnabled() {
         return removable;
     }
 
@@ -114,12 +114,12 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
                              valueToString(param.value()));
     }
 
-    public final T clearableByCommand(boolean clearable) {
-        this.clearable = clearable;
+    public final T disableClear() {
+        this.clearable = false;
         return ((T) this);
     }
 
-    protected final boolean clearableByCommand() {
+    protected final boolean isClearEnabled() {
         return clearable;
     }
 

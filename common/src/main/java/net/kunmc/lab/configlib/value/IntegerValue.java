@@ -96,6 +96,10 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
     }
 
     public String toString() {
-        return String.format("IntegerValue{value=%d,min=%d,max=%d,writable=%b}", value, min, max, writableByCommand());
+        return String.format("IntegerValue{value=%d,min=%d,max=%d,modifyEnabled=%b}",
+                             value,
+                             min,
+                             max,
+                             isModifyEnabled());
     }
 }

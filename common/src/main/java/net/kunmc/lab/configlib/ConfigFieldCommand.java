@@ -67,7 +67,7 @@ class ConfigFieldCommand extends Command {
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
         }
 
-        if (modifyEnabled && v.writableByCommand()) {
+        if (modifyEnabled && v.isModifyEnabled()) {
             applySet(this, field, v);
             addChildren(new Command("set") {{
                 applySet(this, field, v);
@@ -101,13 +101,13 @@ class ConfigFieldCommand extends Command {
         }
 
         if (modifyEnabled) {
-            if (v.addableByCommand()) {
+            if (v.isAddEnabled()) {
                 addChildren(new ModifyAddCommand(field, v));
             }
-            if (v.removableByCommand()) {
+            if (v.isRemoveEnabled()) {
                 addChildren(new ModifyRemoveCommand(field, v));
             }
-            if (v.clearableByCommand()) {
+            if (v.isClearEnabled()) {
                 addChildren(new ModifyClearCommand(field, v));
             }
 
@@ -131,13 +131,13 @@ class ConfigFieldCommand extends Command {
         }
 
         if (modifyEnabled) {
-            if (v.puttableByCommand()) {
+            if (v.isPutEnabled()) {
                 addChildren(new ModifyMapPutCommand(field, v));
             }
-            if (v.removableByCommand()) {
+            if (v.isRemoveEnabled()) {
                 addChildren(new ModifyMapRemoveCommand(field, v));
             }
-            if (v.clearableByCommand()) {
+            if (v.isClearEnabled()) {
                 addChildren(new ModifyMapClearCommand(field, v));
             }
 

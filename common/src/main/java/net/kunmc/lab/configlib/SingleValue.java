@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<E, T> {
     private transient final List<Consumer<E>> modifyCommandListeners = new ArrayList<>();
-    private transient boolean writable = true;
+    private transient boolean modifyEnabled = true;
     private transient Function<SingleValueModifyCommandMessageParameter, String> successMessage;
 
     public SingleValue(E value) {
@@ -70,13 +70,13 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
         return supplier.get();
     }
 
-    public final T writableByCommand(boolean writable) {
-        this.writable = writable;
+    public final T disableModify() {
+        this.modifyEnabled = false;
         return ((T) this);
     }
 
-    protected final boolean writableByCommand() {
-        return writable;
+    protected final boolean isModifyEnabled() {
+        return modifyEnabled;
     }
 
     protected abstract <A extends ArgumentApplier & ArgumentMapper<E>> List<A> argumentDefinitions();

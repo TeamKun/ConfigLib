@@ -33,10 +33,10 @@ public abstract class CommonBaseConfig {
     private final transient List<Runnable> onChangeListeners = new CopyOnWriteArrayList<>();
     final transient Object ioLock = new Object();
     private final transient ConfigModificationDetector modificationDetector = new ConfigModificationDetector(this);
-    protected transient boolean enableList = true;
-    protected transient boolean enableReload = true;
-    protected transient boolean enableReset = true;
-    protected transient boolean enableHistory = true;
+    private transient boolean listEnabled = true;
+    private transient boolean reloadEnabled = true;
+    private transient boolean resetEnabled = true;
+    private transient boolean historyEnabled = true;
     transient volatile boolean initialized = false;
     private transient String entryName;
     private transient Migrations migrations;
@@ -101,19 +101,35 @@ public abstract class CommonBaseConfig {
     }
 
     final boolean isListEnabled() {
-        return enableList;
+        return listEnabled;
     }
 
     final boolean isReloadEnabled() {
-        return enableReload;
+        return reloadEnabled;
     }
 
     final boolean isResetEnabled() {
-        return enableReset;
+        return resetEnabled;
     }
 
     final boolean isHistoryEnabled() {
-        return enableHistory;
+        return historyEnabled;
+    }
+
+    protected final void disableList() {
+        this.listEnabled = false;
+    }
+
+    protected final void disableReload() {
+        this.reloadEnabled = false;
+    }
+
+    protected final void disableReset() {
+        this.resetEnabled = false;
+    }
+
+    protected final void disableHistory() {
+        this.historyEnabled = false;
     }
 
     /**

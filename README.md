@@ -402,8 +402,7 @@ These subcommands operate on the config as a whole.
 | `/config reload` | Reload from file                         |
 | `/config reset`  | Reset all fields to their default values |
 
-Use `disableListCommand()` / `disableReloadCommand()` / `disableResetCommand()` on `ConfigCommandBuilder` to suppress
-any of these.
+Use `.disableList()` / `.disableReload()` / `.disableReset()` on `ConfigCommandBuilder` to suppress any of these.
 
 **With multiple configs**, each subcommand also accepts a config name:
 
@@ -455,8 +454,7 @@ These subcommands are generated for each `Value` field.
 | `/config <field> clear`            | Remove all elements        |
 | `/config <field> reset`            | Reset to the default value |
 
-Disable individual operations with `.addableByCommand(false)` / `.removableByCommand(false)` /
-`.clearableByCommand(false)`.
+Disable individual operations with `.disableAdd()` / `.disableRemove()` / `.disableClear()`.
 
 **MapValue — put / remove / clear**
 
@@ -467,11 +465,9 @@ Disable individual operations with `.addableByCommand(false)` / `.removableByCom
 | `/config <field> clear`             | Remove all entries         |
 | `/config <field> reset`             | Reset to the default value |
 
-Disable individual operations with `.puttableByCommand(false)` / `.removableByCommand(false)` /
-`.clearableByCommand(false)`.
+Disable individual operations with `.disablePut()` / `.disableRemove()` / `.disableClear()`.
 
-Use `disableGetCommand()` / `disableModifyCommand()` on `ConfigCommandBuilder` to suppress get or modify commands
-globally.
+Use `.disableGet()` / `.disableModify()` on `ConfigCommandBuilder` to suppress get or modify commands globally.
 
 </details>
 
@@ -519,14 +515,16 @@ To hide history commands from the generated command tree:
 
 ```java
 public final class MyConfig extends BaseConfig {
-    {
-        enableHistory = false;
+    public MyConfig(Plugin plugin) {
+        super(plugin);
+        disableHistory();
+        initialize();
     }
     // ...
 }
 ```
 
-Use `disableHistoryCommand()` on `ConfigCommandBuilder` to suppress history commands globally.
+Use `.disableHistory()` on `ConfigCommandBuilder` to suppress history commands globally.
 
 </details>
 

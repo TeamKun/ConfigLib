@@ -32,45 +32,45 @@ public class ConfigCommandBuilder {
 
     private static boolean isModifiable(Object obj) {
         if (obj instanceof SingleValue) {
-            return ((SingleValue<?, ?>) obj).writableByCommand();
+            return ((SingleValue<?, ?>) obj).isModifyEnabled();
         }
         if (obj instanceof CollectionValue) {
             CollectionValue<?, ?, ?> v = (CollectionValue<?, ?, ?>) obj;
-            return v.addableByCommand() || v.removableByCommand() || v.clearableByCommand();
+            return v.isAddEnabled() || v.isRemoveEnabled() || v.isClearEnabled();
         }
         if (obj instanceof MapValue) {
             MapValue<?, ?, ?> v = (MapValue<?, ?, ?>) obj;
-            return v.puttableByCommand() || v.removableByCommand() || v.clearableByCommand();
+            return v.isPutEnabled() || v.isRemoveEnabled() || v.isClearEnabled();
         }
         return false;
     }
 
-    public ConfigCommandBuilder disableListCommand() {
+    public ConfigCommandBuilder disableList() {
         listEnabled = false;
         return this;
     }
 
-    public ConfigCommandBuilder disableReloadCommand() {
+    public ConfigCommandBuilder disableReload() {
         reloadEnabled = false;
         return this;
     }
 
-    public ConfigCommandBuilder disableResetCommand() {
+    public ConfigCommandBuilder disableReset() {
         resetEnabled = false;
         return this;
     }
 
-    public ConfigCommandBuilder disableHistoryCommand() {
+    public ConfigCommandBuilder disableHistory() {
         historyEnabled = false;
         return this;
     }
 
-    public ConfigCommandBuilder disableGetCommand() {
+    public ConfigCommandBuilder disableGet() {
         getEnabled = false;
         return this;
     }
 
-    public ConfigCommandBuilder disableModifyCommand() {
+    public ConfigCommandBuilder disableModify() {
         modifyEnabled = false;
         return this;
     }

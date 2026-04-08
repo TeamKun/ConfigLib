@@ -33,7 +33,7 @@ public void onEnable() {
 }
 ```
 
-`ConfigCommandBuilder` auto-generates `list`, `reload`, `reset`, `history`, `undo`, `diff`, and per-field get/modify subcommands. Use `disableXxxCommand()` to suppress subcommands you don't want.
+`ConfigCommandBuilder` auto-generates `list`, `reload`, `reset`, `history`, `undo`, `diff`, and per-field get/modify subcommands. Use `.disableList()`, `.disableReload()`, `.disableReset()`, `.disableHistory()`, `.disableGet()`, `.disableModify()` to suppress subcommands you don't want.
 
 ## Value type selection guide
 
@@ -110,7 +110,7 @@ public final IntegerValue spawnRadius = new IntegerValue(50, 1, 500)
 
 | Method | Purpose |
 |---|---|
-| `writableByCommand(false)` | Make read-only via command (still writable by file) |
+| `disableModify()` | Make read-only via command (still writable by file) |
 | `onModifyCommand(Consumer<E>)` | Fires only on command modify, not file reload |
 | `successMessage(Function)` | Custom success message after command modify |
 
@@ -118,14 +118,14 @@ public final IntegerValue spawnRadius = new IntegerValue(50, 1, 500)
 
 | Method | Purpose |
 |---|---|
-| `addableByCommand(false)` | Disable add subcommand |
-| `removableByCommand(false)` | Disable remove subcommand |
-| `clearableByCommand(false)` | Disable clear subcommand |
+| `disableAdd()` | Disable add subcommand |
+| `disableRemove()` | Disable remove subcommand |
+| `disableClear()` | Disable clear subcommand |
 | `onAdd(Consumer<T>)` | Fires after add command |
 | `onRemove(Consumer<T>)` | Fires after remove command |
 | `onClear(Runnable)` | Fires after clear command |
 
-**`MapValue` extras** — same pattern with `puttableByCommand` / `onPut` / `onRemove` / `onClear`.
+**`MapValue` extras** — same pattern with `disablePut()` / `disableRemove()` / `disableClear()` / `onPut` / `onRemove` / `onClear`.
 
 ## Reading values
 
