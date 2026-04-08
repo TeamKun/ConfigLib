@@ -39,11 +39,11 @@ the [CommandLib Release Page](https://github.com/TeamKun/CommandLib/releases)
 and [ConfigLib Release Page](https://github.com/TeamKun/ConfigLib/releases).
 
 <details>
-  <summary>Bukkit</summary>
+  <summary>Bukkit (Groovy DSL)</summary>
 
 ```groovy
 plugins {
-    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "com.gradleup.shadow" version "8.3.5"
 }
 
 repositories {
@@ -61,16 +61,43 @@ shadowJar {
     relocate "net.kunmc.lab.configlib", "${project.group}.${project.name.toLowerCase()}.configlib"
 }
 tasks.build.dependsOn tasks.shadowJar
-  ```
+```
 
 </details>
 
 <details>
-  <summary>Forge</summary>
+  <summary>Bukkit (Kotlin DSL)</summary>
+
+```kotlin
+plugins {
+    id("com.gradleup.shadow") version "8.3.5"
+}
+
+repositories {
+    maven { url = uri("https://jitpack.io") }
+}
+
+dependencies {
+    implementation("com.github.TeamKun.CommandLib:bukkit:latest.release")
+    implementation("com.github.TeamKun.ConfigLib:bukkit:latest.release")
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    archiveFileName.set("${rootProject.name}-${project.version}.jar")
+    relocate("net.kunmc.lab.commandlib", "${project.group}.${project.name.lowercase()}.commandlib")
+    relocate("net.kunmc.lab.configlib", "${project.group}.${project.name.lowercase()}.configlib")
+}
+tasks.named("build") { dependsOn(tasks.named("shadowJar")) }
+```
+
+</details>
+
+<details>
+  <summary>Forge (Groovy DSL)</summary>
 
 ```groovy
 plugins {
-    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "com.gradleup.shadow" version "8.3.5"
 }
 
 repositories {
@@ -96,6 +123,41 @@ shadowJar {
 reobf {
     shadowJar {
     }
+}
+```
+
+</details>
+
+<details>
+  <summary>Forge (Kotlin DSL)</summary>
+
+```kotlin
+plugins {
+    id("com.gradleup.shadow") version "8.3.5"
+}
+
+repositories {
+    maven { url = uri("https://jitpack.io") }
+}
+
+dependencies {
+    implementation("com.github.TeamKun.CommandLib:forge:latest.release")
+    implementation("com.github.TeamKun.ConfigLib:forge:latest.release")
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    archiveFileName.set("${rootProject.name}-${project.version}.jar")
+    dependencies {
+        include(dependency("com.github.TeamKun.CommandLib:forge:.*"))
+        include(dependency("com.github.TeamKun.ConfigLib:forge:.*"))
+    }
+    relocate("net.kunmc.lab.commandlib", "${project.group}.${project.name.lowercase()}.commandlib")
+    relocate("net.kunmc.lab.configlib", "${project.group}.${project.name.lowercase()}.configlib")
+    finalizedBy("reobfShadowJar")
+}
+
+reobf {
+    create("shadowJar")
 }
 ```
 
@@ -440,7 +502,8 @@ These subcommands are generated for each `Value` field.
 | `/config <field> set <value>` | Set the value              |
 | `/config <field> reset`       | Reset to the default value |
 
-**NumericValue — arithmetic** (IntegerValue, DoubleValue, FloatValue) — extends SingleValue, so `set` and `reset` also apply
+**NumericValue — arithmetic** (IntegerValue, DoubleValue, FloatValue) — extends SingleValue, so `set` and `reset` also
+apply
 
 | Command                        | Description                          |
 |--------------------------------|--------------------------------------|
