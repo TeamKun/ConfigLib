@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value;
 import net.kunmc.lab.commandlib.argument.TeamArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public class TeamValue extends SingleValue<ScorePlayerTeam, TeamValue> {
 
     @Override
     protected List<ArgumentDefinition<ScorePlayerTeam>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team"), (team, ctx) -> team));
+        return List.of(new ArgumentDefinition<>(new TeamArgument("team"), (team, ctx) -> team));
     }
 
     @Override

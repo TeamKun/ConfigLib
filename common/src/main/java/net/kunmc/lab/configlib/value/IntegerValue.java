@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value;
 import net.kunmc.lab.commandlib.argument.IntegerArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.NumericValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 
@@ -85,7 +84,7 @@ public class IntegerValue extends NumericValue<Integer, IntegerValue> {
 
     @Override
     protected List<ArgumentDefinition<Integer>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new IntegerArgument("Integer", min, max), (n, ctx) -> {
+        return List.of(new ArgumentDefinition<>(new IntegerArgument("Integer", min, max), (n, ctx) -> {
             return n;
         }));
     }

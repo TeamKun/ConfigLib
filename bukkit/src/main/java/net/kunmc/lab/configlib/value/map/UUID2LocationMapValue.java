@@ -2,7 +2,6 @@ package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.argument.LocationArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.Location;
 
 import java.util.List;
@@ -11,9 +10,9 @@ import java.util.UUID;
 public class UUID2LocationMapValue extends UUID2ObjectMapValue<Location, UUID2LocationMapValue> {
     @Override
     protected List<PutArgumentDefinition<UUID, Location>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                       new ArgumentDefinition<>(new LocationArgument("location"),
-                                                                                (loc, ctx) -> loc)));
+        return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                   new ArgumentDefinition<>(new LocationArgument("location"),
+                                                                            (loc, ctx) -> loc)));
     }
 
     @Override

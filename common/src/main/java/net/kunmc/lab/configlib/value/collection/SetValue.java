@@ -9,7 +9,8 @@ import java.util.stream.StreamSupport;
 
 public abstract class SetValue<E, U extends SetValue<E, U>> extends CollectionValue<Set<E>, E, U> implements Iterable<E> {
     public SetValue(@NotNull Set<E> value) {
-        super(value);
+        // Makes value mutable
+        super(new HashSet<>(value));
     }
 
     @Override

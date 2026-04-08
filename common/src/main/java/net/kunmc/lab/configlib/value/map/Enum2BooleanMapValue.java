@@ -2,7 +2,6 @@ package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.argument.BooleanArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,11 +18,10 @@ public class Enum2BooleanMapValue<T extends Enum<T>> extends Enum2ObjectMapValue
 
     @Override
     protected List<PutArgumentDefinition<T, Boolean>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                       new ArgumentDefinition<>(new BooleanArgument("bool"),
-                                                                                (b, ctx) -> {
-                                                                                    return b;
-                                                                                })));
+        return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                   new ArgumentDefinition<>(new BooleanArgument("bool"), (b, ctx) -> {
+                                                       return b;
+                                                   })));
     }
 
     @Override

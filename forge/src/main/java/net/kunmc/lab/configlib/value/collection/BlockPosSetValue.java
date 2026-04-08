@@ -3,8 +3,6 @@ package net.kunmc.lab.configlib.value.collection;
 import net.kunmc.lab.commandlib.argument.BlockPosArgument;
 import net.kunmc.lab.commandlib.argument.IntegerArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
-import net.kunmc.lab.configlib.util.SetUtil;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class BlockPosSetValue extends SetValue<BlockPos, BlockPosSetValue> {
     public BlockPosSetValue(BlockPos... blockPoses) {
-        this(SetUtil.newHashSet(blockPoses));
+        this(Set.of(blockPoses));
     }
 
     public BlockPosSetValue(@NotNull Set<BlockPos> value) {
@@ -24,13 +22,12 @@ public class BlockPosSetValue extends SetValue<BlockPos, BlockPosSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<BlockPos>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new BlockPosArgument("pos"),
-                                                    (pos, ctx) -> Collections.singleton(pos)));
+        return List.of(new ArgumentDefinition<>(new BlockPosArgument("pos"), (pos, ctx) -> Collections.singleton(pos)));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<BlockPos>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new IntegerArgument("x", opt -> {
+        return List.of(new ArgumentDefinition<>(new IntegerArgument("x", opt -> {
             opt.suggestionAction(sb -> {
                 value.stream()
                      .map(BlockPos::getX)

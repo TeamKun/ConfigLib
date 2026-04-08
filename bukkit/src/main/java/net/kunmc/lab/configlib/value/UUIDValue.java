@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value;
 import net.kunmc.lab.commandlib.argument.UUIDArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -52,7 +51,7 @@ public class UUIDValue extends SingleValue<UUID, UUIDValue> {
 
     @Override
     protected List<ArgumentDefinition<UUID>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new UUIDArgument("target"), (target, ctx) -> target));
+        return List.of(new ArgumentDefinition<>(new UUIDArgument("target"), (target, ctx) -> target));
     }
 
     @Override

@@ -4,8 +4,6 @@ import net.kunmc.lab.commandlib.argument.BlockDataArgument;
 import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
-import net.kunmc.lab.configlib.util.SetUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
@@ -32,13 +30,12 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<BlockData>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new BlockDataArgument("data"),
-                                                    (blockData, ctx) -> SetUtil.newHashSet(blockData)));
+        return List.of(new ArgumentDefinition<>(new BlockDataArgument("data"), (blockData, ctx) -> Set.of(blockData)));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<BlockData>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new StringArgument("name", opt -> {
+        return List.of(new ArgumentDefinition<>(new StringArgument("name", opt -> {
             opt.suggestionAction(sb -> {
                 value().stream()
                        .map(BlockData::getAsString)
@@ -46,7 +43,7 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
             });
         }, StringArgument.Type.PHRASE), (data, ctx) -> {
             try {
-                return SetUtil.newHashSet(Bukkit.createBlockData(data));
+                return Set.of(Bukkit.createBlockData(data));
             } catch (IllegalArgumentException e) {
                 throw new ArgumentValidationException(data + "はブロック化出来ない値です.");
             }

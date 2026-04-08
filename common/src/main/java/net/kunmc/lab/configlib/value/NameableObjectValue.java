@@ -35,12 +35,12 @@ public class NameableObjectValue<T extends Nameable> extends SingleValue<T, Name
 
     @Override
     protected List<ArgumentDefinition<T>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name",
-                                                                                 candidates,
-                                                                                 opt -> opt.validator(filter)),
-                                                    (name, ctx) -> {
-                                                        return name;
-                                                    }));
+        return List.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name",
+                                                                             candidates,
+                                                                             opt -> opt.validator(filter)),
+                                                (name, ctx) -> {
+                                                    return name;
+                                                }));
     }
 
     @Override

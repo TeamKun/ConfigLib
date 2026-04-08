@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value;
 import net.kunmc.lab.commandlib.argument.FloatArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.NumericValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 
@@ -84,7 +83,7 @@ public class FloatValue extends NumericValue<Float, FloatValue> {
 
     @Override
     protected List<ArgumentDefinition<Float>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new FloatArgument("float", min, max), (n, ctx) -> {
+        return List.of(new ArgumentDefinition<>(new FloatArgument("float", min, max), (n, ctx) -> {
             return n;
         }));
     }

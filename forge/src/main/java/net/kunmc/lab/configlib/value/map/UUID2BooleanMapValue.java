@@ -2,7 +2,6 @@ package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.argument.BooleanArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,9 +9,9 @@ import java.util.UUID;
 public class UUID2BooleanMapValue extends UUID2ObjectMapValue<Boolean, UUID2BooleanMapValue> {
     @Override
     protected List<PutArgumentDefinition<UUID, Boolean>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                       new ArgumentDefinition<>(new BooleanArgument("boolean"),
-                                                                                (b, ctx) -> b)));
+        return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                   new ArgumentDefinition<>(new BooleanArgument("boolean"),
+                                                                            (b, ctx) -> b)));
     }
 
     @Override

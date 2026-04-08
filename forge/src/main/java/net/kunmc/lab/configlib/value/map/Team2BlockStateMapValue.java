@@ -2,7 +2,6 @@ package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.argument.BlockStateArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 
@@ -18,9 +17,9 @@ public class Team2BlockStateMapValue extends Team2ObjectMapValue<BlockState, Tea
 
     @Override
     protected List<PutArgumentDefinition<ScorePlayerTeam, BlockState>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                       new ArgumentDefinition<>(new BlockStateArgument("state"),
-                                                                                (state, ctx) -> state.getState())));
+        return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                   new ArgumentDefinition<>(new BlockStateArgument("state"),
+                                                                            (state, ctx) -> state.getState())));
     }
 
     @Override

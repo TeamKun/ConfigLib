@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value;
 import net.kunmc.lab.commandlib.argument.BlockDataArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.block.data.BlockData;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public class BlockDataValue extends SingleValue<BlockData, BlockDataValue> {
 
     @Override
     protected List<ArgumentDefinition<BlockData>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new BlockDataArgument("data"), (data, ctx) -> data));
+        return List.of(new ArgumentDefinition<>(new BlockDataArgument("data"), (data, ctx) -> data));
     }
 
     @Override

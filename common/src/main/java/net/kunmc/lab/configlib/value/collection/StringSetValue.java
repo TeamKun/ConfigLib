@@ -3,11 +3,12 @@ package net.kunmc.lab.configlib.value.collection;
 import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
-import net.kunmc.lab.configlib.util.SetUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class StringSetValue extends SetValue<String, StringSetValue> {
     private final transient List<String> allowableStringList = new ArrayList<>();
@@ -15,7 +16,7 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
     protected transient StringArgument.Type type = StringArgument.Type.PHRASE;
 
     public StringSetValue(String... strings) {
-        this(new HashSet<>(Arrays.asList(strings)));
+        this(new HashSet<>(List.of(strings)));
     }
 
     public StringSetValue(@NotNull Set<String> value) {
@@ -39,7 +40,7 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<String>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
+        return List.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
             opt.suggestionAction(sb -> {
                    allowableStringList.stream()
                                       .filter(s -> !value.contains(s))
@@ -52,18 +53,18 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
                    }
                });
         }, type), (s, ctx) -> {
-            return SetUtil.newHashSet(s);
+            return Set.of(s);
         }));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<String>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
+        return List.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
             opt.suggestionAction(sb -> {
                 value.forEach(sb::suggest);
             });
         }), (s, ctx) -> {
-            return SetUtil.newHashSet(s);
+            return Set.of(s);
         }));
     }
 

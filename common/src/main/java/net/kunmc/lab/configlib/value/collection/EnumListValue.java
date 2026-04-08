@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value.collection;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.EnumArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,20 +24,18 @@ public class EnumListValue<T extends Enum<T>> extends ListValue<T, EnumListValue
 
     @Override
     protected List<ArgumentDefinition<List<T>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name",
-                                                                       clazz,
-                                                                       opt -> opt.validator(filterForAdd)),
-                                                    (name, ctx) -> {
-                                                        return ListUtil.of(name);
-                                                    }));
+        return List.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(filterForAdd)),
+                                                (name, ctx) -> {
+                                                    return List.of(name);
+                                                }));
     }
 
     @Override
     protected List<ArgumentDefinition<List<T>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(x -> {
+        return List.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(x -> {
             return value.contains(x);
         })), (name, ctx) -> {
-            return ListUtil.of(name);
+            return List.of(name);
         }));
     }
 

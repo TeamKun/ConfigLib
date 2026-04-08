@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value;
 import net.kunmc.lab.commandlib.argument.DoubleArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.NumericValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 
@@ -84,7 +83,7 @@ public class DoubleValue extends NumericValue<Double, DoubleValue> {
 
     @Override
     protected List<ArgumentDefinition<Double>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new DoubleArgument("Double", min, max), (d, ctx) -> {
+        return List.of(new ArgumentDefinition<>(new DoubleArgument("Double", min, max), (d, ctx) -> {
             return d;
         }));
     }

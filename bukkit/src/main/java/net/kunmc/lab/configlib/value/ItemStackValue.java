@@ -4,7 +4,6 @@ import net.kunmc.lab.commandlib.argument.IntegerArgument;
 import net.kunmc.lab.commandlib.argument.ItemStackArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -25,12 +24,12 @@ public class ItemStackValue extends SingleValue<ItemStack, ItemStackValue> {
 
     @Override
     protected List<ArgumentDefinition<ItemStack>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new ItemStackArgument("item"),
-                                                    new IntegerArgument("amount", 1, Integer.MAX_VALUE),
-                                                    (item, amount, ctx) -> {
-                                                        item.setAmount(amount);
-                                                        return item;
-                                                    }));
+        return List.of(new ArgumentDefinition<>(new ItemStackArgument("item"),
+                                                new IntegerArgument("amount", 1, Integer.MAX_VALUE),
+                                                (item, amount, ctx) -> {
+                                                    item.setAmount(amount);
+                                                    return item;
+                                                }));
     }
 
     @Override

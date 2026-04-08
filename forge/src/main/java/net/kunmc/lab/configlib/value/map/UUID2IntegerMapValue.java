@@ -2,7 +2,6 @@ package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.argument.IntegerArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,9 +9,9 @@ import java.util.UUID;
 public class UUID2IntegerMapValue extends UUID2ObjectMapValue<Integer, UUID2IntegerMapValue> {
     @Override
     protected List<PutArgumentDefinition<UUID, Integer>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                       new ArgumentDefinition<>(new IntegerArgument("integer"),
-                                                                                (n, ctx) -> n)));
+        return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                   new ArgumentDefinition<>(new IntegerArgument("integer"),
+                                                                            (n, ctx) -> n)));
     }
 
     @Override

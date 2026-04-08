@@ -2,8 +2,6 @@ package net.kunmc.lab.configlib.value.collection;
 
 import net.kunmc.lab.commandlib.argument.BlockStateArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
-import net.kunmc.lab.configlib.util.SetUtil;
 import net.minecraft.block.BlockState;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,19 +27,19 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
 
     @Override
     protected List<ArgumentDefinition<Set<BlockState>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new BlockStateArgument("state"),
-                                                    (state, ctx) -> SetUtil.newHashSet(state.getState())));
+        return List.of(new ArgumentDefinition<>(new BlockStateArgument("state"),
+                                                (state, ctx) -> Set.of(state.getState())));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<BlockState>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new BlockStateArgument("state", opt -> {
+        return List.of(new ArgumentDefinition<>(new BlockStateArgument("state", opt -> {
             opt.suggestionAction(sb -> {
                 value().stream()
                        .map(BlockState::toString)
                        .forEach(sb::suggest);
             });
-        }), (state, ctx) -> SetUtil.newHashSet(state.getState())));
+        }), (state, ctx) -> Set.of(state.getState())));
     }
 
     @Override

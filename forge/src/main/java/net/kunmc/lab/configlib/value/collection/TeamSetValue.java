@@ -2,14 +2,11 @@ package net.kunmc.lab.configlib.value.collection;
 
 import net.kunmc.lab.commandlib.argument.TeamArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
-import net.kunmc.lab.configlib.util.SetUtil;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Team;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +17,7 @@ import java.util.Set;
  */
 public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
     public TeamSetValue(ScorePlayerTeam... teams) {
-        this(new HashSet<>(Arrays.asList(teams)));
+        this(new HashSet<>(List.of(teams)));
     }
 
     public TeamSetValue(@NotNull Set<ScorePlayerTeam> value) {
@@ -29,7 +26,7 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<ScorePlayerTeam>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
+        return List.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
             opt.suggestionAction(sb -> {
                 ServerLifecycleHooks.getCurrentServer()
                                     .getScoreboard()
@@ -41,18 +38,18 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
                                                          .noneMatch(s -> s.equals(name)))
                                     .forEach(sb::suggest);
             });
-        }), (team, ctx) -> SetUtil.newHashSet(team)));
+        }), (team, ctx) -> Set.of(team)));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<ScorePlayerTeam>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
+        return List.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
             opt.suggestionAction(sb -> {
                 value.stream()
                      .map(Team::getName)
                      .forEach(sb::suggest);
             });
-        }), (team, ctx) -> SetUtil.newHashSet(team)));
+        }), (team, ctx) -> Set.of(team)));
     }
 
     @Override

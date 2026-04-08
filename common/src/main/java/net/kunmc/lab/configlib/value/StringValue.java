@@ -6,7 +6,6 @@ import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -54,7 +53,7 @@ public class StringValue extends SingleValue<String, StringValue> {
 
     @Override
     protected List<ArgumentDefinition<String>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
+        return List.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
             opt.suggestionAction(suggestionAction)
                .validator((x, ctx) -> {
                    if (!allowableStringList.isEmpty()) {

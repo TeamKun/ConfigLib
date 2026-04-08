@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value.map;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.EnumArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,15 +24,12 @@ public class String2EnumMapValue<T extends Enum<T>> extends String2ObjectMapValu
 
     @Override
     protected List<PutArgumentDefinition<String, T>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                       new ArgumentDefinition<>(new EnumArgument<>("name",
-                                                                                                   clazz,
-                                                                                                   opt -> {
-                                                                                                       opt.validator(
-                                                                                                               valueFilter);
-                                                                                                   }), (name, ctx) -> {
-                                                           return name;
-                                                       })));
+        return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                   new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> {
+                                                       opt.validator(valueFilter);
+                                                   }), (name, ctx) -> {
+                                                       return name;
+                                                   })));
     }
 
     @Override

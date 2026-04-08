@@ -12,7 +12,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -44,11 +47,11 @@ class JsonFileConfigStoreTest {
     }
 
     private void writeFile(String json) throws IOException {
-        Files.write(configFile.toPath(), json.getBytes(StandardCharsets.UTF_8));
+        Files.writeString(configFile.toPath(), json, StandardCharsets.UTF_8);
     }
 
     private String readFile() throws IOException {
-        return new String(Files.readAllBytes(configFile.toPath()), StandardCharsets.UTF_8);
+        return Files.readString(configFile.toPath(), StandardCharsets.UTF_8);
     }
 
     // ---- exists() ----
@@ -161,7 +164,7 @@ class JsonFileConfigStoreTest {
 
             // ファイルを変更してウォッチャーが検知するのを待つ
             Thread.sleep(200);
-            Files.write(configFile.toPath(), "{\"value\":1}".getBytes(StandardCharsets.UTF_8));
+            Files.writeString(configFile.toPath(), "{\"value\":1}", StandardCharsets.UTF_8);
             Thread.sleep(1000); // WatchTask は 500ms ごとに実行
 
             assertTrue(called.get());
@@ -190,13 +193,13 @@ class JsonFileConfigStoreTest {
     @Test
     void writeAndReadGenericListField() {
         GenericConfig cfg = new GenericConfig();
-        cfg.tags = Arrays.asList("alpha", "beta", "gamma");
+        cfg.tags = List.of("alpha", "beta", "gamma");
         store.write(cfg);
 
         GenericConfig loaded = (GenericConfig) new JsonFileConfigStore(configFile, gson).read(GenericConfig.class,
                                                                                               noMigrations());
 
-        assertEquals(Arrays.asList("alpha", "beta", "gamma"), loaded.tags);
+        assertEquals(List.of("alpha", "beta", "gamma"), loaded.tags);
     }
 
     @Test
@@ -350,7 +353,7 @@ class JsonFileConfigStoreTest {
     }
 
     static class GenericConfig extends CommonBaseConfig {
-        List<String> tags = Arrays.asList();
+        List<String> tags = List.of();
 
         @Override
         protected ConfigStore createConfigStore() {

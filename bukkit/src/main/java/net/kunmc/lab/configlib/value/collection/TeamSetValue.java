@@ -2,14 +2,11 @@ package net.kunmc.lab.configlib.value.collection;
 
 import net.kunmc.lab.commandlib.argument.TeamArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
-import net.kunmc.lab.configlib.util.SetUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,7 +15,7 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
     private final transient Scoreboard scoreboard;
 
     public TeamSetValue(Team... teams) {
-        this(new HashSet<>(Arrays.asList(teams)));
+        this(new HashSet<>(List.of(teams)));
     }
 
     public TeamSetValue(@NotNull Set<Team> value) {
@@ -33,7 +30,7 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<Team>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
+        return List.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
             opt.suggestionAction(sb -> {
                 scoreboard.getTeams()
                           .stream()
@@ -43,18 +40,18 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
                                                .noneMatch(s -> s.equals(name)))
                           .forEach(sb::suggest);
             });
-        }), (team, ctx) -> SetUtil.newHashSet(team)));
+        }), (team, ctx) -> Set.of(team)));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<Team>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
+        return List.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
             opt.suggestionAction(sb -> {
                 value.stream()
                      .map(Team::getName)
                      .forEach(sb::suggest);
             });
-        }), (team, ctx) -> SetUtil.newHashSet(team)));
+        }), (team, ctx) -> Set.of(team)));
     }
 
     @Override

@@ -4,7 +4,6 @@ import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -45,7 +44,7 @@ public abstract class String2ObjectMapValue<V, T extends String2ObjectMapValue<V
 
     @Override
     protected List<ArgumentDefinition<String>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new StringArgument("string", opt -> {
+        return List.of(new ArgumentDefinition<>(new StringArgument("string", opt -> {
             opt.suggestionAction(sb -> {
                 keySet().forEach(sb::suggest);
             });

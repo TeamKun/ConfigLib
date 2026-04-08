@@ -4,7 +4,6 @@ import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.EnumArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,7 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
 
     @Override
     protected List<ArgumentDefinition<T>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(x -> {
+        return List.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(x -> {
             return value.containsKey(x);
         })), (name, ctx) -> {
             return name;

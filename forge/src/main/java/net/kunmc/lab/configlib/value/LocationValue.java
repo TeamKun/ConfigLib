@@ -4,7 +4,6 @@ import net.kunmc.lab.commandlib.argument.LocationArgument;
 import net.kunmc.lab.commandlib.util.Location;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.block.BlockState;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public class LocationValue extends SingleValue<Location, LocationValue> {
 
     @Override
     protected List<ArgumentDefinition<Location>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new LocationArgument("location"), (loc, ctx) -> loc));
+        return List.of(new ArgumentDefinition<>(new LocationArgument("location"), (loc, ctx) -> loc));
     }
 
     @Override

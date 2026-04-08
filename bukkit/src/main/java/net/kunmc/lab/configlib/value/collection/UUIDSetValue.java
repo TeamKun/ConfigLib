@@ -3,8 +3,6 @@ package net.kunmc.lab.configlib.value.collection;
 import net.kunmc.lab.commandlib.argument.UUIDArgument;
 import net.kunmc.lab.commandlib.argument.UUIDsArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
-import net.kunmc.lab.configlib.util.SetUtil;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -15,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
     public UUIDSetValue(UUID... uuids) {
-        this(SetUtil.newHashSet(uuids));
+        this(Set.of(uuids));
     }
 
     public UUIDSetValue(Collection<Player> players) {
@@ -44,14 +42,14 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<UUID>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new UUIDsArgument("targets", opt -> {
+        return List.of(new ArgumentDefinition<>(new UUIDsArgument("targets", opt -> {
             opt.validator(x -> x.size() > 1 || !value.contains(x.get(0)));
-        }), (targets, ctx) -> SetUtil.newHashSet(targets)));
+        }), (targets, ctx) -> new HashSet<>(targets)));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<UUID>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new UUIDArgument("target", opt -> {
+        return List.of(new ArgumentDefinition<>(new UUIDArgument("target", opt -> {
             opt.validator(x -> {
                    return value.contains(x);
                })
@@ -63,7 +61,7 @@ public class UUIDSetValue extends SetValue<UUID, UUIDSetValue> {
                         .filter(offlinePlayerUUIDs::contains)
                         .forEach(x -> sb.suggest(x.toString()));
                });
-        }), (target, ctx) -> SetUtil.newHashSet(target)));
+        }), (target, ctx) -> Set.of(target)));
     }
 
     @Override

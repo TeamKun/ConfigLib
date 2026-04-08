@@ -3,8 +3,6 @@ package net.kunmc.lab.configlib.value.collection;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.EnumArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
-import net.kunmc.lab.configlib.util.SetUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,17 +30,17 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
         definitions.add(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> {
             opt.validator((x, ctx) -> !value.contains(x) && filterForAdd.apply(x, ctx));
         }), (name, ctx) -> {
-            return SetUtil.newHashSet(clazz.cast(name));
+            return Set.of(clazz.cast(name));
         }));
         return definitions;
     }
 
     @Override
     protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(x -> {
+        return List.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(x -> {
             return value.contains(x);
         })), (name, ctx) -> {
-            return SetUtil.newHashSet(name);
+            return Set.of(name);
         }));
     }
 

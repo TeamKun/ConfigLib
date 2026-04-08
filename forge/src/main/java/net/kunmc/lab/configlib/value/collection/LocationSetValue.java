@@ -4,8 +4,6 @@ import net.kunmc.lab.commandlib.argument.DoubleArgument;
 import net.kunmc.lab.commandlib.argument.LocationArgument;
 import net.kunmc.lab.commandlib.util.Location;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
-import net.kunmc.lab.configlib.util.SetUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -14,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class LocationSetValue extends SetValue<Location, LocationSetValue> {
     public LocationSetValue(Location... locations) {
-        this(SetUtil.newHashSet(locations));
+        this(Set.of(locations));
     }
 
     public LocationSetValue(@NotNull Set<Location> value) {
@@ -23,13 +21,12 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<Location>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new LocationArgument("location"),
-                                                    (loc, ctx) -> SetUtil.newHashSet(loc)));
+        return List.of(new ArgumentDefinition<>(new LocationArgument("location"), (loc, ctx) -> Set.of(loc)));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<Location>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new DoubleArgument("x", opt -> {
+        return List.of(new ArgumentDefinition<>(new DoubleArgument("x", opt -> {
             opt.suggestionAction(sb -> {
                 value.stream()
                      .map(Location::getX)

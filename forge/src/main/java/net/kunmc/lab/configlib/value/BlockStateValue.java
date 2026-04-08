@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value;
 import net.kunmc.lab.commandlib.argument.BlockStateArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.block.BlockState;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class BlockStateValue extends SingleValue<BlockState, BlockStateValue> {
 
     @Override
     protected List<ArgumentDefinition<BlockState>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new BlockStateArgument("state"), (state, ctx) -> state.getState()));
+        return List.of(new ArgumentDefinition<>(new BlockStateArgument("state"), (state, ctx) -> state.getState()));
     }
 
     @Override

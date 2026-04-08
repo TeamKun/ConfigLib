@@ -4,7 +4,6 @@ import net.kunmc.lab.commandlib.argument.GameProfileArgument;
 import net.kunmc.lab.commandlib.argument.UUIDArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
@@ -28,7 +27,7 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected List<ArgumentDefinition<UUID>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new UUIDArgument("uuid", opt -> {
+        return List.of(new ArgumentDefinition<>(new UUIDArgument("uuid", opt -> {
             opt.additionalSuggestionAction(sb -> {
                    value.keySet()
                         .stream()

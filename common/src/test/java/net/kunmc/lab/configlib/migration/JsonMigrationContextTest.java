@@ -6,7 +6,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -132,12 +131,12 @@ class JsonMigrationContextTest {
 
         List<String> tags = c.getObject("tags", new TypeToken<List<String>>() {
         }.getType());
-        assertEquals(Arrays.asList("a", "b", "c"), tags);
+        assertEquals(List.of("a", "b", "c"), tags);
 
-        c.setObject("tags", Arrays.asList("x", "y"));
+        c.setObject("tags", List.of("x", "y"));
         List<String> updated = c.getObject("tags", new TypeToken<List<String>>() {
         }.getType());
-        assertEquals(Arrays.asList("x", "y"), updated);
+        assertEquals(List.of("x", "y"), updated);
     }
 
     static class Point {

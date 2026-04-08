@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value;
 import net.kunmc.lab.commandlib.argument.LocationArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public class VectorValue extends SingleValue<Vector, VectorValue> {
 
     @Override
     protected List<ArgumentDefinition<Vector>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new LocationArgument("location"), (loc, ctx) -> (loc).toVector()));
+        return List.of(new ArgumentDefinition<>(new LocationArgument("location"), (loc, ctx) -> (loc).toVector()));
     }
 
     @Override

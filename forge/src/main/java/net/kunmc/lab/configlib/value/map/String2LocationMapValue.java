@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value.map;
 import net.kunmc.lab.commandlib.argument.LocationArgument;
 import net.kunmc.lab.commandlib.util.Location;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +19,9 @@ public class String2LocationMapValue extends String2ObjectMapValue<Location, Str
 
     @Override
     protected List<PutArgumentDefinition<String, Location>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                       new ArgumentDefinition<>(new LocationArgument("location"),
-                                                                                (loc, ctx) -> loc)));
+        return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                   new ArgumentDefinition<>(new LocationArgument("location"),
+                                                                            (loc, ctx) -> loc)));
     }
 
     @Override

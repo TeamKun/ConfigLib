@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value.collection;
 import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class StringListValue extends ListValue<String, StringListValue> {
 
     @Override
     protected List<ArgumentDefinition<List<String>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
+        return List.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
             opt.suggestionAction(sb -> {
                    allowableStringList.forEach(sb::suggest);
                })
@@ -53,18 +52,18 @@ public class StringListValue extends ListValue<String, StringListValue> {
                    }
                });
         }, type), (s, ctx) -> {
-            return ListUtil.of(s);
+            return List.of(s);
         }));
     }
 
     @Override
     protected List<ArgumentDefinition<List<String>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
+        return List.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
             opt.suggestionAction(sb -> {
                 value.forEach(sb::suggest);
             });
         }), (s, ctx) -> {
-            return ListUtil.of(s);
+            return List.of(s);
         }));
     }
 

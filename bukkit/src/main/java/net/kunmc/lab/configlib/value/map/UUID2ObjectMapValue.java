@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value.map;
 import net.kunmc.lab.commandlib.argument.UUIDArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import net.kunmc.lab.configlib.util.UUIDUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -26,7 +25,7 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected List<ArgumentDefinition<UUID>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new UUIDArgument("key", opt -> {
+        return List.of(new ArgumentDefinition<>(new UUIDArgument("key", opt -> {
             List<UUID> offlinePlayerUUIDs = Arrays.stream(Bukkit.getOfflinePlayers())
                                                   .map(OfflinePlayer::getUniqueId)
                                                   .collect(Collectors.toList());

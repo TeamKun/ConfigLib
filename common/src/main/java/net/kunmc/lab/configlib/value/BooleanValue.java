@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value;
 import net.kunmc.lab.commandlib.argument.BooleanArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -67,7 +66,7 @@ public class BooleanValue extends SingleValue<Boolean, BooleanValue> {
 
     @Override
     protected List<ArgumentDefinition<Boolean>> argumentDefinitions() {
-        return ListUtil.of(new ArgumentDefinition<>(new BooleanArgument("bool"), (b, ctx) -> {
+        return List.of(new ArgumentDefinition<>(new BooleanArgument("bool"), (b, ctx) -> {
             return b;
         }));
     }

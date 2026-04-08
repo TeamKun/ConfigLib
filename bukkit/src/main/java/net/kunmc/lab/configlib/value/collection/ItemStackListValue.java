@@ -8,7 +8,6 @@ import net.kunmc.lab.commandlib.argument.ItemStackArgument;
 import net.kunmc.lab.commandlib.argument.StringArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.gson.ItemStackTypeAdapter;
-import net.kunmc.lab.configlib.util.ListUtil;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -29,17 +28,17 @@ public class ItemStackListValue extends ListValue<ItemStack, ItemStackListValue>
 
     @Override
     protected List<ArgumentDefinition<List<ItemStack>>> argumentDefinitionsForAdd() {
-        return ListUtil.of(new ArgumentDefinition<>(new ItemStackArgument("item"),
-                                                    new IntegerArgument("amount", 1, Integer.MAX_VALUE),
-                                                    (item, amount, ctx) -> {
-                                                        item.setAmount(amount);
-                                                        return ListUtil.of(item);
-                                                    }));
+        return List.of(new ArgumentDefinition<>(new ItemStackArgument("item"),
+                                                new IntegerArgument("amount", 1, Integer.MAX_VALUE),
+                                                (item, amount, ctx) -> {
+                                                    item.setAmount(amount);
+                                                    return List.of(item);
+                                                }));
     }
 
     @Override
     protected List<ArgumentDefinition<List<ItemStack>>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new StringArgument("item", opt -> {
+        return List.of(new ArgumentDefinition<>(new StringArgument("item", opt -> {
             opt.displayDefaultSuggestions(false)
                .suggestionAction(sb -> {
                    value.stream()

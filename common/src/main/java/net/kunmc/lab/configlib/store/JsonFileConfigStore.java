@@ -8,7 +8,10 @@ import net.kunmc.lab.configlib.CommonBaseConfig;
 import net.kunmc.lab.configlib.migration.JsonMigrationContext;
 import net.kunmc.lab.configlib.migration.Migrations;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -200,16 +203,15 @@ public class JsonFileConfigStore implements ConfigStore {
 
     private static String readString(File file) {
         try {
-            return new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+            return Files.readString(file.toPath(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
     private static void writeString(File file, String content) {
-        try (OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(file.toPath()),
-                                                                StandardCharsets.UTF_8)) {
-            writer.write(content);
+        try {
+            Files.writeString(file.toPath(), content, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

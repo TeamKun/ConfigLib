@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value.map;
 import net.kunmc.lab.commandlib.argument.TeamArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.MapValue;
-import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.HashMap;
@@ -25,7 +24,7 @@ public abstract class Team2ObjectMapValue<V, T extends Team2ObjectMapValue<V, T>
 
     @Override
     protected List<ArgumentDefinition<ScorePlayerTeam>> argumentDefinitionsForRemove() {
-        return ListUtil.of(new ArgumentDefinition<>(new TeamArgument("team"), (team, ctx) -> team));
+        return List.of(new ArgumentDefinition<>(new TeamArgument("team"), (team, ctx) -> team));
     }
 
     @Override

@@ -8,7 +8,8 @@ import java.util.stream.Stream;
 
 public abstract class ListValue<E, U extends ListValue<E, U>> extends CollectionValue<List<E>, E, U> implements Iterable<E> {
     public ListValue(List<E> value) {
-        super(value);
+        // Makes value mutable
+        super(new ArrayList<>(value));
     }
 
     @Override
@@ -127,7 +128,7 @@ public abstract class ListValue<E, U extends ListValue<E, U>> extends Collection
     @Override
     public final List<E> toAdded(E... elements) {
         List<E> res = new ArrayList<>(value);
-        res.addAll(Arrays.asList(elements));
+        Collections.addAll(res, elements);
         return res;
     }
 

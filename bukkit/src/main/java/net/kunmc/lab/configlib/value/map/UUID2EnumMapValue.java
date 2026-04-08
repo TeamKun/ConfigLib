@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value.map;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.EnumArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,12 +25,12 @@ public class UUID2EnumMapValue<T extends Enum<T>> extends UUID2ObjectMapValue<T,
 
     @Override
     protected List<PutArgumentDefinition<UUID, T>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                       new ArgumentDefinition<>(new EnumArgument<>("name",
-                                                                                                   clazz,
-                                                                                                   opt -> opt.validator(
-                                                                                                           valueFilter)),
-                                                                                (t, ctx) -> t)));
+        return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                   new ArgumentDefinition<>(new EnumArgument<>("name",
+                                                                                               clazz,
+                                                                                               opt -> opt.validator(
+                                                                                                       valueFilter)),
+                                                                            (t, ctx) -> t)));
     }
 
     @Override

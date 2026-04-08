@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.value.map;
 import net.kunmc.lab.commandlib.argument.LocationArgument;
 import net.kunmc.lab.commandlib.util.Location;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 
 import java.util.List;
@@ -11,9 +10,9 @@ import java.util.List;
 public class Team2LocationMapValue extends Team2ObjectMapValue<Location, Team2LocationMapValue> {
     @Override
     protected List<PutArgumentDefinition<ScorePlayerTeam, Location>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                       new ArgumentDefinition<>(new LocationArgument("location"),
-                                                                                (loc, ctx) -> loc)));
+        return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                   new ArgumentDefinition<>(new LocationArgument("location"),
+                                                                            (loc, ctx) -> loc)));
     }
 
     @Override

@@ -2,7 +2,6 @@ package net.kunmc.lab.configlib.value.map;
 
 import net.kunmc.lab.commandlib.argument.BlockStateArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
-import net.kunmc.lab.configlib.util.ListUtil;
 import net.minecraft.block.BlockState;
 
 import java.util.HashMap;
@@ -27,9 +26,9 @@ public class String2BlockStateValue extends String2ObjectMapValue<BlockState, St
 
     @Override
     protected List<PutArgumentDefinition<String, BlockState>> argumentDefinitionsForPut() {
-        return ListUtil.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                       new ArgumentDefinition<>(new BlockStateArgument("state"),
-                                                                                (state, ctx) -> state.getState())));
+        return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
+                                                   new ArgumentDefinition<>(new BlockStateArgument("state"),
+                                                                            (state, ctx) -> state.getState())));
     }
 
     @Override
