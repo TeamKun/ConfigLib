@@ -1,18 +1,12 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
-buildscript {
-    repositories {
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath("com.github.jengelman.gradle.plugins:shadow:6.1.0")
-    }
+plugins {
+    java
+    id("com.gradleup.shadow") version "9.4.1"
 }
-
-apply(plugin = "java")
-apply(plugin = "com.github.johnrengelman.shadow")
 
 group = "net.kunmc.lab"
 version = "1.0.0"
@@ -32,10 +26,10 @@ repositories {
 }
 
 dependencies {
-    "compileOnly"(mapOf("name" to "patched_1.16.5"))
-    "implementation"("com.google.code.gson:gson:2.10")
-    "implementation"("org.apache.commons:commons-lang3:3.12.0")
-    "implementation"("com.github.TeamKun.CommandLib:bukkit:0.17.1")
+    compileOnly(mapOf("name" to "patched_1.16.5"))
+    implementation("com.google.code.gson:gson:2.10")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("com.github.TeamKun.CommandLib:bukkit:0.17.1")
 }
 
 configure<JavaPluginExtension> {
@@ -68,16 +62,17 @@ configure<SourceSetContainer> {
     }
 }
 
-tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+tasks.named<ShadowJar>("shadowJar") {
     archiveFileName.set("${rootProject.name}-${project.version}.jar")
-    relocate("net.kunmc.lab.commandlib", "${project.group}.${project.name.toLowerCase()}.commandlib")
-    relocate("net.kunmc.lab.configlib", "${project.group}.${project.name.toLowerCase()}.configlib")
-    relocate("com.google.gson", "${project.group}.${project.name.toLowerCase()}.gson")
+    relocate("net.kunmc.lab.commandlib", "${project.group}.${project.name.lowercase()}.commandlib")
+    relocate("net.kunmc.lab.configlib", "${project.group}.${project.name.lowercase()}.configlib")
+    relocate("com.google.gson", "${project.group}.${project.name.lowercase()}.gson")
 }
 tasks.named("build") { dependsOn(tasks.named("shadowJar")) }
 
 tasks.named<ProcessResources>("processResources") {
-    val props = mapOf("name" to rootProject.name, "version" to version, "MainClass" to getMainClassFQDN(projectDir.toPath()))
+    val props =
+        mapOf("name" to rootProject.name, "version" to version, "MainClass" to getMainClassFQDN(projectDir.toPath()))
     inputs.properties(props)
     filteringCharset = "UTF-8"
     filesMatching("plugin.yml") {
@@ -98,7 +93,8 @@ tasks.register("buildAndCopy") {
 }
 
 tasks.register("downloadServerJar") {
-    val url = uri("https://api.papermc.io/v2/projects/paper/versions/1.16.5/builds/794/downloads/paper-1.16.5-794.jar").toURL()
+    val url =
+        uri("https://api.papermc.io/v2/projects/paper/versions/1.16.5/builds/794/downloads/paper-1.16.5-794.jar").toURL()
     val file = projectDir.toPath().toAbsolutePath().resolve("server/server.jar").toFile()
     if (!file.exists()) {
         url.openStream().use { stream ->
@@ -113,13 +109,10 @@ tasks.register("generatePatchedJar") {
     val serverDir = projectDir.toPath().toAbsolutePath().resolve("server").toString()
     val file = Path.of(serverDir, "cache/patched_1.16.5.jar").toFile()
     if (!file.exists()) {
-        try {
-            val p = Runtime.getRuntime().exec("java -jar $serverDir/server.jar nogui", emptyArray(), Path.of(serverDir).toFile())
-            p.waitFor()
-            p.destroy()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        val p = Runtime.getRuntime()
+            .exec(arrayOf("java", "-jar", "$serverDir/server.jar", "nogui"), emptyArray(), Path.of(serverDir).toFile())
+        p.waitFor()
+        p.destroy()
     }
 }
 
