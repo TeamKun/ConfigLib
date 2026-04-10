@@ -113,7 +113,7 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
     }
 
     @Override
-    protected String asString() {
+    protected String defaultDisplayString() {
         if (value() == null) {
             return "null";
         }

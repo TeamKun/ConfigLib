@@ -51,7 +51,7 @@ class ConfigListCommand extends Command {
 
             if (o instanceof Value) {
                 Value<?, ?> v = ((Value<?, ?>) o);
-                ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
+                ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
                                           option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                           .hoverText(StringUtils.defaultString(v.description())));
             } else {

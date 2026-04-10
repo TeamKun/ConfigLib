@@ -93,6 +93,6 @@ public abstract class NumericValue<E extends Number & Comparable<E>, T extends N
 
     @Override
     public String toString() {
-        return String.format("%s{value=%s,min=%s,max=%s}", getClass().getSimpleName(), asString(), min, max);
+        return String.format("%s{value=%s,min=%s,max=%s}", getClass().getSimpleName(), value, min, max);
     }
 }

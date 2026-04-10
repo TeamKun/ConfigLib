@@ -90,13 +90,11 @@ class ConfigDiffCommand extends Command {
                 Object older = field.get(olderConfig);
                 Object newer = field.get(newerConfig);
 
-                String olderFmt;
-                String newerFmt;
                 if (older instanceof Value && newer instanceof Value) {
                     // liveConfigのValue名を使う
                     String name = ((Value<?, ?>) field.get(config)).resolveEntryName(field.getName());
-                    olderFmt = ((Value<?, ?>) older).format();
-                    newerFmt = ((Value<?, ?>) newer).format();
+                    String olderFmt = ((Value<?, ?>) older).displayString();
+                    String newerFmt = ((Value<?, ?>) newer).displayString();
                     if (olderFmt.equals(newerFmt)) {
                         continue;
                     }
@@ -104,8 +102,8 @@ class ConfigDiffCommand extends Command {
                     String line = name + ": " + olderFmt + " → " + newerFmt;
                     ctx.sendMessageWithOption(line, opt -> opt.rgb(ChatColorUtil.GREEN.getRGB()));
                 } else {
-                    olderFmt = String.valueOf(older);
-                    newerFmt = String.valueOf(newer);
+                    String olderFmt = String.valueOf(older);
+                    String newerFmt = String.valueOf(newer);
                     if (olderFmt.equals(newerFmt)) {
                         continue;
                     }

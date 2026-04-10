@@ -23,7 +23,7 @@ public abstract class Value<E, T extends Value<E, T>> {
     private transient E initValue;
     private transient Validator<E> validator = x -> {
     };
-    private transient Function<E, String> formatter;
+    private transient Function<E, String> displayFormatter;
     private transient String entryName;
     private transient ExecutionCondition executableIf;
 
@@ -72,15 +72,15 @@ public abstract class Value<E, T extends Value<E, T>> {
 
     /**
      * Sets a custom formatter for converting this value to a display string.
-     * The formatter takes precedence over the default {@link #asString()} implementation
+     * The formatter takes precedence over the default {@link #defaultDisplayString()} implementation
      * and is used wherever the value is displayed as text (e.g. list and get commands).
      *
      * <pre>{@code
-     * new IntegerValue(10).formatter(n -> n + " items")
+     * new IntegerValue(10).displayFormatter(n -> n + " items")
      * }</pre>
      */
-    public final T formatter(Function<@Nullable E, String> formatter) {
-        this.formatter = formatter;
+    public final T displayFormatter(Function<@Nullable E, String> formatter) {
+        this.displayFormatter = formatter;
         return (T) this;
     }
 
@@ -189,17 +189,19 @@ public abstract class Value<E, T extends Value<E, T>> {
         }
     }
 
-    final String format() {
-        if (formatter != null) {
-            return formatter.apply(value);
+    final String displayString() {
+        if (displayFormatter != null) {
+            return displayFormatter.apply(value);
         }
-        return asString();
+        return defaultDisplayString();
     }
 
-    protected abstract String asString();
+    protected String defaultDisplayString() {
+        return String.valueOf(value);
+    }
 
     @Override
     public String toString() {
-        return String.format("%s{value=%s}", getClass().getSimpleName(), asString());
+        return String.format("%s{value=%s}", getClass().getSimpleName(), value);
     }
 }

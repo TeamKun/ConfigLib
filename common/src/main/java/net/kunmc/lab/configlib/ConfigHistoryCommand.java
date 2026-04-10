@@ -144,7 +144,7 @@ class ConfigHistoryCommand extends Command {
                 if (live instanceof Value && hist instanceof Value) {
                     sb.append(((Value<?, ?>) live).resolveEntryName(field.getName()))
                       .append(": ")
-                      .append(((Value<?, ?>) hist).format());
+                      .append(((Value<?, ?>) hist).displayString());
                 } else {
                     sb.append(field.getName())
                       .append(": ")
@@ -167,7 +167,7 @@ class ConfigHistoryCommand extends Command {
                 Object live = field.get(liveConfig);
                 Object hist = field.get(histConfig);
                 if (live instanceof Value && hist instanceof Value) {
-                    ctx.sendSuccess(((Value<?, ?>) live).resolveEntryName(field.getName()) + ": " + ((Value<?, ?>) hist).format());
+                    ctx.sendSuccess(((Value<?, ?>) live).resolveEntryName(field.getName()) + ": " + ((Value<?, ?>) hist).displayString());
                 } else {
                     ctx.sendSuccess(field.getName() + ": " + hist);
                 }

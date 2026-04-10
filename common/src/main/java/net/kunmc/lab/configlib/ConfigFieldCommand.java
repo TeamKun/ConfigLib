@@ -62,7 +62,7 @@ class ConfigFieldCommand extends Command {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
-            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
+            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
         }
@@ -82,7 +82,7 @@ class ConfigFieldCommand extends Command {
             addChildren(new Command("reset") {{
                 execute(ctx -> {
                     v.resetToDefault();
-                    ctx.sendSuccess(entryName + "をデフォルト値(" + v.format() + ")にリセットしました");
+                    ctx.sendSuccess(entryName + "をデフォルト値(" + v.displayString() + ")にリセットしました");
                 });
             }});
         }
@@ -95,7 +95,7 @@ class ConfigFieldCommand extends Command {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
-            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
+            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
         }
@@ -115,7 +115,7 @@ class ConfigFieldCommand extends Command {
             addChildren(new Command("reset") {{
                 execute(ctx -> {
                     v.resetToDefault();
-                    ctx.sendSuccess(entryName + "をデフォルト値(" + v.format() + ")にリセットしました");
+                    ctx.sendSuccess(entryName + "をデフォルト値(" + v.displayString() + ")にリセットしました");
                 });
             }});
         }
@@ -125,7 +125,7 @@ class ConfigFieldCommand extends Command {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
-            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.format(),
+            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
                                                      option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                      .hoverText(StringUtils.defaultString(v.description()))));
         }
@@ -145,7 +145,7 @@ class ConfigFieldCommand extends Command {
             addChildren(new Command("reset") {{
                 execute(ctx -> {
                     v.resetToDefault();
-                    ctx.sendSuccess(entryName + "をデフォルト値(" + v.format() + ")にリセットしました");
+                    ctx.sendSuccess(entryName + "をデフォルト値(" + v.displayString() + ")にリセットしました");
                 });
             }});
         }
