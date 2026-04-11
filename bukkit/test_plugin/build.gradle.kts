@@ -29,7 +29,7 @@ dependencies {
     compileOnly(mapOf("name" to "patched_1.16.5"))
     implementation("com.google.code.gson:gson:2.10")
     implementation("org.apache.commons:commons-lang3:3.12.0")
-    implementation("com.github.TeamKun.CommandLib:bukkit:0.17.1")
+    implementation("com.github.Maru32768.CommandLib:bukkit:0.17.1")
 }
 
 configure<JavaPluginExtension> {

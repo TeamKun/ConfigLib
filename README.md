@@ -1,6 +1,6 @@
 # ConfigLib - A Type-Safe Configuration API for Bukkit and Forge
 
-[![](https://jitpack.io/v/TeamKun/ConfigLib.svg)](https://jitpack.io/#TeamKun/ConfigLib)
+[![](https://jitpack.io/v/Maru32768/ConfigLib.svg)](https://jitpack.io/#Maru32768/ConfigLib)
 
 ConfigLib is an advanced, type-safe Configuration API designed to simplify configuration management for Bukkit and Forge
 developers.
@@ -35,8 +35,8 @@ developers.
 
 To ensure stability, we recommend replacing `latest.release` with a specific version such as `0.16.0`.  
 You can find the latest version on
-the [CommandLib Release Page](https://github.com/TeamKun/CommandLib/releases)
-and [ConfigLib Release Page](https://github.com/TeamKun/ConfigLib/releases).
+the [CommandLib Release Page](https://github.com/Maru32768/CommandLib/releases)
+and [ConfigLib Release Page](https://github.com/Maru32768/ConfigLib/releases).
 
 <details>
   <summary>Bukkit (Groovy DSL)</summary>
@@ -51,8 +51,8 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.TeamKun.CommandLib:bukkit:latest.release"
-    implementation 'com.github.TeamKun.ConfigLib:bukkit:latest.release'
+    implementation "com.github.Maru32768.CommandLib:bukkit:latest.release"
+    implementation 'com.github.Maru32768.ConfigLib:bukkit:latest.release'
 }
 
 shadowJar {
@@ -78,8 +78,8 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.TeamKun.CommandLib:bukkit:latest.release")
-    implementation("com.github.TeamKun.ConfigLib:bukkit:latest.release")
+    implementation("com.github.Maru32768.CommandLib:bukkit:latest.release")
+    implementation("com.github.Maru32768.ConfigLib:bukkit:latest.release")
 }
 
 tasks.named<ShadowJar>("shadowJar") {
@@ -105,15 +105,15 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.TeamKun.CommandLib:forge:latest.release"
-    implementation "com.github.TeamKun.ConfigLib:forge:latest.release"
+    implementation "com.github.Maru32768.CommandLib:forge:latest.release"
+    implementation "com.github.Maru32768.ConfigLib:forge:latest.release"
 }
 
 shadowJar {
     archiveFileName = "${rootProject.name}-${project.version}.jar"
     dependencies {
-        include(dependency("com.github.TeamKun.CommandLib:forge:.*"))
-        include(dependency("com.github.TeamKun.ConfigLib:forge:.*"))
+        include(dependency("com.github.Maru32768.CommandLib:forge:.*"))
+        include(dependency("com.github.Maru32768.ConfigLib:forge:.*"))
     }
     relocate "net.kunmc.lab.commandlib", "${project.group}.${project.name.toLowerCase()}.commandlib"
     relocate "net.kunmc.lab.configlib", "${project.group}.${project.name.toLowerCase()}.configlib"
@@ -141,15 +141,15 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.TeamKun.CommandLib:forge:latest.release")
-    implementation("com.github.TeamKun.ConfigLib:forge:latest.release")
+    implementation("com.github.Maru32768.CommandLib:forge:latest.release")
+    implementation("com.github.Maru32768.ConfigLib:forge:latest.release")
 }
 
 tasks.named<ShadowJar>("shadowJar") {
     archiveFileName.set("${rootProject.name}-${project.version}.jar")
     dependencies {
-        include(dependency("com.github.TeamKun.CommandLib:forge:.*"))
-        include(dependency("com.github.TeamKun.ConfigLib:forge:.*"))
+        include(dependency("com.github.Maru32768.CommandLib:forge:.*"))
+        include(dependency("com.github.Maru32768.ConfigLib:forge:.*"))
     }
     relocate("net.kunmc.lab.commandlib", "${project.group}.${project.name.lowercase()}.commandlib")
     relocate("net.kunmc.lab.configlib", "${project.group}.${project.name.lowercase()}.configlib")

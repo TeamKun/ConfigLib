@@ -35,8 +35,8 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.20'
 
-    implementation "com.github.TeamKun.CommandLib:forge:0.12.0"
-    implementation "com.github.TeamKun.ConfigLib:forge:0.16.0"
+    implementation "com.github.Maru32768.CommandLib:forge:0.12.0"
+    implementation "com.github.Maru32768.ConfigLib:forge:0.16.0"
 }
 
 jar {
@@ -57,8 +57,8 @@ jar.finalizedBy('reobfJar')
 shadowJar {
     archiveFileName = "${rootProject.name}-${project.version}.jar"
     dependencies {
-        include(dependency("com.github.TeamKun.CommandLib:forge:.*"))
-        include(dependency("com.github.TeamKun.ConfigLib:forge:.*"))
+        include(dependency("com.github.Maru32768.CommandLib:forge:.*"))
+        include(dependency("com.github.Maru32768.ConfigLib:forge:.*"))
     }
     relocate "net.kunmc.lab.commandlib", "${project.group}.${project.name.toLowerCase()}.commandlib"
     relocate "net.kunmc.lab.configlib", "${project.group}.${project.name.toLowerCase()}.configlib"

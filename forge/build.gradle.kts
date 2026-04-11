@@ -22,5 +22,5 @@ dependencies {
     add("minecraft", "net.minecraftforge:forge:1.16.5-36.2.31")
     compileOnly("org.jetbrains:annotations:20.1.0")
     api(project(":common"))
-    compileOnly("com.github.TeamKun.CommandLib:forge:$commandLibVersion")
+    compileOnly("com.github.Maru32768.CommandLib:forge:$commandLibVersion")
 }

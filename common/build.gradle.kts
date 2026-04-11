@@ -18,7 +18,7 @@ dependencies {
     api("com.google.code.gson:gson:2.10")
     compileOnly("org.jetbrains:annotations:20.1.0")
     // commonだとコマンド周りを上手く実装出来ないためbukkitを使う
-    compileOnly("com.github.TeamKun.CommandLib:bukkit:$commandLibVersion")
+    compileOnly("com.github.Maru32768.CommandLib:bukkit:$commandLibVersion")
     // CommandContext#sendMessageを呼ぶ時にnet.md_5.bungee.api.chat.BaseComponentを見つけられずコンパイルが通らないため追加
     compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
