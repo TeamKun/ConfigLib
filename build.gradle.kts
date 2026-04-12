@@ -1,5 +1,8 @@
 allprojects {
-    group = "net.kunmc.lab"
+    // TODO: Revisit this local project group after the temporary local CommandLib composite build is removed.
+    // ConfigLib and CommandLib both have "common", "bukkit", and "forge" subprojects; keeping the same local
+    // Gradle coordinates makes composite-build substitution redirect CommandLib internals back to ConfigLib.
+    group = "net.kunmc.lab.configlib"
     version = "0.21.0"
 }
 
@@ -28,7 +31,7 @@ subprojects {
     configure<PublishingExtension> {
         publications {
             create<MavenPublication>("maven") {
-                groupId = project.group.toString()
+                groupId = "net.kunmc.lab"
                 artifactId = project.name
                 version = project.version.toString()
                 from(components["java"])

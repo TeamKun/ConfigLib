@@ -11,3 +11,17 @@ plugins {
 
 rootProject.name = "ConfigLib"
 include("bukkit", "common", "forge")
+
+// TODO: Replace this local CommandLib composite build with released artifacts before publishing.
+includeBuild("../CommandLib") {
+    dependencySubstitution {
+        substitute(module("com.github.Maru32768.CommandLib:common")).using(project(":common"))
+        substitute(module("com.github.Maru32768.CommandLib:bukkit")).using(project(":bukkit"))
+        substitute(module("com.github.Maru32768.CommandLib:forge")).using(project(":forge"))
+        substitute(module("com.github.Maru32768.CommandLib:bukkit-test")).using(project(":bukkit-test"))
+        substitute(module("net.kunmc.lab:common")).using(project(":common"))
+        substitute(module("net.kunmc.lab:bukkit")).using(project(":bukkit"))
+        substitute(module("net.kunmc.lab:forge")).using(project(":forge"))
+        substitute(module("net.kunmc.lab:bukkit-test")).using(project(":bukkit-test"))
+    }
+}

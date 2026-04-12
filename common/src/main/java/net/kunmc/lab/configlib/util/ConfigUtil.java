@@ -1,7 +1,6 @@
 package net.kunmc.lab.configlib.util;
 
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
-import net.kunmc.lab.commandlib.util.StringUtil;
 import net.kunmc.lab.configlib.*;
 
 import java.lang.reflect.Field;
@@ -21,9 +20,7 @@ public class ConfigUtil {
         int totalDashes = Math.max(4, 46 - name.length());
         int left = totalDashes / 2;
         int right = totalDashes - left;
-        return ChatColorUtil.GRAY + StringUtil.repeat("-",
-                                                      left) + "[ " + ChatColorUtil.GOLD + ChatColorUtil.BOLD + name + ChatColorUtil.GRAY + " ]" + StringUtil.repeat(
-                "-",
+        return ChatColorUtil.GRAY + "-".repeat(left) + "[ " + ChatColorUtil.GOLD + ChatColorUtil.BOLD + name + ChatColorUtil.GRAY + " ]" + "-".repeat(
                 right);
     }
 

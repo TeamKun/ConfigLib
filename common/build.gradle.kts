@@ -10,6 +10,9 @@ repositories {
         name = "spigotmc-repo"
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     }
+    maven {
+        url = uri("https://libraries.minecraft.net")
+    }
     maven { url = uri("https://jitpack.io") }
 }
 
@@ -21,8 +24,11 @@ dependencies {
     compileOnly("com.github.Maru32768.CommandLib:bukkit:$commandLibVersion")
     // CommandContext#sendMessageを呼ぶ時にnet.md_5.bungee.api.chat.BaseComponentを見つけられずコンパイルが通らないため追加
     compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
+    testImplementation("com.github.Maru32768.CommandLib:bukkit-test:${commandLibVersion}")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("com.google.guava:guava:27.0-jre")
+    testImplementation("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
+    testImplementation("com.mojang:brigadier:1.0.18")
 }
 
 tasks.test {
