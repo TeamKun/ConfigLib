@@ -1,4 +1,4 @@
-﻿# Claude Code Instructions
+﻿# Agent Instructions
 
 This repository contains the ConfigLib library itself.
 

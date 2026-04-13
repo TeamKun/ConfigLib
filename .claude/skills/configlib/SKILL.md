@@ -1,9 +1,21 @@
----
-description: Load ConfigLib API from the Gradle source cache and generate or explain ConfigLib code. Usage: /configlib <request>
+﻿---
+description: Generate, test, or explain code that uses the ConfigLib library in a Bukkit or Forge project. Usage: /configlib <request>
 allowed-tools: Bash Read Glob Grep
 ---
 
-## Step 1 — Extract ConfigLib sources
+## Purpose
+
+Use this skill when the user is writing a plugin, mod, or library that depends
+on ConfigLib.
+
+Do not use this skill for maintaining the ConfigLib repository itself unless the
+user explicitly asks for downstream usage examples.
+
+## Step 1 - Read downstream usage references
+
+Read and apply the conventions in `.claude/skills/configlib/references/conventions.md`.
+
+## Step 2 - Extract ConfigLib sources when needed
 
 Run the extraction script:
 
@@ -12,35 +24,18 @@ bash .claude/skills/configlib/scripts/extract-sources.sh
 ```
 
 The script prints one of:
-- A JAR path → sources were extracted to `/tmp/configlib-sources/`
-- `LOCAL_BUILD` → ConfigLib source tree is available at the project root
 
-## Step 2 — Read the key source files
+- A JAR path: sources were extracted to `/tmp/configlib-sources/`
+- `LOCAL_BUILD`: ConfigLib source tree is available at the project root
 
-**If extracted JAR** (base path: `/tmp/configlib-sources/`):
+## Step 3 - Read key source files if API detail is needed
 
-- `README.md`
+If extracted JAR, use `/tmp/configlib-sources/` as the base path. If
+`LOCAL_BUILD`, use the project root as the base path.
 
-Core:
-- `net/kunmc/lab/configlib/CommonBaseConfig.java`
-- `net/kunmc/lab/configlib/Value.java`
-- `net/kunmc/lab/configlib/SingleValue.java`
-- `net/kunmc/lab/configlib/CollectionValue.java`
-- `net/kunmc/lab/configlib/MapValue.java`
-- `net/kunmc/lab/configlib/NumericValue.java`
-- `net/kunmc/lab/configlib/ConfigCommandBuilder.java`
-
-Value types:
-- All `.java` files under `net/kunmc/lab/configlib/value/`
-- All `.java` files under `net/kunmc/lab/configlib/value/collection/`
-- All `.java` files under `net/kunmc/lab/configlib/value/map/`
-- All `.java` files under `net/kunmc/lab/configlib/value/tuple/`
-
-**If LOCAL_BUILD** (base path: project root):
+Read only what the request needs. Common public API files include:
 
 - `README.md`
-
-Core:
 - `common/src/main/java/net/kunmc/lab/configlib/CommonBaseConfig.java`
 - `bukkit/src/main/java/net/kunmc/lab/configlib/BaseConfig.java`
 - `common/src/main/java/net/kunmc/lab/configlib/Value.java`
@@ -49,28 +44,15 @@ Core:
 - `common/src/main/java/net/kunmc/lab/configlib/MapValue.java`
 - `common/src/main/java/net/kunmc/lab/configlib/NumericValue.java`
 - `common/src/main/java/net/kunmc/lab/configlib/ConfigCommandBuilder.java`
+- `common/src/main/java/net/kunmc/lab/configlib/value/`
+- `bukkit/src/main/java/net/kunmc/lab/configlib/value/`
 
-Value types:
-- All `.java` files under `common/src/main/java/net/kunmc/lab/configlib/value/`
-- All `.java` files under `common/src/main/java/net/kunmc/lab/configlib/value/collection/`
-- All `.java` files under `common/src/main/java/net/kunmc/lab/configlib/value/map/`
-- All `.java` files under `common/src/main/java/net/kunmc/lab/configlib/value/tuple/`
-- All `.java` files under `bukkit/src/main/java/net/kunmc/lab/configlib/value/`
-- All `.java` files under `bukkit/src/main/java/net/kunmc/lab/configlib/value/collection/`
-- All `.java` files under `bukkit/src/main/java/net/kunmc/lab/configlib/value/map/`
-- All `.java` files under `bukkit/src/main/java/net/kunmc/lab/configlib/value/tuple/`
+For extracted JAR sources, map those paths to the extracted package layout.
 
-> Only read what the request actually needs. For simple usage questions the core files and
-> one `value/` directory are usually sufficient.
+## Step 4 - Respond to the request
 
-## Step 3 — Apply conventions
-
-Read and apply the conventions in `.claude/skills/configlib/references/conventions.md`.
-
-## Step 4 — Respond to the request
-
-Respond in the same language as the user's request.
-If asked to generate code, output a complete working implementation.
+Respond in the same language as the user's request. If asked to generate code,
+output a complete working implementation that follows the public ConfigLib API.
 If asked how to do something, explain with a code example.
 
 $ARGUMENTS
