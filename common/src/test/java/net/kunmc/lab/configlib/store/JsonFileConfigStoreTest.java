@@ -138,6 +138,35 @@ class JsonFileConfigStoreTest {
         assertEquals(original, readFile());
     }
 
+    @Test
+    void writeKeepsExternalDiskChangeWhenMemoryDidNotChangeThatField() throws IOException {
+        writeFile("{\"value\":1,\"other\":2,\"_version_\":0}");
+        TwoFieldConfig loaded = (TwoFieldConfig) store.read(TwoFieldConfig.class, noMigrations());
+
+        loaded.value = 10;
+        writeFile("{\"value\":1,\"other\":20,\"_version_\":0}");
+        TwoFieldConfig saved = (TwoFieldConfig) store.write(loaded, TwoFieldConfig.class, noMigrations());
+
+        assertEquals(10, saved.value);
+        assertEquals(20, saved.other);
+        assertTrue(readFile().contains("\"value\":10"), readFile());
+        assertTrue(readFile().contains("\"other\":20"), readFile());
+    }
+
+    @Test
+    void writeLetsDiskWinWhenSameFieldChangedInMemoryAndOnDisk() throws IOException {
+        writeFile("{\"value\":1,\"other\":2,\"_version_\":0}");
+        TwoFieldConfig loaded = (TwoFieldConfig) store.read(TwoFieldConfig.class, noMigrations());
+
+        loaded.value = 10;
+        writeFile("{\"value\":30,\"other\":2,\"_version_\":0}");
+        TwoFieldConfig saved = (TwoFieldConfig) store.write(loaded, TwoFieldConfig.class, noMigrations());
+
+        assertEquals(30, saved.value);
+        assertEquals(2, saved.other);
+        assertTrue(readFile().contains("\"value\":30"), readFile());
+    }
+
     // ---- startWatching() ----
 
     @Test
@@ -379,6 +408,16 @@ class JsonFileConfigStoreTest {
         ValueConfig(int value) {
             this.value = value;
         }
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return new InMemoryConfigStore(new Gson());
+        }
+    }
+
+    static class TwoFieldConfig extends CommonBaseConfig {
+        int value;
+        int other;
 
         @Override
         protected ConfigStore createConfigStore() {

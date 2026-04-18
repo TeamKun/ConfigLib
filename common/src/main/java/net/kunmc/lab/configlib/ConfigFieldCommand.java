@@ -12,21 +12,26 @@ import org.apache.commons.lang3.StringUtils;
 import java.lang.reflect.Field;
 
 class ConfigFieldCommand extends Command {
-    ConfigFieldCommand(String entryName, Field field, Object obj, boolean getEnabled, boolean modifyEnabled) {
+    ConfigFieldCommand(CommonBaseConfig config,
+                       String entryName,
+                       Field field,
+                       Object obj,
+                       boolean getEnabled,
+                       boolean modifyEnabled) {
         super(entryName);
 
         if (obj instanceof SingleValue) {
-            initSingleValue(field, (SingleValue<?, ?>) obj, getEnabled, modifyEnabled);
+            initSingleValue(config, field, (SingleValue<?, ?>) obj, getEnabled, modifyEnabled);
         } else if (obj instanceof CollectionValue) {
-            initCollectionValue(field, (CollectionValue<?, ?, ?>) obj, getEnabled, modifyEnabled);
+            initCollectionValue(config, field, (CollectionValue<?, ?, ?>) obj, getEnabled, modifyEnabled);
         } else if (obj instanceof MapValue) {
-            initMapValue(field, (MapValue<?, ?, ?>) obj, getEnabled, modifyEnabled);
+            initMapValue(config, field, (MapValue<?, ?, ?>) obj, getEnabled, modifyEnabled);
         } else if (getEnabled) {
-            execute(ctx -> ctx.sendSuccess(field.getName() + ": " + obj));
+            execute(ctx -> config.inspect(() -> ctx.sendSuccess(field.getName() + ": " + obj)));
         }
     }
 
-    static void applySet(Command command, Field field, SingleValue value) {
+    static void applySet(CommonBaseConfig config, Command command, Field field, SingleValue value) {
         String entryName = value.resolveEntryName(field.getName());
         for (Object definition : value.argumentDefinitions()) {
             command.argument(builder -> {
@@ -48,8 +53,10 @@ class ConfigFieldCommand extends Command {
                         return;
                     }
 
-                    value.dispatchModifyCommand(newValue);
-                    value.value(newValue);
+                    config.mutate(() -> {
+                        value.dispatchModifyCommand(newValue);
+                        value.value(newValue);
+                    });
 
                     ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(entryName,
                                                                                                             ctx)));
@@ -58,93 +65,105 @@ class ConfigFieldCommand extends Command {
         }
     }
 
-    private void initSingleValue(Field field, SingleValue<?, ?> v, boolean getEnabled, boolean modifyEnabled) {
+    private void initSingleValue(CommonBaseConfig config,
+                                 Field field,
+                                 SingleValue<?, ?> v,
+                                 boolean getEnabled,
+                                 boolean modifyEnabled) {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
-            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
-                                                     option -> option.rgb(ChatColorUtil.GREEN.getRGB())
-                                                                     .hoverText(StringUtils.defaultString(v.description()))));
+            execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
+                                                                          option -> option.rgb(ChatColorUtil.GREEN.getRGB())
+                                                                                          .hoverText(StringUtils.defaultString(
+                                                                                                  v.description())))));
         }
 
         if (modifyEnabled && v.isModifyEnabled()) {
-            applySet(this, field, v);
+            applySet(config, this, field, v);
             addChildren(new Command("set") {{
-                applySet(this, field, v);
+                applySet(config, this, field, v);
             }});
 
             if (v instanceof NumericValue) {
-                addChildren(new ModifyIncCommand(field, (NumericValue<?, ?>) v));
-                addChildren(new ModifyDecCommand(field, (NumericValue<?, ?>) v));
+                addChildren(new ModifyIncCommand(config, field, (NumericValue<?, ?>) v));
+                addChildren(new ModifyDecCommand(config, field, (NumericValue<?, ?>) v));
             }
 
             String entryName = v.resolveEntryName(field.getName());
             addChildren(new Command("reset") {{
                 execute(ctx -> {
-                    v.resetToDefault();
+                    config.mutate(v::resetToDefault);
                     ctx.sendSuccess(entryName + "をデフォルト値(" + v.displayString() + ")にリセットしました");
                 });
             }});
         }
     }
 
-    private void initCollectionValue(Field field,
+    private void initCollectionValue(CommonBaseConfig config,
+                                     Field field,
                                      CollectionValue<?, ?, ?> v,
                                      boolean getEnabled,
                                      boolean modifyEnabled) {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
-            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
-                                                     option -> option.rgb(ChatColorUtil.GREEN.getRGB())
-                                                                     .hoverText(StringUtils.defaultString(v.description()))));
+            execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
+                                                                          option -> option.rgb(ChatColorUtil.GREEN.getRGB())
+                                                                                          .hoverText(StringUtils.defaultString(
+                                                                                                  v.description())))));
         }
 
         if (modifyEnabled) {
             if (v.isAddEnabled()) {
-                addChildren(new ModifyAddCommand(field, v));
+                addChildren(new ModifyAddCommand(config, field, v));
             }
             if (v.isRemoveEnabled()) {
-                addChildren(new ModifyRemoveCommand(field, v));
+                addChildren(new ModifyRemoveCommand(config, field, v));
             }
             if (v.isClearEnabled()) {
-                addChildren(new ModifyClearCommand(field, v));
+                addChildren(new ModifyClearCommand(config, field, v));
             }
 
             String entryName = v.resolveEntryName(field.getName());
             addChildren(new Command("reset") {{
                 execute(ctx -> {
-                    v.resetToDefault();
+                    config.mutate(v::resetToDefault);
                     ctx.sendSuccess(entryName + "をデフォルト値(" + v.displayString() + ")にリセットしました");
                 });
             }});
         }
     }
 
-    private void initMapValue(Field field, MapValue<?, ?, ?> v, boolean getEnabled, boolean modifyEnabled) {
+    private void initMapValue(CommonBaseConfig config,
+                              Field field,
+                              MapValue<?, ?, ?> v,
+                              boolean getEnabled,
+                              boolean modifyEnabled) {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
-            execute(ctx -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
-                                                     option -> option.rgb(ChatColorUtil.GREEN.getRGB())
-                                                                     .hoverText(StringUtils.defaultString(v.description()))));
+            execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
+                                                                          option -> option.rgb(ChatColorUtil.GREEN.getRGB())
+                                                                                          .hoverText(StringUtils.defaultString(
+                                                                                                  v.description())))));
         }
 
         if (modifyEnabled) {
             if (v.isPutEnabled()) {
-                addChildren(new ModifyMapPutCommand(field, v));
+                addChildren(new ModifyMapPutCommand(config, field, v));
             }
             if (v.isRemoveEnabled()) {
-                addChildren(new ModifyMapRemoveCommand(field, v));
+                addChildren(new ModifyMapRemoveCommand(config, field, v));
             }
             if (v.isClearEnabled()) {
-                addChildren(new ModifyMapClearCommand(field, v));
+                addChildren(new ModifyMapClearCommand(config, field, v));
             }
 
             String entryName = v.resolveEntryName(field.getName());
             addChildren(new Command("reset") {{
                 execute(ctx -> {
-                    v.resetToDefault();
+                    config.mutate(v::resetToDefault);
                     ctx.sendSuccess(entryName + "をデフォルト値(" + v.displayString() + ")にリセットしました");
                 });
             }});

@@ -39,7 +39,7 @@ final class ConfigCommandTestSupport {
 
     static CommonBaseConfig.Option option() {
         return new CommonBaseConfig.Option().modifyDetectionTimerPeriod(10_000)
-                                           .fileWatchTimerPeriod(10_000);
+                                            .fileWatchTimerPeriod(10_000);
     }
 
     static Command commandFor(CommonBaseConfig cfg) {
@@ -48,7 +48,7 @@ final class ConfigCommandTestSupport {
 
     static Command commandFor(CommonBaseConfig first, CommonBaseConfig second) {
         return new ConfigCommandBuilder(first).addConfig(second)
-                                             .build();
+                                              .build();
     }
 
     static void execute(Command command, String input, FakeSender sender) {
@@ -75,7 +75,9 @@ final class ConfigCommandTestSupport {
         final StringListValue names = new StringListValue().addAllowableString("alex")
                                                            .addAllowableString("steve");
         final String2IntegerMapValue scores = new String2IntegerMapValue(new LinkedHashMap<>()).addAllowableKeyString(
-                "alice").addAllowableKeyString("bob");
+                                                                                                       "alice")
+                                                                                               .addAllowableKeyString(
+                                                                                                       "bob");
         final transient InMemoryConfigStore store = new InMemoryConfigStore(new Gson());
 
         @Override

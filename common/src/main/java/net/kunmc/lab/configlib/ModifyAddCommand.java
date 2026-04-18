@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 class ModifyAddCommand extends Command {
-    public ModifyAddCommand(Field field, CollectionValue value) {
+    public ModifyAddCommand(CommonBaseConfig config, Field field, CollectionValue value) {
         super("add");
 
         String entryName = value.resolveEntryName(field.getName());
@@ -38,8 +38,10 @@ class ModifyAddCommand extends Command {
                         return;
                     }
 
-                    value.dispatchAdd(newValue);
-                    ((Collection) value.value()).addAll(newValue);
+                    config.mutate(() -> {
+                        value.dispatchAdd(newValue);
+                        ((Collection) value.value()).addAll(newValue);
+                    });
 
                     ctx.sendSuccess(value.succeedMessageForAdd(new CollectionValueAddCommandMessageParameter<>(entryName,
                                                                                                                ctx,

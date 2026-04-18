@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.kunmc.lab.configlib.CommonBaseConfig;
+import net.kunmc.lab.configlib.ConfigKeys;
 import net.kunmc.lab.configlib.migration.JsonMigrationContext;
 import net.kunmc.lab.configlib.migration.Migrations;
 
@@ -34,16 +35,23 @@ public class InMemoryConfigStore implements ConfigStore {
     public CommonBaseConfig read(Class<? extends CommonBaseConfig> clazz, Migrations migrations) {
         JsonObject jsonObject = JsonParser.parseString(data)
                                           .getAsJsonObject();
-        int storedVersion = jsonObject.has("_version_") ? jsonObject.get("_version_")
-                                                                    .getAsInt() : 0;
+        int storedVersion = jsonObject.has(ConfigKeys.VERSION) ? jsonObject.get(ConfigKeys.VERSION)
+                                                                           .getAsInt() : 0;
         if (migrations.apply(storedVersion, new JsonMigrationContext(gson, jsonObject))) {
-            jsonObject.addProperty("_version_", migrations.latestVersion());
+            jsonObject.addProperty(ConfigKeys.VERSION, migrations.latestVersion());
             data = gson.toJson(jsonObject);
         }
         return gson.fromJson(jsonObject, clazz);
     }
 
     @Override
+    public CommonBaseConfig write(CommonBaseConfig config,
+                                  Class<? extends CommonBaseConfig> clazz,
+                                  Migrations migrations) {
+        data = gson.toJson(config);
+        return gson.fromJson(data, clazz);
+    }
+
     public void write(CommonBaseConfig config) {
         data = gson.toJson(config);
     }

@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.kunmc.lab.configlib.CommonBaseConfig;
+import net.kunmc.lab.configlib.ConfigKeys;
 import net.kunmc.lab.configlib.migration.JsonMigrationContext;
 import net.kunmc.lab.configlib.migration.Migrations;
 
@@ -14,12 +15,13 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class JsonFileConfigStore implements ConfigStore {
@@ -27,6 +29,9 @@ public class JsonFileConfigStore implements ConfigStore {
     private final Gson gson;
     private final Consumer<Exception> exceptionHandler;
     private final int maxHistorySize;
+    private final Logger logger = Logger.getLogger(JsonFileConfigStore.class.getName());
+    private JsonObject lastLoadedSnapshot;
+    private JsonObject lastWrittenSnapshot;
 
     public JsonFileConfigStore(File file, Gson gson) {
         this(file, gson, Throwable::printStackTrace, 50);
@@ -56,25 +61,44 @@ public class JsonFileConfigStore implements ConfigStore {
     public CommonBaseConfig read(Class<? extends CommonBaseConfig> clazz, Migrations migrations) {
         JsonObject jsonObject = JsonParser.parseString(readString(file))
                                           .getAsJsonObject();
-        int storedVersion = jsonObject.has("_version_") ? jsonObject.get("_version_")
-                                                                    .getAsInt() : 0;
+        int storedVersion = jsonObject.has(ConfigKeys.VERSION) ? jsonObject.get(ConfigKeys.VERSION)
+                                                                           .getAsInt() : 0;
         if (migrations.apply(storedVersion, new JsonMigrationContext(gson, jsonObject))) {
-            jsonObject.addProperty("_version_", migrations.latestVersion());
-            writeString(file, gson.toJson(jsonObject));
+            jsonObject.addProperty(ConfigKeys.VERSION, migrations.latestVersion());
+            writeStringAtomically(file, gson.toJson(jsonObject));
         }
+        lastLoadedSnapshot = jsonObject.deepCopy();
         return gson.fromJson(jsonObject, clazz);
     }
 
     @Override
-    public void write(CommonBaseConfig config) {
-        try {
-            file.getParentFile()
-                .mkdirs();
-            file.createNewFile();
-            writeString(file, gson.toJson(config));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+    public CommonBaseConfig write(CommonBaseConfig config,
+                                  Class<? extends CommonBaseConfig> clazz,
+                                  Migrations migrations) {
+        file.getParentFile()
+            .mkdirs();
+        JsonObject memory = JsonParser.parseString(gson.toJson(config))
+                                      .getAsJsonObject();
+        JsonObject merged = memory;
+        if (file.exists()) {
+            JsonObject disk = JsonParser.parseString(readString(file))
+                                        .getAsJsonObject();
+            int storedVersion = disk.has(ConfigKeys.VERSION) ? disk.get(ConfigKeys.VERSION)
+                                                                   .getAsInt() : 0;
+            if (migrations.apply(storedVersion, new JsonMigrationContext(gson, disk))) {
+                disk.addProperty(ConfigKeys.VERSION, migrations.latestVersion());
+            }
+            merged = mergeWithDiskPriority(lastLoadedSnapshot, memory, disk);
         }
+        String json = gson.toJson(merged);
+        writeStringAtomically(file, json);
+        lastLoadedSnapshot = merged.deepCopy();
+        lastWrittenSnapshot = merged.deepCopy();
+        return gson.fromJson(merged, clazz);
+    }
+
+    public void write(CommonBaseConfig config) {
+        write(config, config.getClass(), new Migrations(new java.util.TreeMap<>()));
     }
 
     @Override
@@ -98,7 +122,7 @@ public class JsonFileConfigStore implements ConfigStore {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        writeString(hf, gson.toJson(reordered));
+        writeStringAtomically(hf, gson.toJson(reordered));
     }
 
     @Override
@@ -126,7 +150,7 @@ public class JsonFileConfigStore implements ConfigStore {
         for (int i = stepsBack; i < array.size(); i++) {
             remaining.add(array.get(i));
         }
-        writeString(hf, gson.toJson(remaining));
+        writeStringAtomically(hf, gson.toJson(remaining));
 
         return gson.fromJson(snapshot, clazz);
     }
@@ -165,7 +189,7 @@ public class JsonFileConfigStore implements ConfigStore {
                                                    .newWatchService();
             WatchKey watchKey = file.getParentFile()
                                     .toPath()
-                                    .register(watchService, ENTRY_MODIFY);
+                                    .register(watchService, ENTRY_MODIFY, ENTRY_CREATE);
 
             TimerTask task = new TimerTask() {
                 @Override
@@ -176,6 +200,9 @@ public class JsonFileConfigStore implements ConfigStore {
                                            .resolve((Path) e.context());
                         if (changed.equals(file.toPath())) {
                             try {
+                                if (isLastWrittenSnapshotOnDisk()) {
+                                    continue;
+                                }
                                 onChanged.run();
                             } catch (Exception ex) {
                                 exceptionHandler.accept(ex);
@@ -209,11 +236,119 @@ public class JsonFileConfigStore implements ConfigStore {
         }
     }
 
-    private static void writeString(File file, String content) {
+    private JsonObject mergeWithDiskPriority(JsonObject base, JsonObject memory, JsonObject disk) {
+        if (base == null) {
+            return memory.deepCopy();
+        }
+
+        JsonObject merged = new JsonObject();
+        Set<String> keys = new HashSet<>();
+        keys.addAll(base.keySet());
+        keys.addAll(memory.keySet());
+        keys.addAll(disk.keySet());
+
+        for (String key : keys) {
+            JsonElementState baseValue = JsonElementState.of(base, key);
+            JsonElementState memoryValue = JsonElementState.of(memory, key);
+            JsonElementState diskValue = JsonElementState.of(disk, key);
+
+            JsonElementState selected;
+            if (baseValue.equals(memoryValue)) {
+                selected = diskValue;
+            } else if (baseValue.equals(diskValue)) {
+                selected = memoryValue;
+            } else if (memoryValue.equals(diskValue)) {
+                selected = memoryValue;
+            } else {
+                logger.warning("Config field \"" + key + "\" was changed both in memory and on disk. Disk value wins. " + "discarded memory value: " + truncate(
+                        gson.toJson(memoryValue.element)) + ", disk value: " + truncate(gson.toJson(diskValue.element)));
+                selected = diskValue;
+            }
+
+            if (selected.present) {
+                merged.add(key, selected.element.deepCopy());
+            }
+        }
+        return merged;
+    }
+
+    private boolean isLastWrittenSnapshotOnDisk() {
+        if (lastWrittenSnapshot == null || !file.exists()) {
+            return false;
+        }
         try {
-            Files.writeString(file.toPath(), content, StandardCharsets.UTF_8);
+            JsonObject disk = JsonParser.parseString(readString(file))
+                                        .getAsJsonObject();
+            return disk.equals(lastWrittenSnapshot);
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    private static String truncate(String value) {
+        if (value == null) {
+            return "null";
+        }
+        return value.length() <= 300 ? value : value.substring(0, 300) + "...";
+    }
+
+    private static void writeStringAtomically(File file, String content) {
+        try {
+            Path path = file.toPath();
+            Path parent = path.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            Path tmp = Files.createTempFile(parent,
+                                            path.getFileName()
+                                                .toString(),
+                                            ".tmp");
+            try {
+                Files.writeString(tmp, content, StandardCharsets.UTF_8);
+                try {
+                    Files.move(tmp, path, ATOMIC_MOVE, REPLACE_EXISTING);
+                } catch (AtomicMoveNotSupportedException e) {
+                    Files.move(tmp, path, REPLACE_EXISTING);
+                }
+            } finally {
+                Files.deleteIfExists(tmp);
+            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        }
+    }
+
+    private static final class JsonElementState {
+        private final boolean present;
+        private final com.google.gson.JsonElement element;
+
+        private JsonElementState(boolean present, com.google.gson.JsonElement element) {
+            this.present = present;
+            this.element = element;
+        }
+
+        private static JsonElementState of(JsonObject object, String key) {
+            return new JsonElementState(object.has(key), object.get(key));
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof JsonElementState)) {
+                return false;
+            }
+            JsonElementState other = (JsonElementState) obj;
+            if (present != other.present) {
+                return false;
+            }
+            if (!present) {
+                return true;
+            }
+            return element.equals(other.element);
+        }
+
+        @Override
+        public int hashCode() {
+            return present ? element.hashCode() : 0;
         }
     }
 }

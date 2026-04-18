@@ -202,11 +202,17 @@ public class ConfigCommandBuilder {
             String prefixedName = config.entryName() + "." + valueEntryName;
 
             // Prefixed command is always available
-            configCommand.addChildren(new ConfigFieldCommand(prefixedName, field, obj, getEnabled, modifyEnabled));
+            configCommand.addChildren(new ConfigFieldCommand(config,
+                                                             prefixedName,
+                                                             field,
+                                                             obj,
+                                                             getEnabled,
+                                                             modifyEnabled));
 
             // Non-prefixed command only when no conflict
             if (!conflictingFieldNames.contains(valueEntryName)) {
-                configCommand.addChildren(new ConfigFieldCommand(valueEntryName,
+                configCommand.addChildren(new ConfigFieldCommand(config,
+                                                                 valueEntryName,
                                                                  field,
                                                                  obj,
                                                                  getEnabled,

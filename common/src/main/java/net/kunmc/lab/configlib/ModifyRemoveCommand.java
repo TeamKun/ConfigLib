@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 class ModifyRemoveCommand extends Command {
-    public ModifyRemoveCommand(Field field, CollectionValue value) {
+    public ModifyRemoveCommand(CommonBaseConfig config, Field field, CollectionValue value) {
         super("remove");
 
         addPrerequisite(value::checkExecutable);
@@ -38,8 +38,10 @@ class ModifyRemoveCommand extends Command {
                         return;
                     }
 
-                    value.dispatchRemove(removeValue);
-                    ((Collection) value.value()).removeAll(removeValue);
+                    config.mutate(() -> {
+                        value.dispatchRemove(removeValue);
+                        ((Collection) value.value()).removeAll(removeValue);
+                    });
 
                     ctx.sendSuccess(value.succeedMessageForRemove(new CollectionValueRemoveCommandMessageParameter<>(
                             entryName,

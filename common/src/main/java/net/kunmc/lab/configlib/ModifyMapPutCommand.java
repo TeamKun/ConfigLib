@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 class ModifyMapPutCommand extends Command {
-    public ModifyMapPutCommand(Field field, MapValue value) {
+    public ModifyMapPutCommand(CommonBaseConfig config, Field field, MapValue value) {
         super("put");
 
         addPrerequisite(value::checkExecutable);
@@ -44,8 +44,10 @@ class ModifyMapPutCommand extends Command {
                         return;
                     }
 
-                    value.dispatchPut(k, v);
-                    value.put(k, v);
+                    config.mutate(() -> {
+                        value.dispatchPut(k, v);
+                        value.put(k, v);
+                    });
 
                     ctx.sendSuccess(value.succeedMessageForPut(new MapValuePutCommandMessageParameter<>(entryName,
                                                                                                         ctx,

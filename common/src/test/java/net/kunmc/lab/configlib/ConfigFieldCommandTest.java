@@ -152,7 +152,7 @@ class ConfigFieldCommandTest {
         config = init(new TestConfig());
         FakeSender sender = FakeSender.console();
         Command command = new ConfigCommandBuilder(config).disableGet()
-                                                         .build();
+                                                          .build();
 
         try (CommandTester tester = new CommandTester(command, "configlib.test")) {
             tester.execute("config count 22", sender);
@@ -169,7 +169,7 @@ class ConfigFieldCommandTest {
         config = init(new TestConfig());
         FakeSender sender = FakeSender.console();
         Command command = new ConfigCommandBuilder(config).disableModify()
-                                                         .build();
+                                                          .build();
 
         try (CommandTester tester = new CommandTester(command, "configlib.test")) {
             tester.execute("config count", sender);

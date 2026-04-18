@@ -11,16 +11,18 @@ import java.lang.reflect.Field;
 class ModifyIncCommand extends Command {
     private final Field field;
     private final NumericValue value;
+    private final CommonBaseConfig config;
 
-    public ModifyIncCommand(Field field, NumericValue value) {
+    public ModifyIncCommand(CommonBaseConfig config, Field field, NumericValue value) {
         super("inc");
 
+        this.config = config;
         this.field = field;
         this.value = value;
 
         addPrerequisite(value::checkExecutable);
         execute(ctx -> exec(1.0, ctx));
-        argument(new DoubleArgument("incValue"), this::exec);
+        argument(new DoubleArgument("incValue")).execute(this::exec);
     }
 
     private void exec(double amount, CommandContext ctx) {
@@ -38,8 +40,10 @@ class ModifyIncCommand extends Command {
             return;
         }
 
-        value.dispatchModifyCommand(newValue);
-        value.value(newValue);
+        config.mutate(() -> {
+            value.dispatchModifyCommand(newValue);
+            value.value(newValue);
+        });
 
         ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(entryName, ctx)));
     }

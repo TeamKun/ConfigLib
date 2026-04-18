@@ -35,28 +35,30 @@ class ConfigListCommand extends Command {
     }
 
     static void listFields(CommandContext ctx, CommonBaseConfig config) {
-        ctx.sendMessage(ConfigUtil.configHeader(config));
-        for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())) {
-            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
-                continue;
-            }
-            field.setAccessible(true);
+        config.inspect(() -> {
+            ctx.sendMessage(ConfigUtil.configHeader(config));
+            for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())) {
+                if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+                    continue;
+                }
+                field.setAccessible(true);
 
-            Object o;
-            try {
-                o = field.get(config);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
+                Object o;
+                try {
+                    o = field.get(config);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
 
-            if (o instanceof Value) {
-                Value<?, ?> v = ((Value<?, ?>) o);
-                ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
-                                          option -> option.rgb(ChatColorUtil.GREEN.getRGB())
-                                                          .hoverText(StringUtils.defaultString(v.description())));
-            } else {
-                ctx.sendSuccess(field.getName() + ": " + o);
+                if (o instanceof Value) {
+                    Value<?, ?> v = ((Value<?, ?>) o);
+                    ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
+                                              option -> option.rgb(ChatColorUtil.GREEN.getRGB())
+                                                              .hoverText(StringUtils.defaultString(v.description())));
+                } else {
+                    ctx.sendSuccess(field.getName() + ": " + o);
+                }
             }
-        }
+        });
     }
 }

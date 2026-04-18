@@ -12,7 +12,7 @@ public interface ConfigStore {
 
     CommonBaseConfig read(Class<? extends CommonBaseConfig> clazz, Migrations migrations);
 
-    void write(CommonBaseConfig config);
+    CommonBaseConfig write(CommonBaseConfig config, Class<? extends CommonBaseConfig> clazz, Migrations migrations);
 
     /**
      * Start watching for external changes to the config data.

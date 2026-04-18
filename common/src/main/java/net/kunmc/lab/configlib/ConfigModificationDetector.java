@@ -31,6 +31,31 @@ class ConfigModificationDetector {
                   });
     }
 
+    boolean isModified() {
+        for (Map.Entry<Field, Pair<Object, Integer>> entry : fieldToObjectAndHashMap.entrySet()) {
+            Field field = entry.getKey();
+            Object oldObject = entry.getValue()
+                                    .getKey();
+            int oldHash = entry.getValue()
+                               .getValue();
+            if (oldObject instanceof Value) {
+                if (((Value) oldObject).valueHashCode() != oldHash) {
+                    return true;
+                }
+                continue;
+            }
+
+            try {
+                if (Objects.hashCode(field.get(config)) != oldHash) {
+                    return true;
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return false;
+    }
+
     void start(Timer timer, int period) {
         timer.scheduleAtFixedRate(new DetectionTask(), 0, period);
     }
@@ -42,7 +67,7 @@ class ConfigModificationDetector {
                 return;
             }
 
-            synchronized (config.ioLock) {
+            config.withIoLock(() -> {
                 boolean modified = false;
                 for (Map.Entry<Field, Pair<Object, Integer>> entry : fieldToObjectAndHashMap.entrySet()) {
                     Field field = entry.getKey();
@@ -54,7 +79,6 @@ class ConfigModificationDetector {
                         Value value = (Value) o;
                         int newHash = value.valueHashCode();
                         if (newHash != oldHash) {
-                            config.pushHistory();
                             value.dispatchModify(value.value());
                             fieldToObjectAndHashMap.put(field, Pair.of(value, newHash));
                             modified = true;
@@ -76,9 +100,13 @@ class ConfigModificationDetector {
 
                 if (modified) {
                     config.saveConfigIfPresent();
+                    config.pushHistory();
+                    // Saving may merge disk edits back into the live config. Reset hashes to the
+                    // persisted state instead of the pre-save values detected in this timer tick.
+                    initializeHash();
                     config.dispatchOnChange();
                 }
-            }
+            });
         }
     }
 }

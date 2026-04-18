@@ -81,10 +81,10 @@ class ConfigLevelCommandTest {
         config = init(new TestConfig());
         FakeSender sender = FakeSender.console();
         Command command = new ConfigCommandBuilder(config).disableList()
-                                                         .disableReload()
-                                                         .disableReset()
-                                                         .disableHistory()
-                                                         .build();
+                                                          .disableReload()
+                                                          .disableReset()
+                                                          .disableHistory()
+                                                          .build();
 
         try (CommandTester tester = new CommandTester(command, "configlib.test")) {
             assertThrows(RuntimeException.class, () -> tester.execute("config list", sender));

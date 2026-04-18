@@ -19,7 +19,7 @@ class ConfigUndoCommand extends Command {
         execute(ctx -> configs.forEach(config -> exec(ctx, config, 1)));
 
         // /config undo <N> — go back N steps
-        argument(new IntegerArgument("steps", 1, Integer.MAX_VALUE), (steps, ctx) -> {
+        argument(new IntegerArgument("steps", 1, Integer.MAX_VALUE)).execute((steps, ctx) -> {
             configs.forEach(config -> exec(ctx, config, steps));
         });
 
@@ -27,7 +27,7 @@ class ConfigUndoCommand extends Command {
             configs.forEach(config -> {
                 addChildren(new Command(config.entryName()) {{
                     execute(ctx -> exec(ctx, config, 1));
-                    argument(new IntegerArgument("steps", 1, Integer.MAX_VALUE), (steps, ctx) -> {
+                    argument(new IntegerArgument("steps", 1, Integer.MAX_VALUE)).execute((steps, ctx) -> {
                         exec(ctx, config, steps);
                     });
                 }});

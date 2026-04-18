@@ -26,9 +26,8 @@ class ConfigResetCommand extends Command {
     }
 
     private void exec(CommandContext ctx, CommonBaseConfig config) {
-        for (Value<?, ?> v : ConfigUtil.getValues(config)) {
-            v.resetToDefault();
-        }
+        config.mutate(() -> ConfigUtil.getValues(config)
+                                      .forEach(Value::resetToDefault));
         ctx.sendSuccess(config.entryName() + "をデフォルト値にリセットしました");
         ConfigListCommand.listFields(ctx, config);
     }

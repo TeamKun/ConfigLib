@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 class ModifyMapRemoveCommand extends Command {
-    public ModifyMapRemoveCommand(Field field, MapValue value) {
+    public ModifyMapRemoveCommand(CommonBaseConfig config, Field field, MapValue value) {
         super("remove");
 
         addPrerequisite(value::checkExecutable);
@@ -41,8 +41,10 @@ class ModifyMapRemoveCommand extends Command {
                         return;
                     }
 
-                    value.remove(k);
-                    value.dispatchRemove(k, v);
+                    config.mutate(() -> {
+                        value.remove(k);
+                        value.dispatchRemove(k, v);
+                    });
 
                     ctx.sendSuccess(value.succeedMessageForRemove(new MapValueRemoveCommandMessageParameter<>(entryName,
                                                                                                               ctx,

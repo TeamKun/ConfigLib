@@ -7,14 +7,16 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 class ModifyClearCommand extends Command {
-    public ModifyClearCommand(Field field, CollectionValue value) {
+    public ModifyClearCommand(CommonBaseConfig config, Field field, CollectionValue value) {
         super("clear");
 
         addPrerequisite(value::checkExecutable);
 
         execute(ctx -> {
-            value.dispatchClear();
-            ((Collection) value.value()).clear();
+            config.mutate(() -> {
+                value.dispatchClear();
+                ((Collection) value.value()).clear();
+            });
 
             ctx.sendSuccess(value.succeedMessageForClear(new CollectionValueClearCommandMessageParameter(field.getName(),
                                                                                                          ctx)));

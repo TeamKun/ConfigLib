@@ -21,17 +21,18 @@ import java.util.Timer;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class CommonBaseConfig {
     @SuppressWarnings("unused")
-    @SerializedName("_version_")
+    @SerializedName(ConfigKeys.VERSION)
     private int schemaVersion = 0;
     protected final transient Timer timer = new Timer();
     protected final transient Logger logger = Logger.getLogger(getClass().getName());
     private final transient List<Runnable> onChangeListeners = new CopyOnWriteArrayList<>();
-    final transient Object ioLock = new Object();
+    private final transient Object ioLock = new Object();
     private final transient ConfigModificationDetector modificationDetector = new ConfigModificationDetector(this);
     private transient boolean listEnabled = true;
     private transient boolean reloadEnabled = true;
@@ -139,72 +140,139 @@ public abstract class CommonBaseConfig {
     protected abstract ConfigStore createConfigStore();
 
     protected void saveConfig() {
-        synchronized (ioLock) {
-            configStore.write(this);
-        }
+        withIoLock(this::saveConfigLocked);
     }
 
     protected void saveConfigIfAbsent() {
-        if (!configStore.exists()) {
-            saveConfig();
-        }
+        withIoLock(() -> {
+            if (!configStore.exists()) {
+                saveConfigLocked();
+            }
+        });
     }
 
     protected void saveConfigIfPresent() {
-        if (configStore.exists()) {
-            saveConfig();
-        }
+        withIoLock(() -> {
+            if (configStore.exists()) {
+                saveConfigLocked();
+            }
+        });
     }
 
     void pushHistory() {
-        synchronized (ioLock) {
+        withIoLock(() -> {
             configStore.pushHistory(this);
+        });
+    }
+
+    /**
+     * Runs a config mutation as one consistent change.
+     * <p>
+     * Use this when changing config values outside ConfigLib's built-in commands.
+     * If the mutation changes any observed value after initialization, ConfigLib saves the
+     * resulting config, appends one history entry, refreshes modification tracking, and
+     * dispatches {@link #onChange(Runnable)} listeners.
+     * </p>
+     * <p>
+     * Multiple value updates inside one mutation are treated as a single change. Read-only
+     * operations should use {@link #inspect(Runnable)} or {@link #inspect(Supplier)} instead.
+     * </p>
+     *
+     * @param mutation code that updates this config
+     */
+    public final void mutate(Runnable mutation) {
+        withIoLock(() -> {
+            mutation.run();
+            if (!initialized || !modificationDetector.isModified()) {
+                return;
+            }
+
+            saveConfigLocked();
+            configStore.pushHistory(this);
+            modificationDetector.initializeHash();
+            dispatchOnChange();
+        });
+    }
+
+    /**
+     * Runs read-only code while holding this config's consistency lock.
+     * <p>
+     * Use this for inspecting multiple fields, collections, maps, history, or formatted values
+     * that should be based on a single stable config state. This method does not save the config,
+     * append history, or dispatch change listeners.
+     * </p>
+     *
+     * @param inspector read-only code to run
+     */
+    public final void inspect(Runnable inspector) {
+        inspect(() -> {
+            inspector.run();
+            return null;
+        });
+    }
+
+    /**
+     * Runs read-only code while holding this config's consistency lock and returns its result.
+     * <p>
+     * Use this for deriving a value from multiple config fields without allowing a concurrent
+     * mutation to interleave with the calculation. This method does not save the config, append
+     * history, or dispatch change listeners.
+     * </p>
+     *
+     * @param inspector read-only code to run
+     * @param <T>       result type
+     * @return the value returned by {@code inspector}
+     */
+    public final <T> T inspect(Supplier<T> inspector) {
+        return withIoLock(inspector);
+    }
+
+    private void saveConfigLocked() {
+        CommonBaseConfig saved = configStore.write(this, getClass(), migrations);
+        replaceWithValidatedConfig(saved);
+    }
+
+    void withIoLock(Runnable action) {
+        withIoLock(() -> {
+            action.run();
+            return null;
+        });
+    }
+
+    <T> T withIoLock(Supplier<T> action) {
+        synchronized (ioLock) {
+            return action.get();
         }
     }
 
     public boolean applyUndo(int stepsBack) {
-        synchronized (ioLock) {
+        return withIoLock(() -> {
             if (!configStore.canUndo(stepsBack)) {
                 return false;
             }
             CommonBaseConfig historical = configStore.undo(getClass(), migrations, stepsBack);
             ConfigUtil.replaceFields(getClass(), historical, this);
-            configStore.write(this);
+            saveConfigLocked();
             modificationDetector.initializeHash();
             dispatchOnChange();
             return true;
-        }
+        });
     }
 
     public List<HistoryEntry> readHistory() {
-        synchronized (ioLock) {
+        return withIoLock(() -> {
             return configStore.readHistory(getClass(), migrations);
-        }
+        });
     }
 
     protected final boolean loadConfig() throws LoadingConfigInvalidValueException {
-        synchronized (ioLock) {
+        return withIoLock(() -> {
             if (!configStore.exists()) {
                 return false;
             }
 
             CommonBaseConfig config = configStore.read(getClass(), migrations);
-
-            for (Field field : ConfigUtil.getValueFields(this)) {
-                try {
-                    Value<?, ?> loaded = ((Value<?, ?>) field.get(config));
-                    if (loaded == null || loaded.value() == null) {
-                        continue;
-                    }
-
-                    Value current = ((Value<?, ?>) field.get(this));
-                    current.validate(loaded.value());
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvalidValueException e) {
-                    throw new LoadingConfigInvalidValueException(field, e);
-                }
-            }
+            validateLoadedConfig(config);
 
             ConfigUtil.replaceFields(getClass(), config, this);
             if (!initialized) {
@@ -219,6 +287,33 @@ public abstract class CommonBaseConfig {
 
             dispatchOnChange();
             return true;
+        });
+    }
+
+    private void replaceWithValidatedConfig(CommonBaseConfig config) {
+        try {
+            validateLoadedConfig(config);
+        } catch (LoadingConfigInvalidValueException e) {
+            throw new RuntimeException(e);
+        }
+        ConfigUtil.replaceFields(getClass(), config, this);
+    }
+
+    private void validateLoadedConfig(CommonBaseConfig config) throws LoadingConfigInvalidValueException {
+        for (Field field : ConfigUtil.getValueFields(this)) {
+            try {
+                Value<?, ?> loaded = ((Value<?, ?>) field.get(config));
+                if (loaded == null || loaded.value() == null) {
+                    continue;
+                }
+
+                Value current = ((Value<?, ?>) field.get(this));
+                current.validate(loaded.value());
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvalidValueException e) {
+                throw new LoadingConfigInvalidValueException(field, e);
+            }
         }
     }
 
