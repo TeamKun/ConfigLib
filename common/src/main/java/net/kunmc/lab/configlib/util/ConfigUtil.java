@@ -55,13 +55,44 @@ public class ConfigUtil {
             }
 
             if (Value.class.isAssignableFrom(field.getType())) {
-                replaceFields(field.getType(), srcObj, dstObj);
+                replaceValueFields(field.getType(), srcObj, dstObj);
             } else {
                 field.set(dst, srcObj);
             }
         } catch (NullPointerException ignored) {
             // 新しいフィールドが追加されるとNullPointerExceptionが発生するため握りつぶしている
         }
+    }
+
+    private static void replaceValueFields(Class<?> clazz, Object src, Object dst) {
+        for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(clazz)) {
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+                continue;
+            }
+            if (!field.trySetAccessible()) {
+                logger.fine("Skipping inaccessible field: " + field.getDeclaringClass()
+                                                                   .getName() + "#" + field.getName());
+                continue;
+            }
+
+            try {
+                Object srcObj = field.get(src);
+                Object dstObj = field.get(dst);
+                if (srcObj == null && shouldKeepValueMetadata(field)) {
+                    continue;
+                }
+                if (srcObj == null) {
+                    continue;
+                }
+                field.set(dst, srcObj);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static boolean shouldKeepValueMetadata(Field field) {
+        return "description".equals(field.getName());
     }
 
     public static List<Field> getObservedFields(CommonBaseConfig config, Class<?> targetClass) {

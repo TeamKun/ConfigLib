@@ -6,7 +6,7 @@ import net.kunmc.lab.commandlib.Nameable;
 import net.kunmc.lab.commandlib.util.Location;
 import net.kunmc.lab.configlib.gson.*;
 import net.kunmc.lab.configlib.store.ConfigStore;
-import net.kunmc.lab.configlib.store.JsonFileConfigStore;
+import net.kunmc.lab.configlib.store.YamlFileConfigStore;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.ScorePlayerTeam;
@@ -69,13 +69,21 @@ public abstract class BaseConfig extends CommonBaseConfig {
         return type.getConfigFolder(modId);
     }
 
-    public File getConfigFile() {
-        return new File(getConfigFolder(), entryName() + ".json");
+    protected final Gson gson() {
+        return gson;
+    }
+
+    protected final Consumer<Exception> exceptionHandler() {
+        return exceptionHandler;
+    }
+
+    private File defaultConfigFile() {
+        return new File(getConfigFolder(), entryName() + ".yml");
     }
 
     @Override
     protected ConfigStore createConfigStore() {
-        return new JsonFileConfigStore(getConfigFile(), gson, exceptionHandler);
+        return new YamlFileConfigStore(defaultConfigFile(), gson, exceptionHandler);
     }
 
     public static final class Option extends CommonBaseConfig.Option {

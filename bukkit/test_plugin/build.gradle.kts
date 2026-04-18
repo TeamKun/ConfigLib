@@ -28,6 +28,7 @@ repositories {
 dependencies {
     compileOnly(mapOf("name" to "patched_1.16.5"))
     implementation("com.google.code.gson:gson:2.10")
+    implementation("org.snakeyaml:snakeyaml-engine:2.9")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("com.github.Maru32768.CommandLib:bukkit:0.17.1")
 }
@@ -67,6 +68,7 @@ tasks.named<ShadowJar>("shadowJar") {
     relocate("net.kunmc.lab.commandlib", "${project.group}.${project.name.lowercase()}.commandlib")
     relocate("net.kunmc.lab.configlib", "${project.group}.${project.name.lowercase()}.configlib")
     relocate("com.google.gson", "${project.group}.${project.name.lowercase()}.gson")
+    relocate("org.snakeyaml.engine", "${project.group}.${project.name.toLowerCase()}.snakeyaml.engine")
 }
 tasks.named("build") { dependsOn(tasks.named("shadowJar")) }
 

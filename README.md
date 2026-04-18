@@ -59,6 +59,8 @@ shadowJar {
     archiveFileName = "${rootProject.name}-${project.version}.jar"
     relocate "net.kunmc.lab.commandlib", "${project.group}.${project.name.toLowerCase()}.commandlib"
     relocate "net.kunmc.lab.configlib", "${project.group}.${project.name.toLowerCase()}.configlib"
+    relocate "com.google.gson", "${project.group}.${project.name.toLowerCase()}.gson"
+    relocate "org.snakeyaml.engine", "${project.group}.${project.name.toLowerCase()}.snakeyaml.engine"
 }
 tasks.build.dependsOn tasks.shadowJar
 ```
@@ -86,6 +88,8 @@ tasks.named<ShadowJar>("shadowJar") {
     archiveFileName.set("${rootProject.name}-${project.version}.jar")
     relocate("net.kunmc.lab.commandlib", "${project.group}.${project.name.lowercase()}.commandlib")
     relocate("net.kunmc.lab.configlib", "${project.group}.${project.name.lowercase()}.configlib")
+    relocate("com.google.gson", "${project.group}.${project.name.lowercase()}.gson")
+    relocate("org.snakeyaml.engine", "${project.group}.${project.name.lowercase()}.snakeyaml.engine")
 }
 tasks.named("build") { dependsOn(tasks.named("shadowJar")) }
 ```
@@ -114,9 +118,13 @@ shadowJar {
     dependencies {
         include(dependency("com.github.Maru32768.CommandLib:forge:.*"))
         include(dependency("com.github.Maru32768.ConfigLib:forge:.*"))
+        include(dependency("com.google.code.gson:gson:.*"))
+        include(dependency("org.snakeyaml:snakeyaml-engine:.*"))
     }
     relocate "net.kunmc.lab.commandlib", "${project.group}.${project.name.toLowerCase()}.commandlib"
     relocate "net.kunmc.lab.configlib", "${project.group}.${project.name.toLowerCase()}.configlib"
+    relocate "com.google.gson", "${project.group}.${project.name.toLowerCase()}.gson"
+    relocate "org.snakeyaml.engine", "${project.group}.${project.name.toLowerCase()}.snakeyaml.engine"
     finalizedBy("reobfShadowJar")
 }
 
@@ -150,9 +158,13 @@ tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         include(dependency("com.github.Maru32768.CommandLib:forge:.*"))
         include(dependency("com.github.Maru32768.ConfigLib:forge:.*"))
+        include(dependency("com.google.code.gson:gson:.*"))
+        include(dependency("org.snakeyaml:snakeyaml-engine:.*"))
     }
     relocate("net.kunmc.lab.commandlib", "${project.group}.${project.name.lowercase()}.commandlib")
     relocate("net.kunmc.lab.configlib", "${project.group}.${project.name.lowercase()}.configlib")
+    relocate("com.google.gson", "${project.group}.${project.name.lowercase()}.gson")
+    relocate("org.snakeyaml.engine", "${project.group}.${project.name.lowercase()}.snakeyaml.engine")
     finalizedBy("reobfShadowJar")
 }
 
@@ -542,7 +554,8 @@ Use `.disableGet()` / `.disableModify()` on `ConfigCommandBuilder` to suppress g
 <summary>Change history, undo, and diff</summary>
 
 Every time a configuration value is modified, the new state is automatically saved to a history file
-(`<configName>.history.json`) alongside the config file. The history persists across server restarts and is capped at
+(`<configName>.history.yml` by default) alongside the config file. The history persists across server restarts and is
+capped at
 50 entries by default (override `createConfigStore()` to change this).
 
 History uses **0-based indexing** where `[0]` is the current (latest) state.

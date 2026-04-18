@@ -23,14 +23,17 @@ cause fields to be missed.
 ## Registering commands in onEnable
 
 ```java
+public final class MyPlugin extends JavaPlugin {
+    private MyConfig config;
 
-@Override
-public void onEnable() {
-    config = new MyConfig(this);
+    @Override
+    public void onEnable() {
+        config = new MyConfig(this);
 
-    ConfigCommand cmd = new ConfigCommandBuilder(config).name("myconfig")
-                                                        .build();
-    CommandLib.register(this, cmd);
+        ConfigCommand cmd = new ConfigCommandBuilder(config).name("myconfig")
+                                                            .build();
+        CommandLib.register(this, cmd);
+    }
 }
 ```
 
@@ -86,18 +89,26 @@ subcommands. Use `.disableList()`, `.disableReload()`, `.disableReset()`, `.disa
 All methods return `this` for chaining:
 
 ```java
-public final IntegerValue spawnRadius = new IntegerValue(50, 1, 500).description(
-                                                                            "Radius in blocks around spawn where PvP is disabled")
-                                                                    .onModify(v -> reloadSpawnZone())
-                                                                    .addValidator(v -> {
-                                                                        if (v % 2 != 0)
-                                                                            throw new InvalidValueException(
-                                                                                    "Must be even");
-                                                                    })
-                                                                    .formatter(v -> v + " blocks")
-                                                                    .executableIf(ctx -> ctx.getSender()
-                                                                                            .hasPermission(
-                                                                                                    "myplugin.admin"));
+public final class MyConfig extends BaseConfig {
+    public final IntegerValue spawnRadius = new IntegerValue(50, 1, 500).description(
+                                                                                "Radius in blocks around spawn where PvP is disabled")
+                                                                        .onModify(v -> reloadSpawnZone())
+                                                                        .addValidator(v -> {
+                                                                            if (v % 2 != 0) {
+                                                                                throw new InvalidValueException(
+                                                                                        "Must be even");
+                                                                            }
+                                                                        })
+                                                                        .formatter(v -> v + " blocks")
+                                                                        .executableIf(ctx -> ctx.getSender()
+                                                                                                .hasPermission(
+                                                                                                        "myplugin.admin"));
+
+    public MyConfig(Plugin plugin) {
+        super(plugin);
+        initialize();
+    }
+}
 ```
 
 **Key methods on `Value<E, T>`:**
@@ -155,8 +166,49 @@ class Example {
         int doubled = config.cooldown.multiply(2);
     }
 }
-
 ```
+
+## Consistent programmatic access
+
+Use `CommonBaseConfig#mutate` when changing values from custom code. It treats all changes in the block as one
+ConfigLib change: save, one history entry, modification hash refresh, and `onChange` dispatch.
+
+```java
+public final class Example {
+    private final MyConfig config;
+
+    public Example(MyConfig config) {
+        this.config = config;
+    }
+
+    void updateConfig() {
+        config.mutate(() -> {
+            config.cooldown.value(45);
+            config.welcomeMessage.value("Welcome back!");
+        });
+    }
+}
+```
+
+Use `CommonBaseConfig#inspect` for read-only calculations that need a stable view across multiple fields or collection
+contents. `inspect` does not save, append history, or notify listeners.
+
+```java
+public final class Example {
+    private final MyConfig config;
+
+    public Example(MyConfig config) {
+        this.config = config;
+    }
+
+    String summary() {
+        return config.inspect(() -> "cooldown=" + config.cooldown.value() + ", enabled=" + config.enabled.value());
+    }
+}
+```
+
+Prefer `mutate` over calling `value(...)` directly when the change is initiated by plugin/mod code. Direct `value(...)`
+assignment is still detected by the timer, but it is not as explicit and may be delayed until the next detection tick.
 
 ## Listening for any config change
 
@@ -177,28 +229,65 @@ programmatic change, the new value is also auto-saved to the config file.
 Use when renaming a field or changing a value's format across versions:
 
 ```java
-public MyConfig(Plugin plugin) {
-    super(plugin, opt -> opt.migration(1, ctx -> {
-        // rename "radius" → "spawnRadius"
-        if (ctx.has("radius")) {
-            ctx.set("spawnRadius", ctx.getInt("radius"));
-            ctx.remove("radius");
-        }
-    }));
-    initialize();
+public final class MyConfig extends BaseConfig {
+    public final IntegerValue spawnRadius = new IntegerValue(30);
+
+    public MyConfig(Plugin plugin) {
+        super(plugin, opt -> opt.migration(1, ctx -> {
+            // rename "radius" -> "spawnRadius"
+            if (ctx.has("radius")) {
+                ctx.set("spawnRadius", ctx.getInt("radius"));
+                ctx.remove("radius");
+            }
+        }));
+        initialize();
+    }
 }
 ```
 
-Migrations run in version order on load when `_version_` in the JSON is lower than the latest migration key.
+Migrations run in version order on load when `_version_` in the config file is lower than the latest migration key.
+`_version_` is a ConfigLib-reserved key exposed as `ConfigKeys.VERSION`; do not use it as an application config field.
+
+## Config files and history files
+
+Bukkit and Forge `BaseConfig` use YAML files by default. The standard Gson builder is configured with pretty printing,
+and YAML output uses block style with two-space indentation so files are suitable for direct editing.
+
+Config files can be edited externally. On save, ConfigLib compares the last loaded snapshot, current memory state, and
+current disk state. If the same top-level field changed both in memory and on disk, the disk value wins and the
+discarded
+memory value is logged.
+
+History files use the same extension as the config file:
+
+- `example.yml` -> `example.history.yml`
+- `example.json` -> `example.history.json`
+
+YAML history files are written under a `history:` key:
+
+```yaml
+history:
+  - _ts_: 1710000000000
+    cooldown:
+      value: 45
+```
+
+Older top-level-array YAML history files are still readable.
 
 ## Multiple configs in one command tree
 
 ```java
-ConfigCommand cmd = new ConfigCommandBuilder(mainConfig).addConfig(worldConfig)
-                                                        .addConfig(combatConfig)
-                                                        .name("myplugin")
-                                                        .sort() // sorts configs alphabetically
-                                                        .build();
+public final class CommandRegistration {
+    ConfigCommand buildCommand(CommonBaseConfig mainConfig,
+                               CommonBaseConfig worldConfig,
+                               CommonBaseConfig combatConfig) {
+        return new ConfigCommandBuilder(mainConfig).addConfig(worldConfig)
+                                                   .addConfig(combatConfig)
+                                                   .name("myplugin")
+                                                   .sort() // sorts configs alphabetically
+                                                   .build();
+    }
+}
 ```
 
 Fields with the same name across configs are exposed as `configEntryName.fieldName` to avoid collision.

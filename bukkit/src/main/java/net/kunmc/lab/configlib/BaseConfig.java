@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import net.kunmc.lab.commandlib.Nameable;
 import net.kunmc.lab.configlib.gson.*;
 import net.kunmc.lab.configlib.store.ConfigStore;
-import net.kunmc.lab.configlib.store.JsonFileConfigStore;
+import net.kunmc.lab.configlib.store.YamlFileConfigStore;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -65,17 +65,25 @@ public abstract class BaseConfig extends CommonBaseConfig implements Listener {
         return plugin;
     }
 
+    protected final Gson gson() {
+        return gson;
+    }
+
+    protected final Consumer<Exception> exceptionHandler() {
+        return exceptionHandler;
+    }
+
     protected File getConfigFolder() {
         return plugin.getDataFolder();
     }
 
-    public File getConfigFile() {
-        return new File(getConfigFolder(), entryName() + ".json");
+    private File defaultConfigFile() {
+        return new File(getConfigFolder(), entryName() + ".yml");
     }
 
     @Override
     protected ConfigStore createConfigStore() {
-        return new JsonFileConfigStore(getConfigFile(), gson, exceptionHandler);
+        return new YamlFileConfigStore(defaultConfigFile(), gson, exceptionHandler);
     }
 
     public static final class Option extends CommonBaseConfig.Option {

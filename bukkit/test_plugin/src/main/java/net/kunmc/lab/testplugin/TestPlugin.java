@@ -40,7 +40,7 @@ public final class TestPlugin extends JavaPlugin {
                 });
             }});
 
-            argument(new IntegerArgument("integer"), (integer, ctx) -> {
+            argument(new IntegerArgument("integer")).execute((integer, ctx) -> {
                 ctx.sendSuccess(config.strings);
                 config.strings.add(integer.toString());
             });

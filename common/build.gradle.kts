@@ -19,6 +19,7 @@ repositories {
 dependencies {
     api("org.apache.commons:commons-lang3:3.12.0")
     api("com.google.code.gson:gson:2.10")
+    implementation("org.snakeyaml:snakeyaml-engine:2.9")
     compileOnly("org.jetbrains:annotations:20.1.0")
     // commonだとコマンド周りを上手く実装出来ないためbukkitを使う
     compileOnly("com.github.Maru32768.CommandLib:bukkit:$commandLibVersion")

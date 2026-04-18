@@ -60,7 +60,7 @@ public class InMemoryConfigStore implements ConfigStore {
     public void pushHistory(CommonBaseConfig config) {
         JsonObject obj = JsonParser.parseString(gson.toJson(config))
                                    .getAsJsonObject();
-        obj.addProperty("_ts_", System.currentTimeMillis());
+        obj.addProperty(ConfigKeys.TIMESTAMP, System.currentTimeMillis());
         history.addFirst(gson.toJson(obj));
         while (history.size() > maxHistorySize) {
             history.removeLast();
@@ -88,8 +88,8 @@ public class InMemoryConfigStore implements ConfigStore {
         for (String snapshot : history) {
             JsonObject obj = JsonParser.parseString(snapshot)
                                        .getAsJsonObject();
-            long ts = obj.has("_ts_") ? obj.get("_ts_")
-                                           .getAsLong() : 0L;
+            long ts = obj.has(ConfigKeys.TIMESTAMP) ? obj.get(ConfigKeys.TIMESTAMP)
+                                                        .getAsLong() : 0L;
             result.add(new HistoryEntry(ts, gson.fromJson(obj, clazz)));
         }
         return result;

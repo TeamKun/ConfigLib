@@ -61,7 +61,7 @@ public abstract class CommonBaseConfig {
     final void init(Option option) {
         migrations = new Migrations(option.migrations);
         schemaVersion = migrations.latestVersion();
-        configStore = createConfigStore();
+        configStore = Objects.requireNonNull(createConfigStore());
 
         for (Value<?, ?> v : ConfigUtil.getValues(this)) {
             v.snapshotDefault();

@@ -1,5 +1,6 @@
 ﻿---
-description: Generate, test, or explain code that uses the ConfigLib library in a Bukkit or Forge project. Usage: /configlib <request>
+description:
+  Generate, test, or explain code that uses the ConfigLib library in a Bukkit or Forge project. Usage: /configlib <request>
 allowed-tools: Bash Read Glob Grep
 ---
 
@@ -37,6 +38,7 @@ Read only what the request needs. Common public API files include:
 
 - `README.md`
 - `common/src/main/java/net/kunmc/lab/configlib/CommonBaseConfig.java`
+- `common/src/main/java/net/kunmc/lab/configlib/ConfigKeys.java`
 - `bukkit/src/main/java/net/kunmc/lab/configlib/BaseConfig.java`
 - `common/src/main/java/net/kunmc/lab/configlib/Value.java`
 - `common/src/main/java/net/kunmc/lab/configlib/SingleValue.java`
@@ -44,6 +46,9 @@ Read only what the request needs. Common public API files include:
 - `common/src/main/java/net/kunmc/lab/configlib/MapValue.java`
 - `common/src/main/java/net/kunmc/lab/configlib/NumericValue.java`
 - `common/src/main/java/net/kunmc/lab/configlib/ConfigCommandBuilder.java`
+- `common/src/main/java/net/kunmc/lab/configlib/store/ConfigStore.java`
+- `common/src/main/java/net/kunmc/lab/configlib/store/FileConfigStore.java`
+- `common/src/main/java/net/kunmc/lab/configlib/store/YamlFileConfigStore.java`
 - `common/src/main/java/net/kunmc/lab/configlib/value/`
 - `bukkit/src/main/java/net/kunmc/lab/configlib/value/`
 
