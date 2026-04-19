@@ -1,0 +1,8 @@
+§f§7--------------[ §6§lpojoSnapshotConfig§7 ]--------------
+§x§5§5§f§f§5§5maxPlayers: 20
+§x§5§5§f§f§5§5motd: hello
+§x§5§5§f§f§5§5privateValue: private
+§f§7--------------[ §6§lpojoSnapshotConfig§7 ]--------------
+§x§5§5§f§f§5§5maxPlayers: 20
+§x§5§5§f§f§5§5motd: hello
+§x§5§5§f§f§5§5privateValue: private

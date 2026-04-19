@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -260,7 +259,7 @@ public abstract class CommonBaseConfig {
                 return false;
             }
             CommonBaseConfig historical = configStore.undo(getClass(), migrations, stepsBack);
-            ConfigUtil.replaceFields(getClass(), historical, this);
+            ConfigUtil.replaceFields(this, historical, this);
             saveConfigLocked();
             modificationDetector.initializeHash();
             dispatchOnChange();
@@ -283,7 +282,7 @@ public abstract class CommonBaseConfig {
             CommonBaseConfig config = configStore.read(getClass(), migrations);
             validateLoadedConfig(config);
 
-            ConfigUtil.replaceFields(getClass(), config, this);
+            ConfigUtil.replaceFields(this, config, this);
             if (!initialized) {
                 ConfigUtil.getValues(this)
                           .stream()
@@ -305,21 +304,14 @@ public abstract class CommonBaseConfig {
         } catch (LoadingConfigInvalidValueException e) {
             throw new RuntimeException(e);
         }
-        ConfigUtil.replaceFields(getClass(), config, this);
+        ConfigUtil.replaceFields(this, config, this);
     }
 
     private void validateLoadedConfig(CommonBaseConfig config) throws LoadingConfigInvalidValueException {
         for (ConfigSchemaEntry<?> entry : schema.entries()) {
             try {
-                Field field = entry.field();
-                Value<?, ?> loaded = ((Value<?, ?>) field.get(config));
-                if (loaded == null || loaded.value() == null) {
-                    continue;
-                }
-
-                ConfigSchemaValidation.validate(entry, loaded.value());
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                Object value = entry.get(config);
+                ConfigSchemaValidation.validate(entry, value);
             } catch (InvalidValueException e) {
                 throw new LoadingConfigInvalidValueException(entry.field(), e);
             }

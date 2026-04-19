@@ -31,10 +31,9 @@ enum SubCommandType {
     Diff("diff", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigDiffCommand::new),
     List("list",
          CommonBaseConfig::isListEnabled,
-         x -> !(ConfigUtil.getSingleValueFields(x)
-                          .isEmpty() && ConfigUtil.getCollectionValueFields(x)
-                                                  .isEmpty() && ConfigUtil.getMapValueFields(x)
-                                                                          .isEmpty()),
+         x -> !x.schema()
+                .entries()
+                .isEmpty(),
          ConfigListCommand::new);
 
     public final String name;

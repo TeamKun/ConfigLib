@@ -5,11 +5,8 @@ import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.util.ConfigUtil;
-import net.kunmc.lab.configlib.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Set;
 
 class ConfigListCommand extends Command {
@@ -40,32 +37,10 @@ class ConfigListCommand extends Command {
             ctx.sendMessage(ConfigUtil.configHeader(config));
             for (ConfigSchemaEntry<?> entry : config.schema()
                                                     .entries()) {
-                Object source = entry.source();
-                if (source instanceof Value) {
-                    Value<?, ?> value = (Value<?, ?>) source;
-                    ctx.sendMessageWithOption(entry.entryName() + ": " + value.displayString(),
-                                              option -> option.rgb(ChatColorUtil.GREEN.getRGB())
-                                                              .hoverText(StringUtils.defaultString(entry.metadata()
-                                                                                                        .description())));
-                }
-            }
-
-            for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())) {
-                if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
-                    continue;
-                }
-                field.setAccessible(true);
-
-                Object o;
-                try {
-                    o = field.get(config);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-
-                if (!(o instanceof Value)) {
-                    ctx.sendSuccess(field.getName() + ": " + o);
-                }
+                ctx.sendMessageWithOption(entry.entryName() + ": " + entry.displayString(),
+                                          option -> option.rgb(ChatColorUtil.GREEN.getRGB())
+                                                          .hoverText(StringUtils.defaultString(entry.metadata()
+                                                                                                    .description())));
             }
         });
     }

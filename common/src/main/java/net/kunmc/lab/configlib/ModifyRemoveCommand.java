@@ -8,19 +8,13 @@ import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 
 class ModifyRemoveCommand extends Command {
-    public ModifyRemoveCommand(CommonBaseConfig config,
-                               Field field,
-                               ConfigSchemaEntry<?> schemaEntry,
-                               CollectionValue value) {
+    public ModifyRemoveCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, CollectionValue value) {
         super("remove");
 
         addPrerequisite(value::checkExecutable);
-
-        String entryName = value.resolveEntryName(field.getName());
         for (Object definition : value.argumentDefinitionsForRemove()) {
             argument(builder -> {
                 ((ArgumentApplier) definition).applyArgument(builder);
@@ -48,7 +42,7 @@ class ModifyRemoveCommand extends Command {
                     });
 
                     ctx.sendSuccess(value.succeedMessageForRemove(new CollectionValueRemoveCommandMessageParameter<>(
-                            entryName,
+                            schemaEntry.entryName(),
                             ctx,
                             removeValue)));
                 });

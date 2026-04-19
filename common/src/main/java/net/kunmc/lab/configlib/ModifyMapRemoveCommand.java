@@ -6,21 +6,15 @@ import net.kunmc.lab.configlib.command.MapValueRemoveCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 class ModifyMapRemoveCommand extends Command {
-    public ModifyMapRemoveCommand(CommonBaseConfig config,
-                                  Field field,
-                                  ConfigSchemaEntry<?> schemaEntry,
-                                  MapValue value) {
+    public ModifyMapRemoveCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, MapValue value) {
         super("remove");
 
         addPrerequisite(value::checkExecutable);
-
-        String entryName = value.resolveEntryName(field.getName());
         for (ArgumentDefinition<?> definition : ((List<ArgumentDefinition<?>>) value.argumentDefinitionsForRemove())) {
             argument(builder -> {
                 definition.applyArgument(builder);
@@ -50,10 +44,11 @@ class ModifyMapRemoveCommand extends Command {
                         value.dispatchRemove(k, v);
                     });
 
-                    ctx.sendSuccess(value.succeedMessageForRemove(new MapValueRemoveCommandMessageParameter<>(entryName,
-                                                                                                              ctx,
-                                                                                                              k,
-                                                                                                              v)));
+                    ctx.sendSuccess(value.succeedMessageForRemove(new MapValueRemoveCommandMessageParameter<>(
+                            schemaEntry.entryName(),
+                            ctx,
+                            k,
+                            v)));
                 });
             });
         }

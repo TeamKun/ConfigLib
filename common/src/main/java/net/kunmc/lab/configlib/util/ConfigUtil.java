@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.util;
 
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.*;
+import net.kunmc.lab.configlib.annotation.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -24,12 +25,11 @@ public class ConfigUtil {
                 right);
     }
 
-    public static void replaceFields(Class<?> clazz, Object src, Object dst) {
-        for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(clazz)) {
-            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+    public static void replaceFields(CommonBaseConfig config, Object src, Object dst) {
+        for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())) {
+            if (!ConfigUtil.isObservableField(config, field)) {
                 continue;
             }
-
             if (!field.trySetAccessible()) {
                 logger.fine("Skipping inaccessible field: " + field.getDeclaringClass()
                                                                    .getName() + "#" + field.getName());
@@ -37,25 +37,29 @@ public class ConfigUtil {
             }
 
             try {
-                replaceField(field, src, dst);
+                replaceField(config, field, src, dst);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
-    private static void replaceField(Field field, Object src, Object dst) throws IllegalAccessException {
+    private static void replaceField(CommonBaseConfig config,
+                                     Field field,
+                                     Object src,
+                                     Object dst) throws IllegalAccessException {
         try {
             Object srcObj = field.get(src);
             Object dstObj = field.get(dst);
 
             // jsonにキーが存在しない場合nullになる
-            if (srcObj == null) {
+            if (srcObj == null && field.isAnnotationPresent(Nullable.class)) {
+                field.set(dst, null);
                 return;
             }
 
             if (Value.class.isAssignableFrom(field.getType())) {
-                replaceValueFields(field.getType(), srcObj, dstObj);
+                replaceValueFields(config, field.getType(), srcObj, dstObj);
             } else {
                 field.set(dst, srcObj);
             }
@@ -64,9 +68,9 @@ public class ConfigUtil {
         }
     }
 
-    private static void replaceValueFields(Class<?> clazz, Object src, Object dst) {
+    private static void replaceValueFields(CommonBaseConfig config, Class<?> clazz, Object src, Object dst) {
         for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(clazz)) {
-            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+            if (!isConfigFieldModifier(field)) {
                 continue;
             }
             if (!field.trySetAccessible()) {
@@ -77,11 +81,13 @@ public class ConfigUtil {
 
             try {
                 Object srcObj = field.get(src);
-                Object dstObj = field.get(dst);
-                if (srcObj == null && shouldKeepValueMetadata(field)) {
-                    continue;
-                }
                 if (srcObj == null) {
+                    if (shouldKeepValueMetadata(field)) {
+                        continue;
+                    }
+                    if (isValuePayloadField(field)) {
+                        field.set(dst, null);
+                    }
                     continue;
                 }
                 field.set(dst, srcObj);
@@ -92,18 +98,35 @@ public class ConfigUtil {
     }
 
     private static boolean shouldKeepValueMetadata(Field field) {
-        return "description".equals(field.getName());
+        return field.getName()
+                    .equals("description");
+    }
+
+    private static boolean isValuePayloadField(Field field) {
+        return field.getName()
+                    .equals("value");
     }
 
     public static List<Field> getObservedFields(CommonBaseConfig config, Class<?> targetClass) {
         List<Field> fields = ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())
                                            .stream()
-                                           .filter(f -> !Modifier.isStatic(f.getModifiers()))
-                                           .filter(f -> !Modifier.isTransient(f.getModifiers()))
-                                           .filter(f -> targetClass.isAssignableFrom(f.getType()))
+                                           .filter(f -> isObservableField(config, f))
+                                           .filter(f -> Object.class.equals(targetClass) || targetClass.isAssignableFrom(
+                                                   f.getType()))
                                            .collect(Collectors.toList());
         fields.forEach(x -> x.setAccessible(true));
         return fields;
+    }
+
+    public static boolean isObservableField(CommonBaseConfig config, Field field) {
+        return field.getDeclaringClass() != CommonBaseConfig.class && field.getDeclaringClass()
+                                                                           .isAssignableFrom(config.getClass()) && isConfigFieldModifier(
+                field);
+    }
+
+    public static boolean isConfigFieldModifier(Field field) {
+        int modifiers = field.getModifiers();
+        return !Modifier.isStatic(modifiers) && !Modifier.isTransient(modifiers);
     }
 
     public static List<Field> getValueFields(CommonBaseConfig config) {

@@ -5,19 +5,13 @@ import net.kunmc.lab.configlib.command.CollectionValueClearCommandMessageParamet
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 
 class ModifyClearCommand extends Command {
-    public ModifyClearCommand(CommonBaseConfig config,
-                              Field field,
-                              ConfigSchemaEntry<?> schemaEntry,
-                              CollectionValue value) {
+    public ModifyClearCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, CollectionValue value) {
         super("clear");
 
         addPrerequisite(value::checkExecutable);
-        String entryName = value.resolveEntryName(field.getName());
-
         execute(ctx -> {
             try {
                 Collection cleared = (Collection) value.copyValue(value.value());
@@ -33,7 +27,7 @@ class ModifyClearCommand extends Command {
                 ((Collection) value.value()).clear();
             });
 
-            ctx.sendSuccess(value.succeedMessageForClear(new CollectionValueClearCommandMessageParameter(entryName,
+            ctx.sendSuccess(value.succeedMessageForClear(new CollectionValueClearCommandMessageParameter(schemaEntry.entryName(),
                                                                                                          ctx)));
         });
     }

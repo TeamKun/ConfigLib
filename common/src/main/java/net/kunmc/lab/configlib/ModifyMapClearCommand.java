@@ -5,19 +5,13 @@ import net.kunmc.lab.configlib.command.MapValueClearCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 
 class ModifyMapClearCommand extends Command {
-    public ModifyMapClearCommand(CommonBaseConfig config,
-                                 Field field,
-                                 ConfigSchemaEntry<?> schemaEntry,
-                                 MapValue value) {
+    public ModifyMapClearCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, MapValue value) {
         super("clear");
 
         addPrerequisite(value::checkExecutable);
-        String entryName = value.resolveEntryName(field.getName());
-
         execute(ctx -> {
             try {
                 Map cleared = (Map) value.copyValue(value.value());
@@ -33,7 +27,8 @@ class ModifyMapClearCommand extends Command {
                 value.clear();
             });
 
-            ctx.sendSuccess(value.succeedMessageForClear(new MapValueClearCommandMessageParameter(entryName, ctx)));
+            ctx.sendSuccess(value.succeedMessageForClear(new MapValueClearCommandMessageParameter(schemaEntry.entryName(),
+                                                                                                  ctx)));
         });
     }
 }

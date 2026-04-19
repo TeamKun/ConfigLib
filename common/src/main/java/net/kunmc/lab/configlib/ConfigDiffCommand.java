@@ -3,14 +3,13 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.IntegerArgument;
-import net.kunmc.lab.commandlib.util.ChatColorUtil;
+import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.store.HistoryEntry;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
 
@@ -80,33 +79,29 @@ class ConfigDiffCommand extends Command {
 
             boolean anyDiff = false;
             for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())) {
-                if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+                if (!ConfigUtil.isObservableField(config, field)) {
                     continue;
                 }
+                ConfigSchemaEntry<?> entry = config.schema()
+                                                   .findEntry(field.getName())
+                                                   .orElse(null);
+                if (entry == null) {
+                    continue;
+                }
+
                 field.setAccessible(true);
                 try {
                     Object older = field.get(olderConfig);
                     Object newer = field.get(newerConfig);
 
-                    if (older instanceof Value && newer instanceof Value) {
-                        String name = ((Value<?, ?>) field.get(config)).resolveEntryName(field.getName());
-                        String olderFmt = ((Value<?, ?>) older).displayString();
-                        String newerFmt = ((Value<?, ?>) newer).displayString();
-                        if (olderFmt.equals(newerFmt)) {
-                            continue;
-                        }
-                        anyDiff = true;
-                        String line = name + ": " + olderFmt + " → " + newerFmt;
-                        ctx.sendMessageWithOption(line, opt -> opt.rgb(ChatColorUtil.GREEN.getRGB()));
-                    } else {
-                        String olderFmt = String.valueOf(older);
-                        String newerFmt = String.valueOf(newer);
-                        if (olderFmt.equals(newerFmt)) {
-                            continue;
-                        }
-                        anyDiff = true;
-                        ctx.sendSuccess(field.getName() + ": " + olderFmt + " → " + newerFmt);
+                    String name = entry.entryName();
+                    String olderFmt = entry.displayString(older);
+                    String newerFmt = entry.displayString(newer);
+                    if (olderFmt.equals(newerFmt)) {
+                        continue;
                     }
+                    anyDiff = true;
+                    ctx.sendSuccess(name + ": " + olderFmt + " → " + newerFmt);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }

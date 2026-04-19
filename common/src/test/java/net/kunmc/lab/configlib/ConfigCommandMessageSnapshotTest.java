@@ -3,6 +3,8 @@ package net.kunmc.lab.configlib;
 import com.google.gson.Gson;
 import net.kunmc.lab.commandlib.CommandTester;
 import net.kunmc.lab.commandlib.FakeSender;
+import net.kunmc.lab.configlib.annotation.Description;
+import net.kunmc.lab.configlib.annotation.Range;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.store.InMemoryConfigStore;
@@ -169,6 +171,36 @@ class ConfigCommandMessageSnapshotTest {
         assertEquals(0, cfg.mapClearCount.get());
     }
 
+    @Test
+    void pojoFieldListMessagesMatchSnapshot() {
+        PojoSnapshotConfig cfg = initConfig(new PojoSnapshotConfig());
+        config = cfg;
+        FakeSender sender = FakeSender.console();
+
+        try (CommandTester tester = new CommandTester(new ConfigCommandBuilder(cfg).build(), "configlib.test")) {
+            tester.execute("config list", sender);
+            tester.execute("config pojoSnapshotConfig", sender);
+        }
+
+        SnapshotAssertions.assertMatchesSnapshot("config-command-pojo-list-messages.txt", messages(sender));
+    }
+
+    @Test
+    void pojoFieldDiffMessagesMatchSnapshot() {
+        PojoSnapshotConfig cfg = initConfig(new PojoSnapshotConfig());
+        config = cfg;
+        cfg.timer.cancel();
+        cfg.maxPlayers = 30;
+        cfg.pushHistory();
+        FakeSender sender = FakeSender.console();
+
+        try (CommandTester tester = new CommandTester(new ConfigCommandBuilder(cfg).build(), "configlib.test")) {
+            tester.execute("config diff 0 1", sender);
+        }
+
+        SnapshotAssertions.assertMatchesSnapshot("config-command-pojo-diff-messages.txt", messages(sender));
+    }
+
     static class SnapshotConfig extends CommonBaseConfig {
         final IntegerValue count = new IntegerValue(10, 0, 100);
         final StringListValue names = new StringListValue().addAllowableString("alex")
@@ -274,6 +306,22 @@ class ConfigCommandMessageSnapshotTest {
             scores.onPut((k, v) -> mapPutCount.incrementAndGet())
                   .onRemove((k, v) -> mapRemoveCount.incrementAndGet())
                   .onClear(mapClearCount::incrementAndGet);
+        }
+    }
+
+    static class PojoSnapshotConfig extends CommonBaseConfig {
+        @Description("Maximum player count.")
+        @Range(min = 1, max = 100)
+        public int maxPlayers = 20;
+        @Description("Message of the day.")
+        public String motd = "hello";
+        private String privateValue = "private";
+        public transient String runtimeCache = "cache";
+        final transient InMemoryConfigStore store = new InMemoryConfigStore(new Gson());
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return store;
         }
     }
 }

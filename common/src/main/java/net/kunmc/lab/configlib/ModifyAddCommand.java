@@ -8,17 +8,12 @@ import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 
 class ModifyAddCommand extends Command {
-    public ModifyAddCommand(CommonBaseConfig config,
-                            Field field,
-                            ConfigSchemaEntry<?> schemaEntry,
-                            CollectionValue value) {
+    public ModifyAddCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, CollectionValue value) {
         super("add");
 
-        String entryName = value.resolveEntryName(field.getName());
         for (Object definition : value.argumentDefinitionsForAdd()) {
             argument(builder -> {
                 ((ArgumentApplier) definition).applyArgument(builder);
@@ -47,9 +42,10 @@ class ModifyAddCommand extends Command {
                         ((Collection) value.value()).addAll(newValue);
                     });
 
-                    ctx.sendSuccess(value.succeedMessageForAdd(new CollectionValueAddCommandMessageParameter<>(entryName,
-                                                                                                               ctx,
-                                                                                                               newValue)));
+                    ctx.sendSuccess(value.succeedMessageForAdd(new CollectionValueAddCommandMessageParameter<>(
+                            schemaEntry.entryName(),
+                            ctx,
+                            newValue)));
                 });
             });
         }

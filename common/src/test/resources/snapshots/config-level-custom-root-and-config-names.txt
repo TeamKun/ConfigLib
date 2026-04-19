@@ -3,11 +3,9 @@
 §x§5§5§f§f§5§5message: hello
 §x§5§5§f§f§5§5names: []
 §x§5§5§f§f§5§5scores: {}
-§aschemaVersion: 0
 §f§7-------------------[ §6§lprimary§7 ]--------------------
 §x§5§5§f§f§5§5amount: 10
 §x§5§5§f§f§5§5message: hello
 §x§5§5§f§f§5§5names: []
 §x§5§5§f§f§5§5scores: {}
-§aschemaVersion: 0
 §aamountの値を22に変更しました.

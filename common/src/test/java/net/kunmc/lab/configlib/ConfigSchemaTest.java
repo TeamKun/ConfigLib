@@ -1,7 +1,11 @@
 package net.kunmc.lab.configlib;
 
 import com.google.gson.Gson;
+import net.kunmc.lab.configlib.annotation.Description;
+import net.kunmc.lab.configlib.annotation.Nullable;
+import net.kunmc.lab.configlib.annotation.Range;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.store.InMemoryConfigStore;
@@ -127,6 +131,140 @@ class ConfigSchemaTest {
                           .isPresent());
     }
 
+    @Test
+    void schemaIncludesPojoPublicFields() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+
+        assertTrue(cfg.schema()
+                      .findEntry("maxPlayers")
+                      .isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("motd")
+                      .isPresent());
+    }
+
+    @Test
+    void pojoDescriptionAnnotationBecomesMetadata() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+
+        ConfigSchemaEntry<?> entry = cfg.schema()
+                                        .findEntry("maxPlayers")
+                                        .orElseThrow(AssertionError::new);
+
+        assertEquals("Maximum player count.",
+                     entry.metadata()
+                          .description());
+    }
+
+    @Test
+    void pojoRangeAnnotationBecomesValidator() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "maxPlayers")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
+
+        assertDoesNotThrow(() -> entry.validate(20));
+        assertThrows(InvalidValueException.class, () -> entry.validate(101));
+    }
+
+    @Test
+    void pojoAccessorReadsAndWritesPublicField() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "maxPlayers")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
+        assertEquals(20, entry.get());
+
+        entry.set(30);
+
+        assertEquals(30, cfg.maxPlayers);
+    }
+
+    @Test
+    void schemaIncludesPrivateAndPackagePrivatePojoFields() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+
+        assertTrue(cfg.schema()
+                      .findEntry("privatePojoField")
+                      .isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("packagePrivatePojoField")
+                      .isPresent());
+    }
+
+    @Test
+    void schemaSkipsStaticAndTransientPojoFields() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+
+        assertFalse(cfg.schema()
+                       .findEntry("staticPojoField")
+                       .isPresent());
+        assertFalse(cfg.schema()
+                       .findEntry("runtimeCache")
+                       .isPresent());
+    }
+
+    @Test
+    void loadValidatesPojoRangeAnnotation() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        cfg.store.writeRaw("{\"maxPlayers\":101,\"motd\":\"bad\",\"_version_\":0}");
+
+        assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+    }
+
+    @Test
+    void loadRejectsNullPojoFieldWithoutNullableAnnotation() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        cfg.store.writeRaw("{\"maxPlayers\":20,\"motd\":null,\"_version_\":0}");
+
+        assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+    }
+
+    @Test
+    void loadAllowsNullPojoFieldWithNullableAnnotation() throws LoadingConfigInvalidValueException {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        cfg.store.writeRaw("{\"maxPlayers\":20,\"motd\":\"ok\",\"nullableMotd\":null,\"_version_\":0}");
+
+        cfg.loadConfig();
+
+        assertNull(cfg.nullableMotd);
+    }
+
+    @Test
+    void loadPassesNullValueToValueValidator() {
+        ValueNullConfig cfg = new ValueNullConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        cfg.store.writeRaw("{\"label\":{\"value\":null},\"_version_\":0}");
+
+        assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+    }
+
+    @Test
+    void mutationDetectionObservesPrimitivePojoFields() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+
+        cfg.mutate(() -> cfg.maxPlayers = 30);
+
+        assertTrue(cfg.store.readRaw()
+                            .contains("\"maxPlayers\":30"));
+    }
+
     static final class TestConfig extends CommonBaseConfig {
         final transient InMemoryConfigStore store = new InMemoryConfigStore(new Gson());
         public final IntegerValue count = new IntegerValue(5).entryName("itemCount")
@@ -140,6 +278,40 @@ class ConfigSchemaTest {
         public final StringValue label = new StringValue("default");
         public static final IntegerValue staticValue = new IntegerValue(1);
         public final transient IntegerValue transientValue = new IntegerValue(2);
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return store;
+        }
+    }
+
+    static final class PojoConfig extends CommonBaseConfig {
+        final transient InMemoryConfigStore store = new InMemoryConfigStore(new Gson());
+        @Description("Maximum player count.")
+        @Range(min = 1, max = 100)
+        public int maxPlayers = 20;
+        @Description("Message of the day.")
+        public String motd = "hello";
+        @Nullable
+        public String nullableMotd = "nullable";
+        private String privatePojoField = "private";
+        String packagePrivatePojoField = "package";
+        public static int staticPojoField = 1;
+        public transient String runtimeCache = "cache";
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return store;
+        }
+    }
+
+    static final class ValueNullConfig extends CommonBaseConfig {
+        final transient InMemoryConfigStore store = new InMemoryConfigStore(new Gson());
+        public final StringValue label = new StringValue("default").addValidator(v -> {
+            if (v == null) {
+                throw new InvalidValueException("label must not be null");
+            }
+        });
 
         @Override
         protected ConfigStore createConfigStore() {

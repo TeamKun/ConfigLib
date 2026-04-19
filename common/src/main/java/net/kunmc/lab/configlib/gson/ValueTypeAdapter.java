@@ -4,10 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import net.kunmc.lab.configlib.ConfigKeys;
 import net.kunmc.lab.configlib.Value;
+import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.util.ReflectionUtil;
 
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
 /**
@@ -17,18 +18,17 @@ public class ValueTypeAdapter implements JsonSerializer<Value<?, ?>> {
     @Override
     public JsonElement serialize(Value<?, ?> src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject object = new JsonObject();
-        object.addProperty("description", src.description());
-        object.add("value", context.serialize(src.value()));
+        object.addProperty(ConfigKeys.DESCRIPTION, src.description());
+        object.add(ConfigKeys.VALUE, context.serialize(src.value()));
 
         ReflectionUtil.getFieldsIncludingSuperclasses(src.getClass())
                       .stream()
                       .peek(x -> x.setAccessible(true))
-                      .filter(x -> !Modifier.isTransient(x.getModifiers()))
-                      .filter(x -> !Modifier.isStatic((x.getModifiers())))
+                      .filter(ConfigUtil::isConfigFieldModifier)
                       .filter(x -> !x.getName()
-                                     .equals("description"))
+                                     .equals(ConfigKeys.DESCRIPTION))
                       .filter(x -> !x.getName()
-                                     .equals("value"))
+                                     .equals(ConfigKeys.VALUE))
                       .forEach(x -> {
                           try {
                               object.add(x.getName(), context.serialize(x.get(src)));

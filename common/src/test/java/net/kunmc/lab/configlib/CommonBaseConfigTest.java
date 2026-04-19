@@ -34,6 +34,12 @@ class CommonBaseConfigTest {
         return cfg;
     }
 
+    private TestConfig initWithoutBackgroundDetection(TestConfig cfg) {
+        TestConfig initialized = init(cfg);
+        initialized.timer.cancel();
+        return initialized;
+    }
+
     // ---- 初期化 ----
 
     @Test
@@ -170,7 +176,7 @@ class CommonBaseConfigTest {
 
     @Test
     void initialHistoryHasExactlyOneEntry() {
-        TestConfig cfg = init(new TestConfig());
+        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig());
         assertEquals(1,
                      cfg.readHistory()
                         .size());
@@ -181,7 +187,7 @@ class CommonBaseConfigTest {
         TestConfig cfg = new TestConfig();
         // 履歴が既存（サーバー再起動前の状態を模擬）
         cfg.store.pushHistory(cfg);
-        init(cfg);
+        initWithoutBackgroundDetection(cfg);
 
         assertEquals(1,
                      cfg.readHistory()
@@ -190,7 +196,7 @@ class CommonBaseConfigTest {
 
     @Test
     void applyUndoRevertsToHistoricalValue() {
-        TestConfig cfg = init(new TestConfig()); // history: [value=0]
+        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig()); // history: [value=0]
         cfg.value = 10;
         cfg.pushHistory();                        // history: [value=10, value=0]
 
@@ -200,7 +206,7 @@ class CommonBaseConfigTest {
 
     @Test
     void applyUndoCalledTwiceKeepsGoingBack() {
-        TestConfig cfg = init(new TestConfig()); // history: [value=0]
+        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig()); // history: [value=0]
         cfg.value = 10;
         cfg.pushHistory();                        // history: [value=10, value=0]
         cfg.value = 20;
@@ -215,7 +221,7 @@ class CommonBaseConfigTest {
 
     @Test
     void applyUndoWithStepsBack2() {
-        TestConfig cfg = init(new TestConfig()); // history: [value=0]
+        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig()); // history: [value=0]
         cfg.value = 10;
         cfg.pushHistory();                        // history: [value=10, value=0]
         cfg.value = 20;
@@ -227,7 +233,7 @@ class CommonBaseConfigTest {
 
     @Test
     void applyUndoReturnsFalseWhenOnlyOneHistoryEntry() {
-        TestConfig cfg = init(new TestConfig()); // history: [value=0] — 1件のみ
+        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig()); // history: [value=0] — 1件のみ
         assertFalse(cfg.applyUndo(1));
     }
 

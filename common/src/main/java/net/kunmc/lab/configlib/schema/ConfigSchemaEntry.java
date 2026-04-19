@@ -1,33 +1,22 @@
 package net.kunmc.lab.configlib.schema;
 
+import net.kunmc.lab.configlib.CommonBaseConfig;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-public final class ConfigSchemaEntry<E> {
+public abstract class ConfigSchemaEntry<E> {
     private final ConfigSchemaPath path;
     private final String entryName;
     private final Field field;
-    private final Object source;
     private final ConfigSchemaMetadata metadata;
-    private final ConfigSchemaValidator<E> validator;
-    private final ConfigSchemaAccessor<E> accessor;
 
-    public ConfigSchemaEntry(ConfigSchemaPath path,
-                             String entryName,
-                             Field field,
-                             Object source,
-                             ConfigSchemaMetadata metadata,
-                             ConfigSchemaValidator<E> validator,
-                             ConfigSchemaAccessor<E> accessor) {
+    public ConfigSchemaEntry(ConfigSchemaPath path, String entryName, Field field, ConfigSchemaMetadata metadata) {
         this.path = Objects.requireNonNull(path, "path");
         this.entryName = Objects.requireNonNull(entryName, "entryName");
         this.field = Objects.requireNonNull(field, "field");
-        this.source = Objects.requireNonNull(source, "source");
         this.metadata = Objects.requireNonNull(metadata, "metadata");
-        this.validator = Objects.requireNonNull(validator, "validator");
-        this.accessor = Objects.requireNonNull(accessor, "accessor");
     }
 
     public ConfigSchemaPath path() {
@@ -42,23 +31,27 @@ public final class ConfigSchemaEntry<E> {
         return field;
     }
 
-    public Object source() {
-        return source;
-    }
-
     public ConfigSchemaMetadata metadata() {
         return metadata;
     }
 
-    public void validate(E value) throws InvalidValueException {
-        validator.validate(value);
-    }
+    public abstract void validate(E value) throws InvalidValueException;
 
-    public E get() {
-        return accessor.get();
-    }
+    public abstract E get();
 
-    public void set(E value) {
-        accessor.set(value);
-    }
+    public abstract E get(CommonBaseConfig config);
+
+    public abstract void set(E value);
+
+    public abstract Object commandObject();
+
+    public abstract boolean supportsModificationCommand();
+
+    public abstract String displayString();
+
+    public abstract String displayString(Object fieldValue);
+
+    public abstract int sourceHash();
+
+    public abstract void dispatchModify();
 }

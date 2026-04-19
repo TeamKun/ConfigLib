@@ -7,22 +7,15 @@ import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 
-import java.lang.reflect.Field;
-
 class ModifyIncCommand extends Command {
-    private final Field field;
     private final ConfigSchemaEntry<?> schemaEntry;
     private final NumericValue value;
     private final CommonBaseConfig config;
 
-    public ModifyIncCommand(CommonBaseConfig config,
-                            Field field,
-                            ConfigSchemaEntry<?> schemaEntry,
-                            NumericValue value) {
+    public ModifyIncCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, NumericValue value) {
         super("inc");
 
         this.config = config;
-        this.field = field;
         this.schemaEntry = schemaEntry;
         this.value = value;
 
@@ -32,8 +25,6 @@ class ModifyIncCommand extends Command {
     }
 
     private void exec(double amount, CommandContext ctx) {
-        String entryName = value.resolveEntryName(field.getName());
-
         if (value.compare(value.max.doubleValue() - amount) > 0) {
             amount = value.max.doubleValue() - ((Number) value.value).doubleValue();
         }
@@ -51,6 +42,7 @@ class ModifyIncCommand extends Command {
             value.value(newValue);
         });
 
-        ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(entryName, ctx)));
+        ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(schemaEntry.entryName(),
+                                                                                                ctx)));
     }
 }

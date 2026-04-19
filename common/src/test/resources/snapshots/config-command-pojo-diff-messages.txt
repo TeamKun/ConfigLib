@@ -1,0 +1,3 @@
+§f§7--------------[ §6§lpojoSnapshotConfig§7 ]--------------
+§a[1] → [0]
+§amaxPlayers: 20 → 30

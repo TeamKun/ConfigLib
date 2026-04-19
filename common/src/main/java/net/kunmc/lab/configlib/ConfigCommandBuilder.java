@@ -2,11 +2,8 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
-import net.kunmc.lab.configlib.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,25 +19,6 @@ public class ConfigCommandBuilder {
 
     public ConfigCommandBuilder(@NotNull CommonBaseConfig config) {
         configs.add(config);
-    }
-
-    private static boolean isSchemaModifiable(ConfigSchemaEntry<?> entry) {
-        return isModifiable(entry.source());
-    }
-
-    private static boolean isModifiable(Object obj) {
-        if (obj instanceof SingleValue) {
-            return ((SingleValue<?, ?>) obj).isModifyEnabled();
-        }
-        if (obj instanceof CollectionValue) {
-            CollectionValue<?, ?, ?> v = (CollectionValue<?, ?, ?>) obj;
-            return v.isAddEnabled() || v.isRemoveEnabled() || v.isClearEnabled();
-        }
-        if (obj instanceof MapValue) {
-            MapValue<?, ?, ?> v = (MapValue<?, ?, ?>) obj;
-            return v.isPutEnabled() || v.isRemoveEnabled() || v.isClearEnabled();
-        }
-        return false;
     }
 
     public ConfigCommandBuilder disableList() {
@@ -136,9 +114,6 @@ public class ConfigCommandBuilder {
             for (ConfigSchemaEntry<?> entry : getCommandEntries(config)) {
                 nameCount.merge(entry.entryName(), 1, Integer::sum);
             }
-            for (Field field : getPlainCommandFields(config)) {
-                nameCount.merge(field.getName(), 1, Integer::sum);
-            }
         }
         return nameCount.entrySet()
                         .stream()
@@ -152,31 +127,8 @@ public class ConfigCommandBuilder {
         return config.schema()
                      .entries()
                      .stream()
-                     .filter(e -> getEnabled || (modifyEnabled && isSchemaModifiable(e)))
+                     .filter(e -> getEnabled || (modifyEnabled && e.supportsModificationCommand()))
                      .collect(Collectors.toList());
-    }
-
-    private List<Field> getPlainCommandFields(CommonBaseConfig config) {
-        if (!getEnabled) {
-            return Collections.emptyList();
-        }
-
-        List<Field> result = new ArrayList<>();
-        ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())
-                      .stream()
-                      .filter(f -> !Modifier.isStatic(f.getModifiers()))
-                      .filter(f -> !Modifier.isTransient(f.getModifiers()))
-                      .forEach(field -> {
-                          field.setAccessible(true);
-                          try {
-                              if (!(field.get(config) instanceof Value)) {
-                                  result.add(field);
-                              }
-                          } catch (IllegalAccessException e) {
-                              throw new RuntimeException(e);
-                          }
-                      });
-        return result;
     }
 
     private void addFieldCommandsFor(ConfigCommand configCommand,
@@ -198,58 +150,19 @@ public class ConfigCommandBuilder {
         }});
 
         for (ConfigSchemaEntry<?> entry : getCommandEntries(config)) {
-            Field field = entry.field();
-            Object obj = entry.source();
             String valueEntryName = entry.entryName();
             String prefixedName = config.entryName() + "." + valueEntryName;
 
             // Prefixed command is always available
-            configCommand.addChildren(new ConfigFieldCommand(config,
-                                                             prefixedName,
-                                                             field,
-                                                             obj,
-                                                             entry,
-                                                             getEnabled,
-                                                             modifyEnabled));
+            configCommand.addChildren(new ConfigFieldCommand(config, prefixedName, entry, getEnabled, modifyEnabled));
 
             // Non-prefixed command only when no conflict
             if (!conflictingFieldNames.contains(valueEntryName)) {
                 configCommand.addChildren(new ConfigFieldCommand(config,
                                                                  valueEntryName,
-                                                                 field,
-                                                                 obj,
                                                                  entry,
                                                                  getEnabled,
                                                                  modifyEnabled));
-            }
-        }
-
-        for (Field field : getPlainCommandFields(config)) {
-            Object obj;
-            try {
-                obj = field.get(config);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-
-            String valueEntryName = field.getName();
-            String prefixedName = config.entryName() + "." + valueEntryName;
-            configCommand.addChildren(new ConfigFieldCommand(config,
-                                                             prefixedName,
-                                                             field,
-                                                             obj,
-                                                             null,
-                                                             getEnabled,
-                                                             false));
-
-            if (!conflictingFieldNames.contains(valueEntryName)) {
-                configCommand.addChildren(new ConfigFieldCommand(config,
-                                                                 valueEntryName,
-                                                                 field,
-                                                                 obj,
-                                                                 null,
-                                                                 getEnabled,
-                                                                 false));
             }
         }
     }

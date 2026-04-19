@@ -14,6 +14,9 @@ public abstract class NumericValue<E extends Number & Comparable<E>, T extends N
         this.max = max;
 
         addValidator(x -> {
+            if (x == null) {
+                return;
+            }
             if (x.compareTo(min) < 0 || x.compareTo(max) > 0) {
                 throw new InvalidValueException(min + "以上" + max + "以下の値を入力してください.");
             }

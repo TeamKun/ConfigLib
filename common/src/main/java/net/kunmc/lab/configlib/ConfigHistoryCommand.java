@@ -4,13 +4,13 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.IntegerArgument;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
+import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.store.HistoryEntry;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -133,25 +133,24 @@ class ConfigHistoryCommand extends Command {
     private static String buildFieldsText(CommonBaseConfig liveConfig, CommonBaseConfig histConfig) {
         StringBuilder sb = new StringBuilder();
         for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(liveConfig.getClass())) {
-            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+            if (!ConfigUtil.isConfigFieldModifier(field)) {
+                continue;
+            }
+            ConfigSchemaEntry<?> entry = liveConfig.schema()
+                                                   .findEntry(field.getName())
+                                                   .orElse(null);
+            if (entry == null) {
                 continue;
             }
             field.setAccessible(true);
             try {
-                Object live = field.get(liveConfig);
                 Object hist = field.get(histConfig);
                 if (sb.length() > 0) {
                     sb.append('\n');
                 }
-                if (live instanceof Value && hist instanceof Value) {
-                    sb.append(((Value<?, ?>) live).resolveEntryName(field.getName()))
-                      .append(": ")
-                      .append(((Value<?, ?>) hist).displayString());
-                } else {
-                    sb.append(field.getName())
-                      .append(": ")
-                      .append(hist);
-                }
+                sb.append(entry.entryName())
+                  .append(": ")
+                  .append(entry.displayString(hist));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -161,18 +160,19 @@ class ConfigHistoryCommand extends Command {
 
     private static void listFields(CommandContext ctx, CommonBaseConfig liveConfig, CommonBaseConfig histConfig) {
         for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(liveConfig.getClass())) {
-            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+            if (!ConfigUtil.isConfigFieldModifier(field)) {
+                continue;
+            }
+            ConfigSchemaEntry<?> entry = liveConfig.schema()
+                                                   .findEntry(field.getName())
+                                                   .orElse(null);
+            if (entry == null) {
                 continue;
             }
             field.setAccessible(true);
             try {
-                Object live = field.get(liveConfig);
                 Object hist = field.get(histConfig);
-                if (live instanceof Value && hist instanceof Value) {
-                    ctx.sendSuccess(((Value<?, ?>) live).resolveEntryName(field.getName()) + ": " + ((Value<?, ?>) hist).displayString());
-                } else {
-                    ctx.sendSuccess(field.getName() + ": " + hist);
-                }
+                ctx.sendSuccess(entry.entryName() + ": " + entry.displayString(hist));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

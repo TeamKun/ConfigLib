@@ -2,10 +2,10 @@ package net.kunmc.lab.configlib.gson;
 
 import com.google.gson.*;
 import net.kunmc.lab.commandlib.Nameable;
+import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
 public class NameableTypeAdapter implements JsonSerializer<Nameable>, JsonDeserializer<Nameable> {
@@ -19,8 +19,7 @@ public class NameableTypeAdapter implements JsonSerializer<Nameable>, JsonDeseri
         ReflectionUtil.getFieldsIncludingSuperclasses(src.getClass())
                       .stream()
                       .peek(x -> x.setAccessible(true))
-                      .filter(x -> !Modifier.isTransient(x.getModifiers()))
-                      .filter(x -> !Modifier.isStatic((x.getModifiers())))
+                      .filter(ConfigUtil::isConfigFieldModifier)
                       .forEach(x -> {
                           try {
                               object.add(x.getName(), context.serialize(x.get(src)));
@@ -45,10 +44,7 @@ public class NameableTypeAdapter implements JsonSerializer<Nameable>, JsonDeseri
                                  .newInstance();
 
             for (Field f : clazz.getDeclaredFields()) {
-                if (Modifier.isStatic(f.getModifiers())) {
-                    continue;
-                }
-                if (Modifier.isTransient(f.getModifiers())) {
+                if (!ConfigUtil.isConfigFieldModifier(f)) {
                     continue;
                 }
 
