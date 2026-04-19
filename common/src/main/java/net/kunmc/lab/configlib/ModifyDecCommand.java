@@ -5,19 +5,25 @@ import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.DoubleArgument;
 import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 
 import java.lang.reflect.Field;
 
 class ModifyDecCommand extends Command {
     private final Field field;
+    private final ConfigSchemaEntry<?> schemaEntry;
     private final NumericValue value;
     private final CommonBaseConfig config;
 
-    public ModifyDecCommand(CommonBaseConfig config, Field field, NumericValue value) {
+    public ModifyDecCommand(CommonBaseConfig config,
+                            Field field,
+                            ConfigSchemaEntry<?> schemaEntry,
+                            NumericValue value) {
         super("dec");
 
         this.config = config;
         this.field = field;
+        this.schemaEntry = schemaEntry;
         this.value = value;
 
         addPrerequisite(value::checkExecutable);
@@ -34,7 +40,7 @@ class ModifyDecCommand extends Command {
 
         Number newValue = value.copySub(amount);
         try {
-            value.validate(newValue);
+            ConfigSchemaValidation.validate(schemaEntry, newValue);
         } catch (InvalidValueException e) {
             e.sendMessage(ctx);
             return;

@@ -118,8 +118,9 @@ class YamlFileConfigStoreTest {
 
         List<HistoryEntry> history = store.readHistory(SimpleConfig.class, noMigrations());
         assertEquals(2, history.size());
-        assertEquals(20, ((SimpleConfig) history.get(0)
-                                                .config()).value);
+        assertEquals(20,
+                     ((SimpleConfig) history.get(0)
+                                            .config()).value);
         assertTrue(store.canUndo(1));
 
         SimpleConfig restored = (SimpleConfig) store.undo(SimpleConfig.class, noMigrations(), 1);

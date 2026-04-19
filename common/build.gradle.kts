@@ -27,6 +27,7 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
     testImplementation("com.github.Maru32768.CommandLib:bukkit-test:${commandLibVersion}")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation("org.assertj:assertj-core:3.25.1")
     testImplementation("com.google.guava:guava:27.0-jre")
     testImplementation("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
     testImplementation("com.mojang:brigadier:1.0.18")

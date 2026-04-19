@@ -1,0 +1,9 @@
+§acountの値を22に変更しました.
+§f§7--------------------------------------------------
+§f§cUsage:
+§f§b  /config count §eset
+§f§b  /config count §einc
+§f§b  /config count §edec
+§f§b  /config count §ereset
+§f  §b/config count §7<§eInteger§7>
+§f§7--------------------------------------------------

@@ -146,11 +146,11 @@ public abstract class Value<E, T extends Value<E, T>> {
         return ((T) this);
     }
 
-    final void validate(E value) throws InvalidValueException {
+    public final void validate(E value) throws InvalidValueException {
         validator.validate(value);
     }
 
-    final String resolveEntryName(String fieldName) {
+    public final String resolveEntryName(String fieldName) {
         if (entryName != null) {
             return entryName;
         }

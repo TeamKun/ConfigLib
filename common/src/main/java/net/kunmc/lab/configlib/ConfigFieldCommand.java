@@ -5,6 +5,7 @@ import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -16,22 +17,27 @@ class ConfigFieldCommand extends Command {
                        String entryName,
                        Field field,
                        Object obj,
+                       ConfigSchemaEntry<?> schemaEntry,
                        boolean getEnabled,
                        boolean modifyEnabled) {
         super(entryName);
 
         if (obj instanceof SingleValue) {
-            initSingleValue(config, field, (SingleValue<?, ?>) obj, getEnabled, modifyEnabled);
+            initSingleValue(config, field, schemaEntry, (SingleValue<?, ?>) obj, getEnabled, modifyEnabled);
         } else if (obj instanceof CollectionValue) {
-            initCollectionValue(config, field, (CollectionValue<?, ?, ?>) obj, getEnabled, modifyEnabled);
+            initCollectionValue(config, field, schemaEntry, (CollectionValue<?, ?, ?>) obj, getEnabled, modifyEnabled);
         } else if (obj instanceof MapValue) {
-            initMapValue(config, field, (MapValue<?, ?, ?>) obj, getEnabled, modifyEnabled);
+            initMapValue(config, field, schemaEntry, (MapValue<?, ?, ?>) obj, getEnabled, modifyEnabled);
         } else if (getEnabled) {
             execute(ctx -> config.inspect(() -> ctx.sendSuccess(field.getName() + ": " + obj)));
         }
     }
 
-    static void applySet(CommonBaseConfig config, Command command, Field field, SingleValue value) {
+    static void applySet(CommonBaseConfig config,
+                         Command command,
+                         Field field,
+                         ConfigSchemaEntry<?> schemaEntry,
+                         SingleValue value) {
         String entryName = value.resolveEntryName(field.getName());
         for (Object definition : value.argumentDefinitions()) {
             command.argument(builder -> {
@@ -47,7 +53,7 @@ class ConfigFieldCommand extends Command {
                     }
 
                     try {
-                        value.validate(newValue);
+                        ConfigSchemaValidation.validate(schemaEntry, newValue);
                     } catch (InvalidValueException e) {
                         e.sendMessage(ctx);
                         return;
@@ -67,6 +73,7 @@ class ConfigFieldCommand extends Command {
 
     private void initSingleValue(CommonBaseConfig config,
                                  Field field,
+                                 ConfigSchemaEntry<?> schemaEntry,
                                  SingleValue<?, ?> v,
                                  boolean getEnabled,
                                  boolean modifyEnabled) {
@@ -80,14 +87,14 @@ class ConfigFieldCommand extends Command {
         }
 
         if (modifyEnabled && v.isModifyEnabled()) {
-            applySet(config, this, field, v);
+            applySet(config, this, field, schemaEntry, v);
             addChildren(new Command("set") {{
-                applySet(config, this, field, v);
+                applySet(config, this, field, schemaEntry, v);
             }});
 
             if (v instanceof NumericValue) {
-                addChildren(new ModifyIncCommand(config, field, (NumericValue<?, ?>) v));
-                addChildren(new ModifyDecCommand(config, field, (NumericValue<?, ?>) v));
+                addChildren(new ModifyIncCommand(config, field, schemaEntry, (NumericValue<?, ?>) v));
+                addChildren(new ModifyDecCommand(config, field, schemaEntry, (NumericValue<?, ?>) v));
             }
 
             String entryName = v.resolveEntryName(field.getName());
@@ -102,6 +109,7 @@ class ConfigFieldCommand extends Command {
 
     private void initCollectionValue(CommonBaseConfig config,
                                      Field field,
+                                     ConfigSchemaEntry<?> schemaEntry,
                                      CollectionValue<?, ?, ?> v,
                                      boolean getEnabled,
                                      boolean modifyEnabled) {
@@ -116,13 +124,13 @@ class ConfigFieldCommand extends Command {
 
         if (modifyEnabled) {
             if (v.isAddEnabled()) {
-                addChildren(new ModifyAddCommand(config, field, v));
+                addChildren(new ModifyAddCommand(config, field, schemaEntry, v));
             }
             if (v.isRemoveEnabled()) {
-                addChildren(new ModifyRemoveCommand(config, field, v));
+                addChildren(new ModifyRemoveCommand(config, field, schemaEntry, v));
             }
             if (v.isClearEnabled()) {
-                addChildren(new ModifyClearCommand(config, field, v));
+                addChildren(new ModifyClearCommand(config, field, schemaEntry, v));
             }
 
             String entryName = v.resolveEntryName(field.getName());
@@ -137,6 +145,7 @@ class ConfigFieldCommand extends Command {
 
     private void initMapValue(CommonBaseConfig config,
                               Field field,
+                              ConfigSchemaEntry<?> schemaEntry,
                               MapValue<?, ?, ?> v,
                               boolean getEnabled,
                               boolean modifyEnabled) {
@@ -151,13 +160,13 @@ class ConfigFieldCommand extends Command {
 
         if (modifyEnabled) {
             if (v.isPutEnabled()) {
-                addChildren(new ModifyMapPutCommand(config, field, v));
+                addChildren(new ModifyMapPutCommand(config, field, schemaEntry, v));
             }
             if (v.isRemoveEnabled()) {
-                addChildren(new ModifyMapRemoveCommand(config, field, v));
+                addChildren(new ModifyMapRemoveCommand(config, field, schemaEntry, v));
             }
             if (v.isClearEnabled()) {
-                addChildren(new ModifyMapClearCommand(config, field, v));
+                addChildren(new ModifyMapClearCommand(config, field, schemaEntry, v));
             }
 
             String entryName = v.resolveEntryName(field.getName());

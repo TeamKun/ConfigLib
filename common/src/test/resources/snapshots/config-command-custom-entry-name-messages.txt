@@ -1,0 +1,12 @@
+§aamountの値を25に変更しました.
+§aamountをデフォルト値(10)にリセットしました
+§aplayersにalexを追加しました.
+§aplayersからalexを削除しました.
+§aplayersにalexを追加しました.
+§aplayersをクリアしました
+§aplayersをデフォルト値([])にリセットしました
+§apointsに{alice:7}を追加しました.
+§apointsから{alice:7}を削除しました.
+§apointsに{alice:9}を追加しました.
+§apointsをクリアしました
+§apointsをデフォルト値({})にリセットしました

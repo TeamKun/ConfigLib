@@ -4,6 +4,7 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.command.CollectionValueAddCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 
@@ -11,7 +12,10 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 class ModifyAddCommand extends Command {
-    public ModifyAddCommand(CommonBaseConfig config, Field field, CollectionValue value) {
+    public ModifyAddCommand(CommonBaseConfig config,
+                            Field field,
+                            ConfigSchemaEntry<?> schemaEntry,
+                            CollectionValue value) {
         super("add");
 
         String entryName = value.resolveEntryName(field.getName());
@@ -32,7 +36,7 @@ class ModifyAddCommand extends Command {
 
                     try {
                         Collection result = value.toAdded(newValue.toArray());
-                        value.validate(result);
+                        ConfigSchemaValidation.validate(schemaEntry, result);
                     } catch (InvalidValueException e) {
                         e.sendMessage(ctx);
                         return;

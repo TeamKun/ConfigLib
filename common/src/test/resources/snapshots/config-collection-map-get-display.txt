@@ -1,0 +1,2 @@
+§x§5§5§f§f§5§5names: [alex]
+§x§5§5§f§f§5§5scores: {alice:7}

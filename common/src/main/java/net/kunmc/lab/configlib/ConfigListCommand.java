@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
+import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,18 @@ class ConfigListCommand extends Command {
     static void listFields(CommandContext ctx, CommonBaseConfig config) {
         config.inspect(() -> {
             ctx.sendMessage(ConfigUtil.configHeader(config));
+            for (ConfigSchemaEntry<?> entry : config.schema()
+                                                    .entries()) {
+                Object source = entry.source();
+                if (source instanceof Value) {
+                    Value<?, ?> value = (Value<?, ?>) source;
+                    ctx.sendMessageWithOption(entry.entryName() + ": " + value.displayString(),
+                                              option -> option.rgb(ChatColorUtil.GREEN.getRGB())
+                                                              .hoverText(StringUtils.defaultString(entry.metadata()
+                                                                                                        .description())));
+                }
+            }
+
             for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())) {
                 if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
                     continue;
@@ -50,12 +63,7 @@ class ConfigListCommand extends Command {
                     throw new RuntimeException(e);
                 }
 
-                if (o instanceof Value) {
-                    Value<?, ?> v = ((Value<?, ?>) o);
-                    ctx.sendMessageWithOption(v.resolveEntryName(field.getName()) + ": " + v.displayString(),
-                                              option -> option.rgb(ChatColorUtil.GREEN.getRGB())
-                                                              .hoverText(StringUtils.defaultString(v.description())));
-                } else {
+                if (!(o instanceof Value)) {
                     ctx.sendSuccess(field.getName() + ": " + o);
                 }
             }

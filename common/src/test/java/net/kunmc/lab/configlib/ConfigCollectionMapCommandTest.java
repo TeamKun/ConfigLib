@@ -80,10 +80,7 @@ class ConfigCollectionMapCommandTest {
             tester.execute("config scores", sender);
         }
 
-        assertTrue(messages(sender).stream()
-                                   .anyMatch(x -> x.contains("names: [alex]")), messages(sender).toString());
-        assertTrue(messages(sender).stream()
-                                   .anyMatch(x -> x.contains("scores: {alice:7}")), messages(sender).toString());
+        SnapshotAssertions.assertMatchesSnapshot("config-collection-map-get-display.txt", messages(sender));
     }
 
     @Test

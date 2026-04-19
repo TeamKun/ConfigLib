@@ -7,7 +7,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static net.kunmc.lab.configlib.ConfigCommandTestSupport.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ConfigLevelCommandTest {
     private TestConfig config;
@@ -26,8 +27,6 @@ class ConfigLevelCommandTest {
 
         try (CommandTester tester = new CommandTester(commandFor(config), "configlib.test")) {
             tester.execute("config list", sender);
-            assertTrue(messages(sender).stream()
-                                       .anyMatch(x -> x.contains("count: 10")), messages(sender).toString());
 
             config.store.writeRaw("{\"count\":{\"value\":33},\"message\":{\"value\":\"loaded\"},\"_version_\":0}");
             tester.execute("config reload", sender);
@@ -38,6 +37,8 @@ class ConfigLevelCommandTest {
             assertEquals(10, config.count.value());
             assertEquals("hello", config.message.value());
         }
+
+        SnapshotAssertions.assertMatchesSnapshot("config-level-list-reload-reset.txt", messages(sender));
     }
 
     @Test
@@ -50,8 +51,7 @@ class ConfigLevelCommandTest {
             tester.execute("config testConfig.", sender);
         }
 
-        assertTrue(messages(sender).stream()
-                                   .anyMatch(x -> x.contains("message: hello")), messages(sender).toString());
+        SnapshotAssertions.assertMatchesSnapshot("config-level-config-aliases.txt", messages(sender));
     }
 
     @Test
@@ -72,8 +72,7 @@ class ConfigLevelCommandTest {
             assertThrows(RuntimeException.class, () -> tester.execute("settings testConfig", sender));
         }
 
-        assertTrue(messages(sender).stream()
-                                   .anyMatch(x -> x.contains("amount:")), messages(sender).toString());
+        SnapshotAssertions.assertMatchesSnapshot("config-level-custom-root-and-config-names.txt", messages(sender));
     }
 
     @Test

@@ -89,7 +89,7 @@ public class InMemoryConfigStore implements ConfigStore {
             JsonObject obj = JsonParser.parseString(snapshot)
                                        .getAsJsonObject();
             long ts = obj.has(ConfigKeys.TIMESTAMP) ? obj.get(ConfigKeys.TIMESTAMP)
-                                                        .getAsLong() : 0L;
+                                                         .getAsLong() : 0L;
             result.add(new HistoryEntry(ts, gson.fromJson(obj, clazz)));
         }
         return result;

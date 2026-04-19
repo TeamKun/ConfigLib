@@ -6,6 +6,8 @@ import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import net.kunmc.lab.configlib.migration.MigrationContext;
 import net.kunmc.lab.configlib.migration.Migrations;
+import net.kunmc.lab.configlib.schema.ConfigSchema;
+import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.store.HistoryEntry;
 import net.kunmc.lab.configlib.util.ConfigUtil;
@@ -43,6 +45,7 @@ public abstract class CommonBaseConfig {
     private transient Migrations migrations;
     private transient ConfigStore configStore;
     private transient Closeable configStoreWatcher;
+    private transient ConfigSchema schema;
 
     protected CommonBaseConfig() {
         String s = getClass().getSimpleName();
@@ -58,6 +61,10 @@ public abstract class CommonBaseConfig {
         return entryName;
     }
 
+    public final ConfigSchema schema() {
+        return schema;
+    }
+
     final void init(Option option) {
         migrations = new Migrations(option.migrations);
         schemaVersion = migrations.latestVersion();
@@ -66,6 +73,8 @@ public abstract class CommonBaseConfig {
         for (Value<?, ?> v : ConfigUtil.getValues(this)) {
             v.snapshotDefault();
         }
+
+        schema = ConfigSchema.fromConfig(this);
 
         try {
             saveConfigIfAbsent();
@@ -300,19 +309,19 @@ public abstract class CommonBaseConfig {
     }
 
     private void validateLoadedConfig(CommonBaseConfig config) throws LoadingConfigInvalidValueException {
-        for (Field field : ConfigUtil.getValueFields(this)) {
+        for (ConfigSchemaEntry<?> entry : schema.entries()) {
             try {
+                Field field = entry.field();
                 Value<?, ?> loaded = ((Value<?, ?>) field.get(config));
                 if (loaded == null || loaded.value() == null) {
                     continue;
                 }
 
-                Value current = ((Value<?, ?>) field.get(this));
-                current.validate(loaded.value());
+                ConfigSchemaValidation.validate(entry, loaded.value());
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvalidValueException e) {
-                throw new LoadingConfigInvalidValueException(field, e);
+                throw new LoadingConfigInvalidValueException(entry.field(), e);
             }
         }
     }

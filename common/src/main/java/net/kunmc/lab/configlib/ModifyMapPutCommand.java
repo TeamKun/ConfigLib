@@ -4,6 +4,7 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.command.MapValuePutCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 class ModifyMapPutCommand extends Command {
-    public ModifyMapPutCommand(CommonBaseConfig config, Field field, MapValue value) {
+    public ModifyMapPutCommand(CommonBaseConfig config, Field field, ConfigSchemaEntry<?> schemaEntry, MapValue value) {
         super("put");
 
         addPrerequisite(value::checkExecutable);
@@ -38,7 +39,7 @@ class ModifyMapPutCommand extends Command {
                     try {
                         Map result = new HashMap<>((Map) value.value());
                         result.put(k, v);
-                        value.validate(result);
+                        ConfigSchemaValidation.validate(schemaEntry, result);
                     } catch (InvalidValueException e) {
                         e.sendMessage(ctx);
                         return;

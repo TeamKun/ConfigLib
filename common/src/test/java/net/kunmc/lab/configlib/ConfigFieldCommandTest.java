@@ -7,7 +7,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static net.kunmc.lab.configlib.ConfigCommandTestSupport.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ConfigFieldCommandTest {
     private TestConfig config;
@@ -26,8 +27,7 @@ class ConfigFieldCommandTest {
 
         execute(commandFor(config), "config count", sender);
 
-        assertTrue(messages(sender).stream()
-                                   .anyMatch(x -> x.contains("count: 10")), messages(sender).toString());
+        SnapshotAssertions.assertMatchesSnapshot("config-field-get-single-value.txt", messages(sender));
     }
 
     @Test
@@ -69,10 +69,7 @@ class ConfigFieldCommandTest {
             assertThrows(RuntimeException.class, () -> tester.execute("config label changed", sender));
         }
 
-        assertTrue(messages(sender).stream()
-                                   .anyMatch(x -> x.contains("label: plain")), messages(sender).toString());
-        assertTrue(messages(sender).stream()
-                                   .anyMatch(x -> x.contains("number: 42")), messages(sender).toString());
+        SnapshotAssertions.assertMatchesSnapshot("config-field-plain-fields.txt", messages(sender));
     }
 
     @Test
@@ -159,8 +156,7 @@ class ConfigFieldCommandTest {
             assertEquals(22, config.count.value());
 
             tester.execute("config count", sender);
-            assertFalse(messages(sender).stream()
-                                        .anyMatch(x -> x.contains("count: 22")), messages(sender).toString());
+            SnapshotAssertions.assertMatchesSnapshot("config-field-get-disabled-modify-output.txt", messages(sender));
         }
     }
 
@@ -173,8 +169,7 @@ class ConfigFieldCommandTest {
 
         try (CommandTester tester = new CommandTester(command, "configlib.test")) {
             tester.execute("config count", sender);
-            assertTrue(messages(sender).stream()
-                                       .anyMatch(x -> x.contains("count: 10")), messages(sender).toString());
+            SnapshotAssertions.assertMatchesSnapshot("config-field-modify-disabled-get-output.txt", messages(sender));
 
             assertThrows(RuntimeException.class, () -> tester.execute("config count 22", sender));
         }

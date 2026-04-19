@@ -58,9 +58,9 @@ class ConfigMultiConfigCommandTest {
             tester.execute("config reset", sender);
             assertEquals(99, first.count.value());
             assertEquals(88, second.count.value());
-            assertTrue(messages(sender).stream()
-                                       .anyMatch(x -> x.contains("/config reset")));
         }
+
+        SnapshotAssertions.assertMatchesSnapshot("config-multi-list-reload-reset.txt", messages(sender));
     }
 
     @Test
@@ -74,8 +74,7 @@ class ConfigMultiConfigCommandTest {
             tester.execute("config testConfig.", sender);
         }
 
-        assertTrue(messages(sender).stream()
-                                   .anyMatch(x -> x.contains("message: hello")), messages(sender).toString());
+        SnapshotAssertions.assertMatchesSnapshot("config-multi-config-aliases.txt", messages(sender));
     }
 
     @Test

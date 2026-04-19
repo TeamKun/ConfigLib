@@ -4,6 +4,7 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.command.CollectionValueRemoveCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 
@@ -11,7 +12,10 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 class ModifyRemoveCommand extends Command {
-    public ModifyRemoveCommand(CommonBaseConfig config, Field field, CollectionValue value) {
+    public ModifyRemoveCommand(CommonBaseConfig config,
+                               Field field,
+                               ConfigSchemaEntry<?> schemaEntry,
+                               CollectionValue value) {
         super("remove");
 
         addPrerequisite(value::checkExecutable);
@@ -32,7 +36,7 @@ class ModifyRemoveCommand extends Command {
 
                     try {
                         Collection remaining = value.toRemoved(removeValue.toArray());
-                        value.validate(remaining);
+                        ConfigSchemaValidation.validate(schemaEntry, remaining);
                     } catch (InvalidValueException e) {
                         e.sendMessage(ctx);
                         return;

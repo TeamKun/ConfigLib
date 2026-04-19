@@ -66,7 +66,7 @@ final class ConfigCommandTestSupport {
     }
 
     static List<String> messages(FakeSender sender) {
-        return sender.getSentMessageTexts();
+        return sender.getSentMessageLegacyTexts();
     }
 
     static class TestConfig extends CommonBaseConfig {

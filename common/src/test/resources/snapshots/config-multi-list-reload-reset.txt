@@ -1,0 +1,32 @@
+§f§7------------------[ §6§ltestConfig§7 ]------------------
+§x§5§5§f§f§5§5count: 10
+§x§5§5§f§f§5§5message: hello
+§x§5§5§f§f§5§5names: []
+§x§5§5§f§f§5§5scores: {}
+§aschemaVersion: 0
+§f§7-----------------[ §6§lotherConfig§7 ]------------------
+§x§5§5§f§f§5§5count: 20
+§x§5§5§f§f§5§5title: other
+§x§5§5§f§f§5§5scores: {bob:2}
+§aschemaVersion: 0
+§f§7------------------[ §6§ltestConfig§7 ]------------------
+§x§5§5§f§f§5§5count: 10
+§x§5§5§f§f§5§5message: hello
+§x§5§5§f§f§5§5names: []
+§x§5§5§f§f§5§5scores: {}
+§aschemaVersion: 0
+§atestConfigを再読み込みしました
+§aotherConfigを再読み込みしました
+§atestConfigを再読み込みしました
+§atestConfigをデフォルト値にリセットしました
+§f§7------------------[ §6§ltestConfig§7 ]------------------
+§x§5§5§f§f§5§5count: 10
+§x§5§5§f§f§5§5message: hello
+§x§5§5§f§f§5§5names: []
+§x§5§5§f§f§5§5scores: {}
+§aschemaVersion: 0
+§f§7--------------------------------------------------
+§f§cUsage:
+§f§b  /config reset §etestConfig
+§f§b  /config reset §eotherConfig
+§f§7--------------------------------------------------

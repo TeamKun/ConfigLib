@@ -1,0 +1,18 @@
+§x§5§5§f§f§5§5count: 10
+§acountの値を25に変更しました.
+§acountの値を35に変更しました.
+§acountの値を36に変更しました.
+§acountの値を31に変更しました.
+§acountをデフォルト値(10)にリセットしました
+§x§5§5§f§f§5§5names: []
+§anamesにalexを追加しました.
+§anamesにsteveを追加しました.
+§anamesからalexを削除しました.
+§anamesをクリアしました
+§anamesをデフォルト値([])にリセットしました
+§x§5§5§f§f§5§5scores: {}
+§ascoresに{alice:7}を追加しました.
+§ascoresに{bob:3}を追加しました.
+§ascoresから{alice:7}を削除しました.
+§ascoresをクリアしました
+§ascoresをデフォルト値({})にリセットしました
