@@ -6,8 +6,8 @@ import net.kunmc.lab.configlib.annotation.Nullable;
 import net.kunmc.lab.configlib.annotation.Range;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
-import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
+import net.kunmc.lab.configlib.schema.ConfigSchemaPath;
 import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.store.InMemoryConfigStore;
 import net.kunmc.lab.configlib.value.IntegerValue;
@@ -16,6 +16,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -186,9 +189,24 @@ class ConfigSchemaTest {
         ConfigValidationException ex = assertThrows(ConfigValidationException.class,
                                                     () -> ConfigSchemaValidation.validate(entry, 101));
 
-        assertEquals("maxPlayers", ex.path().asString());
+        assertEquals("maxPlayers",
+                     ex.path()
+                       .asString());
         assertEquals(101, ex.value());
         assertTrue(ex.validationCause() instanceof InvalidValueException);
+        assertTrue(ex.getMessage()
+                     .contains("Validation failed for maxPlayers (value: 101):"));
+        assertTrue(ex.getMessage()
+                     .contains("maxPlayers must be between 1 and 100."));
+    }
+
+    @Test
+    void customValidationMessageCanCarryLogReason() {
+        InvalidValueException cause = new InvalidValueException("log reason", ctx -> ctx.sendFailure("command reason"));
+        ConfigValidationException ex = new ConfigValidationException(new ConfigSchemaPath("custom"), "bad", cause);
+
+        assertTrue(ex.getMessage()
+                     .contains("Validation failed for custom (value: bad): log reason"));
     }
 
     @Test
@@ -240,9 +258,11 @@ class ConfigSchemaTest {
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"maxPlayers\":101,\"motd\":\"bad\",\"_version_\":0}");
 
-        LoadingConfigInvalidValueException ex = assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+        ConfigValidationException ex = assertThrows(ConfigValidationException.class, cfg::loadConfig);
 
-        assertEquals("maxPlayers", ex.path().asString());
+        assertEquals("maxPlayers",
+                     ex.path()
+                       .asString());
         assertEquals(101, ex.value());
     }
 
@@ -252,11 +272,11 @@ class ConfigSchemaTest {
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"maxPlayers\":20,\"motd\":null,\"_version_\":0}");
 
-        assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+        assertThrows(ConfigValidationException.class, cfg::loadConfig);
     }
 
     @Test
-    void loadAllowsNullPojoFieldWithNullableAnnotation() throws LoadingConfigInvalidValueException {
+    void loadAllowsNullPojoFieldWithNullableAnnotation() {
         PojoConfig cfg = new PojoConfig();
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"maxPlayers\":20,\"motd\":\"ok\",\"nullableMotd\":null,\"_version_\":0}");
@@ -272,11 +292,11 @@ class ConfigSchemaTest {
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"label\":{\"value\":null},\"_version_\":0}");
 
-        assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+        assertThrows(ConfigValidationException.class, cfg::loadConfig);
     }
 
     @Test
-    void loadKeepsDefaultForMissingValueField() throws LoadingConfigInvalidValueException {
+    void loadKeepsDefaultForMissingValueField() {
         ValueNullConfig cfg = new ValueNullConfig();
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"_version_\":0}");
@@ -287,7 +307,7 @@ class ConfigSchemaTest {
     }
 
     @Test
-    void loadKeepsDefaultForMissingPojoField() throws LoadingConfigInvalidValueException {
+    void loadKeepsDefaultForMissingPojoField() {
         PojoConfig cfg = new PojoConfig();
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"maxPlayers\":20,\"_version_\":0}");
@@ -306,6 +326,114 @@ class ConfigSchemaTest {
 
         assertTrue(cfg.store.readRaw()
                             .contains("\"maxPlayers\":30"));
+    }
+
+    @Test
+    void saveRejectsInvalidDirectPojoMutationBeforeWriting() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        String before = cfg.store.readRaw();
+        cfg.maxPlayers = 101;
+
+        ConfigValidationException ex = assertThrows(ConfigValidationException.class, cfg::saveConfigIfPresent);
+
+        assertEquals("maxPlayers",
+                     ex.path()
+                       .asString());
+        assertEquals(101, ex.value());
+        assertEquals(before, cfg.store.readRaw());
+    }
+
+    @Test
+    void saveRejectsInvalidDirectValueMutationBeforeWriting() {
+        ValueNullConfig cfg = new ValueNullConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        String before = cfg.store.readRaw();
+        cfg.label.value(null);
+
+        ConfigValidationException ex = assertThrows(ConfigValidationException.class, cfg::saveConfigIfPresent);
+
+        assertEquals("label",
+                     ex.path()
+                       .asString());
+        assertNull(ex.value());
+        assertEquals(before, cfg.store.readRaw());
+    }
+
+    @Test
+    void modificationDetectorRejectsInvalidDirectPojoMutationBeforeWritingHistory() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        cfg.timer.cancel();
+        String before = cfg.store.readRaw();
+        int historySize = cfg.readHistory()
+                             .size();
+        cfg.maxPlayers = 101;
+
+        cfg.detectModifications();
+
+        assertEquals(101, cfg.maxPlayers);
+        assertEquals(before, cfg.store.readRaw());
+        assertEquals(historySize,
+                     cfg.readHistory()
+                        .size());
+    }
+
+    @Test
+    void modificationDetectorLogsSameInvalidDirectMutationOnlyOnce() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        cfg.timer.cancel();
+        AtomicInteger warnings = new AtomicInteger();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                warnings.incrementAndGet();
+            }
+
+            @Override
+            public void flush() {
+            }
+
+            @Override
+            public void close() {
+            }
+        };
+
+        cfg.logger.addHandler(handler);
+        boolean useParentHandlers = cfg.logger.getUseParentHandlers();
+        cfg.logger.setUseParentHandlers(false);
+        try {
+            cfg.maxPlayers = 101;
+            cfg.detectModifications();
+            cfg.detectModifications();
+
+            assertEquals(1, warnings.get());
+
+            cfg.maxPlayers = 102;
+            cfg.detectModifications();
+
+            assertEquals(2, warnings.get());
+        } finally {
+            cfg.logger.removeHandler(handler);
+            cfg.logger.setUseParentHandlers(useParentHandlers);
+        }
+    }
+
+    @Test
+    void mutateRejectsInvalidValueBeforeWriting() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        String before = cfg.store.readRaw();
+
+        ConfigValidationException ex = assertThrows(ConfigValidationException.class,
+                                                    () -> cfg.mutate(() -> cfg.maxPlayers = 101));
+
+        assertEquals("maxPlayers",
+                     ex.path()
+                       .asString());
+        assertEquals(101, ex.value());
+        assertEquals(before, cfg.store.readRaw());
     }
 
     static final class TestConfig extends CommonBaseConfig {
@@ -382,7 +510,10 @@ class ConfigSchemaTest {
             public static int staticField = 0;
         }
 
-        enum Mode { EASY, HARD }
+        enum Mode {
+            EASY,
+            HARD
+        }
     }
 
     @Test
@@ -390,8 +521,12 @@ class ConfigSchemaTest {
         NestedPojoConfig cfg = new NestedPojoConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        assertTrue(cfg.schema().findEntry("arena.maxArenas").isPresent());
-        assertTrue(cfg.schema().findEntry("arena.name").isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("arena.maxArenas")
+                      .isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("arena.name")
+                      .isPresent());
     }
 
     @Test
@@ -399,9 +534,15 @@ class ConfigSchemaTest {
         NestedPojoConfig cfg = new NestedPojoConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        assertFalse(cfg.schema().findEntry("arena.cache").isPresent());
-        assertFalse(cfg.schema().findEntry("arena.staticField").isPresent());
-        assertFalse(cfg.schema().findEntry("arena").isPresent());
+        assertFalse(cfg.schema()
+                       .findEntry("arena.cache")
+                       .isPresent());
+        assertFalse(cfg.schema()
+                       .findEntry("arena.staticField")
+                       .isPresent());
+        assertFalse(cfg.schema()
+                       .findEntry("arena")
+                       .isPresent());
     }
 
     @Test
@@ -409,9 +550,15 @@ class ConfigSchemaTest {
         NestedPojoConfig cfg = new NestedPojoConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        assertTrue(cfg.schema().findEntry("mode").isPresent());
-        assertFalse(cfg.schema().findEntry("mode.name").isPresent());
-        assertFalse(cfg.schema().findEntry("mode.ordinal").isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("mode")
+                      .isPresent());
+        assertFalse(cfg.schema()
+                       .findEntry("mode.name")
+                       .isPresent());
+        assertFalse(cfg.schema()
+                       .findEntry("mode.ordinal")
+                       .isPresent());
     }
 
     @Test
@@ -422,7 +569,9 @@ class ConfigSchemaTest {
         ConfigSchemaEntry<?> entry = cfg.schema()
                                         .findEntry("arena.maxArenas")
                                         .orElseThrow(AssertionError::new);
-        assertEquals("Maximum number of arenas.", entry.metadata().description());
+        assertEquals("Maximum number of arenas.",
+                     entry.metadata()
+                          .description());
     }
 
     @Test
@@ -430,10 +579,11 @@ class ConfigSchemaTest {
         NestedPojoConfig cfg = new NestedPojoConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        @SuppressWarnings("unchecked")
-        ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
-                                                                           .findEntry("arena.maxArenas")
-                                                                           .orElseThrow(AssertionError::new);
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "arena.maxArenas")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
         assertEquals(5, entry.get());
     }
 
@@ -442,10 +592,11 @@ class ConfigSchemaTest {
         NestedPojoConfig cfg = new NestedPojoConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        @SuppressWarnings("unchecked")
-        ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
-                                                                           .findEntry("arena.maxArenas")
-                                                                           .orElseThrow(AssertionError::new);
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "arena.maxArenas")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
         entry.set(10);
         assertEquals(10, cfg.arena.maxArenas);
     }
@@ -455,17 +606,18 @@ class ConfigSchemaTest {
         NestedPojoConfig cfg = new NestedPojoConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        @SuppressWarnings("unchecked")
-        ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
-                                                                           .findEntry("arena.maxArenas")
-                                                                           .orElseThrow(AssertionError::new);
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "arena.maxArenas")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
 
         assertDoesNotThrow(() -> entry.validate(10));
         assertThrows(InvalidValueException.class, () -> entry.validate(51));
     }
 
     @Test
-    void nestedPojoLoadRoundTrip() throws LoadingConfigInvalidValueException {
+    void nestedPojoLoadRoundTrip() {
         NestedPojoConfig cfg = new NestedPojoConfig();
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"arena\":{\"maxArenas\":12,\"name\":\"test\"},\"_version_\":0}");
@@ -482,9 +634,11 @@ class ConfigSchemaTest {
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"arena\":{\"maxArenas\":99,\"name\":\"bad\"},\"_version_\":0}");
 
-        LoadingConfigInvalidValueException ex = assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+        ConfigValidationException ex = assertThrows(ConfigValidationException.class, cfg::loadConfig);
 
-        assertEquals("arena.maxArenas", ex.path().asString());
+        assertEquals("arena.maxArenas",
+                     ex.path()
+                       .asString());
         assertEquals(99, ex.value());
     }
 
@@ -495,7 +649,8 @@ class ConfigSchemaTest {
 
         cfg.mutate(() -> cfg.arena.maxArenas = 15);
 
-        assertTrue(cfg.store.readRaw().contains("\"maxArenas\":15"));
+        assertTrue(cfg.store.readRaw()
+                            .contains("\"maxArenas\":15"));
     }
 
     static final class ImmutableNestedConfig extends CommonBaseConfig {
@@ -533,9 +688,15 @@ class ConfigSchemaTest {
         ImmutableNestedConfig cfg = new ImmutableNestedConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        assertTrue(cfg.schema().findEntry("arena.maxArenas").isPresent());
-        assertTrue(cfg.schema().findEntry("arena.name").isPresent());
-        assertFalse(cfg.schema().findEntry("arena").isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("arena.maxArenas")
+                      .isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("arena.name")
+                      .isPresent());
+        assertFalse(cfg.schema()
+                       .findEntry("arena")
+                       .isPresent());
     }
 
     @Test
@@ -546,7 +707,9 @@ class ConfigSchemaTest {
         ConfigSchemaEntry<?> entry = cfg.schema()
                                         .findEntry("arena.maxArenas")
                                         .orElseThrow(AssertionError::new);
-        assertEquals("Maximum number of arenas.", entry.metadata().description());
+        assertEquals("Maximum number of arenas.",
+                     entry.metadata()
+                          .description());
     }
 
     @Test
@@ -554,10 +717,11 @@ class ConfigSchemaTest {
         ImmutableNestedConfig cfg = new ImmutableNestedConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        @SuppressWarnings("unchecked")
-        ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
-                                                                           .findEntry("arena.maxArenas")
-                                                                           .orElseThrow(AssertionError::new);
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "arena.maxArenas")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
         assertEquals(5, entry.get());
     }
 
@@ -566,10 +730,11 @@ class ConfigSchemaTest {
         ImmutableNestedConfig cfg = new ImmutableNestedConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        @SuppressWarnings("unchecked")
-        ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
-                                                                           .findEntry("arena.maxArenas")
-                                                                           .orElseThrow(AssertionError::new);
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "arena.maxArenas")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
         entry.set(10);
 
         assertEquals(10, cfg.arena.maxArenas());
@@ -581,17 +746,18 @@ class ConfigSchemaTest {
         ImmutableNestedConfig cfg = new ImmutableNestedConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        @SuppressWarnings("unchecked")
-        ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
-                                                                           .findEntry("arena.maxArenas")
-                                                                           .orElseThrow(AssertionError::new);
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "arena.maxArenas")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
 
         assertDoesNotThrow(() -> entry.validate(10));
         assertThrows(InvalidValueException.class, () -> entry.validate(51));
     }
 
     @Test
-    void immutableNestedLoadRoundTrip() throws LoadingConfigInvalidValueException {
+    void immutableNestedLoadRoundTrip() {
         ImmutableNestedConfig cfg = new ImmutableNestedConfig();
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"arena\":{\"maxArenas\":12,\"name\":\"test\"},\"_version_\":0}");
@@ -608,7 +774,7 @@ class ConfigSchemaTest {
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"arena\":{\"maxArenas\":99,\"name\":\"bad\"},\"_version_\":0}");
 
-        assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+        assertThrows(ConfigValidationException.class, cfg::loadConfig);
     }
 
     @Test
@@ -618,7 +784,8 @@ class ConfigSchemaTest {
 
         cfg.mutate(() -> cfg.arena = new ImmutableNestedConfig.ArenaSettings(15, "arena"));
 
-        assertTrue(cfg.store.readRaw().contains("\"maxArenas\":15"));
+        assertTrue(cfg.store.readRaw()
+                            .contains("\"maxArenas\":15"));
     }
 
     // --- deep nesting (class-within-class) ---
@@ -648,11 +815,21 @@ class ConfigSchemaTest {
         DeepMutableConfig cfg = new DeepMutableConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        assertTrue(cfg.schema().findEntry("outer.inner.y").isPresent());
-        assertTrue(cfg.schema().findEntry("outer.inner.z").isPresent());
-        assertTrue(cfg.schema().findEntry("outer.x").isPresent());
-        assertFalse(cfg.schema().findEntry("outer.inner").isPresent());
-        assertFalse(cfg.schema().findEntry("outer").isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("outer.inner.y")
+                      .isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("outer.inner.z")
+                      .isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("outer.x")
+                      .isPresent());
+        assertFalse(cfg.schema()
+                       .findEntry("outer.inner")
+                       .isPresent());
+        assertFalse(cfg.schema()
+                       .findEntry("outer")
+                       .isPresent());
     }
 
     @Test
@@ -660,10 +837,11 @@ class ConfigSchemaTest {
         DeepMutableConfig cfg = new DeepMutableConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        @SuppressWarnings("unchecked")
-        ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
-                                                                           .findEntry("outer.inner.y")
-                                                                           .orElseThrow(AssertionError::new);
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "outer.inner.y")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
         assertEquals(5, entry.get());
     }
 
@@ -672,10 +850,11 @@ class ConfigSchemaTest {
         DeepMutableConfig cfg = new DeepMutableConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        @SuppressWarnings("unchecked")
-        ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
-                                                                           .findEntry("outer.inner.y")
-                                                                           .orElseThrow(AssertionError::new);
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "outer.inner.y")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
         entry.set(99);
 
         assertEquals(99, cfg.outer.inner.y);
@@ -684,7 +863,7 @@ class ConfigSchemaTest {
     }
 
     @Test
-    void deepMutableNestingLoadRoundTrip() throws LoadingConfigInvalidValueException {
+    void deepMutableNestingLoadRoundTrip() {
         DeepMutableConfig cfg = new DeepMutableConfig();
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"outer\":{\"inner\":{\"y\":42,\"z\":\"world\"},\"x\":7},\"_version_\":0}");

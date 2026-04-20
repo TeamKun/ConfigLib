@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib;
 import com.google.common.base.Preconditions;
 import com.google.gson.annotations.SerializedName;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
-import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import net.kunmc.lab.configlib.migration.MigrationContext;
 import net.kunmc.lab.configlib.migration.Migrations;
 import net.kunmc.lab.configlib.schema.ConfigSchema;
@@ -91,12 +90,8 @@ public abstract class CommonBaseConfig {
         configStoreWatcher = configStore.startWatching(timer, () -> {
             try {
                 loadConfig();
-            } catch (LoadingConfigInvalidValueException ex) {
-                logger.log(Level.WARNING,
-                           String.format("\"%s\"'s validation failed.",
-                                         ex.path()
-                                           .asString()),
-                           ex);
+            } catch (ConfigValidationException ex) {
+                logValidationFailure(ex);
             }
         }, option.fileWatchTimerPeriod);
     }
@@ -107,6 +102,10 @@ public abstract class CommonBaseConfig {
 
     final void dispatchOnChange() {
         onChangeListeners.forEach(Runnable::run);
+    }
+
+    void detectModifications() {
+        modificationDetector.detect();
     }
 
     final boolean isListEnabled() {
@@ -187,6 +186,7 @@ public abstract class CommonBaseConfig {
      * </p>
      *
      * @param mutation code that updates this config
+     * @throws ConfigValidationException if the mutated config does not satisfy schema validation
      */
     public final void mutate(Runnable mutation) {
         withIoLock(() -> {
@@ -236,6 +236,7 @@ public abstract class CommonBaseConfig {
     }
 
     private void saveConfigLocked() {
+        validateConfig(this);
         CommonBaseConfig saved = configStore.write(this, getClass(), migrations);
         replaceWithValidatedConfig(saved);
     }
@@ -273,14 +274,20 @@ public abstract class CommonBaseConfig {
         });
     }
 
-    protected final boolean loadConfig() throws LoadingConfigInvalidValueException {
+    /**
+     * Loads this config from the backing store and applies it to the live config.
+     *
+     * @return true when stored config content was loaded; false when no store exists
+     * @throws ConfigValidationException if the loaded config does not satisfy schema validation
+     */
+    protected final boolean loadConfig() {
         return withIoLock(() -> {
             if (!configStore.exists()) {
                 return false;
             }
 
             CommonBaseConfig config = configStore.read(getClass(), migrations, this);
-            validateLoadedConfig(config);
+            validateConfig(config);
 
             ConfigUtil.replaceFields(this, config, this);
             if (!initialized) {
@@ -299,22 +306,22 @@ public abstract class CommonBaseConfig {
     }
 
     private void replaceWithValidatedConfig(CommonBaseConfig config) {
-        try {
-            validateLoadedConfig(config);
-        } catch (LoadingConfigInvalidValueException e) {
-            throw new RuntimeException(e);
-        }
+        validateConfig(config);
         ConfigUtil.replaceFields(this, config, this);
     }
 
-    private void validateLoadedConfig(CommonBaseConfig config) throws LoadingConfigInvalidValueException {
+    void validateCurrentConfig() {
+        validateConfig(this);
+    }
+
+    void logValidationFailure(ConfigValidationException ex) {
+        logger.log(Level.WARNING, ex.getMessage(), ex);
+    }
+
+    private void validateConfig(CommonBaseConfig config) {
         for (ConfigSchemaEntry<?> entry : schema.entries()) {
-            try {
-                Object value = entry.get(config);
-                ConfigSchemaValidation.validate(entry, value);
-            } catch (ConfigValidationException e) {
-                throw new LoadingConfigInvalidValueException(e);
-            }
+            Object value = entry.get(config);
+            ConfigSchemaValidation.validate(entry, value);
         }
     }
 
@@ -355,4 +362,5 @@ public abstract class CommonBaseConfig {
             return this;
         }
     }
+
 }

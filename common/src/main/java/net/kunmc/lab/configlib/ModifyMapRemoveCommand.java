@@ -39,10 +39,15 @@ class ModifyMapRemoveCommand extends Command {
                         return;
                     }
 
-                    config.mutate(() -> {
-                        value.remove(k);
-                        value.dispatchRemove(k, v);
-                    });
+                    try {
+                        config.mutate(() -> {
+                            value.remove(k);
+                            value.dispatchRemove(k, v);
+                        });
+                    } catch (ConfigValidationException e) {
+                        e.sendMessage(ctx);
+                        return;
+                    }
 
                     ctx.sendSuccess(value.succeedMessageForRemove(new MapValueRemoveCommandMessageParameter<>(
                             schemaEntry.entryName(),

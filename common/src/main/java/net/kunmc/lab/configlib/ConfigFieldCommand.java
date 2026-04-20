@@ -56,10 +56,15 @@ class ConfigFieldCommand extends Command {
                         return;
                     }
 
-                    config.mutate(() -> {
-                        value.dispatchModifyCommand(newValue);
-                        value.value(newValue);
-                    });
+                    try {
+                        config.mutate(() -> {
+                            value.dispatchModifyCommand(newValue);
+                            value.value(newValue);
+                        });
+                    } catch (ConfigValidationException e) {
+                        e.sendMessage(ctx);
+                        return;
+                    }
 
                     ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(schemaEntry.entryName(),
                                                                                                             ctx)));
@@ -97,7 +102,12 @@ class ConfigFieldCommand extends Command {
             String entryName = schemaEntry.entryName();
             addChildren(new Command("reset") {{
                 execute(ctx -> {
-                    config.mutate(v::resetToDefault);
+                    try {
+                        config.mutate(v::resetToDefault);
+                    } catch (ConfigValidationException e) {
+                        e.sendMessage(ctx);
+                        return;
+                    }
                     ctx.sendSuccess(entryName + "をデフォルト値(" + v.displayString() + ")にリセットしました");
                 });
             }});
@@ -132,7 +142,12 @@ class ConfigFieldCommand extends Command {
 
             addChildren(new Command("reset") {{
                 execute(ctx -> {
-                    config.mutate(v::resetToDefault);
+                    try {
+                        config.mutate(v::resetToDefault);
+                    } catch (ConfigValidationException e) {
+                        e.sendMessage(ctx);
+                        return;
+                    }
                     ctx.sendSuccess(schemaEntry.entryName() + "をデフォルト値(" + v.displayString() + ")にリセットしました");
                 });
             }});
@@ -167,7 +182,12 @@ class ConfigFieldCommand extends Command {
 
             addChildren(new Command("reset") {{
                 execute(ctx -> {
-                    config.mutate(v::resetToDefault);
+                    try {
+                        config.mutate(v::resetToDefault);
+                    } catch (ConfigValidationException e) {
+                        e.sendMessage(ctx);
+                        return;
+                    }
                     ctx.sendSuccess(schemaEntry.entryName() + "をデフォルト値(" + v.displayString() + ")にリセットしました");
                 });
             }});

@@ -36,10 +36,15 @@ class ModifyRemoveCommand extends Command {
                         return;
                     }
 
-                    config.mutate(() -> {
-                        value.dispatchRemove(removeValue);
-                        ((Collection) value.value()).removeAll(removeValue);
-                    });
+                    try {
+                        config.mutate(() -> {
+                            value.dispatchRemove(removeValue);
+                            ((Collection) value.value()).removeAll(removeValue);
+                        });
+                    } catch (ConfigValidationException e) {
+                        e.sendMessage(ctx);
+                        return;
+                    }
 
                     ctx.sendSuccess(value.succeedMessageForRemove(new CollectionValueRemoveCommandMessageParameter<>(
                             schemaEntry.entryName(),

@@ -42,10 +42,15 @@ class ModifyMapPutCommand extends Command {
                         return;
                     }
 
-                    config.mutate(() -> {
-                        value.dispatchPut(k, v);
-                        value.put(k, v);
-                    });
+                    try {
+                        config.mutate(() -> {
+                            value.dispatchPut(k, v);
+                            value.put(k, v);
+                        });
+                    } catch (ConfigValidationException e) {
+                        e.sendMessage(ctx);
+                        return;
+                    }
 
                     ctx.sendSuccess(value.succeedMessageForPut(new MapValuePutCommandMessageParameter<>(schemaEntry.entryName(),
                                                                                                         ctx,

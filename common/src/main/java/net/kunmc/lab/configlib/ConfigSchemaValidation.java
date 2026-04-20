@@ -9,7 +9,7 @@ final class ConfigSchemaValidation {
     }
 
     @SuppressWarnings("unchecked")
-    static void validate(ConfigSchemaEntry<?> entry, Object value) throws ConfigValidationException {
+    static void validate(ConfigSchemaEntry<?> entry, Object value) {
         try {
             ((ConfigSchemaEntry<Object>) entry).validate(value);
         } catch (InvalidValueException e) {

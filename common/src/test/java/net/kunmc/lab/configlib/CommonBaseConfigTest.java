@@ -1,7 +1,6 @@
 package net.kunmc.lab.configlib;
 
 import com.google.gson.Gson;
-import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.store.InMemoryConfigStore;
 import org.junit.jupiter.api.AfterEach;
@@ -141,7 +140,7 @@ class CommonBaseConfigTest {
     }
 
     @Test
-    void onChangeCalledOnSubsequentLoad() throws LoadingConfigInvalidValueException {
+    void onChangeCalledOnSubsequentLoad() {
         TestConfig cfg = new TestConfig();
         cfg.store.writeRaw("{\"value\":1,\"_version_\":0}");
         init(cfg);
@@ -157,7 +156,7 @@ class CommonBaseConfigTest {
     }
 
     @Test
-    void multipleOnReloadListenersAllCalled() throws LoadingConfigInvalidValueException {
+    void multipleOnReloadListenersAllCalled() {
         TestConfig cfg = new TestConfig();
         init(cfg);
 

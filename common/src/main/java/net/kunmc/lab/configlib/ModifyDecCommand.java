@@ -37,10 +37,15 @@ class ModifyDecCommand extends Command {
             return;
         }
 
-        config.mutate(() -> {
-            value.dispatchModifyCommand(newValue);
-            value.value(newValue);
-        });
+        try {
+            config.mutate(() -> {
+                value.dispatchModifyCommand(newValue);
+                value.value(newValue);
+            });
+        } catch (ConfigValidationException e) {
+            e.sendMessage(ctx);
+            return;
+        }
 
         ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(schemaEntry.entryName(),
                                                                                                 ctx)));

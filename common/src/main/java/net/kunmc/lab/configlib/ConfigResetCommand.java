@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,8 +27,13 @@ class ConfigResetCommand extends Command {
     }
 
     private void exec(CommandContext ctx, CommonBaseConfig config) {
-        config.mutate(() -> ConfigUtil.getValues(config)
-                                      .forEach(Value::resetToDefault));
+        try {
+            config.mutate(() -> ConfigUtil.getValues(config)
+                                          .forEach(Value::resetToDefault));
+        } catch (ConfigValidationException e) {
+            e.sendMessage(ctx);
+            return;
+        }
         ctx.sendSuccess(config.entryName() + "をデフォルト値にリセットしました");
         ConfigListCommand.listFields(ctx, config);
     }

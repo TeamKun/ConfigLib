@@ -14,16 +14,27 @@ public class InvalidValueException extends Exception {
     }
 
     public InvalidValueException(String message, String... messages) {
-        this(ListUtil.asList(message, messages));
+        this(ListUtil.asList(message, messages),
+             String.join(System.lineSeparator(), ListUtil.asList(message, messages)));
     }
 
     public InvalidValueException(List<String> messages) {
-        this(ctx -> {
+        this(messages, String.join(System.lineSeparator(), messages));
+    }
+
+    private InvalidValueException(List<String> messages, String logMessage) {
+        super(logMessage);
+        this.messageSender = ctx -> {
             messages.forEach(ctx::sendFailure);
-        });
+        };
     }
 
     public InvalidValueException(Consumer<CommandContext> messageSender) {
+        this("Custom validation message", messageSender);
+    }
+
+    public InvalidValueException(String logMessage, Consumer<CommandContext> messageSender) {
+        super(logMessage);
         this.messageSender = messageSender;
     }
 

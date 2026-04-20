@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
-import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -39,9 +39,9 @@ class ConfigReloadCommand extends Command {
             } else {
                 ctx.sendFailure(config.entryName() + "の読み込みに失敗しました");
             }
-        } catch (LoadingConfigInvalidValueException e) {
+        } catch (ConfigValidationException e) {
             ctx.sendFailure(config.entryName() + "の読み込みに失敗しました");
-            e.printStackTrace();
+            e.sendMessage(ctx);
         }
     }
 }

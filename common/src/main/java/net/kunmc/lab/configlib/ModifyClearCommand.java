@@ -22,10 +22,15 @@ class ModifyClearCommand extends Command {
                 return;
             }
 
-            config.mutate(() -> {
-                value.dispatchClear();
-                ((Collection) value.value()).clear();
-            });
+            try {
+                config.mutate(() -> {
+                    value.dispatchClear();
+                    ((Collection) value.value()).clear();
+                });
+            } catch (ConfigValidationException e) {
+                e.sendMessage(ctx);
+                return;
+            }
 
             ctx.sendSuccess(value.succeedMessageForClear(new CollectionValueClearCommandMessageParameter(schemaEntry.entryName(),
                                                                                                          ctx)));

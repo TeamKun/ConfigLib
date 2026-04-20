@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.IntegerArgument;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -36,7 +37,15 @@ class ConfigUndoCommand extends Command {
     }
 
     static void exec(CommandContext ctx, CommonBaseConfig config, int stepsBack) {
-        if (config.applyUndo(stepsBack)) {
+        boolean applied;
+        try {
+            applied = config.applyUndo(stepsBack);
+        } catch (ConfigValidationException e) {
+            e.sendMessage(ctx);
+            return;
+        }
+
+        if (applied) {
             ctx.sendSuccess(config.entryName() + "を" + stepsBack + "つ前の状態に戻しました");
             ConfigListCommand.listFields(ctx, config);
         } else {

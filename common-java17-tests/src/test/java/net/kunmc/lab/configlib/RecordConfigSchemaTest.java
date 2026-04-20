@@ -166,11 +166,21 @@ class RecordConfigSchemaTest {
         DeepRecordConfig cfg = new DeepRecordConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        assertTrue(cfg.schema().findEntry("outer.inner.y").isPresent());
-        assertTrue(cfg.schema().findEntry("outer.inner.z").isPresent());
-        assertTrue(cfg.schema().findEntry("outer.x").isPresent());
-        assertFalse(cfg.schema().findEntry("outer.inner").isPresent());
-        assertFalse(cfg.schema().findEntry("outer").isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("outer.inner.y")
+                      .isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("outer.inner.z")
+                      .isPresent());
+        assertTrue(cfg.schema()
+                      .findEntry("outer.x")
+                      .isPresent());
+        assertFalse(cfg.schema()
+                       .findEntry("outer.inner")
+                       .isPresent());
+        assertFalse(cfg.schema()
+                       .findEntry("outer")
+                       .isPresent());
     }
 
     @Test
@@ -178,10 +188,11 @@ class RecordConfigSchemaTest {
         DeepRecordConfig cfg = new DeepRecordConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        @SuppressWarnings("unchecked")
-        ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
-                                                                           .findEntry("outer.inner.y")
-                                                                           .orElseThrow(AssertionError::new);
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "outer.inner.y")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
         assertEquals(5, entry.get());
     }
 
@@ -190,14 +201,19 @@ class RecordConfigSchemaTest {
         DeepRecordConfig cfg = new DeepRecordConfig();
         cfg.init(new CommonBaseConfig.Option());
 
-        @SuppressWarnings("unchecked")
-        ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
-                                                                           .findEntry("outer.inner.y")
-                                                                           .orElseThrow(AssertionError::new);
+        @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> entry = (ConfigSchemaEntry<Integer>) cfg.schema()
+                                                                                                          .findEntry(
+                                                                                                                  "outer.inner.y")
+                                                                                                          .orElseThrow(
+                                                                                                                  AssertionError::new);
         entry.set(99);
 
-        assertEquals(99, cfg.outer.inner().y());
-        assertEquals("hello", cfg.outer.inner().z());
+        assertEquals(99,
+                     cfg.outer.inner()
+                              .y());
+        assertEquals("hello",
+                     cfg.outer.inner()
+                              .z());
         assertEquals(1, cfg.outer.x());
     }
 
@@ -209,8 +225,12 @@ class RecordConfigSchemaTest {
 
         cfg.loadConfig();
 
-        assertEquals(42, cfg.outer.inner().y());
-        assertEquals("world", cfg.outer.inner().z());
+        assertEquals(42,
+                     cfg.outer.inner()
+                              .y());
+        assertEquals("world",
+                     cfg.outer.inner()
+                              .z());
         assertEquals(7, cfg.outer.x());
     }
 }

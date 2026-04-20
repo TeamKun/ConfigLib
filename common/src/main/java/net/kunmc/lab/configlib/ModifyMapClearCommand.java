@@ -22,10 +22,15 @@ class ModifyMapClearCommand extends Command {
                 return;
             }
 
-            config.mutate(() -> {
-                value.dispatchClear();
-                value.clear();
-            });
+            try {
+                config.mutate(() -> {
+                    value.dispatchClear();
+                    value.clear();
+                });
+            } catch (ConfigValidationException e) {
+                e.sendMessage(ctx);
+                return;
+            }
 
             ctx.sendSuccess(value.succeedMessageForClear(new MapValueClearCommandMessageParameter(schemaEntry.entryName(),
                                                                                                   ctx)));

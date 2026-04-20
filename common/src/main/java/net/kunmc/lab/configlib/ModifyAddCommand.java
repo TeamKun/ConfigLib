@@ -37,10 +37,15 @@ class ModifyAddCommand extends Command {
                         return;
                     }
 
-                    config.mutate(() -> {
-                        value.dispatchAdd(newValue);
-                        ((Collection) value.value()).addAll(newValue);
-                    });
+                    try {
+                        config.mutate(() -> {
+                            value.dispatchAdd(newValue);
+                            ((Collection) value.value()).addAll(newValue);
+                        });
+                    } catch (ConfigValidationException e) {
+                        e.sendMessage(ctx);
+                        return;
+                    }
 
                     ctx.sendSuccess(value.succeedMessageForAdd(new CollectionValueAddCommandMessageParameter<>(
                             schemaEntry.entryName(),
