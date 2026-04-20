@@ -3,7 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.command.MapValueRemoveCommandMessageParameter;
-import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 
 import java.util.HashMap;
@@ -34,7 +34,7 @@ class ModifyMapRemoveCommand extends Command {
                         Map remaining = new HashMap<>(((Map) value.value()));
                         remaining.remove(k);
                         ConfigSchemaValidation.validate(schemaEntry, remaining);
-                    } catch (InvalidValueException e) {
+                    } catch (ConfigValidationException e) {
                         e.sendMessage(ctx);
                         return;
                     }

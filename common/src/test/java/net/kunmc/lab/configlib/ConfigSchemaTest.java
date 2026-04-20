@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import net.kunmc.lab.configlib.annotation.Description;
 import net.kunmc.lab.configlib.annotation.Nullable;
 import net.kunmc.lab.configlib.annotation.Range;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
@@ -174,6 +175,23 @@ class ConfigSchemaTest {
     }
 
     @Test
+    void schemaValidationExceptionCarriesPathAndValue() {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+
+        ConfigSchemaEntry<?> entry = cfg.schema()
+                                        .findEntry("maxPlayers")
+                                        .orElseThrow(AssertionError::new);
+
+        ConfigValidationException ex = assertThrows(ConfigValidationException.class,
+                                                    () -> ConfigSchemaValidation.validate(entry, 101));
+
+        assertEquals("maxPlayers", ex.path().asString());
+        assertEquals(101, ex.value());
+        assertTrue(ex.validationCause() instanceof InvalidValueException);
+    }
+
+    @Test
     void pojoAccessorReadsAndWritesPublicField() {
         PojoConfig cfg = new PojoConfig();
         cfg.init(new CommonBaseConfig.Option());
@@ -222,7 +240,10 @@ class ConfigSchemaTest {
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"maxPlayers\":101,\"motd\":\"bad\",\"_version_\":0}");
 
-        assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+        LoadingConfigInvalidValueException ex = assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+
+        assertEquals("maxPlayers", ex.path().asString());
+        assertEquals(101, ex.value());
     }
 
     @Test
@@ -461,7 +482,10 @@ class ConfigSchemaTest {
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"arena\":{\"maxArenas\":99,\"name\":\"bad\"},\"_version_\":0}");
 
-        assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+        LoadingConfigInvalidValueException ex = assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+
+        assertEquals("arena.maxArenas", ex.path().asString());
+        assertEquals(99, ex.value());
     }
 
     @Test

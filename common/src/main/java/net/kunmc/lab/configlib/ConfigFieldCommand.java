@@ -4,7 +4,7 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
-import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
@@ -51,7 +51,7 @@ class ConfigFieldCommand extends Command {
 
                     try {
                         ConfigSchemaValidation.validate(schemaEntry, newValue);
-                    } catch (InvalidValueException e) {
+                    } catch (ConfigValidationException e) {
                         e.sendMessage(ctx);
                         return;
                     }

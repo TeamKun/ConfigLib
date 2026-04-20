@@ -1,16 +1,24 @@
 package net.kunmc.lab.configlib.exception;
 
-import java.lang.reflect.Field;
+import net.kunmc.lab.configlib.schema.ConfigSchemaPath;
 
 public final class LoadingConfigInvalidValueException extends RuntimeException {
-    private final Field valueField;
+    private final ConfigValidationException validationException;
 
-    public LoadingConfigInvalidValueException(Field valueField, InvalidValueException e) {
-        super(e);
-        this.valueField = valueField;
+    public LoadingConfigInvalidValueException(ConfigValidationException validationException) {
+        super(validationException);
+        this.validationException = validationException;
     }
 
-    public Field getValueField() {
-        return valueField;
+    public ConfigSchemaPath path() {
+        return validationException.path();
+    }
+
+    public Object value() {
+        return validationException.value();
+    }
+
+    public ConfigValidationException validationException() {
+        return validationException;
     }
 }

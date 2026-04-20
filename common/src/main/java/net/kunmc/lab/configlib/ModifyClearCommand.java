@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.configlib.command.CollectionValueClearCommandMessageParameter;
-import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 
 import java.util.Collection;
@@ -17,7 +17,7 @@ class ModifyClearCommand extends Command {
                 Collection cleared = (Collection) value.copyValue(value.value());
                 cleared.clear();
                 ConfigSchemaValidation.validate(schemaEntry, cleared);
-            } catch (InvalidValueException e) {
+            } catch (ConfigValidationException e) {
                 e.sendMessage(ctx);
                 return;
             }

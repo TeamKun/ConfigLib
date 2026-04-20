@@ -3,7 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.command.MapValuePutCommandMessageParameter;
-import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 
 import java.util.HashMap;
@@ -37,7 +37,7 @@ class ModifyMapPutCommand extends Command {
                         Map result = new HashMap<>((Map) value.value());
                         result.put(k, v);
                         ConfigSchemaValidation.validate(schemaEntry, result);
-                    } catch (InvalidValueException e) {
+                    } catch (ConfigValidationException e) {
                         e.sendMessage(ctx);
                         return;
                     }

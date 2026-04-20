@@ -3,7 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.command.CollectionValueAddCommandMessageParameter;
-import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
@@ -32,7 +32,7 @@ class ModifyAddCommand extends Command {
                     try {
                         Collection result = value.toAdded(newValue.toArray());
                         ConfigSchemaValidation.validate(schemaEntry, result);
-                    } catch (InvalidValueException e) {
+                    } catch (ConfigValidationException e) {
                         e.sendMessage(ctx);
                         return;
                     }

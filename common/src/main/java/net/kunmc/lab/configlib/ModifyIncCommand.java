@@ -4,7 +4,7 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.DoubleArgument;
 import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
-import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 
 class ModifyIncCommand extends Command {
@@ -32,7 +32,7 @@ class ModifyIncCommand extends Command {
         Number newValue = value.copyAdd(amount);
         try {
             ConfigSchemaValidation.validate(schemaEntry, newValue);
-        } catch (InvalidValueException e) {
+        } catch (ConfigValidationException e) {
             e.sendMessage(ctx);
             return;
         }

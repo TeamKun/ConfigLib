@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.annotations.SerializedName;
-import net.kunmc.lab.configlib.exception.InvalidValueException;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import net.kunmc.lab.configlib.migration.MigrationContext;
 import net.kunmc.lab.configlib.migration.Migrations;
@@ -94,8 +94,8 @@ public abstract class CommonBaseConfig {
             } catch (LoadingConfigInvalidValueException ex) {
                 logger.log(Level.WARNING,
                            String.format("\"%s\"'s validation failed.",
-                                         ex.getValueField()
-                                           .getName()),
+                                         ex.path()
+                                           .asString()),
                            ex);
             }
         }, option.fileWatchTimerPeriod);
@@ -312,8 +312,8 @@ public abstract class CommonBaseConfig {
             try {
                 Object value = entry.get(config);
                 ConfigSchemaValidation.validate(entry, value);
-            } catch (InvalidValueException e) {
-                throw new LoadingConfigInvalidValueException(entry.field(), e);
+            } catch (ConfigValidationException e) {
+                throw new LoadingConfigInvalidValueException(e);
             }
         }
     }

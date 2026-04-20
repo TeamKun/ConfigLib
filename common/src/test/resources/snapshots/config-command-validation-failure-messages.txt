@@ -1,9 +1,18 @@
+§cValidation failed for count (value: 13).
 §ccount cannot be 13
+§cValidation failed for count (value: 13).
 §ccount cannot be 13
+§cValidation failed for count (value: 12).
 §ccount cannot be 12
+§cValidation failed for names (value: [alex, steve]).
 §cnames cannot contain steve
+§cValidation failed for names (value: []).
 §cnames cannot be empty
+§cValidation failed for names (value: []).
 §cnames cannot be empty
+§cValidation failed for scores (value: {bob=3, alice=7}).
 §cscores cannot contain bob
+§cValidation failed for scores (value: {}).
 §cscores cannot be empty
+§cValidation failed for scores (value: {}).
 §cscores cannot be empty
