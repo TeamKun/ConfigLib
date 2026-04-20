@@ -32,7 +32,9 @@ public class InMemoryConfigStore implements ConfigStore {
     }
 
     @Override
-    public CommonBaseConfig read(Class<? extends CommonBaseConfig> clazz, Migrations migrations) {
+    public CommonBaseConfig read(Class<? extends CommonBaseConfig> clazz,
+                                 Migrations migrations,
+                                 CommonBaseConfig defaults) {
         JsonObject jsonObject = JsonParser.parseString(data)
                                           .getAsJsonObject();
         int storedVersion = jsonObject.has(ConfigKeys.VERSION) ? jsonObject.get(ConfigKeys.VERSION)
@@ -41,7 +43,9 @@ public class InMemoryConfigStore implements ConfigStore {
             jsonObject.addProperty(ConfigKeys.VERSION, migrations.latestVersion());
             data = gson.toJson(jsonObject);
         }
-        return gson.fromJson(jsonObject, clazz);
+        JsonObject defaultObject = JsonConfigDefaults.fromConfig(defaults, gson);
+        JsonObject merged = JsonConfigDefaults.fillMissing(jsonObject, defaultObject);
+        return gson.fromJson(merged, clazz);
     }
 
     @Override

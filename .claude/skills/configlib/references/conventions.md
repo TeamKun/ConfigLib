@@ -248,6 +248,17 @@ public final class MyConfig extends BaseConfig {
 Migrations run in version order on load when `_version_` in the config file is lower than the latest migration key.
 `_version_` is a ConfigLib-reserved key exposed as `ConfigKeys.VERSION`; do not use it as an application config field.
 
+**Adding new fields:**
+
+When a config class gains a new field, existing config files usually do not contain that key yet. ConfigLib keeps the
+field's Java-side default value for missing keys during load, so adding a field does not require a migration by itself.
+
+This only applies to missing keys. If a config file explicitly contains `null`, the loaded `null` is validated normally:
+POJO fields require `@Nullable`, and `Value` fields must accept `null` in their validators.
+
+Use a migration when an existing key must be renamed, moved, removed, converted to another type, or changed to a
+different value based on old file contents.
+
 ## Config files and history files
 
 Bukkit and Forge `BaseConfig` use YAML files by default. The standard Gson builder is configured with pretty printing,

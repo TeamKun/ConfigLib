@@ -109,7 +109,7 @@ class JsonFileConfigStoreTest {
     void readDeserializesConfig() throws IOException {
         writeFile("{\"value\":99,\"_version_\":0}");
 
-        SimpleConfig loaded = (SimpleConfig) store.read(SimpleConfig.class, noMigrations());
+        SimpleConfig loaded = (SimpleConfig) store.read(SimpleConfig.class, noMigrations(), new SimpleConfig());
 
         assertEquals(99, loaded.value);
     }
@@ -121,7 +121,8 @@ class JsonFileConfigStoreTest {
         SimpleConfig loaded = (SimpleConfig) store.read(SimpleConfig.class,
                                                         migrations(m -> m.put(1,
                                                                               ctx -> ctx.setInt("value",
-                                                                                                ctx.getInt("value") * 10))));
+                                                                                                ctx.getInt("value") * 10))),
+                                                        new SimpleConfig());
 
         assertEquals(30, loaded.value);
         assertTrue(readFile().contains("\"_version_\":1"), readFile());
@@ -133,7 +134,8 @@ class JsonFileConfigStoreTest {
         writeFile(original);
 
         store.read(SimpleConfig.class,
-                   migrations(m -> m.put(1, ctx -> ctx.setInt("value", ctx.getInt("value") + 100))));
+                   migrations(m -> m.put(1, ctx -> ctx.setInt("value", ctx.getInt("value") + 100))),
+                   new SimpleConfig());
 
         assertEquals(original, readFile());
     }
@@ -141,7 +143,7 @@ class JsonFileConfigStoreTest {
     @Test
     void writeKeepsExternalDiskChangeWhenMemoryDidNotChangeThatField() throws IOException {
         writeFile("{\"value\":1,\"other\":2,\"_version_\":0}");
-        TwoFieldConfig loaded = (TwoFieldConfig) store.read(TwoFieldConfig.class, noMigrations());
+        TwoFieldConfig loaded = (TwoFieldConfig) store.read(TwoFieldConfig.class, noMigrations(), new TwoFieldConfig());
 
         loaded.value = 10;
         writeFile("{\"value\":1,\"other\":20,\"_version_\":0}");
@@ -156,7 +158,7 @@ class JsonFileConfigStoreTest {
     @Test
     void writeLetsDiskWinWhenSameFieldChangedInMemoryAndOnDisk() throws IOException {
         writeFile("{\"value\":1,\"other\":2,\"_version_\":0}");
-        TwoFieldConfig loaded = (TwoFieldConfig) store.read(TwoFieldConfig.class, noMigrations());
+        TwoFieldConfig loaded = (TwoFieldConfig) store.read(TwoFieldConfig.class, noMigrations(), new TwoFieldConfig());
 
         loaded.value = 10;
         writeFile("{\"value\":30,\"other\":2,\"_version_\":0}");
@@ -211,7 +213,8 @@ class JsonFileConfigStoreTest {
         store.write(cfg);
 
         ObjectConfig loaded = (ObjectConfig) new JsonFileConfigStore(configFile, gson).read(ObjectConfig.class,
-                                                                                            noMigrations());
+                                                                                            noMigrations(),
+                                                                                            new ObjectConfig());
 
         assertEquals(3, loaded.point.x);
         assertEquals(7, loaded.point.y);
@@ -226,7 +229,8 @@ class JsonFileConfigStoreTest {
         store.write(cfg);
 
         GenericConfig loaded = (GenericConfig) new JsonFileConfigStore(configFile, gson).read(GenericConfig.class,
-                                                                                              noMigrations());
+                                                                                              noMigrations(),
+                                                                                              new GenericConfig());
 
         assertEquals(List.of("alpha", "beta", "gamma"), loaded.tags);
     }
@@ -239,7 +243,9 @@ class JsonFileConfigStoreTest {
         cfg.scores.put("bob", 42);
         store.write(cfg);
 
-        MapConfig loaded = (MapConfig) new JsonFileConfigStore(configFile, gson).read(MapConfig.class, noMigrations());
+        MapConfig loaded = (MapConfig) new JsonFileConfigStore(configFile, gson).read(MapConfig.class,
+                                                                                      noMigrations(),
+                                                                                      new MapConfig());
 
         assertEquals(100, (int) loaded.scores.get("alice"));
         assertEquals(42, (int) loaded.scores.get("bob"));

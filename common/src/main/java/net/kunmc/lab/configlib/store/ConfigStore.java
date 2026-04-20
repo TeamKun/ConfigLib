@@ -10,7 +10,9 @@ import java.util.Timer;
 public interface ConfigStore {
     boolean exists();
 
-    CommonBaseConfig read(Class<? extends CommonBaseConfig> clazz, Migrations migrations);
+    CommonBaseConfig read(Class<? extends CommonBaseConfig> clazz,
+                          Migrations migrations,
+                          CommonBaseConfig defaults);
 
     CommonBaseConfig write(CommonBaseConfig config, Class<? extends CommonBaseConfig> clazz, Migrations migrations);
 

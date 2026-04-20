@@ -567,6 +567,17 @@ public final class MyConfig extends BaseConfig {
 Migrations only run on existing files that have an older version. New installations start at the latest version and
 skip all migrations.
 
+**Adding new fields:**
+
+When a config class gains a new field, existing config files usually do not contain that key yet. ConfigLib keeps the
+field's Java-side default value for missing keys during load, so adding a field does not require a migration by itself.
+
+This only applies to missing keys. If a config file explicitly contains `null`, the loaded `null` is validated normally:
+POJO fields require `@Nullable`, and `Value` fields must accept `null` in their validators.
+
+Use a migration when an existing key must be renamed, moved, removed, converted to another type, or changed to a
+different value based on old file contents.
+
 </details>
 
 ## Usage Notes

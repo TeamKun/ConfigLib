@@ -63,7 +63,9 @@ public class FileConfigStore implements ConfigStore {
     }
 
     @Override
-    public CommonBaseConfig read(Class<? extends CommonBaseConfig> clazz, Migrations migrations) {
+    public CommonBaseConfig read(Class<? extends CommonBaseConfig> clazz,
+                                 Migrations migrations,
+                                 CommonBaseConfig defaults) {
         JsonObject jsonObject = format.parseObject(readString(file));
         int storedVersion = jsonObject.has(ConfigKeys.VERSION) ? jsonObject.get(ConfigKeys.VERSION)
                                                                            .getAsInt() : 0;
@@ -71,8 +73,10 @@ public class FileConfigStore implements ConfigStore {
             jsonObject.addProperty(ConfigKeys.VERSION, migrations.latestVersion());
             writeStringAtomically(file, format.write(jsonObject));
         }
-        lastLoadedSnapshot = jsonObject.deepCopy();
-        return gson.fromJson(jsonObject, clazz);
+        JsonObject defaultObject = JsonConfigDefaults.fromConfig(defaults, gson);
+        JsonObject merged = JsonConfigDefaults.fillMissing(jsonObject, defaultObject);
+        lastLoadedSnapshot = merged.deepCopy();
+        return gson.fromJson(merged, clazz);
     }
 
     @Override
@@ -254,7 +258,7 @@ public class FileConfigStore implements ConfigStore {
 
     private JsonObject mergeWithDiskPriority(JsonObject base, JsonObject memory, JsonObject disk) {
         if (base == null) {
-            return memory.deepCopy();
+            return JsonConfigDefaults.fillMissing(disk, memory);
         }
 
         JsonObject merged = new JsonObject();

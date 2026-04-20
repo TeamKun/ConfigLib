@@ -255,6 +255,28 @@ class ConfigSchemaTest {
     }
 
     @Test
+    void loadKeepsDefaultForMissingValueField() throws LoadingConfigInvalidValueException {
+        ValueNullConfig cfg = new ValueNullConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        cfg.store.writeRaw("{\"_version_\":0}");
+
+        cfg.loadConfig();
+
+        assertEquals("default", cfg.label.value());
+    }
+
+    @Test
+    void loadKeepsDefaultForMissingPojoField() throws LoadingConfigInvalidValueException {
+        PojoConfig cfg = new PojoConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        cfg.store.writeRaw("{\"maxPlayers\":20,\"_version_\":0}");
+
+        cfg.loadConfig();
+
+        assertEquals("hello", cfg.motd);
+    }
+
+    @Test
     void mutationDetectionObservesPrimitivePojoFields() {
         PojoConfig cfg = new PojoConfig();
         cfg.init(new CommonBaseConfig.Option());

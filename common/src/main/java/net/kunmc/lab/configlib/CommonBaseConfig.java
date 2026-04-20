@@ -279,7 +279,7 @@ public abstract class CommonBaseConfig {
                 return false;
             }
 
-            CommonBaseConfig config = configStore.read(getClass(), migrations);
+            CommonBaseConfig config = configStore.read(getClass(), migrations, this);
             validateLoadedConfig(config);
 
             ConfigUtil.replaceFields(this, config, this);

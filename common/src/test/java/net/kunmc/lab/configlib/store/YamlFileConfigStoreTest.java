@@ -67,7 +67,7 @@ class YamlFileConfigStoreTest {
     void readDeserializesYaml() throws IOException {
         writeFile("value: 99\n_version_: 0\n");
 
-        SimpleConfig loaded = (SimpleConfig) store.read(SimpleConfig.class, noMigrations());
+        SimpleConfig loaded = (SimpleConfig) store.read(SimpleConfig.class, noMigrations(), new SimpleConfig());
 
         assertEquals(99, loaded.value);
     }
@@ -79,7 +79,8 @@ class YamlFileConfigStoreTest {
         SimpleConfig loaded = (SimpleConfig) store.read(SimpleConfig.class,
                                                         migrations(m -> m.put(1,
                                                                               ctx -> ctx.setInt("value",
-                                                                                                ctx.getInt("value") * 10))));
+                                                                                                ctx.getInt("value") * 10))),
+                                                        new SimpleConfig());
 
         assertEquals(30, loaded.value);
         assertTrue(readFile().contains("_version_: 1"), readFile());
@@ -99,7 +100,7 @@ class YamlFileConfigStoreTest {
     @Test
     void writeKeepsExternalDiskChangeWhenMemoryDidNotChangeThatField() throws IOException {
         writeFile("value: 1\nother: 2\n_version_: 0\n");
-        TwoFieldConfig loaded = (TwoFieldConfig) store.read(TwoFieldConfig.class, noMigrations());
+        TwoFieldConfig loaded = (TwoFieldConfig) store.read(TwoFieldConfig.class, noMigrations(), new TwoFieldConfig());
 
         loaded.value = 10;
         writeFile("value: 1\nother: 20\n_version_: 0\n");

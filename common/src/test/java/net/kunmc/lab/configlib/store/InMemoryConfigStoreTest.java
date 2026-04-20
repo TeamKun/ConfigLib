@@ -39,7 +39,7 @@ class InMemoryConfigStoreTest {
         m.put(1, ctx -> ctx.rename("old", "new"));
 
         InMemoryConfigStore store = storeWith("{\"old\": \"value\"}");
-        store.read(SimpleConfig.class, migrations(m));
+        store.read(SimpleConfig.class, migrations(m), new SimpleConfig());
 
         JsonObject saved = JsonParser.parseString(store.readRaw())
                                      .getAsJsonObject();
@@ -59,7 +59,7 @@ class InMemoryConfigStoreTest {
 
         String original = "{\"_version_\": 1, \"field\": \"original\"}";
         InMemoryConfigStore store = storeWith(original);
-        store.read(SimpleConfig.class, migrations(m));
+        store.read(SimpleConfig.class, migrations(m), new SimpleConfig());
 
         assertEquals(original, store.readRaw());
     }
