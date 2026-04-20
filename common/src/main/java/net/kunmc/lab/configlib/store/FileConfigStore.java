@@ -73,9 +73,12 @@ public class FileConfigStore implements ConfigStore {
             jsonObject.addProperty(ConfigKeys.VERSION, migrations.latestVersion());
             writeStringAtomically(file, format.write(jsonObject));
         }
+        // The merge base must be the content that actually existed on disk.
+        // Defaults are still applied to the returned config, but recording the filled config
+        // as the base would make newly added fields look changed on disk from default to absent.
+        lastLoadedSnapshot = jsonObject.deepCopy();
         JsonObject defaultObject = JsonConfigDefaults.fromConfig(defaults, gson);
         JsonObject merged = JsonConfigDefaults.fillMissing(jsonObject, defaultObject);
-        lastLoadedSnapshot = merged.deepCopy();
         return gson.fromJson(merged, clazz);
     }
 
@@ -273,6 +276,12 @@ public class FileConfigStore implements ConfigStore {
             JsonElementState diskValue = JsonElementState.of(disk, key);
 
             JsonElementState selected;
+            // Three-way merge:
+            // - base is the last content read from disk
+            // - memory is the current in-process config
+            // - disk is the latest file content
+            // Missing keys are tracked separately from JSON null, so a field added in code
+            // after the file was created is treated as a memory-only addition, not a conflict.
             if (baseValue.equals(memoryValue)) {
                 selected = diskValue;
             } else if (baseValue.equals(diskValue)) {

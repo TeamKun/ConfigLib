@@ -169,6 +169,20 @@ class JsonFileConfigStoreTest {
         assertTrue(readFile().contains("\"value\":30"), readFile());
     }
 
+    @Test
+    void writePersistsNewFieldAddedAfterStoredConfigWasCreated() throws IOException {
+        writeFile("{\"value\":1,\"_version_\":0}");
+        AddedFieldConfig loaded = (AddedFieldConfig) store.read(AddedFieldConfig.class,
+                                                                noMigrations(),
+                                                                new AddedFieldConfig());
+
+        loaded.added = 10;
+        AddedFieldConfig saved = (AddedFieldConfig) store.write(loaded, AddedFieldConfig.class, noMigrations());
+
+        assertEquals(10, saved.added);
+        assertTrue(readFile().contains("\"added\":10"), readFile());
+    }
+
     // ---- startWatching() ----
 
     @Test
@@ -424,6 +438,16 @@ class JsonFileConfigStoreTest {
     static class TwoFieldConfig extends CommonBaseConfig {
         int value;
         int other;
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return new InMemoryConfigStore(new Gson());
+        }
+    }
+
+    static class AddedFieldConfig extends CommonBaseConfig {
+        int value;
+        int added = 1;
 
         @Override
         protected ConfigStore createConfigStore() {
