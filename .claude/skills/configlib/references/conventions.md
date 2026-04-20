@@ -292,6 +292,114 @@ public final class CommandRegistration {
 
 Fields with the same name across configs are exposed as `configEntryName.fieldName` to avoid collision.
 
+## POJO API
+
+Use plain Java fields instead of `Value` objects for a simpler, annotation-driven style.
+Non-`static`, non-`transient` fields are automatically treated as config entries.
+Value API and POJO fields can be mixed freely in the same config class.
+
+### Flat POJO config
+
+```java
+public final class ServerConfig extends BaseConfig {
+    @Description("Maximum number of players.")
+    @Range(min = 1, max = 100)
+    public int maxPlayers = 20;
+
+    @Description("Message shown on join.")
+    public String motd = "Welcome!";
+
+    @Nullable
+    public String adminContact = null;
+
+    public transient RuntimeCache cache = new RuntimeCache(); // excluded
+
+    public ServerConfig(Plugin plugin) {
+        super(plugin);
+        initialize();
+    }
+}
+```
+
+### Annotations
+
+| Annotation     | Target        | Effect                                            |
+|----------------|---------------|---------------------------------------------------|
+| `@Description` | field         | YAML comment + hover text in commands             |
+| `@Range`       | numeric field | Validates `min ≤ value ≤ max` on load and command |
+| `@Nullable`    | field         | Allows `null`; fields without it reject `null`    |
+
+### Nested POJO (mutable inner class)
+
+Declare a `static` inner class. Entries appear with dotted paths (`arena.maxArenas`).
+
+```java
+public final class PluginConfig extends BaseConfig {
+    public ArenaSettings arena = new ArenaSettings();
+
+    public PluginConfig(Plugin plugin) {
+        super(plugin);
+        initialize();
+    }
+
+    public static final class ArenaSettings {
+        @Description("Maximum number of arenas.")
+        @Range(min = 1, max = 50)
+        public int maxArenas = 5;
+        public String defaultName = "arena";
+    }
+}
+```
+
+### Nested immutable class (constructor/accessor model)
+
+All non-`static` non-`transient` fields must be `private final`. An all-args constructor whose parameter types match
+the field declaration order is used to write values. Accessor methods (same name as field, no args) are optional for
+reading.
+
+```java
+public static final class ArenaSettings {
+    @Description("Maximum number of arenas.")
+    @Range(min = 1, max = 50)
+    private final int maxArenas;
+    private final String defaultName;
+
+    public ArenaSettings(int maxArenas, String defaultName) {
+        this.maxArenas = maxArenas;
+        this.defaultName = defaultName;
+    }
+
+    public int maxArenas() {
+        return maxArenas;
+    }
+
+    public String defaultName() {
+        return defaultName;
+    }
+}
+```
+
+### Nested record (Java 16+ runtime)
+
+```java
+public record ArenaSettings(@Description("Maximum number of arenas.") @Range(min = 1, max = 50) int maxArenas,
+                            String defaultName) {
+}
+```
+
+Nesting is supported to any depth. Records can be nested inside records.
+
+### When to use POJO API vs Value API
+
+| Need                                             | Use       |
+|--------------------------------------------------|-----------|
+| Simple primitive / String fields                 | POJO API  |
+| Existing Java value classes (immutable, records) | POJO API  |
+| Minecraft-specific types (World, Location, …)    | Value API |
+| Custom tab-completion or argument parsing        | Value API |
+| Per-field modify/add/remove commands             | Value API |
+| Dynamic validators with complex logic            | Value API |
+
 ## Custom Value types
 
 Extend `SingleValue`, `ListValue`, `SetValue`, or `MapValue` in your own project:

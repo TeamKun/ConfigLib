@@ -51,6 +51,7 @@ Read only what the request needs. Common public API files include:
 - `common/src/main/java/net/kunmc/lab/configlib/store/YamlFileConfigStore.java`
 - `common/src/main/java/net/kunmc/lab/configlib/value/`
 - `bukkit/src/main/java/net/kunmc/lab/configlib/value/`
+- `common/src/main/java/net/kunmc/lab/configlib/annotation/` (POJO API: `@Description`, `@Range`, `@Nullable`)
 
 For extracted JAR sources, map those paths to the extracted package layout.
 

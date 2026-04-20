@@ -18,12 +18,30 @@ public class Config extends AbstractConfig {
     public final List<String> strings = new ArrayList<>();
     public final TeamSetValue teams = new TeamSetValue().entryName("チーム");
     public final IntegerValue conflict = new IntegerValue(1);
+    public final int intField = 1;
+    public final Inner innerClass = new Inner("default");
+
 
     public Config(@NotNull Plugin plugin) {
-        super(plugin);
+        super(plugin, opt -> {
+            opt.migration(1, ctx -> {
+                var obj = ctx.getObject("innerClass", Inner.class);
+                if (obj == null) {
+                    ctx.setObject("innerClass", new Inner("default"));
+                }
+            });
+        });
 
         strings.add("hogehoge");
 
         initialize();
+    }
+
+    public static final class Inner {
+        private final String str;
+
+        public Inner(String str) {
+            this.str = str;
+        }
     }
 }

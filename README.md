@@ -10,20 +10,26 @@ developers.
 1. **Type-Safety Configuration Handling**  
    Ensures configuration values are used in a type-safe manner directly within your code, reducing potential runtime
    errors and improving maintainability.
-2. **Automatic JSON Mapping**  
-   Automatically maps configuration data to Java objects using JSON, eliminating the need for manual parsing and data
-   transformation.
-3. **Automatic Configuration Reloading**  
+2. **Two Configuration APIs**  
+   Choose the style that fits your needs:
+    - **Value API** — wrap each field in a typed `Value` object for full control over commands, validation,
+      tab-completion, and display.
+    - **POJO API** — declare plain Java fields (including `final`/immutable classes and Java 16+ `record`s) and annotate
+      with `@Description`, `@Range`, `@Nullable`. Nested POJOs are expanded automatically.
+3. **YAML and JSON Storage**  
+   YAML is the default format for Bukkit and Forge. `description()` and `@Description` annotations are written as YAML
+   comments. JSON is available by overriding `createConfigStore()`.
+4. **Automatic Configuration Reloading**  
    Monitors configuration files and reloads them automatically when changes are detected, ensuring your application
    always works with the latest settings.
-4. **Automatic Configuration Saving**  
+5. **Automatic Configuration Saving**  
    Automatically saves updated configuration values to disk, preventing data loss and ensuring persistence.
-5. **Command Generation for Configuration Management**  
+6. **Command Generation for Configuration Management**  
    Seamlessly integrates with CommandLib to generate commands for managing configurations via the command line.
-6. **Schema Migration**  
+7. **Schema Migration**  
    Built-in versioned migration system allows safe evolution of configuration structure across releases — handling field
    renames, type changes, and validation constraint changes without breaking existing user data.
-7. **Change History & Undo**  
+8. **Change History & Undo**  
    Every configuration change is automatically recorded with a timestamp. You can browse the history via command and
    revert to any previous state.
 
@@ -178,7 +184,126 @@ reobf {
 ## Code Examples
 
 <details>
-<summary>Defining Configuration Classes</summary>
+<summary>POJO API — plain Java fields as configuration</summary>
+
+Use plain fields instead of `Value` objects when you want a simpler, annotation-driven style.
+Non-`static`, non-`transient` fields are automatically included. Use `transient` to exclude a field.
+
+**Flat POJO config:**
+
+```java
+public final class ServerConfig extends BaseConfig {
+    @Description("Maximum number of players.")
+    @Range(min = 1, max = 100)
+    public int maxPlayers = 20;
+
+    @Description("Message shown on join.")
+    public String motd = "Welcome!";
+
+    @Nullable
+    public String adminContact = null;   // null allowed because of @Nullable
+
+    public transient RuntimeCache cache = new RuntimeCache(); // excluded from config
+
+    public ServerConfig(Plugin plugin) {
+        super(plugin);
+        initialize();
+    }
+}
+```
+
+**Nested POJO (mutable inner class):**
+
+```java
+public final class PluginConfig extends BaseConfig {
+    public ArenaSettings arena = new ArenaSettings();
+
+    public PluginConfig(Plugin plugin) {
+        super(plugin);
+        initialize();
+    }
+
+    public static final class ArenaSettings {
+        @Description("Maximum number of arenas.")
+        @Range(min = 1, max = 50)
+        public int maxArenas = 5;
+
+        public String defaultName = "arena";
+    }
+}
+```
+
+Entries appear as `arena.maxArenas` and `arena.defaultName`.
+
+**Nested immutable class (constructor/accessor model):**
+
+```java
+public final class PluginConfig extends BaseConfig {
+    public ArenaSettings arena = new ArenaSettings(5, "arena");
+
+    public PluginConfig(Plugin plugin) {
+        super(plugin);
+        initialize();
+    }
+
+    public static final class ArenaSettings {
+        @Description("Maximum number of arenas.")
+        @Range(min = 1, max = 50)
+        private final int maxArenas;
+        private final String defaultName;
+
+        public ArenaSettings(int maxArenas, String defaultName) {
+            this.maxArenas = maxArenas;
+            this.defaultName = defaultName;
+        }
+
+        public int maxArenas() {
+            return maxArenas;
+        }
+
+        public String defaultName() {
+            return defaultName;
+        }
+    }
+}
+```
+
+The all-args constructor is used to write values; field declaration order must match constructor parameter order.
+
+**Nested record (Java 16+ runtime):**
+
+```java
+public final class PluginConfig extends BaseConfig {
+    public ArenaSettings arena = new ArenaSettings(5, "arena");
+
+    public PluginConfig(Plugin plugin) {
+        super(plugin);
+        initialize();
+    }
+
+    public record ArenaSettings(@Description("Maximum number of arenas.") @Range(min = 1, max = 50) int maxArenas,
+                                String defaultName) {
+    }
+}
+```
+
+Nesting is supported to any depth. Records can be nested inside records; immutable classes can be nested inside
+immutable classes.
+
+**Available annotations:**
+
+| Annotation     | Target        | Effect                                                |
+|----------------|---------------|-------------------------------------------------------|
+| `@Description` | field         | Written as a YAML comment; shown on hover in commands |
+| `@Range`       | numeric field | Validates `min ≤ value ≤ max` on load and command set |
+| `@Nullable`    | field         | Allows `null`; non-annotated fields reject `null`     |
+
+Value API and POJO fields can be mixed freely in the same config class.
+
+</details>
+
+<details>
+<summary>Defining Configuration Classes (Value API)</summary>
 
 ```java
 public final class TestConfig extends BaseConfig {

@@ -24,14 +24,15 @@ public final class ConfigSchema {
             if (!ConfigUtil.isObservableField(config, field)) {
                 continue;
             }
-
             field.setAccessible(true);
             try {
                 if (Value.class.isAssignableFrom(field.getType())) {
                     Value<?, ?> value = (Value<?, ?>) field.get(config);
                     entries.add(ValueConfigSchemaEntry.from(field, value));
+                } else if (isNestedPojoType(field.getType())) {
+                    collectNestedEntries(config, new Field[]{field}, field.getType(), entries);
                 } else {
-                    entries.add(PojoConfigSchemaEntry.from(config, field));
+                    entries.add(PojoConfigSchemaEntry.from(config, new Field[0], field));
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
@@ -39,6 +40,56 @@ public final class ConfigSchema {
         }
 
         return new ConfigSchema(entries);
+    }
+
+    private static void collectNestedEntries(Object root,
+                                             Field[] parentChain,
+                                             Class<?> pojoClass,
+                                             List<ConfigSchemaEntry<?>> result) {
+        for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(pojoClass)) {
+            if (field.getDeclaringClass() == Object.class) {
+                continue;
+            }
+            if (field.isSynthetic()) {
+                continue;
+            }
+            if (!ConfigUtil.isConfigFieldModifier(field)) {
+                continue;
+            }
+            field.setAccessible(true);
+            if (isNestedPojoType(field.getType())) {
+                Field[] newChain = appendToChain(parentChain, field);
+                collectNestedEntries(root, newChain, field.getType(), result);
+            } else {
+                result.add(PojoConfigSchemaEntry.from(root, parentChain, field));
+            }
+        }
+    }
+
+    private static Field[] appendToChain(Field[] chain, Field field) {
+        Field[] newChain = new Field[chain.length + 1];
+        System.arraycopy(chain, 0, newChain, 0, chain.length);
+        newChain[chain.length] = field;
+        return newChain;
+    }
+
+    // Only expand classes explicitly designed as config POJOs (i.e. nested/inner classes).
+    // Top-level library types (ConfigStore, Gson, etc.) are treated as opaque leaf values.
+    // Enum, primitive wrappers, collections, arrays, and java.* types are leaf values.
+    private static boolean isNestedPojoType(Class<?> type) {
+        if (type.getEnclosingClass() == null) {
+            return false;
+        }
+        if (type.isEnum()) {
+            return false;
+        }
+        if (type.isAnnotation()) {
+            return false;
+        }
+        if (Value.class.isAssignableFrom(type)) {
+            return false;
+        }
+        return true;
     }
 
     public List<ConfigSchemaEntry<?>> entries() {
