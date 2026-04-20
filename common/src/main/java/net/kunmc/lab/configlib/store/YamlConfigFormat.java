@@ -1,6 +1,9 @@
 package net.kunmc.lab.configlib.store;
 
 import com.google.gson.*;
+import net.kunmc.lab.configlib.ConfigKeys;
+import net.kunmc.lab.configlib.schema.ConfigSchema;
+import org.jetbrains.annotations.Nullable;
 import org.snakeyaml.engine.v2.api.Dump;
 import org.snakeyaml.engine.v2.api.DumpSettings;
 import org.snakeyaml.engine.v2.api.Load;
@@ -49,11 +52,11 @@ public final class YamlConfigFormat implements ConfigFormat {
     }
 
     @Override
-    public String write(JsonElement element) {
+    public String write(JsonElement element, @Nullable ConfigSchema schema) {
         Object value = toYamlValue(element);
         String yaml = dump.dumpToString(value);
         if (element.isJsonObject()) {
-            yaml = addTopLevelDescriptionComments(yaml, element.getAsJsonObject());
+            yaml = addDescriptionComments(yaml, element.getAsJsonObject(), schema);
         }
         return yaml;
     }
@@ -93,7 +96,7 @@ public final class YamlConfigFormat implements ConfigFormat {
             element.getAsJsonObject()
                    .entrySet()
                    .stream()
-                   .filter(e -> !"description".equals(e.getKey()))
+                   .filter(e -> !ConfigKeys.DESCRIPTION.equals(e.getKey()))
                    .forEach(e -> map.put(e.getKey(), toYamlValue(e.getValue())));
             return map;
         }
@@ -126,8 +129,11 @@ public final class YamlConfigFormat implements ConfigFormat {
         return decimal.doubleValue();
     }
 
-    private String addTopLevelDescriptionComments(String yaml, JsonObject root) {
-        Map<String, String> comments = new HashMap<>();
+    private String addDescriptionComments(String yaml, JsonObject root, @Nullable ConfigSchema schema) {
+        Map<String, String> comments = new LinkedHashMap<>();
+        if (schema != null) {
+            comments.putAll(schema.descriptionsByPath());
+        }
         root.entrySet()
             .stream()
             .filter(e -> e.getValue()
@@ -135,11 +141,11 @@ public final class YamlConfigFormat implements ConfigFormat {
             .forEach(e -> {
                 JsonObject object = e.getValue()
                                      .getAsJsonObject();
-                if (object.has("description") && !object.get("description")
-                                                        .isJsonNull()) {
-                    comments.put(e.getKey(),
-                                 object.get("description")
-                                       .getAsString());
+                if (object.has(ConfigKeys.DESCRIPTION) && !object.get(ConfigKeys.DESCRIPTION)
+                                                                 .isJsonNull()) {
+                    comments.putIfAbsent(e.getKey(),
+                                         object.get(ConfigKeys.DESCRIPTION)
+                                               .getAsString());
                 }
             });
 
@@ -149,10 +155,18 @@ public final class YamlConfigFormat implements ConfigFormat {
 
         StringBuilder result = new StringBuilder();
         String[] lines = yaml.split("\\R", -1);
+        List<PathSegment> path = new ArrayList<>();
         for (String line : lines) {
-            String key = topLevelKey(line);
-            if (key != null && comments.containsKey(key)) {
-                appendComment(result, comments.get(key));
+            String key = keyOf(line);
+            if (key != null) {
+                int indent = indentationOf(line);
+                path.removeIf(segment -> segment.indent >= indent);
+                path.add(new PathSegment(indent, key));
+
+                String currentPath = pathString(path);
+                if (comments.containsKey(currentPath)) {
+                    appendComment(result, indent, comments.get(currentPath));
+                }
             }
             result.append(line)
                   .append(System.lineSeparator());
@@ -160,21 +174,64 @@ public final class YamlConfigFormat implements ConfigFormat {
         return result.toString();
     }
 
-    private String topLevelKey(String line) {
-        if (line.isEmpty() || Character.isWhitespace(line.charAt(0)) || line.startsWith("-")) {
+    private int indentationOf(String line) {
+        int indent = 0;
+        while (indent < line.length() && Character.isWhitespace(line.charAt(indent))) {
+            indent++;
+        }
+        return indent;
+    }
+
+    private String keyOf(String line) {
+        if (line.isEmpty()) {
             return null;
         }
-        int index = line.indexOf(':');
+        String trimmed = line.trim();
+        if (trimmed.isEmpty() || trimmed.startsWith("-") || trimmed.startsWith("#")) {
+            return null;
+        }
+        int index = trimmed.indexOf(':');
         if (index <= 0) {
             return null;
         }
-        return line.substring(0, index);
+        return unquote(trimmed.substring(0, index));
     }
 
-    private void appendComment(StringBuilder result, String comment) {
+    private String unquote(String key) {
+        if (key.length() >= 2 && ((key.startsWith("\"") && key.endsWith("\"")) || (key.startsWith("'") && key.endsWith(
+                "'")))) {
+            return key.substring(1, key.length() - 1);
+        }
+        return key;
+    }
+
+    private String pathString(List<PathSegment> path) {
+        StringBuilder sb = new StringBuilder();
+        for (PathSegment segment : path) {
+            if (sb.length() > 0) {
+                sb.append('.');
+            }
+            sb.append(segment.key);
+        }
+        return sb.toString();
+    }
+
+    private void appendComment(StringBuilder result, int indent, String comment) {
+        String prefix = " ".repeat(indent);
         Arrays.stream(comment.split("\\R", -1))
-              .forEach(line -> result.append("# ")
+              .forEach(line -> result.append(prefix)
+                                     .append("# ")
                                      .append(line)
                                      .append(System.lineSeparator()));
+    }
+
+    private static final class PathSegment {
+        private final int indent;
+        private final String key;
+
+        private PathSegment(int indent, String key) {
+            this.indent = indent;
+            this.key = key;
+        }
     }
 }

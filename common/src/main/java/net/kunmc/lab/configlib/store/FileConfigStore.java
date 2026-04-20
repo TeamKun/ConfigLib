@@ -7,6 +7,7 @@ import net.kunmc.lab.configlib.CommonBaseConfig;
 import net.kunmc.lab.configlib.ConfigKeys;
 import net.kunmc.lab.configlib.migration.JsonMigrationContext;
 import net.kunmc.lab.configlib.migration.Migrations;
+import net.kunmc.lab.configlib.schema.ConfigSchema;
 
 import java.io.Closeable;
 import java.io.File;
@@ -71,7 +72,8 @@ public class FileConfigStore implements ConfigStore {
                                                                            .getAsInt() : 0;
         if (migrations.apply(storedVersion, new JsonMigrationContext(gson, jsonObject))) {
             jsonObject.addProperty(ConfigKeys.VERSION, migrations.latestVersion());
-            writeStringAtomically(file, format.write(jsonObject));
+            // Migration rewrites raw disk JSON/YAML, not a live config instance, so no schema metadata is available.
+            writeStringAtomically(file, format.write(jsonObject, null));
         }
         // The merge base must be the content that actually existed on disk.
         // Defaults are still applied to the returned config, but recording the filled config
@@ -100,7 +102,7 @@ public class FileConfigStore implements ConfigStore {
             }
             merged = mergeWithDiskPriority(lastLoadedSnapshot, memory, disk);
         }
-        String content = format.write(merged);
+        String content = format.write(merged, schemaFor(config));
         writeStringAtomically(file, content);
         lastLoadedSnapshot = merged.deepCopy();
         lastWrittenSnapshot = merged.deepCopy();
@@ -130,7 +132,8 @@ public class FileConfigStore implements ConfigStore {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        writeStringAtomically(hf, format.write(wrapHistory(reordered)));
+        // History files contain snapshots under a history wrapper, not the config root schema.
+        writeStringAtomically(hf, format.write(wrapHistory(reordered), null));
     }
 
     @Override
@@ -155,7 +158,8 @@ public class FileConfigStore implements ConfigStore {
         for (int i = stepsBack; i < array.size(); i++) {
             remaining.add(array.get(i));
         }
-        writeStringAtomically(hf, format.write(wrapHistory(remaining)));
+        // History files contain snapshots under a history wrapper, not the config root schema.
+        writeStringAtomically(hf, format.write(wrapHistory(remaining), null));
 
         return gson.fromJson(snapshot, clazz);
     }
@@ -183,6 +187,11 @@ public class FileConfigStore implements ConfigStore {
         String suffix = "." + format.extension();
         String base = name.endsWith(suffix) ? name.substring(0, name.length() - suffix.length()) : name;
         return new File(file.getParentFile(), base + ".history." + format.extension());
+    }
+
+    private ConfigSchema schemaFor(CommonBaseConfig config) {
+        ConfigSchema schema = config.schema();
+        return schema == null ? ConfigSchema.fromConfig(config) : schema;
     }
 
     private JsonArray readHistoryArray(File hf) {
@@ -322,11 +331,10 @@ public class FileConfigStore implements ConfigStore {
 
     private static void writeStringAtomically(File file, String content) {
         try {
-            Path path = file.toPath();
+            Path path = file.toPath()
+                            .toAbsolutePath();
             Path parent = path.getParent();
-            if (parent != null) {
-                Files.createDirectories(parent);
-            }
+            Files.createDirectories(parent);
             Path tmp = Files.createTempFile(parent,
                                             path.getFileName()
                                                 .toString(),

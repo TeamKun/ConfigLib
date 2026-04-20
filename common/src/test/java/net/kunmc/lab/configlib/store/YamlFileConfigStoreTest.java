@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib.store;
 
 import com.google.gson.Gson;
 import net.kunmc.lab.configlib.CommonBaseConfig;
+import net.kunmc.lab.configlib.annotation.Description;
 import net.kunmc.lab.configlib.migration.MigrationContext;
 import net.kunmc.lab.configlib.migration.Migrations;
 import net.kunmc.lab.configlib.value.IntegerValue;
@@ -98,6 +99,28 @@ class YamlFileConfigStoreTest {
     }
 
     @Test
+    void writeAddsDescriptionCommentForPojoFields() throws IOException {
+        PojoFieldConfig cfg = new PojoFieldConfig();
+
+        store.write(cfg);
+
+        assertTrue(readFile().contains("# Maximum player count."), readFile());
+        assertTrue(readFile().contains("maxPlayers: 20"), readFile());
+    }
+
+    @Test
+    void writeAddsDescriptionCommentForNestedPojoFields() throws IOException {
+        NestedPojoConfig cfg = new NestedPojoConfig();
+
+        store.write(cfg);
+
+        assertTrue(readFile().contains("# Arena settings."), readFile());
+        assertTrue(readFile().contains("arena:"), readFile());
+        assertTrue(readFile().contains("  # Maximum number of arenas."), readFile());
+        assertTrue(readFile().contains("  maxArenas: 5"), readFile());
+    }
+
+    @Test
     void writeKeepsExternalDiskChangeWhenMemoryDidNotChangeThatField() throws IOException {
         writeFile("value: 1\nother: 2\n_version_: 0\n");
         TwoFieldConfig loaded = (TwoFieldConfig) store.read(TwoFieldConfig.class, noMigrations(), new TwoFieldConfig());
@@ -165,6 +188,31 @@ class YamlFileConfigStoreTest {
         @Override
         protected ConfigStore createConfigStore() {
             return new InMemoryConfigStore(new Gson());
+        }
+    }
+
+    static class PojoFieldConfig extends CommonBaseConfig {
+        @Description("Maximum player count.")
+        public int maxPlayers = 20;
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return new InMemoryConfigStore(new Gson());
+        }
+    }
+
+    static class NestedPojoConfig extends CommonBaseConfig {
+        @Description("Arena settings.")
+        public ArenaSettings arena = new ArenaSettings();
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return new InMemoryConfigStore(new Gson());
+        }
+
+        static class ArenaSettings {
+            @Description("Maximum number of arenas.")
+            public int maxArenas = 5;
         }
     }
 }

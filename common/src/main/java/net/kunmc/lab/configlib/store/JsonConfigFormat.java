@@ -3,6 +3,8 @@ package net.kunmc.lab.configlib.store;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import net.kunmc.lab.configlib.schema.ConfigSchema;
+import org.jetbrains.annotations.Nullable;
 
 public final class JsonConfigFormat implements ConfigFormat {
     private final Gson gson;
@@ -22,7 +24,7 @@ public final class JsonConfigFormat implements ConfigFormat {
     }
 
     @Override
-    public String write(JsonElement element) {
+    public String write(JsonElement element, @Nullable ConfigSchema schema) {
         return gson.toJson(element);
     }
 }

@@ -2,6 +2,8 @@ package net.kunmc.lab.configlib.store;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.kunmc.lab.configlib.schema.ConfigSchema;
+import org.jetbrains.annotations.Nullable;
 
 public interface ConfigFormat {
     String extension();
@@ -16,5 +18,5 @@ public interface ConfigFormat {
         return false;
     }
 
-    String write(JsonElement element);
+    String write(JsonElement element, @Nullable ConfigSchema schema);
 }
