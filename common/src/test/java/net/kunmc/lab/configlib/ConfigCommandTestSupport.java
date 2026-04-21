@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandTester;
 import net.kunmc.lab.commandlib.FakeSender;
+import net.kunmc.lab.configlib.annotation.Range;
 import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.store.InMemoryConfigStore;
 import net.kunmc.lab.configlib.value.IntegerValue;
@@ -120,6 +121,70 @@ final class ConfigCommandTestSupport {
         @Override
         protected ConfigStore createConfigStore() {
             return store;
+        }
+    }
+
+    static class PojoModifyConfig extends CommonBaseConfig {
+        @Range(min = 0, max = 100)
+        int maxPlayers = 20;
+        String motd = "hello";
+        boolean enabled = true;
+        Mode mode = Mode.EASY;
+        List<String> names = List.of("alex");
+        final transient InMemoryConfigStore store = new InMemoryConfigStore(new Gson());
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return store;
+        }
+    }
+
+    enum Mode {
+        EASY,
+        HARD
+    }
+
+    static class NestedPojoModifyConfig extends CommonBaseConfig {
+        ArenaSettings arena = new ArenaSettings();
+        final transient InMemoryConfigStore store = new InMemoryConfigStore(new Gson());
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return store;
+        }
+
+        static class ArenaSettings {
+            @Range(min = 1, max = 50)
+            int maxArenas = 5;
+            String defaultName = "arena";
+        }
+    }
+
+    static class ImmutableNestedPojoModifyConfig extends CommonBaseConfig {
+        ArenaSettings arena = new ArenaSettings(5, "arena");
+        final transient InMemoryConfigStore store = new InMemoryConfigStore(new Gson());
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return store;
+        }
+
+        static class ArenaSettings {
+            private final int maxArenas;
+            private final String defaultName;
+
+            ArenaSettings(int maxArenas, String defaultName) {
+                this.maxArenas = maxArenas;
+                this.defaultName = defaultName;
+            }
+
+            int maxArenas() {
+                return maxArenas;
+            }
+
+            String defaultName() {
+                return defaultName;
+            }
         }
     }
 }

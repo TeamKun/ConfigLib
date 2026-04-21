@@ -20,6 +20,18 @@ public class ArgumentDefinition<T> implements ArgumentApplier, ArgumentMapper<T>
         this.mapper = mapper;
     }
 
+    public ArgumentDefinition(CommonArgument<T, CommandContext> argument1) {
+        this(singleArgumentApplier(argument1), singleArgumentMapper(argument1));
+    }
+
+    private static <T> ArgumentApplier singleArgumentApplier(CommonArgument<T, CommandContext> argument1) {
+        return b -> b.customArgument(argument1);
+    }
+
+    private static <T> ArgumentMapper<T> singleArgumentMapper(CommonArgument<T, CommandContext> argument1) {
+        return ctx -> argument1.cast(ctx.getParsedArg(argument1.name()));
+    }
+
     public <A1> ArgumentDefinition(CommonArgument<A1, CommandContext> argument1, BiArgumentMapper<A1, T> mapper) {
         this(b -> {
             b.customArgument(argument1);

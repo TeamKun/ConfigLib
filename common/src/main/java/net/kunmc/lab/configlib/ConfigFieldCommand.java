@@ -59,7 +59,7 @@ class ConfigFieldCommand extends Command {
                     try {
                         config.mutate(() -> {
                             value.dispatchModifyCommand(newValue);
-                            value.value(newValue);
+                            setSchemaValue(schemaEntry, newValue);
                         });
                     } catch (ConfigValidationException e) {
                         e.sendMessage(ctx);
@@ -81,7 +81,7 @@ class ConfigFieldCommand extends Command {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
-            execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(schemaEntry.entryName() + ": " + v.displayString(),
+            execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(schemaEntry.entryName() + ": " + schemaEntry.displayString(),
                                                                           option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                                           .hoverText(StringUtils.defaultString(
                                                                                                   schemaEntry.metadata()
@@ -99,19 +99,26 @@ class ConfigFieldCommand extends Command {
                 addChildren(new ModifyDecCommand(config, schemaEntry, (NumericValue<?, ?>) v));
             }
 
-            String entryName = schemaEntry.entryName();
-            addChildren(new Command("reset") {{
-                execute(ctx -> {
-                    try {
-                        config.mutate(v::resetToDefault);
-                    } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
-                        return;
-                    }
-                    ctx.sendSuccess(entryName + "をデフォルト値(" + v.displayString() + ")にリセットしました");
-                });
-            }});
+            if (schemaEntry instanceof ValueConfigSchemaEntry) {
+                String entryName = schemaEntry.entryName();
+                addChildren(new Command("reset") {{
+                    execute(ctx -> {
+                        try {
+                            config.mutate(v::resetToDefault);
+                        } catch (ConfigValidationException e) {
+                            e.sendMessage(ctx);
+                            return;
+                        }
+                        ctx.sendSuccess(entryName + "をデフォルト値(" + schemaEntry.displayString() + ")にリセットしました");
+                    });
+                }});
+            }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void setSchemaValue(ConfigSchemaEntry<?> schemaEntry, Object newValue) {
+        ((ConfigSchemaEntry<Object>) schemaEntry).set(newValue);
     }
 
     private void initCollectionValue(CommonBaseConfig config,

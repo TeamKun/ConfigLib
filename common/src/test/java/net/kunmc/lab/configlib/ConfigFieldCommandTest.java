@@ -86,6 +86,77 @@ class ConfigFieldCommandTest {
     }
 
     @Test
+    void supportedPojoFieldsAllowSetModifyCommands() {
+        PojoModifyConfig cfg = initConfig(new PojoModifyConfig());
+        FakeSender sender = FakeSender.console();
+
+        try (CommandTester tester = new CommandTester(commandFor(cfg), "configlib.test")) {
+            tester.execute("config maxPlayers 35", sender);
+            tester.execute("config motd changed", sender);
+            tester.execute("config enabled false", sender);
+            tester.execute("config mode HARD", sender);
+        }
+
+        assertEquals(35, cfg.maxPlayers);
+        assertEquals("changed", cfg.motd);
+        assertEquals(false, cfg.enabled);
+        assertEquals(Mode.HARD, cfg.mode);
+    }
+
+    @Test
+    void unsupportedPojoFieldsStayGetOnly() {
+        PojoModifyConfig cfg = initConfig(new PojoModifyConfig());
+        FakeSender sender = FakeSender.console();
+
+        try (CommandTester tester = new CommandTester(commandFor(cfg), "configlib.test")) {
+            tester.execute("config names", sender);
+            assertThrows(RuntimeException.class, () -> tester.execute("config names add steve", sender));
+        }
+    }
+
+    @Test
+    void pojoModifyCommandsAreNotGeneratedWhenGetIsDisabledForUnsupportedTypes() {
+        PojoModifyConfig cfg = initConfig(new PojoModifyConfig());
+        FakeSender sender = FakeSender.console();
+        Command command = new ConfigCommandBuilder(cfg).disableGet()
+                                                       .build();
+
+        try (CommandTester tester = new CommandTester(command, "configlib.test")) {
+            tester.execute("config maxPlayers 45", sender);
+            assertEquals(45, cfg.maxPlayers);
+            assertThrows(RuntimeException.class, () -> tester.execute("config names", sender));
+        }
+    }
+
+    @Test
+    void nestedPojoLeafFieldsAllowSetModifyCommands() {
+        NestedPojoModifyConfig cfg = initConfig(new NestedPojoModifyConfig());
+        FakeSender sender = FakeSender.console();
+
+        try (CommandTester tester = new CommandTester(commandFor(cfg), "configlib.test")) {
+            tester.execute("config arena.maxArenas 10", sender);
+            tester.execute("config arena.defaultName battle", sender);
+        }
+
+        assertEquals(10, cfg.arena.maxArenas);
+        assertEquals("battle", cfg.arena.defaultName);
+    }
+
+    @Test
+    void immutableNestedPojoLeafFieldsAllowSetModifyCommands() {
+        ImmutableNestedPojoModifyConfig cfg = initConfig(new ImmutableNestedPojoModifyConfig());
+        FakeSender sender = FakeSender.console();
+
+        try (CommandTester tester = new CommandTester(commandFor(cfg), "configlib.test")) {
+            tester.execute("config arena.maxArenas 10", sender);
+            tester.execute("config arena.defaultName battle", sender);
+        }
+
+        assertEquals(10, cfg.arena.maxArenas());
+        assertEquals("battle", cfg.arena.defaultName());
+    }
+
+    @Test
     void shorthandSetAndExplicitSetUpdateSingleValue() {
         config = init(new TestConfig());
         FakeSender sender = FakeSender.console();

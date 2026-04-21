@@ -1,11 +1,13 @@
 package net.kunmc.lab.configlib;
 
 import com.google.gson.Gson;
+import net.kunmc.lab.commandlib.CommandTester;
+import net.kunmc.lab.commandlib.FakeSender;
+import net.kunmc.lab.configlib.annotation.ConfigNullable;
 import net.kunmc.lab.configlib.annotation.Description;
-import net.kunmc.lab.configlib.annotation.Nullable;
 import net.kunmc.lab.configlib.annotation.Range;
+import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
-import net.kunmc.lab.configlib.exception.LoadingConfigInvalidValueException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.store.InMemoryConfigStore;
@@ -25,7 +27,7 @@ class RecordConfigSchemaTest {
         }
 
         record ArenaSettings(@Description("Maximum number of arenas.") @Range(min = 1, max = 50) int maxArenas,
-                             @Nullable String name) {
+                             @ConfigNullable String name) {
         }
     }
 
@@ -102,7 +104,24 @@ class RecordConfigSchemaTest {
     }
 
     @Test
-    void recordLoadRoundTrip() throws LoadingConfigInvalidValueException {
+    void recordLeafFieldsAllowSetModifyCommands() {
+        RecordConfig cfg = new RecordConfig();
+        cfg.init(new CommonBaseConfig.Option().modifyDetectionTimerPeriod(10_000)
+                                              .fileWatchTimerPeriod(10_000));
+        cfg.close();
+        FakeSender sender = FakeSender.console();
+
+        try (CommandTester tester = new CommandTester(new ConfigCommandBuilder(cfg).build(), "configlib.test")) {
+            tester.execute("config arena.maxArenas 10", sender);
+            tester.execute("config arena.name battle", sender);
+        }
+
+        assertEquals(10, cfg.arena.maxArenas());
+        assertEquals("battle", cfg.arena.name());
+    }
+
+    @Test
+    void recordLoadRoundTrip() {
         RecordConfig cfg = new RecordConfig();
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"arena\":{\"maxArenas\":12,\"name\":\"test\"},\"_version_\":0}");
@@ -119,11 +138,11 @@ class RecordConfigSchemaTest {
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"arena\":{\"maxArenas\":99,\"name\":\"bad\"},\"_version_\":0}");
 
-        assertThrows(LoadingConfigInvalidValueException.class, cfg::loadConfig);
+        assertThrows(ConfigValidationException.class, cfg::loadConfig);
     }
 
     @Test
-    void recordNullableAllowsNull() throws LoadingConfigInvalidValueException {
+    void recordNullableAllowsNull() {
         RecordConfig cfg = new RecordConfig();
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"arena\":{\"maxArenas\":5,\"name\":null},\"_version_\":0}");
@@ -218,7 +237,7 @@ class RecordConfigSchemaTest {
     }
 
     @Test
-    void deepRecordNestingLoadRoundTrip() throws LoadingConfigInvalidValueException {
+    void deepRecordNestingLoadRoundTrip() {
         DeepRecordConfig cfg = new DeepRecordConfig();
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"outer\":{\"inner\":{\"y\":42,\"z\":\"world\"},\"x\":7},\"_version_\":0}");

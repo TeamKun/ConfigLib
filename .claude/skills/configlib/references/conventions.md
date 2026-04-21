@@ -2,7 +2,10 @@
 
 ## Config class definition
 
-Declare all config fields as `public final` Value instances. Call `initialize()` at the end of the constructor.
+Use either the Value API or the POJO API. Call `initialize()` at the end of the constructor.
+
+Prefer Value fields when the config needs custom command parsing, tab-completion, listeners, or collection/map
+modification commands. Prefer POJO fields for simple annotation-driven scalar settings.
 
 ```java
 public class MyConfig extends BaseConfig {
@@ -38,8 +41,12 @@ public final class MyPlugin extends JavaPlugin {
 ```
 
 `ConfigCommandBuilder` auto-generates `list`, `reload`, `reset`, `history`, `undo`, `diff`, and per-field get/modify
-subcommands. Use `.disableList()`, `.disableReload()`, `.disableReset()`, `.disableHistory()`, `.disableGet()`,
-`.disableModify()` to suppress subcommands you don't want.
+subcommands. Value fields get their normal `set`, `reset`, numeric, collection, and map operations. Mutable POJO scalar
+fields (`String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equivalents) get set commands only. Complex
+POJO fields remain get-only.
+
+Use `.disableList()`, `.disableReload()`, `.disableReset()`, `.disableHistory()`, `.disableGet()`, `.disableModify()` to
+suppress subcommands you don't want.
 
 ## Value type selection guide
 
@@ -254,7 +261,7 @@ When a config class gains a new field, existing config files usually do not cont
 field's Java-side default value for missing keys during load, so adding a field does not require a migration by itself.
 
 This only applies to missing keys. If a config file explicitly contains `null`, the loaded `null` is validated normally:
-POJO fields require `@Nullable`, and `Value` fields must accept `null` in their validators.
+POJO fields require `@ConfigNullable`, and `Value` fields must accept `null` in their validators.
 
 Use a migration when an existing key must be renamed, moved, removed, converted to another type, or changed to a
 different value based on old file contents.
@@ -263,6 +270,7 @@ different value based on old file contents.
 
 Bukkit and Forge `BaseConfig` use YAML files by default. The standard Gson builder is configured with pretty printing,
 and YAML output uses block style with two-space indentation so files are suitable for direct editing.
+`Value.description(...)` and POJO `@Description` annotations are written as YAML comments when the config is saved.
 
 Config files can be edited externally. On save, ConfigLib compares the last loaded snapshot, current memory state, and
 current disk state. If the same top-level field changed both in memory and on disk, the disk value wins and the
@@ -320,7 +328,7 @@ public final class ServerConfig extends BaseConfig {
     @Description("Message shown on join.")
     public String motd = "Welcome!";
 
-    @Nullable
+    @ConfignNullable
     public String adminContact = null;
 
     public transient RuntimeCache cache = new RuntimeCache(); // excluded
@@ -334,11 +342,32 @@ public final class ServerConfig extends BaseConfig {
 
 ### Annotations
 
-| Annotation     | Target        | Effect                                            |
-|----------------|---------------|---------------------------------------------------|
-| `@Description` | field         | YAML comment + hover text in commands             |
-| `@Range`       | numeric field | Validates `min ≤ value ≤ max` on load and command |
-| `@Nullable`    | field         | Allows `null`; fields without it reject `null`    |
+| Annotation        | Target        | Effect                                            |
+|-------------------|---------------|---------------------------------------------------|
+| `@Description`    | field         | YAML comment + hover text in commands             |
+| `@Range`          | numeric field | Validates `min ≤ value ≤ max` on load and command |
+| `@ConfigNullable` | field         | Allows `null`; fields without it reject `null`    |
+
+### POJO generated commands
+
+All POJO fields appear in `list`, `get`, `diff`, and `history` output. Mutable scalar POJO fields can also be changed
+with set commands:
+
+```text
+/config maxPlayers 30
+/config maxPlayers set 30
+/config arena.maxArenas 10
+```
+
+Supported POJO modify types are `String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equivalents. `@Range`
+is applied to numeric command input and file load validation.
+
+Collection, map, object-valued leaf fields, Minecraft-specific object fields, and top-level `final` POJO fields are
+read-only in generated per-field commands. Nested POJO, immutable class, and record leaf fields are still modifiable
+when their leaf type is supported.
+
+POJO fields do not get per-field `reset`, `inc`, `dec`, `add`, `remove`, `clear`, or `put` commands. Use the Value API
+when those operations or custom command behavior are needed.
 
 ### Nested POJO (mutable inner class)
 
@@ -408,7 +437,8 @@ Nesting is supported to any depth. Records can be nested inside records.
 | Existing Java value classes (immutable, records) | POJO API  |
 | Minecraft-specific types (World, Location, …)    | Value API |
 | Custom tab-completion or argument parsing        | Value API |
-| Per-field modify/add/remove commands             | Value API |
+| Simple scalar set commands                       | POJO API  |
+| Reset, arithmetic, collection, or map commands   | Value API |
 | Dynamic validators with complex logic            | Value API |
 
 ## Custom Value types

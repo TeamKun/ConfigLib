@@ -15,7 +15,7 @@ developers.
     - **Value API** — wrap each field in a typed `Value` object for full control over commands, validation,
       tab-completion, and display.
     - **POJO API** — declare plain Java fields (including `final`/immutable classes and Java 16+ `record`s) and annotate
-      with `@Description`, `@Range`, `@Nullable`. Nested POJOs are expanded automatically.
+      with `@Description`, `@Range`, `@ConfigNullable`. Nested POJOs are expanded automatically.
 3. **YAML and JSON Storage**  
    YAML is the default format for Bukkit and Forge. `description()` and `@Description` annotations are written as YAML
    comments. JSON is available by overriding `createConfigStore()`.
@@ -200,8 +200,8 @@ public final class ServerConfig extends BaseConfig {
     @Description("Message shown on join.")
     public String motd = "Welcome!";
 
-    @Nullable
-    public String adminContact = null;   // null allowed because of @Nullable
+    @ConfigNullable
+    public String adminContact = null;   // null allowed because of @ConfigNullable
 
     public transient RuntimeCache cache = new RuntimeCache(); // excluded from config
 
@@ -292,11 +292,22 @@ immutable classes.
 
 **Available annotations:**
 
-| Annotation     | Target        | Effect                                                |
-|----------------|---------------|-------------------------------------------------------|
-| `@Description` | field         | Written as a YAML comment; shown on hover in commands |
-| `@Range`       | numeric field | Validates `min ≤ value ≤ max` on load and command set |
-| `@Nullable`    | field         | Allows `null`; non-annotated fields reject `null`     |
+| Annotation        | Target        | Effect                                                |
+|-------------------|---------------|-------------------------------------------------------|
+| `@Description`    | field         | Written as a YAML comment; shown on hover in commands |
+| `@Range`          | numeric field | Validates `min ≤ value ≤ max` on load and command set |
+| `@ConfigNullable` | field         | Allows `null`; non-annotated fields reject `null`     |
+
+**Generated commands for POJO fields:**
+
+- All POJO fields are listed and can be read with `/config <field>`.
+- Mutable `String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equivalents support set commands:
+  `/config <field> <value>` and `/config <field> set <value>`.
+- `@Range` limits numeric command input as well as file load validation.
+- Collection, map, object-valued leaf fields, and top-level `final` POJO fields are read-only in generated per-field
+  commands. Nested POJO, immutable class, and record leaf fields are still modifiable when their leaf type is supported.
+- POJO fields do not generate per-field `reset`, `inc`, `dec`, `add`, `remove`, `clear`, or `put` commands. Use the
+  Value API when those operations, custom tab-completion, custom command parsing, or command listeners are needed.
 
 Value API and POJO fields can be mixed freely in the same config class.
 
@@ -573,7 +584,7 @@ When a config class gains a new field, existing config files usually do not cont
 field's Java-side default value for missing keys during load, so adding a field does not require a migration by itself.
 
 This only applies to missing keys. If a config file explicitly contains `null`, the loaded `null` is validated normally:
-POJO fields require `@Nullable`, and `Value` fields must accept `null` in their validators.
+POJO fields require `@ConfigNullable`, and `Value` fields must accept `null` in their validators.
 
 Use a migration when an existing key must be renamed, moved, removed, converted to another type, or changed to a
 different value based on old file contents.
@@ -632,8 +643,9 @@ Use `.disableList()` / `.disableReload()` / `.disableReset()` on `ConfigCommandB
 <details>
 <summary>Per-field subcommands</summary>
 
-These subcommands are generated for each `Value` field.
-`<field>` is the Java field name, or the name set via `.entryName()`.
+These subcommands are generated for config fields.
+For Value fields, `<field>` is the Java field name or the name set via `.entryName()`.
+For POJO fields, nested entries use dotted paths such as `arena.maxArenas`.
 
 **Get**
 
@@ -649,6 +661,17 @@ These subcommands are generated for each `Value` field.
 | `/config <field> <value>`     | Set the value (shorthand)  |
 | `/config <field> set <value>` | Set the value              |
 | `/config <field> reset`       | Reset to the default value |
+
+**POJO field — set**
+
+Mutable `String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equivalents support set commands.
+Collection, map, object-valued leaf fields, and top-level `final` POJO fields are get-only. Nested POJO, immutable
+class, and record leaf fields are still modifiable when their leaf type is supported.
+
+| Command                       | Description              |
+|-------------------------------|--------------------------|
+| `/config <field> <value>`     | Set the POJO field value |
+| `/config <field> set <value>` | Set the POJO field value |
 
 **NumericValue — arithmetic** (IntegerValue, DoubleValue, FloatValue) — extends SingleValue, so `set` and `reset` also
 apply

@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib.util;
 
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.*;
-import net.kunmc.lab.configlib.annotation.Nullable;
+import net.kunmc.lab.configlib.annotation.ConfigNullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -53,7 +53,7 @@ public class ConfigUtil {
             Object dstObj = field.get(dst);
 
             // jsonにキーが存在しない場合nullになる
-            if (srcObj == null && field.isAnnotationPresent(Nullable.class)) {
+            if (srcObj == null && field.isAnnotationPresent(ConfigNullable.class)) {
                 field.set(dst, null);
                 return;
             }

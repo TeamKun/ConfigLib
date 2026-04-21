@@ -1,8 +1,8 @@
 package net.kunmc.lab.configlib;
 
 import com.google.gson.Gson;
+import net.kunmc.lab.configlib.annotation.ConfigNullable;
 import net.kunmc.lab.configlib.annotation.Description;
-import net.kunmc.lab.configlib.annotation.Nullable;
 import net.kunmc.lab.configlib.annotation.Range;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
@@ -463,7 +463,7 @@ class ConfigSchemaTest {
         public int maxPlayers = 20;
         @Description("Message of the day.")
         public String motd = "hello";
-        @Nullable
+        @ConfigNullable
         public String nullableMotd = "nullable";
         private String privatePojoField = "private";
         String packagePrivatePojoField = "package";

@@ -1,10 +1,11 @@
 package net.kunmc.lab.configlib.schema;
 
 import net.kunmc.lab.configlib.CommonBaseConfig;
+import net.kunmc.lab.configlib.annotation.ConfigNullable;
 import net.kunmc.lab.configlib.annotation.Description;
-import net.kunmc.lab.configlib.annotation.Nullable;
 import net.kunmc.lab.configlib.annotation.Range;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -18,6 +19,8 @@ public final class PojoConfigSchemaEntry<E> extends ConfigSchemaEntry<E> {
     private final Object root;
     private final Field[] parentChain;
     private final ConfigSchemaValidator<E> validator;
+    @Nullable
+    private final PojoCommandValue commandValue;
 
     private PojoConfigSchemaEntry(ConfigSchemaPath path,
                                   String entryName,
@@ -25,11 +28,13 @@ public final class PojoConfigSchemaEntry<E> extends ConfigSchemaEntry<E> {
                                   Object root,
                                   Field[] parentChain,
                                   ConfigSchemaMetadata metadata,
-                                  ConfigSchemaValidator<E> validator) {
+                                  ConfigSchemaValidator<E> validator,
+                                  @Nullable PojoCommandValue commandValue) {
         super(path, entryName, field, metadata);
         this.root = Objects.requireNonNull(root, "root");
         this.parentChain = parentChain.clone();
         this.validator = Objects.requireNonNull(validator, "validator");
+        this.commandValue = commandValue;
     }
 
     public static PojoConfigSchemaEntry<Object> from(Object root, Field[] parentChain, Field field) {
@@ -41,7 +46,10 @@ public final class PojoConfigSchemaEntry<E> extends ConfigSchemaEntry<E> {
                                            root,
                                            parentChain,
                                            new ConfigSchemaMetadata(descriptionOf(field)),
-                                           validatorOf(field));
+                                           validatorOf(field),
+                                           PojoCommandValue.from(parentChain,
+                                                                 field,
+                                                                 currentValue(root, parentChain, field)));
     }
 
     private static String buildPath(Field[] parentChain, Field leafField) {
@@ -62,9 +70,24 @@ public final class PojoConfigSchemaEntry<E> extends ConfigSchemaEntry<E> {
         return description == null ? null : description.value();
     }
 
+    private static Object currentValue(Object root, Field[] parentChain, Field leafField) {
+        try {
+            Object current = root;
+            for (Field field : parentChain) {
+                current = field.get(current);
+                if (current == null) {
+                    return null;
+                }
+            }
+            return leafField.get(current);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static ConfigSchemaValidator<Object> validatorOf(Field field) {
         ConfigSchemaValidator<Object> validator = ConfigSchemaValidator.noOp();
-        if (!field.isAnnotationPresent(Nullable.class)) {
+        if (!field.isAnnotationPresent(ConfigNullable.class)) {
             validator = validator.and(value -> validateNotNull(field, value));
         }
         Range range = field.getAnnotation(Range.class);
@@ -275,12 +298,12 @@ public final class PojoConfigSchemaEntry<E> extends ConfigSchemaEntry<E> {
 
     @Override
     public Object commandObject() {
-        return get();
+        return commandValue == null ? get() : commandValue;
     }
 
     @Override
     public boolean supportsModificationCommand() {
-        return false;
+        return commandValue != null;
     }
 
     @Override
