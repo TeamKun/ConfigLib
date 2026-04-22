@@ -240,17 +240,16 @@ public final class MyConfig extends BaseConfig {
     public final IntegerValue spawnRadius = new IntegerValue(30);
 
     public MyConfig(Plugin plugin) {
-        super(plugin, opt -> opt.migration(1, ctx -> {
-            // rename "radius" -> "spawnRadius"
-            if (ctx.has("radius")) {
-                ctx.set("spawnRadius", ctx.getInt("radius"));
-                ctx.remove("radius");
-            }
-        }));
+        super(plugin,
+              opt -> opt.migrateTo(1, migration -> migration.rename("radius", "spawnRadius"))
+                        .migrateTo(2, migration -> migration.defaultValue("limits.maxPlayers", 20)));
         initialize();
     }
 }
 ```
+
+Supported migration operations are `rename`, `move`, `delete`, `set`, `defaultValue`, and `convert`.
+Nested fields use dotted paths such as `limits.maxPlayers`.
 
 Migrations run in version order on load when `_version_` in the config file is lower than the latest migration key.
 `_version_` is a ConfigLib-reserved key exposed as `ConfigKeys.VERSION`; do not use it as an application config field.
@@ -293,6 +292,10 @@ history:
 
 Older top-level-array YAML history files are still readable.
 
+Each history entry also has a source: `INITIAL`, `MIGRATION`, or `PROGRAMMATIC`.
+The first history entry is `MIGRATION` when ConfigLib had to migrate an existing file during load; otherwise it is
+`INITIAL`.
+
 ## Multiple configs in one command tree
 
 ```java
@@ -328,7 +331,7 @@ public final class ServerConfig extends BaseConfig {
     @Description("Message shown on join.")
     public String motd = "Welcome!";
 
-    @ConfignNullable
+    @ConfigNullable
     public String adminContact = null;
 
     public transient RuntimeCache cache = new RuntimeCache(); // excluded

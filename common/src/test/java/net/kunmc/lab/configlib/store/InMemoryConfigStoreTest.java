@@ -4,13 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.kunmc.lab.configlib.CommonBaseConfig;
-import net.kunmc.lab.configlib.migration.MigrationContext;
+import net.kunmc.lab.configlib.migration.MigrationExecutionException;
+import net.kunmc.lab.configlib.migration.MigrationOperationType;
 import net.kunmc.lab.configlib.migration.Migrations;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
-import java.util.function.Consumer;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,22 +28,19 @@ class InMemoryConfigStoreTest {
     }
 
     private Migrations noMigrations() {
-        return new Migrations(new TreeMap<>());
-    }
-
-    private Migrations migrations(TreeMap<Integer, Consumer<MigrationContext>> m) {
-        return new Migrations(m);
+        return Migrations.empty();
     }
 
     // ---- マイグレーション後の保存 ----
 
     @Test
     void updatesStoreAfterMigration() {
-        TreeMap<Integer, Consumer<MigrationContext>> m = new TreeMap<>();
-        m.put(1, ctx -> ctx.rename("old", "new"));
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1, migration -> migration.rename("old", "new"))
+                                          .build();
 
         InMemoryConfigStore store = storeWith("{\"old\": \"value\"}");
-        store.read(SimpleConfig.class, migrations(m), new SimpleConfig());
+        store.read(SimpleConfig.class, migrations, new SimpleConfig());
 
         JsonObject saved = JsonParser.parseString(store.readRaw())
                                      .getAsJsonObject();
@@ -54,14 +55,75 @@ class InMemoryConfigStoreTest {
 
     @Test
     void doesNotUpdateStoreWhenNoMigrationNeeded() {
-        TreeMap<Integer, Consumer<MigrationContext>> m = new TreeMap<>();
-        m.put(1, ctx -> ctx.setString("field", "migrated"));
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1, migration -> migration.set("field", "migrated"))
+                                          .build();
 
         String original = "{\"_version_\": 1, \"field\": \"original\"}";
         InMemoryConfigStore store = storeWith(original);
-        store.read(SimpleConfig.class, migrations(m), new SimpleConfig());
+        store.read(SimpleConfig.class, migrations, new SimpleConfig());
 
         assertEquals(original, store.readRaw());
+    }
+
+    @Test
+    void logsAppliedMigrationSummary() {
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1, migration -> migration.rename("old", "new"))
+                                          .build();
+        InMemoryConfigStore store = storeWith("{\"old\":\"value\"}");
+        Logger logger = Logger.getLogger(InMemoryConfigStore.class.getName());
+        TestLogHandler handler = new TestLogHandler();
+        logger.addHandler(handler);
+        logger.setUseParentHandlers(false);
+        logger.setLevel(Level.ALL);
+
+        try {
+            store.read(SimpleConfig.class, migrations, new SimpleConfig());
+        } finally {
+            logger.removeHandler(handler);
+            logger.setUseParentHandlers(true);
+        }
+
+        assertTrue(handler.messages.stream()
+                                   .anyMatch(message -> message.contains("Applied config migrations from v0 to v1")));
+        assertTrue(handler.messages.stream()
+                                   .anyMatch(message -> message.contains("v1: rename old -> new")));
+    }
+
+    @Test
+    void logsMigrationFailureDetails() {
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1, migration -> migration.set("broken.child", 1))
+                                          .build();
+        InMemoryConfigStore store = storeWith("{\"broken\":1}");
+        Logger logger = Logger.getLogger(InMemoryConfigStore.class.getName());
+        TestLogHandler handler = new TestLogHandler();
+        logger.addHandler(handler);
+        logger.setUseParentHandlers(false);
+        logger.setLevel(Level.ALL);
+
+        try {
+            MigrationExecutionException ex = assertThrows(MigrationExecutionException.class,
+                                                          () -> store.read(SimpleConfig.class,
+                                                                           migrations,
+                                                                           new SimpleConfig()));
+            assertTrue(ex.getMessage()
+                         .contains("Migration v1 failed while applying set broken.child"));
+            assertEquals(0,
+                         ex.completedVersionReports()
+                           .size());
+            assertEquals(MigrationOperationType.SET,
+                         ex.failedOperationReport()
+                           .type());
+        } finally {
+            logger.removeHandler(handler);
+            logger.setUseParentHandlers(true);
+        }
+
+        assertTrue(handler.messages.stream()
+                                   .anyMatch(message -> message.contains(
+                                           "Migration v1 failed while applying set broken.child")));
     }
 
     // ---- history: pushHistory / readHistory ----
@@ -202,6 +264,23 @@ class InMemoryConfigStoreTest {
         @Override
         protected ConfigStore createConfigStore() {
             return new InMemoryConfigStore(new Gson());
+        }
+    }
+
+    static class TestLogHandler extends Handler {
+        final List<String> messages = new ArrayList<>();
+
+        @Override
+        public void publish(LogRecord record) {
+            messages.add(record.getMessage());
+        }
+
+        @Override
+        public void flush() {
+        }
+
+        @Override
+        public void close() {
         }
     }
 }

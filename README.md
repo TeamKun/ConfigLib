@@ -529,8 +529,8 @@ public final class TestConfig extends BaseConfig {
 <summary>Schema Migration</summary>
 
 ConfigLib provides a versioned migration system to evolve your configuration schema safely across releases.
-Migrations are registered via `Option` and run automatically when an older config file is loaded.
-The current version is stored as `_version_` in the JSON file.
+Migrations are registered via `Option#migrateTo(...)` and run automatically when an older config file is loaded.
+The current version is stored as `_version_` in the config file.
 
 ```java
 public final class MyConfig extends BaseConfig {
@@ -540,43 +540,35 @@ public final class MyConfig extends BaseConfig {
     public MyConfig(Plugin plugin) {
         super(plugin, opt -> opt
                 // Version 1: rename field
-                .migration(1, ctx -> {
-                    ctx.rename("msg", "message");
-                })
-                // Version 2: type change (IntegerValue -> StringValue)
-                .migration(2, ctx -> {
-                    if (ctx.has("cooldown")) {
-                        ctx.setString("cooldown", String.valueOf(ctx.getInt("cooldown")));
-                    }
-                })
-                // Version 3: remove value that no longer passes validation
-                .migration(3, ctx -> {
-                    EnumSetValue<EntityType> types = ctx.getObject("spawnTypes",
-                                                                   new TypeToken<EnumSetValue<EntityType>>() {
-                                                                   }.getType());
-                    types.remove(EntityType.GIANT);
-                    ctx.setObject("spawnTypes", types);
-                }));
+                .migrateTo(1, migration -> migration.rename("msg", "message"))
+                // Version 2: type change (number -> string)
+                .migrateTo(2,
+                           migration -> migration.convert("cooldown",
+                                                          Number.class,
+                                                          String.class,
+                                                          value -> String.valueOf(value.intValue())))
+                // Version 3: add a missing nested value
+                .migrateTo(3, migration -> migration.defaultValue("limits.maxPlayers", 20)));
         initialize();
     }
 }
 ```
 
-`MigrationContext` provides the following operations:
+`MigrationDsl` provides the following operations:
 
-| Method                                                                  | Description                                          |
-|-------------------------------------------------------------------------|------------------------------------------------------|
-| `has(key)`                                                              | Check if a key exists                                |
-| `getString(key)` / `getInt(key)` / `getDouble(key)` / `getBoolean(key)` | Read primitive values                                |
-| `getObject(key, Class<T>)`                                              | Read a complex value by class                        |
-| `getObject(key, Type)`                                                  | Read a generic complex value (e.g. with `TypeToken`) |
-| `setString(key, value)` / `setInt` / `setDouble` / `setBoolean`         | Write primitive values                               |
-| `setObject(key, value)`                                                 | Write a complex value                                |
-| `rename(from, to)`                                                      | Rename a field                                       |
-| `remove(key)`                                                           | Remove a field                                       |
+| Method                                      | Description                                                             |
+|---------------------------------------------|-------------------------------------------------------------------------|
+| `rename(from, to)`                          | Rename a field in place                                                 |
+| `move(from, to)`                            | Move a field to another path                                            |
+| `delete(path)`                              | Remove a field                                                          |
+| `set(path, value)`                          | Overwrite a value                                                       |
+| `defaultValue(path, value)`                 | Set a value only when the path is currently missing                     |
+| `convert(path, sourceType, targetType, fn)` | Read the current value as `sourceType`, transform it, and write it back |
 
 Migrations only run on existing files that have an older version. New installations start at the latest version and
 skip all migrations.
+
+Paths can be nested using dot notation such as `limits.maxPlayers`.
 
 **Adding new fields:**
 
@@ -716,6 +708,12 @@ Every time a configuration value is modified, the new state is automatically sav
 (`<configName>.history.yml` by default) alongside the config file. The history persists across server restarts and is
 capped at
 50 entries by default (override `createConfigStore()` to change this).
+
+Each history entry also records its source:
+
+- `INITIAL`: initial snapshot for a brand-new config
+- `MIGRATION`: initial snapshot created immediately after applying migrations on load
+- `PROGRAMMATIC`: normal updates, including command changes, undo results, and explicit programmatic mutations
 
 History uses **0-based indexing** where `[0]` is the current (latest) state.
 

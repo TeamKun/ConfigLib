@@ -2,7 +2,8 @@ package net.kunmc.lab.configlib.store;
 
 import com.google.gson.Gson;
 import net.kunmc.lab.configlib.CommonBaseConfig;
-import net.kunmc.lab.configlib.migration.MigrationContext;
+import net.kunmc.lab.configlib.migration.MigrationExecutionException;
+import net.kunmc.lab.configlib.migration.MigrationOperationType;
 import net.kunmc.lab.configlib.migration.Migrations;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,12 +13,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,13 +41,7 @@ class JsonFileConfigStoreTest {
     }
 
     private Migrations noMigrations() {
-        return new Migrations(new TreeMap<>());
-    }
-
-    private Migrations migrations(Consumer<TreeMap<Integer, Consumer<MigrationContext>>> setup) {
-        TreeMap<Integer, Consumer<MigrationContext>> m = new TreeMap<>();
-        setup.accept(m);
-        return new Migrations(m);
+        return Migrations.empty();
     }
 
     private void writeFile(String json) throws IOException {
@@ -119,9 +117,13 @@ class JsonFileConfigStoreTest {
         writeFile("{\"value\":3,\"_version_\":0}");
 
         SimpleConfig loaded = (SimpleConfig) store.read(SimpleConfig.class,
-                                                        migrations(m -> m.put(1,
-                                                                              ctx -> ctx.setInt("value",
-                                                                                                ctx.getInt("value") * 10))),
+                                                        Migrations.builder()
+                                                                  .migrateTo(1,
+                                                                             migration -> migration.convert("value",
+                                                                                                            Integer.class,
+                                                                                                            Integer.class,
+                                                                                                            value -> value * 10))
+                                                                  .build(),
                                                         new SimpleConfig());
 
         assertEquals(30, loaded.value);
@@ -134,10 +136,83 @@ class JsonFileConfigStoreTest {
         writeFile(original);
 
         store.read(SimpleConfig.class,
-                   migrations(m -> m.put(1, ctx -> ctx.setInt("value", ctx.getInt("value") + 100))),
+                   Migrations.builder()
+                             .migrateTo(1,
+                                        migration -> migration.convert("value",
+                                                                       Integer.class,
+                                                                       Integer.class,
+                                                                       value -> value + 100))
+                             .build(),
                    new SimpleConfig());
 
         assertEquals(original, readFile());
+    }
+
+    @Test
+    void readLogsAppliedMigrationSummary() throws IOException {
+        writeFile("{\"value\":3,\"_version_\":0}");
+        Logger logger = Logger.getLogger(FileConfigStore.class.getName());
+        TestLogHandler handler = new TestLogHandler();
+        logger.addHandler(handler);
+        logger.setUseParentHandlers(false);
+        logger.setLevel(Level.ALL);
+
+        try {
+            store.read(SimpleConfig.class,
+                       Migrations.builder()
+                                 .migrateTo(1,
+                                            migration -> migration.convert("value",
+                                                                           Integer.class,
+                                                                           Integer.class,
+                                                                           value -> value * 10))
+                                 .build(),
+                       new SimpleConfig());
+        } finally {
+            logger.removeHandler(handler);
+            logger.setUseParentHandlers(true);
+        }
+
+        assertTrue(handler.messages.stream()
+                                   .anyMatch(message -> message.contains(
+                                           "Applied config migrations for config.json from v0 to v1")));
+        assertTrue(handler.messages.stream()
+                                   .anyMatch(message -> message.contains("v1: convert value")));
+    }
+
+    @Test
+    void readLogsMigrationFailureDetails() throws IOException {
+        writeFile("{\"broken\":1,\"_version_\":0}");
+        Logger logger = Logger.getLogger(FileConfigStore.class.getName());
+        TestLogHandler handler = new TestLogHandler();
+        logger.addHandler(handler);
+        logger.setUseParentHandlers(false);
+        logger.setLevel(Level.ALL);
+
+        try {
+            MigrationExecutionException ex = assertThrows(MigrationExecutionException.class,
+                                                          () -> store.read(SimpleConfig.class,
+                                                                           Migrations.builder()
+                                                                                     .migrateTo(1,
+                                                                                                migration -> migration.set(
+                                                                                                        "broken.child",
+                                                                                                        1))
+                                                                                     .build(),
+                                                                           new SimpleConfig()));
+            assertTrue(ex.getMessage()
+                         .contains("Migration v1 failed while applying set broken.child"));
+            assertEquals(MigrationOperationType.SET,
+                         ex.failedOperationReport()
+                           .type());
+        } finally {
+            logger.removeHandler(handler);
+            logger.setUseParentHandlers(true);
+        }
+
+        assertTrue(handler.messages.stream()
+                                   .anyMatch(message -> message.contains("Config migration failed for config.json")));
+        assertTrue(handler.messages.stream()
+                                   .anyMatch(message -> message.contains(
+                                           "Migration v1 failed while applying set broken.child")));
     }
 
     @Test
@@ -452,6 +527,23 @@ class JsonFileConfigStoreTest {
         @Override
         protected ConfigStore createConfigStore() {
             return new InMemoryConfigStore(new Gson());
+        }
+    }
+
+    static class TestLogHandler extends Handler {
+        final List<String> messages = new ArrayList<>();
+
+        @Override
+        public void publish(LogRecord record) {
+            messages.add(record.getMessage());
+        }
+
+        @Override
+        public void flush() {
+        }
+
+        @Override
+        public void close() {
         }
     }
 }

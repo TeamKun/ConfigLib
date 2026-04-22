@@ -3,12 +3,13 @@ package net.kunmc.lab.configlib;
 import com.google.common.base.Preconditions;
 import com.google.gson.annotations.SerializedName;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
-import net.kunmc.lab.configlib.migration.MigrationContext;
+import net.kunmc.lab.configlib.migration.MigrationDsl;
 import net.kunmc.lab.configlib.migration.Migrations;
 import net.kunmc.lab.configlib.schema.ConfigSchema;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.store.HistoryEntry;
+import net.kunmc.lab.configlib.store.HistorySource;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +19,6 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
-import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -64,7 +64,7 @@ public abstract class CommonBaseConfig {
     }
 
     final void init(Option option) {
-        migrations = new Migrations(option.migrations);
+        migrations = option.migrations.build();
         schemaVersion = migrations.latestVersion();
         configStore = Objects.requireNonNull(createConfigStore());
 
@@ -83,7 +83,10 @@ public abstract class CommonBaseConfig {
 
         if (configStore.readHistory(getClass(), migrations)
                        .isEmpty()) {
-            configStore.pushHistory(this);
+            HistorySource source = configStore.lastAppliedMigrationResult()
+                                              .map(x -> HistorySource.MIGRATION)
+                                              .orElse(HistorySource.INITIAL);
+            configStore.pushHistory(this, source);
         }
 
         modificationDetector.start(timer, option.modifyDetectionTimerPeriod);
@@ -168,7 +171,7 @@ public abstract class CommonBaseConfig {
 
     void pushHistory() {
         withIoLock(() -> {
-            configStore.pushHistory(this);
+            configStore.pushHistory(this, HistorySource.PROGRAMMATIC);
         });
     }
 
@@ -196,7 +199,7 @@ public abstract class CommonBaseConfig {
             }
 
             saveConfigLocked();
-            configStore.pushHistory(this);
+            configStore.pushHistory(this, HistorySource.PROGRAMMATIC);
             modificationDetector.initializeHash();
             dispatchOnChange();
         });
@@ -280,6 +283,7 @@ public abstract class CommonBaseConfig {
      * @return true when stored config content was loaded; false when no store exists
      * @throws ConfigValidationException if the loaded config does not satisfy schema validation
      */
+    @SuppressWarnings("unchecked")
     protected final boolean loadConfig() {
         return withIoLock(() -> {
             if (!configStore.exists()) {
@@ -339,7 +343,7 @@ public abstract class CommonBaseConfig {
     public static class Option {
         int modifyDetectionTimerPeriod = 100;
         int fileWatchTimerPeriod = 100;
-        final TreeMap<Integer, Consumer<MigrationContext>> migrations = new TreeMap<>();
+        final Migrations.Builder migrations = Migrations.builder();
 
         public Option() {
         }
@@ -356,9 +360,24 @@ public abstract class CommonBaseConfig {
             return this;
         }
 
-        public Option migration(int version, Consumer<MigrationContext> migration) {
-            Preconditions.checkArgument(version > 0, "version must be positive");
-            migrations.put(version, Objects.requireNonNull(migration));
+        /**
+         * Registers a schema migration for the given target version.
+         * <p>
+         * Migrations run automatically in ascending version order when an existing config file has an
+         * older {@value ConfigKeys#VERSION} value. New installations start at the latest registered
+         * version and do not run historical migrations.
+         * </p>
+         * <p>
+         * Version numbers are explicit to keep migration history stable when declarations are moved or
+         * reordered in source. Register each version at most once.
+         * </p>
+         *
+         * @param version   target schema version for this migration step
+         * @param migration migration operations to apply for that version
+         * @return this option instance
+         */
+        public Option migrateTo(int version, Consumer<MigrationDsl> migration) {
+            migrations.migrateTo(version, Objects.requireNonNull(migration));
             return this;
         }
     }

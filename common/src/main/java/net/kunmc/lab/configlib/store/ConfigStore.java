@@ -5,6 +5,7 @@ import net.kunmc.lab.configlib.migration.Migrations;
 
 import java.io.Closeable;
 import java.util.List;
+import java.util.Optional;
 import java.util.Timer;
 
 public interface ConfigStore {
@@ -15,6 +16,13 @@ public interface ConfigStore {
     CommonBaseConfig write(CommonBaseConfig config, Class<? extends CommonBaseConfig> clazz, Migrations migrations);
 
     /**
+     * Returns the migration result that would be produced for the currently stored document, if any.
+     * Intended for diagnostics and tests rather than normal config loading, and typically backed by
+     * {@link Migrations#execute(int, com.google.gson.Gson, com.google.gson.JsonObject)}.
+     */
+    Optional<Migrations.MigrationResult> previewMigrations(Migrations migrations);
+
+    /**
      * Start watching for external changes to the config data.
      * The returned {@link Closeable} stops watching when closed.
      * {@code onChanged} is called when a change is detected.
@@ -22,9 +30,9 @@ public interface ConfigStore {
     Closeable startWatching(Timer timer, Runnable onChanged, int periodMs);
 
     /**
-     * Save the current config state to history.
+     * Save the current config state to history with its origin.
      */
-    void pushHistory(CommonBaseConfig config);
+    void pushHistory(CommonBaseConfig config, HistorySource source);
 
     /**
      * Returns true if there are at least {@code stepsBack + 1} history entries.
@@ -41,4 +49,9 @@ public interface ConfigStore {
      * Returns all history entries, most recent first.
      */
     List<HistoryEntry> readHistory(Class<? extends CommonBaseConfig> clazz, Migrations migrations);
+
+    /**
+     * Returns the most recent migration result applied during {@link #read}, if that read migrated data.
+     */
+    java.util.Optional<Migrations.MigrationResult> lastAppliedMigrationResult();
 }

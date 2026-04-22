@@ -5,7 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.kunmc.lab.configlib.CommonBaseConfig;
 import net.kunmc.lab.configlib.ConfigKeys;
-import net.kunmc.lab.configlib.migration.JsonMigrationContext;
+import net.kunmc.lab.configlib.migration.MigrationExecutionException;
 import net.kunmc.lab.configlib.migration.Migrations;
 import net.kunmc.lab.configlib.schema.ConfigSchema;
 
@@ -30,9 +30,10 @@ public class FileConfigStore implements ConfigStore {
     private final ConfigFormat format;
     private final Consumer<Exception> exceptionHandler;
     private final int maxHistorySize;
-    private final Logger logger = Logger.getLogger(FileConfigStore.class.getName());
+    private final transient Logger logger = Logger.getLogger(FileConfigStore.class.getName());
     private JsonObject lastLoadedSnapshot;
     private JsonObject lastWrittenSnapshot;
+    private transient Migrations.MigrationResult lastAppliedMigrationResult;
 
     public FileConfigStore(File file, Gson gson, ConfigFormat format) {
         this(file, gson, format, Throwable::printStackTrace, 50);
@@ -70,10 +71,20 @@ public class FileConfigStore implements ConfigStore {
         JsonObject jsonObject = format.parseObject(readString(file));
         int storedVersion = jsonObject.has(ConfigKeys.VERSION) ? jsonObject.get(ConfigKeys.VERSION)
                                                                            .getAsInt() : 0;
-        if (migrations.apply(storedVersion, new JsonMigrationContext(gson, jsonObject))) {
+        Migrations.MigrationResult migrationResult;
+        try {
+            migrationResult = migrations.execute(storedVersion, gson, jsonObject);
+        } catch (MigrationExecutionException e) {
+            logger.severe("Config migration failed for " + file.getName() + ": " + e.getMessage());
+            throw e;
+        }
+        lastAppliedMigrationResult = migrationResult.migrated() ? migrationResult : null;
+        if (migrationResult.migrated()) {
+            jsonObject = migrationResult.document();
             jsonObject.addProperty(ConfigKeys.VERSION, migrations.latestVersion());
             // Migration rewrites raw disk JSON/YAML, not a live config instance, so no schema metadata is available.
             writeStringAtomically(file, format.write(jsonObject, null));
+            logMigrationResult(migrationResult);
         }
         // The merge base must be the content that actually existed on disk.
         // Defaults are still applied to the returned config, but recording the filled config
@@ -97,7 +108,9 @@ public class FileConfigStore implements ConfigStore {
             JsonObject disk = format.parseObject(readString(file));
             int storedVersion = disk.has(ConfigKeys.VERSION) ? disk.get(ConfigKeys.VERSION)
                                                                    .getAsInt() : 0;
-            if (migrations.apply(storedVersion, new JsonMigrationContext(gson, disk))) {
+            Migrations.MigrationResult migrationResult = migrations.execute(storedVersion, gson, disk);
+            if (migrationResult.migrated()) {
+                disk = migrationResult.document();
                 disk.addProperty(ConfigKeys.VERSION, migrations.latestVersion());
             }
             merged = mergeWithDiskPriority(lastLoadedSnapshot, memory, disk);
@@ -109,17 +122,30 @@ public class FileConfigStore implements ConfigStore {
         return gson.fromJson(merged, clazz);
     }
 
+    @Override
+    public Optional<Migrations.MigrationResult> previewMigrations(Migrations migrations) {
+        if (!exists()) {
+            return Optional.empty();
+        }
+
+        JsonObject jsonObject = format.parseObject(readString(file));
+        int storedVersion = jsonObject.has(ConfigKeys.VERSION) ? jsonObject.get(ConfigKeys.VERSION)
+                                                                           .getAsInt() : 0;
+        return Optional.of(migrations.execute(storedVersion, gson, jsonObject));
+    }
+
     public void write(CommonBaseConfig config) {
-        write(config, config.getClass(), new Migrations(new TreeMap<>()));
+        write(config, config.getClass(), Migrations.empty());
     }
 
     @Override
-    public void pushHistory(CommonBaseConfig config) {
+    public void pushHistory(CommonBaseConfig config, HistorySource source) {
         File hf = historyFile();
         JsonArray array = hf.exists() ? readHistoryArray(hf) : new JsonArray();
         JsonObject newEntry = gson.toJsonTree(config)
                                   .getAsJsonObject();
         newEntry.addProperty(ConfigKeys.TIMESTAMP, System.currentTimeMillis());
+        newEntry.addProperty(ConfigKeys.HISTORY_SOURCE, source.name());
         JsonArray reordered = new JsonArray();
         reordered.add(newEntry);
         for (int i = 0; i < array.size() && i < maxHistorySize - 1; i++) {
@@ -134,6 +160,10 @@ public class FileConfigStore implements ConfigStore {
         }
         // History files contain snapshots under a history wrapper, not the config root schema.
         writeStringAtomically(hf, format.write(wrapHistory(reordered), null));
+    }
+
+    public void pushHistory(CommonBaseConfig config) {
+        pushHistory(config, HistorySource.PROGRAMMATIC);
     }
 
     @Override
@@ -177,9 +207,16 @@ public class FileConfigStore implements ConfigStore {
                                   .getAsJsonObject();
             long ts = obj.has(ConfigKeys.TIMESTAMP) ? obj.get(ConfigKeys.TIMESTAMP)
                                                          .getAsLong() : 0L;
-            result.add(new HistoryEntry(ts, gson.fromJson(obj, clazz)));
+            HistorySource source = obj.has(ConfigKeys.HISTORY_SOURCE) ? HistorySource.valueOf(obj.get(ConfigKeys.HISTORY_SOURCE)
+                                                                                                 .getAsString()) : HistorySource.PROGRAMMATIC;
+            result.add(new HistoryEntry(ts, source, gson.fromJson(obj, clazz)));
         }
         return result;
+    }
+
+    @Override
+    public Optional<Migrations.MigrationResult> lastAppliedMigrationResult() {
+        return Optional.ofNullable(lastAppliedMigrationResult);
     }
 
     private File historyFile() {
@@ -352,6 +389,27 @@ public class FileConfigStore implements ConfigStore {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    private void logMigrationResult(Migrations.MigrationResult migrationResult) {
+        logger.info("Applied config migrations for " + file.getName() + " from v" + migrationResult.storedVersion() + " to v" + migrationResult.targetVersion());
+        for (Migrations.VersionReport versionReport : migrationResult.versionReports()) {
+            for (Migrations.OperationReport operation : versionReport.operations()) {
+                if (!operation.applied()) {
+                    continue;
+                }
+                logger.info("  v" + versionReport.version() + ": " + formatOperation(operation));
+            }
+        }
+    }
+
+    private static String formatOperation(Migrations.OperationReport operation) {
+        if (operation.targetPath() != null) {
+            return operation.type()
+                            .displayName() + " " + operation.path() + " -> " + operation.targetPath();
+        }
+        return operation.type()
+                        .displayName() + " " + operation.path();
     }
 
     private static final class JsonElementState {

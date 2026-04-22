@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib;
 
 import com.google.gson.Gson;
 import net.kunmc.lab.configlib.store.ConfigStore;
+import net.kunmc.lab.configlib.store.HistorySource;
 import net.kunmc.lab.configlib.store.InMemoryConfigStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 
 class CommonBaseConfigTest {
     private TestConfig config;
@@ -39,7 +39,11 @@ class CommonBaseConfigTest {
         return initialized;
     }
 
-    // ---- 初期化 ----
+    private TestConfig initWithoutBackgroundDetection(TestConfig cfg, CommonBaseConfig.Option option) {
+        TestConfig initialized = init(cfg, option);
+        initialized.timer.cancel();
+        return initialized;
+    }
 
     @Test
     void savesDefaultsWhenStoreIsEmpty() {
@@ -75,9 +79,9 @@ class CommonBaseConfigTest {
     void versionWrittenAsLatestOnFreshInstall() {
         TestConfig cfg = new TestConfig();
         CommonBaseConfig.Option opt = new CommonBaseConfig.Option();
-        opt.migration(1, ctx -> {
+        opt.migrateTo(1, migration -> {
         });
-        opt.migration(2, ctx -> {
+        opt.migrateTo(2, migration -> {
         });
         init(cfg, opt);
 
@@ -85,15 +89,13 @@ class CommonBaseConfigTest {
                             .contains("\"_version_\":2"), cfg.store.readRaw());
     }
 
-    // ---- マイグレーション ----
-
     @Test
     void migrationAppliedOnLoad() {
         TestConfig cfg = new TestConfig();
         cfg.store.writeRaw("{\"value\":5,\"_version_\":0}");
 
         CommonBaseConfig.Option opt = new CommonBaseConfig.Option();
-        opt.migration(1, ctx -> ctx.setInt("value", ctx.getInt("value") * 10));
+        opt.migrateTo(1, migration -> migration.convert("value", Integer.class, Integer.class, value -> value * 10));
         init(cfg, opt);
 
         assertEquals(50, cfg.value);
@@ -107,7 +109,7 @@ class CommonBaseConfigTest {
         cfg.store.writeRaw("{\"value\":5,\"_version_\":1}");
 
         CommonBaseConfig.Option opt = new CommonBaseConfig.Option();
-        opt.migration(1, ctx -> ctx.setInt("value", ctx.getInt("value") * 10));
+        opt.migrateTo(1, migration -> migration.convert("value", Integer.class, Integer.class, value -> value * 10));
         init(cfg, opt);
 
         assertEquals(5, cfg.value);
@@ -119,14 +121,12 @@ class CommonBaseConfigTest {
         cfg.store.writeRaw("{\"value\":1,\"_version_\":1}");
 
         CommonBaseConfig.Option opt = new CommonBaseConfig.Option();
-        opt.migration(1, ctx -> ctx.setInt("value", ctx.getInt("value") + 100)); // スキップ
-        opt.migration(2, ctx -> ctx.setInt("value", ctx.getInt("value") * 10)); // 適用
+        opt.migrateTo(1, migration -> migration.convert("value", Integer.class, Integer.class, value -> value + 100));
+        opt.migrateTo(2, migration -> migration.convert("value", Integer.class, Integer.class, value -> value * 10));
         init(cfg, opt);
 
         assertEquals(10, cfg.value);
     }
-
-    // ---- onChange ----
 
     @Test
     void onChangeNotCalledOnFirstLoad() {
@@ -171,20 +171,21 @@ class CommonBaseConfigTest {
         assertEquals(1, b.get());
     }
 
-    // ---- 履歴管理 ----
-
     @Test
     void initialHistoryHasExactlyOneEntry() {
         TestConfig cfg = initWithoutBackgroundDetection(new TestConfig());
         assertEquals(1,
                      cfg.readHistory()
                         .size());
+        assertEquals(HistorySource.INITIAL,
+                     cfg.readHistory()
+                        .get(0)
+                        .source());
     }
 
     @Test
     void noAdditionalHistoryPushWhenHistoryAlreadyExists() {
         TestConfig cfg = new TestConfig();
-        // 履歴が既存（サーバー再起動前の状態を模擬）
         cfg.store.pushHistory(cfg);
         initWithoutBackgroundDetection(cfg);
 
@@ -194,10 +195,40 @@ class CommonBaseConfigTest {
     }
 
     @Test
-    void applyUndoRevertsToHistoricalValue() {
-        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig()); // history: [value=0]
+    void initialHistoryUsesMigrationSourceWhenStoreWasMigratedOnLoad() {
+        TestConfig cfg = new TestConfig();
+        cfg.store.writeRaw("{\"value\":5,\"_version_\":0}");
+
+        CommonBaseConfig.Option opt = new CommonBaseConfig.Option();
+        opt.migrateTo(1, migration -> migration.convert("value", Integer.class, Integer.class, value -> value * 10));
+        initWithoutBackgroundDetection(cfg, opt);
+
+        assertEquals(1,
+                     cfg.readHistory()
+                        .size());
+        assertEquals(HistorySource.MIGRATION,
+                     cfg.readHistory()
+                        .get(0)
+                        .source());
+    }
+
+    @Test
+    void manualPushHistoryUsesProgrammaticSource() {
+        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig());
         cfg.value = 10;
-        cfg.pushHistory();                        // history: [value=10, value=0]
+        cfg.pushHistory();
+
+        assertEquals(HistorySource.PROGRAMMATIC,
+                     cfg.readHistory()
+                        .get(0)
+                        .source());
+    }
+
+    @Test
+    void applyUndoRevertsToHistoricalValue() {
+        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig());
+        cfg.value = 10;
+        cfg.pushHistory();
 
         assertTrue(cfg.applyUndo(1));
         assertEquals(0, cfg.value);
@@ -205,11 +236,11 @@ class CommonBaseConfigTest {
 
     @Test
     void applyUndoCalledTwiceKeepsGoingBack() {
-        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig()); // history: [value=0]
+        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig());
         cfg.value = 10;
-        cfg.pushHistory();                        // history: [value=10, value=0]
+        cfg.pushHistory();
         cfg.value = 20;
-        cfg.pushHistory();                        // history: [value=20, value=10, value=0]
+        cfg.pushHistory();
 
         assertTrue(cfg.applyUndo(1));
         assertEquals(10, cfg.value);
@@ -220,11 +251,11 @@ class CommonBaseConfigTest {
 
     @Test
     void applyUndoWithStepsBack2() {
-        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig()); // history: [value=0]
+        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig());
         cfg.value = 10;
-        cfg.pushHistory();                        // history: [value=10, value=0]
+        cfg.pushHistory();
         cfg.value = 20;
-        cfg.pushHistory();                        // history: [value=20, value=10, value=0]
+        cfg.pushHistory();
 
         assertTrue(cfg.applyUndo(2));
         assertEquals(0, cfg.value);
@@ -232,11 +263,9 @@ class CommonBaseConfigTest {
 
     @Test
     void applyUndoReturnsFalseWhenOnlyOneHistoryEntry() {
-        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig()); // history: [value=0] — 1件のみ
+        TestConfig cfg = initWithoutBackgroundDetection(new TestConfig());
         assertFalse(cfg.applyUndo(1));
     }
-
-    // ---- saveConfigIfAbsent / Present ----
 
     @Test
     void saveConfigIfAbsentDoesNothingWhenStoreExists() {
@@ -247,7 +276,6 @@ class CommonBaseConfigTest {
         cfg.value = 0;
         cfg.saveConfigIfAbsent();
 
-        // 上書きされていない
         assertTrue(cfg.store.readRaw()
                             .contains("\"value\":99"), cfg.store.readRaw());
     }
@@ -264,10 +292,7 @@ class CommonBaseConfigTest {
                             .contains("\"value\":42"), cfg.store.readRaw());
     }
 
-    // ---- TestConfig ----
-
     static class TestConfig extends CommonBaseConfig {
-        // String フィールドは ConfigUtil.replaceFields が String 内部に再帰するため使用しない
         int value = 0;
         int count = 10;
 

@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.store;
 import com.google.gson.Gson;
 import net.kunmc.lab.configlib.CommonBaseConfig;
 import net.kunmc.lab.configlib.annotation.Description;
-import net.kunmc.lab.configlib.migration.MigrationContext;
 import net.kunmc.lab.configlib.migration.Migrations;
 import net.kunmc.lab.configlib.value.IntegerValue;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +14,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.TreeMap;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,13 +33,7 @@ class YamlFileConfigStoreTest {
     }
 
     private Migrations noMigrations() {
-        return new Migrations(new TreeMap<>());
-    }
-
-    private Migrations migrations(Consumer<TreeMap<Integer, Consumer<MigrationContext>>> setup) {
-        TreeMap<Integer, Consumer<MigrationContext>> m = new TreeMap<>();
-        setup.accept(m);
-        return new Migrations(m);
+        return Migrations.empty();
     }
 
     private void writeFile(String yaml) throws IOException {
@@ -78,9 +69,13 @@ class YamlFileConfigStoreTest {
         writeFile("value: 3\n_version_: 0\n");
 
         SimpleConfig loaded = (SimpleConfig) store.read(SimpleConfig.class,
-                                                        migrations(m -> m.put(1,
-                                                                              ctx -> ctx.setInt("value",
-                                                                                                ctx.getInt("value") * 10))),
+                                                        Migrations.builder()
+                                                                  .migrateTo(1,
+                                                                             migration -> migration.convert("value",
+                                                                                                            Integer.class,
+                                                                                                            Integer.class,
+                                                                                                            value -> value * 10))
+                                                                  .build(),
                                                         new SimpleConfig());
 
         assertEquals(30, loaded.value);

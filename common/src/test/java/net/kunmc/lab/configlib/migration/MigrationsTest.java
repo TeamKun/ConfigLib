@@ -5,96 +5,272 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
 
-import java.util.TreeMap;
-import java.util.function.Consumer;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class MigrationsTest {
     private final Gson gson = new Gson();
-
-    private Migrations manager(TreeMap<Integer, Consumer<MigrationContext>> migrations) {
-        return new Migrations(migrations);
-    }
 
     private JsonObject json(String raw) {
         return JsonParser.parseString(raw)
                          .getAsJsonObject();
     }
 
-    private boolean apply(Migrations mgr, JsonObject j) {
-        int storedVersion = j.has("_version_") ? j.get("_version_")
-                                                  .getAsInt() : 0;
-        return mgr.apply(storedVersion, new JsonMigrationContext(gson, j));
-    }
-
     // ---- latestVersion ----
 
     @Test
     void latestVersionReturnsZeroWhenEmpty() {
-        assertEquals(0, manager(new TreeMap<>()).latestVersion());
+        assertEquals(0,
+                     Migrations.empty()
+                               .latestVersion());
     }
 
     @Test
-    void latestVersionReturnsHighestKey() {
-        TreeMap<Integer, Consumer<MigrationContext>> migrations = new TreeMap<>();
-        migrations.put(1, ctx -> {
-        });
-        migrations.put(3, ctx -> {
-        });
-        migrations.put(2, ctx -> {
-        });
+    void latestVersionReturnsHighestRegisteredVersion() {
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1, migration -> migration.set("field", "v1"))
+                                          .migrateTo(3, migration -> migration.set("field", "v3"))
+                                          .migrateTo(2, migration -> migration.set("field", "v2"))
+                                          .build();
 
-        assertEquals(3, manager(migrations).latestVersion());
+        assertEquals(3, migrations.latestVersion());
     }
 
-    // ---- スキップ ----
+    // ---- execute ----
 
     @Test
     void returnsFalseWhenNoMigrations() {
-        assertFalse(apply(manager(new TreeMap<>()), json("{\"value\": 42}")));
+        Migrations.MigrationResult result = Migrations.empty()
+                                                      .execute(0, gson, json("{\"value\":42}"));
+
+        assertFalse(result.migrated());
+        assertEquals(42,
+                     result.document()
+                           .get("value")
+                           .getAsInt());
     }
 
     @Test
     void returnsFalseWhenAlreadyLatestVersion() {
-        TreeMap<Integer, Consumer<MigrationContext>> migrations = new TreeMap<>();
-        migrations.put(1, ctx -> ctx.setString("field", "should_not_run"));
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1, migration -> migration.set("field", "should_not_run"))
+                                          .build();
 
-        JsonObject j = json("{\"_version_\": 1, \"field\": \"original\"}");
-        assertFalse(apply(manager(migrations), j));
+        Migrations.MigrationResult result = migrations.execute(1, gson, json("{\"_version_\":1,\"field\":\"original\"}"));
+        assertFalse(result.migrated());
         assertEquals("original",
-                     j.get("field")
-                      .getAsString());
+                     result.document()
+                           .get("field")
+                           .getAsString());
     }
 
-    // ---- バージョン適用 ----
-
     @Test
-    void appliesAllMigrationsFromVersionZero() {
-        TreeMap<Integer, Consumer<MigrationContext>> migrations = new TreeMap<>();
-        migrations.put(1, ctx -> ctx.setInt("value", ctx.getInt("value") + 1));
-        migrations.put(2, ctx -> ctx.setInt("value", ctx.getInt("value") * 10));
+    void appliesAllPendingVersionBlocksInOrder() {
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1,
+                                                     migration -> migration.convert("value",
+                                                                                    Integer.class,
+                                                                                    Integer.class,
+                                                                                    value -> value + 1))
+                                          .migrateTo(2,
+                                                     migration -> migration.convert("value",
+                                                                                    Integer.class,
+                                                                                    Integer.class,
+                                                                                    value -> value * 10))
+                                          .build();
 
-        JsonObject j = json("{\"value\": 1}");
-        assertTrue(apply(manager(migrations), j));
+        Migrations.MigrationResult result = migrations.execute(0, gson, json("{\"value\":1}"));
 
-        // (1+1)*10 = 20
+        assertTrue(result.migrated());
         assertEquals(20,
-                     j.get("value")
-                      .getAsInt());
+                     result.document()
+                           .get("value")
+                           .getAsInt());
     }
 
     @Test
-    void appliesOnlyRemainingMigrationsFromPartialVersion() {
-        TreeMap<Integer, Consumer<MigrationContext>> migrations = new TreeMap<>();
-        migrations.put(1, ctx -> ctx.setString("field", "v1"));
-        migrations.put(2, ctx -> ctx.setString("field", "v2"));
-        migrations.put(3, ctx -> ctx.setString("field", "v3"));
+    void appliesOnlyVersionsGreaterThanStoredVersion() {
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1, migration -> migration.set("field", "v1"))
+                                          .migrateTo(2, migration -> migration.set("field", "v2"))
+                                          .migrateTo(3, migration -> migration.set("field", "v3"))
+                                          .build();
 
-        JsonObject j = json("{\"_version_\": 1, \"field\": \"original\"}");
-        assertTrue(apply(manager(migrations), j));
+        Migrations.MigrationResult result = migrations.execute(1, gson, json("{\"_version_\":1,\"field\":\"original\"}"));
+
+        assertTrue(result.migrated());
         assertEquals("v3",
-                     j.get("field")
-                      .getAsString());
+                     result.document()
+                           .get("field")
+                           .getAsString());
+    }
+
+    @Test
+    void executeReturnsMigratedCopyWithoutMutatingSourceDocument() {
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1, migration -> migration.rename("oldName", "newName"))
+                                          .build();
+
+        JsonObject source = json("{\"oldName\":\"value\"}");
+        Migrations.MigrationResult result = migrations.execute(0, gson, source);
+
+        assertTrue(result.migrated());
+        assertTrue(source.has("oldName"));
+        assertFalse(source.has("newName"));
+        assertFalse(result.document()
+                          .has("oldName"));
+        assertEquals("value",
+                     result.document()
+                           .get("newName")
+                           .getAsString());
+    }
+
+    @Test
+    void resultIncludesVersionAndOperationReports() {
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1,
+                                                     migration -> migration.rename("oldName", "newName")
+                                                                           .defaultValue("missing", 10))
+                                          .migrateTo(2, migration -> migration.delete("unknown"))
+                                          .build();
+
+        Migrations.MigrationResult result = migrations.execute(0, gson, json("{\"oldName\":\"value\"}"));
+
+        assertEquals(2,
+                     result.versionReports()
+                           .size());
+        assertEquals(1,
+                     result.versionReports()
+                           .get(0)
+                           .version());
+        assertEquals(2,
+                     result.versionReports()
+                           .get(0)
+                           .operations()
+                           .size());
+        assertTrue(result.versionReports()
+                         .get(0)
+                         .applied());
+        assertEquals(MigrationOperationType.RENAME,
+                     result.versionReports()
+                           .get(0)
+                           .operations()
+                           .get(0)
+                           .type());
+        assertEquals("oldName",
+                     result.versionReports()
+                           .get(0)
+                           .operations()
+                           .get(0)
+                           .path());
+        assertEquals("newName",
+                     result.versionReports()
+                           .get(0)
+                           .operations()
+                           .get(0)
+                           .targetPath());
+        assertTrue(result.versionReports()
+                         .get(0)
+                         .operations()
+                         .get(0)
+                         .applied());
+        assertEquals(MigrationOperationType.DEFAULT_VALUE,
+                     result.versionReports()
+                           .get(0)
+                           .operations()
+                           .get(1)
+                           .type());
+        assertTrue(result.versionReports()
+                         .get(0)
+                         .operations()
+                         .get(1)
+                         .applied());
+        assertEquals(2,
+                     result.versionReports()
+                           .get(1)
+                           .version());
+        assertFalse(result.versionReports()
+                          .get(1)
+                          .applied());
+        assertEquals(MigrationOperationType.DELETE,
+                     result.versionReports()
+                           .get(1)
+                           .operations()
+                           .get(0)
+                           .type());
+        assertFalse(result.versionReports()
+                          .get(1)
+                          .operations()
+                          .get(0)
+                          .applied());
+        assertEquals(3,
+                     result.reports()
+                           .size());
+    }
+
+    @Test
+    void versionBlockIsAtomicWhenLaterOperationFails() {
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1,
+                                                     migration -> migration.rename("oldName", "newName")
+                                                                           .set("broken.child", 1))
+                                          .build();
+
+        JsonObject document = json("{\"oldName\":\"value\",\"broken\":1}");
+        MigrationExecutionException ex = assertThrows(MigrationExecutionException.class,
+                                                      () -> migrations.execute(0, gson, document));
+
+        assertEquals(1, ex.version());
+        assertEquals(MigrationOperationType.SET, ex.operationType());
+        assertEquals("broken.child", ex.path());
+        assertEquals(0,
+                     ex.completedVersionReports()
+                       .size());
+        assertEquals(0,
+                     ex.completedOperationReports()
+                       .size());
+        assertEquals(MigrationOperationType.SET,
+                     ex.failedOperationReport()
+                       .type());
+        assertEquals("broken.child",
+                     ex.failedOperationReport()
+                       .path());
+        assertTrue(ex.getMessage()
+                     .contains("Migration v1 failed while applying set broken.child"));
+        assertTrue(ex.getMessage()
+                     .contains("Cannot create nested migration path"));
+        assertTrue(document.has("oldName"));
+        assertFalse(document.has("newName"));
+    }
+
+    @Test
+    void exceptionIncludesCompletedReportsBeforeLaterVersionFails() {
+        Migrations migrations = Migrations.builder()
+                                          .migrateTo(1, migration -> migration.rename("oldName", "newName"))
+                                          .migrateTo(2, migration -> migration.set("broken.child", 1))
+                                          .build();
+
+        MigrationExecutionException ex = assertThrows(MigrationExecutionException.class,
+                                                      () -> migrations.execute(0,
+                                                                               gson,
+                                                                               json("{\"oldName\":\"value\",\"broken\":1}")));
+
+        assertEquals(1,
+                     ex.completedVersionReports()
+                       .size());
+        assertEquals(1,
+                     ex.completedVersionReports()
+                       .get(0)
+                       .version());
+        assertEquals(1,
+                     ex.completedOperationReports()
+                       .size());
+        assertEquals(MigrationOperationType.RENAME,
+                     ex.completedOperationReports()
+                       .get(0)
+                       .type());
+        assertEquals(MigrationOperationType.SET,
+                     ex.failedOperationReport()
+                       .type());
+        assertEquals(2, ex.version());
     }
 }

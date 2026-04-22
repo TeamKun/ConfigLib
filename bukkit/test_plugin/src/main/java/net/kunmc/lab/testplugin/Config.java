@@ -24,12 +24,7 @@ public class Config extends AbstractConfig {
 
     public Config(@NotNull Plugin plugin) {
         super(plugin, opt -> {
-            opt.migration(1, ctx -> {
-                var obj = ctx.getObject("innerClass", Inner.class);
-                if (obj == null) {
-                    ctx.setObject("innerClass", new Inner("default"));
-                }
-            });
+            opt.migrateTo(1, migration -> migration.defaultValue("innerClass", new Inner("default")));
         });
 
         strings.add("hogehoge");

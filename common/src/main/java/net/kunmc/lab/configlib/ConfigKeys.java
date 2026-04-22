@@ -6,6 +6,7 @@ package net.kunmc.lab.configlib;
 public final class ConfigKeys {
     public static final String VERSION = "_version_";
     public static final String TIMESTAMP = "_ts_";
+    public static final String HISTORY_SOURCE = "_src_";
     public static final String VALUE = "value";
     public static final String DESCRIPTION = "description";
 

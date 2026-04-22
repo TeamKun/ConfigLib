@@ -39,6 +39,8 @@ Read only what the request needs. Common public API files include:
 - `README.md`
 - `common/src/main/java/net/kunmc/lab/configlib/CommonBaseConfig.java`
 - `common/src/main/java/net/kunmc/lab/configlib/ConfigKeys.java`
+- `common/src/main/java/net/kunmc/lab/configlib/migration/MigrationDsl.java`
+- `common/src/main/java/net/kunmc/lab/configlib/migration/Migrations.java`
 - `bukkit/src/main/java/net/kunmc/lab/configlib/BaseConfig.java`
 - `common/src/main/java/net/kunmc/lab/configlib/Value.java`
 - `common/src/main/java/net/kunmc/lab/configlib/SingleValue.java`
@@ -49,6 +51,8 @@ Read only what the request needs. Common public API files include:
 - `common/src/main/java/net/kunmc/lab/configlib/store/ConfigStore.java`
 - `common/src/main/java/net/kunmc/lab/configlib/store/FileConfigStore.java`
 - `common/src/main/java/net/kunmc/lab/configlib/store/YamlFileConfigStore.java`
+- `common/src/main/java/net/kunmc/lab/configlib/store/HistoryEntry.java`
+- `common/src/main/java/net/kunmc/lab/configlib/store/HistorySource.java`
 - `common/src/main/java/net/kunmc/lab/configlib/value/`
 - `bukkit/src/main/java/net/kunmc/lab/configlib/value/`
 - `common/src/main/java/net/kunmc/lab/configlib/annotation/` (POJO API: `@Description`, `@Range`, `@Nullable`)
