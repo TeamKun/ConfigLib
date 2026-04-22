@@ -111,6 +111,30 @@ class ConfigLevelCommandTest {
         }
     }
 
+    @Test
+    void configLevelResetRestoresPojoDefaults() {
+        PojoModifyConfig cfg = initConfig(new PojoModifyConfig());
+        config = null;
+        FakeSender sender = FakeSender.console();
+
+        cfg.maxPlayers = 45;
+        cfg.motd = "changed";
+        cfg.enabled = false;
+        cfg.mode = Mode.HARD;
+        cfg.names = java.util.List.of("steve");
+
+        try (CommandTester tester = new CommandTester(commandFor(cfg), "configlib.test")) {
+            tester.execute("config reset", sender);
+        }
+
+        assertEquals(20, cfg.maxPlayers);
+        assertEquals("hello", cfg.motd);
+        assertEquals(true, cfg.enabled);
+        assertEquals(Mode.EASY, cfg.mode);
+        assertEquals(java.util.List.of("alex"), cfg.names);
+        cfg.close();
+    }
+
     static class DisabledConfig extends TestConfig {
         DisabledConfig() {
             disableList();

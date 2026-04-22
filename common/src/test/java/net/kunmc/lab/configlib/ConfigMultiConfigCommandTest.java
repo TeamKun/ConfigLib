@@ -164,6 +164,21 @@ class ConfigMultiConfigCommandTest {
     }
 
     @Test
+    void multiConfigDiffDefaultSupportsConfigNamePrefixes() {
+        first = init(new TestConfig());
+        second = init(new OtherConfig());
+        first.count.value(30);
+        FakeSender sender = FakeSender.console();
+
+        try (CommandTester tester = new CommandTester(commandFor(first, second), "configlib.test")) {
+            tester.execute("config diff testConfig default", sender);
+        }
+
+        assertTrue(messages(sender).stream()
+                                   .anyMatch(x -> x.contains("count: 10")), messages(sender).toString());
+    }
+
+    @Test
     void multiConfigHistoryConfigSpecificFormsAreGenerated() {
         first = init(new TestConfig());
         second = init(new OtherConfig());

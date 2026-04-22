@@ -67,6 +67,39 @@ class ConfigHistoryCommandTest {
     }
 
     @Test
+    void diffDefaultCommandShowsDifferenceFromInitialDefaults() {
+        config = init(new TestConfig());
+        config.count.value(25);
+        config.message.value("changed");
+        FakeSender sender = FakeSender.console();
+
+        try (CommandTester tester = new CommandTester(commandFor(config), "configlib.test")) {
+            tester.execute("config diff default", sender);
+        }
+
+        assertTrue(messages(sender).stream()
+                                   .anyMatch(x -> x.contains("count: 10")), messages(sender).toString());
+        assertTrue(messages(sender).stream()
+                                   .anyMatch(x -> x.contains("message: hello")), messages(sender).toString());
+    }
+
+    @Test
+    void diffDefaultIncludesNestedPojoEntries() {
+        NestedPojoModifyConfig cfg = initConfig(new NestedPojoModifyConfig());
+        config = null;
+        cfg.arena.maxArenas = 12;
+        FakeSender sender = FakeSender.console();
+
+        try (CommandTester tester = new CommandTester(commandFor(cfg), "configlib.test")) {
+            tester.execute("config diff default", sender);
+        }
+
+        assertTrue(messages(sender).stream()
+                                   .anyMatch(x -> x.contains("arena.maxArenas: 5 -> 12")), messages(sender).toString());
+        cfg.close();
+    }
+
+    @Test
     void historyUndoCommandsAreGenerated() {
         config = init(new TestConfig());
         makeHistory(config);

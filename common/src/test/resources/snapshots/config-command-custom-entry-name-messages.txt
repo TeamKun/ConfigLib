@@ -1,12 +1,12 @@
-§aamountの値を25に変更しました.
-§aamountをデフォルト値(10)にリセットしました
-§aplayersにalexを追加しました.
-§aplayersからalexを削除しました.
-§aplayersにalexを追加しました.
-§aplayersをクリアしました
-§aplayersをデフォルト値([])にリセットしました
-§apointsに{alice:7}を追加しました.
-§apointsから{alice:7}を削除しました.
-§apointsに{alice:9}を追加しました.
-§apointsをクリアしました
-§apointsをデフォルト値({})にリセットしました
+\u00A7aamount\u306E\u5024\u309225\u306B\u5909\u66F4\u3057\u307E\u3057\u305F.
+\u00A7aamount was reset to default (10)
+\u00A7aplayers\u306Balex\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F.
+\u00A7aplayers\u304B\u3089alex\u3092\u524A\u9664\u3057\u307E\u3057\u305F.
+\u00A7aplayers\u306Balex\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F.
+\u00A7aplayers\u3092\u30AF\u30EA\u30A2\u3057\u307E\u3057\u305F
+\u00A7aplayers was reset to default ([])
+\u00A7apoints\u306B{alice:7}\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F.
+\u00A7apoints\u304B\u3089{alice:7}\u3092\u524A\u9664\u3057\u307E\u3057\u305F.
+\u00A7apoints\u306B{alice:9}\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F.
+\u00A7apoints\u3092\u30AF\u30EA\u30A2\u3057\u307E\u3057\u305F
+\u00A7apoints was reset to default ({})

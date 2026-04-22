@@ -182,6 +182,28 @@ class ConfigFieldCommandTest {
     }
 
     @Test
+    void pojoFieldResetRestoresDefaultValue() {
+        PojoModifyConfig cfg = initConfig(new PojoModifyConfig());
+        FakeSender sender = FakeSender.console();
+        cfg.maxPlayers = 44;
+
+        execute(commandFor(cfg), "config maxPlayers reset", sender);
+
+        assertEquals(20, cfg.maxPlayers);
+    }
+
+    @Test
+    void nestedPojoFieldResetRestoresDefaultValue() {
+        NestedPojoModifyConfig cfg = initConfig(new NestedPojoModifyConfig());
+        FakeSender sender = FakeSender.console();
+        cfg.arena.maxArenas = 12;
+
+        execute(commandFor(cfg), "config arena.maxArenas reset", sender);
+
+        assertEquals(5, cfg.arena.maxArenas);
+    }
+
+    @Test
     void numericIncAndDecSupportDefaultAndExplicitAmounts() {
         config = init(new TestConfig());
         FakeSender sender = FakeSender.console();

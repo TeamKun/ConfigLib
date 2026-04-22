@@ -1,9 +1,9 @@
-§acustom count
-§acustom add names=[alex]
-§acustom remove names=[alex]
-§acustom add names=[steve]
-§acustom clear names
-§acustom put scores=alice:7
-§acustom map remove scores=alice:7
-§acustom put scores=bob:3
-§acustom map clear scores
+\u00A7acustom count
+\u00A7acustom add names=[alex]
+\u00A7acustom remove names=[alex]
+\u00A7acustom add names=[steve]
+\u00A7acustom clear names
+\u00A7acustom put scores=alice:7
+\u00A7acustom map remove scores=alice:7
+\u00A7acustom put scores=bob:3
+\u00A7acustom map clear scores

@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
+import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
@@ -99,20 +100,9 @@ class ConfigFieldCommand extends Command {
                 addChildren(new ModifyDecCommand(config, schemaEntry, (NumericValue<?, ?>) v));
             }
 
-            if (schemaEntry instanceof ValueConfigSchemaEntry) {
-                String entryName = schemaEntry.entryName();
-                addChildren(new Command("reset") {{
-                    execute(ctx -> {
-                        try {
-                            config.mutate(v::resetToDefault);
-                        } catch (ConfigValidationException e) {
-                            e.sendMessage(ctx);
-                            return;
-                        }
-                        ctx.sendSuccess(entryName + "をデフォルト値(" + schemaEntry.displayString() + ")にリセットしました");
-                    });
-                }});
-            }
+            addChildren(new Command("reset") {{
+                execute(ctx -> resetEntry(ctx, config, schemaEntry));
+            }});
         }
     }
 
@@ -148,15 +138,7 @@ class ConfigFieldCommand extends Command {
             }
 
             addChildren(new Command("reset") {{
-                execute(ctx -> {
-                    try {
-                        config.mutate(v::resetToDefault);
-                    } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
-                        return;
-                    }
-                    ctx.sendSuccess(schemaEntry.entryName() + "をデフォルト値(" + v.displayString() + ")にリセットしました");
-                });
+                execute(ctx -> resetEntry(ctx, config, schemaEntry));
             }});
         }
     }
@@ -188,16 +170,18 @@ class ConfigFieldCommand extends Command {
             }
 
             addChildren(new Command("reset") {{
-                execute(ctx -> {
-                    try {
-                        config.mutate(v::resetToDefault);
-                    } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
-                        return;
-                    }
-                    ctx.sendSuccess(schemaEntry.entryName() + "をデフォルト値(" + v.displayString() + ")にリセットしました");
-                });
+                execute(ctx -> resetEntry(ctx, config, schemaEntry));
             }});
         }
+    }
+
+    private static void resetEntry(CommandContext ctx, CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry) {
+        try {
+            config.mutate(() -> config.resetEntryToDefault(schemaEntry));
+        } catch (ConfigValidationException e) {
+            e.sendMessage(ctx);
+            return;
+        }
+        ctx.sendSuccess(schemaEntry.entryName() + " was reset to default (" + schemaEntry.displayString() + ")");
     }
 }

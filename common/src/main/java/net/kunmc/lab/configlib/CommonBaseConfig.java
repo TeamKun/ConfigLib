@@ -12,11 +12,13 @@ import net.kunmc.lab.configlib.store.HistoryEntry;
 import net.kunmc.lab.configlib.store.HistorySource;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -44,6 +46,7 @@ public abstract class CommonBaseConfig {
     private transient ConfigStore configStore;
     private transient Closeable configStoreWatcher;
     private transient ConfigSchema schema;
+    private transient Map<String, Object> defaultValues;
 
     protected CommonBaseConfig() {
         String s = getClass().getSimpleName();
@@ -63,16 +66,29 @@ public abstract class CommonBaseConfig {
         return schema;
     }
 
+    final String formatDefaultValue(ConfigSchemaEntry<?> entry) {
+        return entry.displayString(copyDefaultValue(entry));
+    }
+
+    final void resetEntryToDefault(ConfigSchemaEntry<?> entry) {
+        setSchemaValue(entry, copyDefaultValue(entry));
+    }
+
+    final void resetAllEntriesToDefault() {
+        schema.entries()
+              .forEach(this::resetEntryToDefault);
+    }
+
     final void init(Option option) {
         migrations = option.migrations.build();
         schemaVersion = migrations.latestVersion();
         configStore = Objects.requireNonNull(createConfigStore());
 
-        for (Value<?, ?> v : ConfigUtil.getValues(this)) {
-            v.snapshotDefault();
-        }
-
         schema = ConfigSchema.fromConfig(this);
+        defaultValues = schema.entries()
+                              .stream()
+                              .collect(java.util.stream.Collectors.toUnmodifiableMap(ConfigSchemaEntry::entryName,
+                                                                                     this::snapshotDefaultValue));
 
         try {
             saveConfigIfAbsent();
@@ -312,6 +328,52 @@ public abstract class CommonBaseConfig {
     private void replaceWithValidatedConfig(CommonBaseConfig config) {
         validateConfig(config);
         ConfigUtil.replaceFields(this, config, this);
+    }
+
+    private Object snapshotDefaultValue(ConfigSchemaEntry<?> entry) {
+        Object value = entry.get();
+        Value<?, ?> backingValue = resolveValueField(entry);
+        if (backingValue != null) {
+            return copyValueDefault(backingValue, value);
+        }
+        return configStore.copyValue(entry.field()
+                                          .getGenericType(), value);
+    }
+
+    private Object copyDefaultValue(ConfigSchemaEntry<?> entry) {
+        Object value = defaultValues.get(entry.entryName());
+        Value<?, ?> backingValue = resolveValueField(entry);
+        if (backingValue != null) {
+            return copyValueDefault(backingValue, value);
+        }
+        return configStore.copyValue(entry.field()
+                                          .getGenericType(), value);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object copyValueDefault(Value<?, ?> value, Object rawValue) {
+        return ((Value<Object, ?>) value).copyValue(rawValue);
+    }
+
+    @Nullable
+    private Value<?, ?> resolveValueField(ConfigSchemaEntry<?> entry) {
+        if (!Value.class.isAssignableFrom(entry.field()
+                                               .getType())) {
+            return null;
+        }
+
+        try {
+            Object value = entry.field()
+                                .get(this);
+            return value instanceof Value ? (Value<?, ?>) value : null;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void setSchemaValue(ConfigSchemaEntry<?> entry, Object newValue) {
+        ((ConfigSchemaEntry<Object>) entry).set(newValue);
     }
 
     void validateCurrentConfig() {

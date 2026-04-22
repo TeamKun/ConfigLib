@@ -6,14 +6,14 @@ import net.kunmc.lab.commandlib.argument.IntegerArgument;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.store.HistoryEntry;
 import net.kunmc.lab.configlib.util.ConfigUtil;
-import net.kunmc.lab.configlib.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
 class ConfigDiffCommand extends Command {
+    private static final String DIFF_ARROW = " -> ";
+
     public ConfigDiffCommand(@NotNull Set<CommonBaseConfig> configs) {
         super(SubCommandType.Diff.name);
 
@@ -22,9 +22,13 @@ class ConfigDiffCommand extends Command {
         }
 
         if (configs.size() > 1) {
+            // /config diff <name> default
             // /config diff <name> <index>
             // /config diff <name> <index1> <index2>
             configs.forEach(config -> addChildren(new Command(config.entryName()) {{
+                addChildren(new Command("default") {{
+                    execute(ctx -> execDefaultDiff(ctx, config));
+                }});
                 argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
                     execDiff(ctx, config, 0, index);
                 });
@@ -33,37 +37,42 @@ class ConfigDiffCommand extends Command {
                     execDiff(ctx, config, index1, index2);
                 });
             }}));
-        } else {
-            // /config diff <index>
-            // /config diff <index1> <index2>
-            CommonBaseConfig config = configs.iterator()
-                                             .next();
-            argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
-                execDiff(ctx, config, 0, index);
-            });
-            argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
-                     new IntegerArgument("index2", 0, Integer.MAX_VALUE)).execute((index1, index2, ctx) -> {
-                execDiff(ctx, config, index1, index2);
-            });
+            return;
         }
+
+        // /config diff default
+        // /config diff <index>
+        // /config diff <index1> <index2>
+        CommonBaseConfig config = configs.iterator()
+                                         .next();
+        addChildren(new Command("default") {{
+            execute(ctx -> execDefaultDiff(ctx, config));
+        }});
+        argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
+            execDiff(ctx, config, 0, index);
+        });
+        argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
+                 new IntegerArgument("index2", 0, Integer.MAX_VALUE)).execute((index1, index2, ctx) -> {
+            execDiff(ctx, config, index1, index2);
+        });
     }
 
     static void execDiff(CommandContext ctx, CommonBaseConfig config, int index1, int index2) {
         config.inspect(() -> {
             if (index1 == index2) {
-                ctx.sendFailure("同じインデックスを指定しています");
+                ctx.sendFailure("Cannot diff the same index");
                 return;
             }
 
             List<HistoryEntry> history = config.readHistory();
             if (history.size() <= 1) {
-                ctx.sendFailure(config.entryName() + "の変更履歴がありません");
+                ctx.sendFailure("Not enough history entries for " + config.entryName());
                 return;
             }
 
             int maxIndex = Math.max(index1, index2);
             if (maxIndex >= history.size()) {
-                ctx.sendFailure("インデックス " + maxIndex + " は範囲外です (0–" + (history.size() - 1) + ")");
+                ctx.sendFailure("Index " + maxIndex + " is out of range (0-" + (history.size() - 1) + ")");
                 return;
             }
 
@@ -75,41 +84,55 @@ class ConfigDiffCommand extends Command {
                                                   .config();
 
             ctx.sendMessage(ConfigUtil.configHeader(config));
-            ctx.sendSuccess("[" + olderIndex + "] → [" + newerIndex + "]");
+            ctx.sendSuccess("[" + olderIndex + "]" + DIFF_ARROW + "[" + newerIndex + "]");
+            emitDiff(ctx, config, olderConfig, newerConfig);
+        });
+    }
+
+    static void execDefaultDiff(CommandContext ctx, CommonBaseConfig config) {
+        config.inspect(() -> {
+            ctx.sendMessage(ConfigUtil.configHeader(config));
+            ctx.sendSuccess("[default]" + DIFF_ARROW + "[current]");
 
             boolean anyDiff = false;
-            for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())) {
-                if (!ConfigUtil.isObservableField(config, field)) {
+            for (ConfigSchemaEntry<?> entry : config.schema()
+                                                    .entries()) {
+                String defaultFmt = config.formatDefaultValue(entry);
+                String currentFmt = entry.displayString();
+                if (defaultFmt.equals(currentFmt)) {
                     continue;
                 }
-                ConfigSchemaEntry<?> entry = config.schema()
-                                                   .findEntry(field.getName())
-                                                   .orElse(null);
-                if (entry == null) {
-                    continue;
-                }
-
-                field.setAccessible(true);
-                try {
-                    Object older = field.get(olderConfig);
-                    Object newer = field.get(newerConfig);
-
-                    String name = entry.entryName();
-                    String olderFmt = entry.displayString(older);
-                    String newerFmt = entry.displayString(newer);
-                    if (olderFmt.equals(newerFmt)) {
-                        continue;
-                    }
-                    anyDiff = true;
-                    ctx.sendSuccess(name + ": " + olderFmt + " → " + newerFmt);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+                anyDiff = true;
+                ctx.sendSuccess(entry.entryName() + ": " + defaultFmt + DIFF_ARROW + currentFmt);
             }
 
             if (!anyDiff) {
-                ctx.sendSuccess("差分はありません");
+                ctx.sendSuccess("No differences found");
             }
         });
+    }
+
+    private static void emitDiff(CommandContext ctx,
+                                 CommonBaseConfig liveConfig,
+                                 CommonBaseConfig olderConfig,
+                                 CommonBaseConfig newerConfig) {
+        boolean anyDiff = false;
+        for (ConfigSchemaEntry<?> entry : liveConfig.schema()
+                                                    .entries()) {
+            Object older = entry.get(olderConfig);
+            Object newer = entry.get(newerConfig);
+
+            String olderFmt = entry.displayString(older);
+            String newerFmt = entry.displayString(newer);
+            if (olderFmt.equals(newerFmt)) {
+                continue;
+            }
+            anyDiff = true;
+            ctx.sendSuccess(entry.entryName() + ": " + olderFmt + DIFF_ARROW + newerFmt);
+        }
+
+        if (!anyDiff) {
+            ctx.sendSuccess("No differences found");
+        }
     }
 }

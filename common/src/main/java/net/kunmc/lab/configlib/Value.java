@@ -17,7 +17,6 @@ public abstract class Value<E, T extends Value<E, T>> {
     private transient final List<Consumer<E>> initializeListeners = new ArrayList<>();
     private transient final List<Consumer<E>> modifyListeners = new ArrayList<>();
     protected E value;
-    private transient E defaultValue;
     private String description;
     private transient volatile boolean initialized = false;
     private transient E initValue;
@@ -41,14 +40,6 @@ public abstract class Value<E, T extends Value<E, T>> {
 
     protected E copyValue(E value) {
         return value;
-    }
-
-    final void snapshotDefault() {
-        this.defaultValue = copyValue(this.value);
-    }
-
-    final void resetToDefault() {
-        this.value = copyValue(defaultValue);
     }
 
     @Nullable

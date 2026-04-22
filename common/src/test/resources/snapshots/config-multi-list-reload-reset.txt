@@ -1,28 +1,28 @@
-§f§7------------------[ §6§ltestConfig§7 ]------------------
-§x§5§5§f§f§5§5count: 10
-§x§5§5§f§f§5§5message: hello
-§x§5§5§f§f§5§5names: []
-§x§5§5§f§f§5§5scores: {}
-§f§7-----------------[ §6§lotherConfig§7 ]------------------
-§x§5§5§f§f§5§5count: 20
-§x§5§5§f§f§5§5title: other
-§x§5§5§f§f§5§5scores: {bob:2}
-§f§7------------------[ §6§ltestConfig§7 ]------------------
-§x§5§5§f§f§5§5count: 10
-§x§5§5§f§f§5§5message: hello
-§x§5§5§f§f§5§5names: []
-§x§5§5§f§f§5§5scores: {}
-§atestConfigを再読み込みしました
-§aotherConfigを再読み込みしました
-§atestConfigを再読み込みしました
-§atestConfigをデフォルト値にリセットしました
-§f§7------------------[ §6§ltestConfig§7 ]------------------
-§x§5§5§f§f§5§5count: 10
-§x§5§5§f§f§5§5message: hello
-§x§5§5§f§f§5§5names: []
-§x§5§5§f§f§5§5scores: {}
-§f§7--------------------------------------------------
-§f§cUsage:
-§f§b  /config reset §etestConfig
-§f§b  /config reset §eotherConfig
-§f§7--------------------------------------------------
+\u00A7f\u00A77------------------[ \u00A76\u00A7ltestConfig\u00A77 ]------------------
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75count: 10
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75message: hello
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75names: []
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75scores: {}
+\u00A7f\u00A77-----------------[ \u00A76\u00A7lotherConfig\u00A77 ]------------------
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75count: 20
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75title: other
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75scores: {bob:2}
+\u00A7f\u00A77------------------[ \u00A76\u00A7ltestConfig\u00A77 ]------------------
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75count: 10
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75message: hello
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75names: []
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75scores: {}
+\u00A7atestConfig\u3092\u518D\u8AAD\u307F\u8FBC\u307F\u3057\u307E\u3057\u305F
+\u00A7aotherConfig\u3092\u518D\u8AAD\u307F\u8FBC\u307F\u3057\u307E\u3057\u305F
+\u00A7atestConfig\u3092\u518D\u8AAD\u307F\u8FBC\u307F\u3057\u307E\u3057\u305F
+\u00A7atestConfig\u3092\u30C7\u30D5\u30A9\u30EB\u30C8\u5024\u306B\u30EA\u30BB\u30C3\u30C8\u3057\u307E\u3057\u305F
+\u00A7f\u00A77------------------[ \u00A76\u00A7ltestConfig\u00A77 ]------------------
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75count: 10
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75message: hello
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75names: []
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75scores: {}
+\u00A7f\u00A77--------------------------------------------------
+\u00A7f\u00A7cUsage:
+\u00A7f\u00A7b  /config reset \u00A7etestConfig
+\u00A7f\u00A7b  /config reset \u00A7eotherConfig
+\u00A7f\u00A77--------------------------------------------------

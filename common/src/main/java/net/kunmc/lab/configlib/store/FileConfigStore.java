@@ -13,6 +13,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
@@ -120,6 +121,14 @@ public class FileConfigStore implements ConfigStore {
         lastLoadedSnapshot = merged.deepCopy();
         lastWrittenSnapshot = merged.deepCopy();
         return gson.fromJson(merged, clazz);
+    }
+
+    @Override
+    public Object copyValue(Type type, Object value) {
+        if (value == null) {
+            return null;
+        }
+        return gson.fromJson(gson.toJsonTree(value, type), type);
     }
 
     @Override

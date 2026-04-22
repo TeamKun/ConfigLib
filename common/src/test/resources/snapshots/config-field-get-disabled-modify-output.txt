@@ -1,9 +1,9 @@
-§acountの値を22に変更しました.
-§f§7--------------------------------------------------
-§f§cUsage:
-§f§b  /config count §eset
-§f§b  /config count §einc
-§f§b  /config count §edec
-§f§b  /config count §ereset
-§f  §b/config count §7<§eInteger§7>
-§f§7--------------------------------------------------
+\u00A7acount\u306E\u5024\u309222\u306B\u5909\u66F4\u3057\u307E\u3057\u305F.
+\u00A7f\u00A77--------------------------------------------------
+\u00A7f\u00A7cUsage:
+\u00A7f\u00A7b  /config count \u00A7eset
+\u00A7f\u00A7b  /config count \u00A7einc
+\u00A7f\u00A7b  /config count \u00A7edec
+\u00A7f\u00A7b  /config count \u00A7ereset
+\u00A7f  \u00A7b/config count \u00A77<\u00A7eInteger\u00A77>
+\u00A7f\u00A77--------------------------------------------------

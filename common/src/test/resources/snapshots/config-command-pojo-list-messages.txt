@@ -1,8 +1,8 @@
-§f§7--------------[ §6§lpojoSnapshotConfig§7 ]--------------
-§x§5§5§f§f§5§5maxPlayers: 20
-§x§5§5§f§f§5§5motd: hello
-§x§5§5§f§f§5§5privateValue: private
-§f§7--------------[ §6§lpojoSnapshotConfig§7 ]--------------
-§x§5§5§f§f§5§5maxPlayers: 20
-§x§5§5§f§f§5§5motd: hello
-§x§5§5§f§f§5§5privateValue: private
+\u00A7f\u00A77--------------[ \u00A76\u00A7lpojoSnapshotConfig\u00A77 ]--------------
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75maxPlayers: 20
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75motd: hello
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75privateValue: private
+\u00A7f\u00A77--------------[ \u00A76\u00A7lpojoSnapshotConfig\u00A77 ]--------------
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75maxPlayers: 20
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75motd: hello
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75privateValue: private

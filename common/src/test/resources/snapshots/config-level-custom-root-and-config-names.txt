@@ -1,11 +1,11 @@
-§f§7-------------------[ §6§lprimary§7 ]--------------------
-§x§5§5§f§f§5§5amount: 10
-§x§5§5§f§f§5§5message: hello
-§x§5§5§f§f§5§5names: []
-§x§5§5§f§f§5§5scores: {}
-§f§7-------------------[ §6§lprimary§7 ]--------------------
-§x§5§5§f§f§5§5amount: 10
-§x§5§5§f§f§5§5message: hello
-§x§5§5§f§f§5§5names: []
-§x§5§5§f§f§5§5scores: {}
-§aamountの値を22に変更しました.
+\u00A7f\u00A77-------------------[ \u00A76\u00A7lprimary\u00A77 ]--------------------
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75amount: 10
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75message: hello
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75names: []
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75scores: {}
+\u00A7f\u00A77-------------------[ \u00A76\u00A7lprimary\u00A77 ]--------------------
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75amount: 10
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75message: hello
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75names: []
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75scores: {}
+\u00A7aamount\u306E\u5024\u309222\u306B\u5909\u66F4\u3057\u307E\u3057\u305F.

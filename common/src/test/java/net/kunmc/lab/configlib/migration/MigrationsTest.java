@@ -55,7 +55,9 @@ class MigrationsTest {
                                           .migrateTo(1, migration -> migration.set("field", "should_not_run"))
                                           .build();
 
-        Migrations.MigrationResult result = migrations.execute(1, gson, json("{\"_version_\":1,\"field\":\"original\"}"));
+        Migrations.MigrationResult result = migrations.execute(1,
+                                                               gson,
+                                                               json("{\"_version_\":1,\"field\":\"original\"}"));
         assertFalse(result.migrated());
         assertEquals("original",
                      result.document()
@@ -95,7 +97,9 @@ class MigrationsTest {
                                           .migrateTo(3, migration -> migration.set("field", "v3"))
                                           .build();
 
-        Migrations.MigrationResult result = migrations.execute(1, gson, json("{\"_version_\":1,\"field\":\"original\"}"));
+        Migrations.MigrationResult result = migrations.execute(1,
+                                                               gson,
+                                                               json("{\"_version_\":1,\"field\":\"original\"}"));
 
         assertTrue(result.migrated());
         assertEquals("v3",

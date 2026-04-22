@@ -1,18 +1,18 @@
-§x§5§5§f§f§5§5count: 10
-§acountの値を25に変更しました.
-§acountの値を35に変更しました.
-§acountの値を36に変更しました.
-§acountの値を31に変更しました.
-§acountをデフォルト値(10)にリセットしました
-§x§5§5§f§f§5§5names: []
-§anamesにalexを追加しました.
-§anamesにsteveを追加しました.
-§anamesからalexを削除しました.
-§anamesをクリアしました
-§anamesをデフォルト値([])にリセットしました
-§x§5§5§f§f§5§5scores: {}
-§ascoresに{alice:7}を追加しました.
-§ascoresに{bob:3}を追加しました.
-§ascoresから{alice:7}を削除しました.
-§ascoresをクリアしました
-§ascoresをデフォルト値({})にリセットしました
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75count: 10
+\u00A7acount\u306E\u5024\u309225\u306B\u5909\u66F4\u3057\u307E\u3057\u305F.
+\u00A7acount\u306E\u5024\u309235\u306B\u5909\u66F4\u3057\u307E\u3057\u305F.
+\u00A7acount\u306E\u5024\u309236\u306B\u5909\u66F4\u3057\u307E\u3057\u305F.
+\u00A7acount\u306E\u5024\u309231\u306B\u5909\u66F4\u3057\u307E\u3057\u305F.
+\u00A7acount was reset to default (10)
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75names: []
+\u00A7anames\u306Balex\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F.
+\u00A7anames\u306Bsteve\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F.
+\u00A7anames\u304B\u3089alex\u3092\u524A\u9664\u3057\u307E\u3057\u305F.
+\u00A7anames\u3092\u30AF\u30EA\u30A2\u3057\u307E\u3057\u305F
+\u00A7anames was reset to default ([])
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75scores: {}
+\u00A7ascores\u306B{alice:7}\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F.
+\u00A7ascores\u306B{bob:3}\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F.
+\u00A7ascores\u304B\u3089{alice:7}\u3092\u524A\u9664\u3057\u307E\u3057\u305F.
+\u00A7ascores\u3092\u30AF\u30EA\u30A2\u3057\u307E\u3057\u305F
+\u00A7ascores was reset to default ({})

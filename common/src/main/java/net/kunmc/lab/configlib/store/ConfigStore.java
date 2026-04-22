@@ -4,6 +4,7 @@ import net.kunmc.lab.configlib.CommonBaseConfig;
 import net.kunmc.lab.configlib.migration.Migrations;
 
 import java.io.Closeable;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
@@ -14,6 +15,11 @@ public interface ConfigStore {
     CommonBaseConfig read(Class<? extends CommonBaseConfig> clazz, Migrations migrations, CommonBaseConfig defaults);
 
     CommonBaseConfig write(CommonBaseConfig config, Class<? extends CommonBaseConfig> clazz, Migrations migrations);
+
+    /**
+     * Creates a detached copy of a value using this store's configured serialization rules.
+     */
+    Object copyValue(Type type, Object value);
 
     /**
      * Returns the migration result that would be produced for the currently stored document, if any.

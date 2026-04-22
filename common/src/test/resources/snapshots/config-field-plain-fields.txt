@@ -1,2 +1,2 @@
-§alabel: plain
-§anumber: 42
+\u00A7alabel: plain
+\u00A7anumber: 42

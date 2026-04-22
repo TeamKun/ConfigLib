@@ -1,2 +1,2 @@
-§x§5§5§f§f§5§5names: [alex]
-§x§5§5§f§f§5§5scores: {alice:7}
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75names: [alex]
+\u00A7x\u00A75\u00A75\u00A7f\u00A7f\u00A75\u00A75scores: {alice:7}

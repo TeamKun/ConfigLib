@@ -303,11 +303,13 @@ immutable classes.
 - All POJO fields are listed and can be read with `/config <field>`.
 - Mutable `String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equivalents support set commands:
   `/config <field> <value>` and `/config <field> set <value>`.
+- Any schema entry, including mutable POJO scalar fields and nested POJO leaves such as `arena.maxArenas`, also
+  supports `/config <field> reset`.
 - `@Range` limits numeric command input as well as file load validation.
 - Collection, map, object-valued leaf fields, and top-level `final` POJO fields are read-only in generated per-field
   commands. Nested POJO, immutable class, and record leaf fields are still modifiable when their leaf type is supported.
-- POJO fields do not generate per-field `reset`, `inc`, `dec`, `add`, `remove`, `clear`, or `put` commands. Use the
-  Value API when those operations, custom tab-completion, custom command parsing, or command listeners are needed.
+- POJO fields do not generate per-field `inc`, `dec`, `add`, `remove`, `clear`, or `put` commands. Use the Value API
+  when those operations, custom tab-completion, custom command parsing, or command listeners are needed.
 
 Value API and POJO fields can be mixed freely in the same config class.
 
@@ -340,11 +342,12 @@ public final class TestPlugin extends JavaPlugin {
         Command root = new Command("test") {
         };
 
-        // The following commands will be generated:
-        // /test config get <key> - Gets a specific configuration value.
-        // /test config list - Gets all configuration values.
-        // /test config modify <key> <value> - Sets a specific configuration value.
-        // /test config reload - Reloads the configuration file. You may not need it because there's automatic reloading.
+        // The generated tree includes:
+        // /test config list
+        // /test config reload
+        // /test config reset
+        // /test config history / undo / diff
+        // /test config <field> ...
         root.addChildren(new ConfigCommandBuilder(testConfig).build());
 
         CommandLib.register(this, root);
@@ -619,6 +622,8 @@ These subcommands operate on the config as a whole.
 | `/config reload` | Reload from file                         |
 | `/config reset`  | Reset all fields to their default values |
 
+These commands are generated when the config has at least one schema entry. That includes POJO-only configs.
+
 Use `.disableList()` / `.disableReload()` / `.disableReset()` on `ConfigCommandBuilder` to suppress any of these.
 
 **With multiple configs**, each subcommand also accepts a config name:
@@ -664,6 +669,7 @@ class, and record leaf fields are still modifiable when their leaf type is suppo
 |-------------------------------|--------------------------|
 | `/config <field> <value>`     | Set the POJO field value |
 | `/config <field> set <value>` | Set the POJO field value |
+| `/config <field> reset`       | Reset to the default value |
 
 **NumericValue — arithmetic** (IntegerValue, DoubleValue, FloatValue) — extends SingleValue, so `set` and `reset` also
 apply
@@ -729,6 +735,7 @@ History uses **0-based indexing** where `[0]` is the current (latest) state.
 | `/config history undo <N>`               | Revert N steps back                                        |
 | `/config undo`                           | Revert to the previous state                               |
 | `/config undo <N>`                       | Revert N steps back                                        |
+| `/config diff default`                   | Diff current state vs declared default values              |
 | `/config diff <index>`                   | Diff current state vs history entry                        |
 | `/config diff <index1> <index2>`         | Diff between two history entries                           |
 
@@ -741,12 +748,17 @@ History uses **0-based indexing** where `[0]` is the current (latest) state.
 | `/config history <configName> diff <index>` | Diff for that config            |
 | `/config history <configName> undo [N]`     | Undo for that config            |
 | `/config undo <configName> [N]`             | Undo for that config            |
+| `/config diff <configName> default`         | Diff for that config vs defaults |
 | `/config diff <configName> <index>`         | Diff for that config            |
 | `/config <configName> history [index]`      | Alternative prefix order        |
 | `/config <configName> undo [N]`             | Alternative prefix order        |
+| `/config <configName> diff default`         | Alternative prefix order        |
 | `/config <configName> diff <index>`         | Alternative prefix order        |
 
 `diff` shows only fields that differ, formatted as `fieldName: <old> → <new>`.
+
+`diff default` compares the current in-memory config against the defaults declared in Java code.
+Diff output is formatted as `fieldName: <old> -> <new>`.
 
 To hide history commands from the generated command tree:
 

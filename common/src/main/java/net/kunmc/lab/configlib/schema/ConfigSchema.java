@@ -4,6 +4,7 @@ import net.kunmc.lab.configlib.CommonBaseConfig;
 import net.kunmc.lab.configlib.Value;
 import net.kunmc.lab.configlib.ValueConfigSchemaEntry;
 import net.kunmc.lab.configlib.annotation.Description;
+import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.util.ReflectionUtil;
 
@@ -24,6 +25,9 @@ public final class ConfigSchema {
         Map<String, String> descriptionsByPath = new LinkedHashMap<>();
         for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(config.getClass())) {
             if (!ConfigUtil.isObservableField(config, field)) {
+                continue;
+            }
+            if (ConfigStore.class.isAssignableFrom(field.getType())) {
                 continue;
             }
             field.setAccessible(true);

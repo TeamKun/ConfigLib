@@ -42,8 +42,9 @@ public final class MyPlugin extends JavaPlugin {
 
 `ConfigCommandBuilder` auto-generates `list`, `reload`, `reset`, `history`, `undo`, `diff`, and per-field get/modify
 subcommands. Value fields get their normal `set`, `reset`, numeric, collection, and map operations. Mutable POJO scalar
-fields (`String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equivalents) get set commands only. Complex
-POJO fields remain get-only.
+fields (`String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equivalents) get `set` and `reset` commands.
+Complex POJO fields remain get-only. Config-level `list`, `reload`, and `reset` are generated whenever the config has
+at least one schema entry, including POJO-only configs.
 
 Use `.disableList()`, `.disableReload()`, `.disableReset()`, `.disableHistory()`, `.disableGet()`, `.disableModify()` to
 suppress subcommands you don't want.
@@ -359,7 +360,9 @@ with set commands:
 ```text
 /config maxPlayers 30
 /config maxPlayers set 30
+/config maxPlayers reset
 /config arena.maxArenas 10
+/config arena.maxArenas reset
 ```
 
 Supported POJO modify types are `String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equivalents. `@Range`
@@ -369,8 +372,8 @@ Collection, map, object-valued leaf fields, Minecraft-specific object fields, an
 read-only in generated per-field commands. Nested POJO, immutable class, and record leaf fields are still modifiable
 when their leaf type is supported.
 
-POJO fields do not get per-field `reset`, `inc`, `dec`, `add`, `remove`, `clear`, or `put` commands. Use the Value API
-when those operations or custom command behavior are needed.
+POJO fields do not get per-field `inc`, `dec`, `add`, `remove`, `clear`, or `put` commands. Use the Value API when
+those operations or custom command behavior are needed.
 
 ### Nested POJO (mutable inner class)
 

@@ -1,7 +1,6 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
-import net.kunmc.lab.configlib.util.ConfigUtil;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,17 +13,15 @@ import java.util.stream.Collectors;
 enum SubCommandType {
     Reload("reload",
            CommonBaseConfig::isReloadEnabled,
-           x -> !(ConfigUtil.getSingleValueFields(x)
-                            .isEmpty() && ConfigUtil.getCollectionValueFields(x)
-                                                    .isEmpty() && ConfigUtil.getMapValueFields(x)
-                                                                            .isEmpty()),
+           x -> !x.schema()
+                  .entries()
+                  .isEmpty(),
            ConfigReloadCommand::new),
     Reset("reset",
           CommonBaseConfig::isResetEnabled,
-          x -> !(ConfigUtil.getSingleValueFields(x)
-                           .isEmpty() && ConfigUtil.getCollectionValueFields(x)
-                                                   .isEmpty() && ConfigUtil.getMapValueFields(x)
-                                                                           .isEmpty()),
+          x -> !x.schema()
+                 .entries()
+                 .isEmpty(),
           ConfigResetCommand::new),
     History("history", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigHistoryCommand::new),
     Undo("undo", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigUndoCommand::new),

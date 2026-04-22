@@ -9,6 +9,7 @@ import net.kunmc.lab.configlib.migration.MigrationExecutionException;
 import net.kunmc.lab.configlib.migration.Migrations;
 
 import java.io.Closeable;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -67,6 +68,14 @@ public class InMemoryConfigStore implements ConfigStore {
                                   Migrations migrations) {
         data = gson.toJson(config);
         return gson.fromJson(data, clazz);
+    }
+
+    @Override
+    public Object copyValue(Type type, Object value) {
+        if (value == null) {
+            return null;
+        }
+        return gson.fromJson(gson.toJsonTree(value, type), type);
     }
 
     @Override
