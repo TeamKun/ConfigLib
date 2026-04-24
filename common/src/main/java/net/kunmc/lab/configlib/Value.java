@@ -47,6 +47,7 @@ public abstract class Value<E, T extends Value<E, T>> {
         return description;
     }
 
+    @SuppressWarnings("unchecked")
     public final T description(String description) {
         this.description = description;
         return ((T) this);
@@ -56,6 +57,7 @@ public abstract class Value<E, T extends Value<E, T>> {
      * Sets a custom entry name used when registering this value's command.
      * By default, the field name is used.
      */
+    @SuppressWarnings("unchecked")
     public final T entryName(String entryName) {
         this.entryName = entryName;
         return ((T) this);
@@ -63,13 +65,14 @@ public abstract class Value<E, T extends Value<E, T>> {
 
     /**
      * Sets a custom formatter for converting this value to a display string.
-     * The formatter takes precedence over the default {@link #defaultDisplayString()} implementation
+     * The formatter takes precedence over the default {@link #defaultDisplayString(Object)} implementation
      * and is used wherever the value is displayed as text (e.g. list and get commands).
      *
      * <pre>{@code
      * new IntegerValue(10).displayFormatter(n -> n + " items")
      * }</pre>
      */
+    @SuppressWarnings("unchecked")
     public final T displayFormatter(Function<@Nullable E, String> formatter) {
         this.displayFormatter = formatter;
         return (T) this;
@@ -86,6 +89,7 @@ public abstract class Value<E, T extends Value<E, T>> {
      * Adds a listener that will be triggered after the value has been initialized.
      * If initialization has already been completed, the listener will be immediately triggered.
      */
+    @SuppressWarnings("unchecked")
     public final T onInitialize(Consumer<E> listener) {
         if (initialized) {
             listener.accept(initValue);
@@ -115,6 +119,7 @@ public abstract class Value<E, T extends Value<E, T>> {
      *
      * @see Value#onInitialize(Consumer)
      */
+    @SuppressWarnings("unchecked")
     public final T onModify(Consumer<E> listener, boolean triggeredOnInitialize) {
         modifyListeners.add(listener);
         if (triggeredOnInitialize) {
@@ -132,6 +137,7 @@ public abstract class Value<E, T extends Value<E, T>> {
      * Validates values on executing modify command and loading config.<br>
      * Throwing {@link net.kunmc.lab.configlib.exception.InvalidValueException}, you can customize the error message.
      */
+    @SuppressWarnings("unchecked")
     public final T addValidator(Validator<E> validator) {
         this.validator = this.validator.and(validator);
         return ((T) this);
@@ -158,6 +164,7 @@ public abstract class Value<E, T extends Value<E, T>> {
      * })
      * }</pre>
      */
+    @SuppressWarnings("unchecked")
     public final T executableIf(ExecutionCondition condition) {
         this.executableIf = condition;
         return (T) this;
@@ -181,13 +188,17 @@ public abstract class Value<E, T extends Value<E, T>> {
     }
 
     final String displayString() {
-        if (displayFormatter != null) {
-            return displayFormatter.apply(value);
-        }
-        return defaultDisplayString();
+        return displayString(value);
     }
 
-    protected String defaultDisplayString() {
+    final String displayString(@Nullable E displayValue) {
+        if (displayFormatter != null) {
+            return displayFormatter.apply(displayValue);
+        }
+        return defaultDisplayString(displayValue);
+    }
+
+    protected String defaultDisplayString(@Nullable E value) {
         return String.valueOf(value);
     }
 

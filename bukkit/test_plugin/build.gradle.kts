@@ -26,7 +26,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly(mapOf("name" to "patched_1.16.5"))
+//    compileOnly(mapOf("name" to "patched_1.16.5"))
+    compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
     implementation("com.google.code.gson:gson:2.10")
     implementation("org.snakeyaml:snakeyaml-engine:2.9")
     implementation("org.apache.commons:commons-lang3:3.12.0")

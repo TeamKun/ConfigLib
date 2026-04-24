@@ -4,17 +4,17 @@ import net.kunmc.lab.configlib.CommonBaseConfig;
 
 public class HistoryEntry {
     private final long timestamp;
-    private final HistorySource source;
+    private final ChangeTrace trace;
     private final CommonBaseConfig config;
 
     /**
      * @param timestamp creation time in epoch milliseconds
-     * @param source    why this snapshot was recorded
+     * @param trace     why this snapshot was recorded
      * @param config    config state captured in this history entry
      */
-    public HistoryEntry(long timestamp, HistorySource source, CommonBaseConfig config) {
+    public HistoryEntry(long timestamp, ChangeTrace trace, CommonBaseConfig config) {
         this.timestamp = timestamp;
-        this.source = source;
+        this.trace = trace;
         this.config = config;
     }
 
@@ -22,8 +22,12 @@ public class HistoryEntry {
         return timestamp;
     }
 
-    public HistorySource source() {
-        return source;
+    public ChangeSource source() {
+        return trace.source();
+    }
+
+    public ChangeTrace trace() {
+        return trace;
     }
 
     /**

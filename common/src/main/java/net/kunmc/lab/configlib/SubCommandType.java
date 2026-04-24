@@ -24,6 +24,7 @@ enum SubCommandType {
                  .isEmpty(),
           ConfigResetCommand::new),
     History("history", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigHistoryCommand::new),
+    Audit("audit", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigAuditCommand::new),
     Undo("undo", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigUndoCommand::new),
     Diff("diff", CommonBaseConfig::isHistoryEnabled, x -> true, ConfigDiffCommand::new),
     List("list",

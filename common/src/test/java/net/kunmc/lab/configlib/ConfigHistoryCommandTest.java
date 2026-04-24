@@ -128,4 +128,18 @@ class ConfigHistoryCommandTest {
             assertEquals(10, config.count.value());
         }
     }
+
+    @Test
+    void undoWithoutRestorableHistoryShowsSpecificMessage() {
+        config = init(new TestConfig());
+        FakeSender sender = FakeSender.console();
+
+        try (CommandTester tester = new CommandTester(commandFor(config), "configlib.test")) {
+            tester.execute("config undo", sender);
+        }
+
+        assertTrue(messages(sender).stream()
+                                   .anyMatch(x -> x.contains("No restorable history entries")),
+                   messages(sender).toString());
+    }
 }

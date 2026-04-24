@@ -5,6 +5,7 @@ import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.IntegerArgument;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
+import net.kunmc.lab.configlib.schema.DisplayContext;
 import net.kunmc.lab.configlib.store.HistoryEntry;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.util.ReflectionUtil;
@@ -31,8 +32,8 @@ class ConfigHistoryCommand extends Command {
             // /config history <name>               - list entries for that config
             // /config history <name> <index>       - show detail for that config
             // /config history <name> diff <index>  - diff current vs history[index]
-            // /config history <name> undo          - undo 1 step
-            // /config history <name> undo <N>      - undo N steps
+            // /config history <name> undo          - restore history[1]
+            // /config history <name> undo <index>  - restore history[index]
             argument(new IntegerArgument("index", 0, Integer.MAX_VALUE)).execute((index, ctx) -> {
                 configs.forEach(config -> execDetail(ctx, config, index));
             });
@@ -52,8 +53,8 @@ class ConfigHistoryCommand extends Command {
                 }});
                 addChildren(new Command("undo") {{
                     execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1));
-                    argument(new IntegerArgument("steps", 1, Integer.MAX_VALUE)).execute((steps, ctx) -> {
-                        ConfigUndoCommand.exec(ctx, config, steps);
+                    argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
+                        ConfigUndoCommand.exec(ctx, config, index);
                     });
                 }});
             }}));
@@ -61,8 +62,8 @@ class ConfigHistoryCommand extends Command {
             // /config history              - list all entries
             // /config history <index>      - show detail
             // /config history diff <index> - diff current vs history[index]
-            // /config history undo         - undo 1 step
-            // /config history undo <N>     - undo N steps
+            // /config history undo         - restore history[1]
+            // /config history undo <index> - restore history[index]
             CommonBaseConfig config = configs.iterator()
                                              .next();
             execute(ctx -> execList(ctx, config));
@@ -80,8 +81,8 @@ class ConfigHistoryCommand extends Command {
             }});
             addChildren(new Command("undo") {{
                 execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1));
-                argument(new IntegerArgument("steps", 1, Integer.MAX_VALUE)).execute((steps, ctx) -> {
-                    ConfigUndoCommand.exec(ctx, config, steps);
+                argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
+                    ConfigUndoCommand.exec(ctx, config, index);
                 });
             }});
         }
@@ -150,7 +151,7 @@ class ConfigHistoryCommand extends Command {
                 }
                 sb.append(entry.entryName())
                   .append(": ")
-                  .append(entry.displayString(hist));
+                  .append(entry.displayString(hist, DisplayContext.history(null)));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -172,7 +173,7 @@ class ConfigHistoryCommand extends Command {
             field.setAccessible(true);
             try {
                 Object hist = field.get(histConfig);
-                ctx.sendSuccess(entry.entryName() + ": " + entry.displayString(hist));
+                ctx.sendSuccess(entry.entryName() + ": " + entry.displayString(hist, DisplayContext.history(ctx)));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

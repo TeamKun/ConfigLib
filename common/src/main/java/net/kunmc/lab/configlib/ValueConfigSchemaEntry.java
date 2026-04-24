@@ -78,17 +78,13 @@ public final class ValueConfigSchemaEntry<E> extends ConfigSchemaEntry<E> {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public String displayString() {
-        return value.displayString();
-    }
-
-    @Override
-    public String displayString(Object fieldValue) {
+    protected String displayRawString(Object fieldValue) {
         if (fieldValue instanceof Value) {
             return ((Value<?, ?>) fieldValue).displayString();
         }
-        return String.valueOf(fieldValue);
+        return ((Value<Object, ?>) value).displayString(fieldValue);
     }
 
     @Override

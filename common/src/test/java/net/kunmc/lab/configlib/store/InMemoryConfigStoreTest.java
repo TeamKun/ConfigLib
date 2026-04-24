@@ -131,7 +131,7 @@ class InMemoryConfigStoreTest {
     @Test
     void pushHistoryStoresEntry() {
         InMemoryConfigStore store = new InMemoryConfigStore(gson);
-        store.pushHistory(new ValueConfig(5));
+        store.pushHistory(new ValueConfig(5), ChangeTrace.programmatic());
 
         assertEquals(1,
                      store.readHistory(ValueConfig.class, noMigrations())
@@ -142,7 +142,7 @@ class InMemoryConfigStoreTest {
     void pushHistoryEmbeddsTimestamp() {
         InMemoryConfigStore store = new InMemoryConfigStore(gson);
         long before = System.currentTimeMillis();
-        store.pushHistory(new ValueConfig(0));
+        store.pushHistory(new ValueConfig(0), ChangeTrace.programmatic());
         long after = System.currentTimeMillis();
 
         HistoryEntry entry = store.readHistory(ValueConfig.class, noMigrations())
@@ -153,8 +153,8 @@ class InMemoryConfigStoreTest {
     @Test
     void readHistoryReturnsNewestFirst() {
         InMemoryConfigStore store = new InMemoryConfigStore(gson);
-        store.pushHistory(new ValueConfig(1));
-        store.pushHistory(new ValueConfig(2));
+        store.pushHistory(new ValueConfig(1), ChangeTrace.programmatic());
+        store.pushHistory(new ValueConfig(2), ChangeTrace.programmatic());
 
         List<HistoryEntry> history = store.readHistory(ValueConfig.class, noMigrations());
         assertEquals(2,
@@ -169,7 +169,7 @@ class InMemoryConfigStoreTest {
     void historyCapAtMaxSize() {
         InMemoryConfigStore store = new InMemoryConfigStore(gson, 3);
         for (int i = 0; i < 5; i++) {
-            store.pushHistory(new ValueConfig(i));
+            store.pushHistory(new ValueConfig(i), ChangeTrace.programmatic());
         }
 
         assertEquals(3,
@@ -177,48 +177,48 @@ class InMemoryConfigStoreTest {
                           .size());
     }
 
-    // ---- history: canUndo ----
+    // ---- history: canRestoreHistoryIndex ----
 
     @Test
-    void canUndoReturnsFalseWhenHistoryEmpty() {
-        assertFalse(new InMemoryConfigStore(gson).canUndo(1));
+    void canRestoreHistoryIndexReturnsFalseWhenHistoryEmpty() {
+        assertFalse(new InMemoryConfigStore(gson).canRestoreHistoryIndex(1));
     }
 
     @Test
-    void canUndoReturnsFalseWithSingleEntry() {
+    void canRestoreHistoryIndexReturnsFalseWithSingleEntry() {
         InMemoryConfigStore store = new InMemoryConfigStore(gson);
-        store.pushHistory(new ValueConfig(0));
-        assertFalse(store.canUndo(1));
+        store.pushHistory(new ValueConfig(0), ChangeTrace.programmatic());
+        assertFalse(store.canRestoreHistoryIndex(1));
     }
 
     @Test
-    void canUndoReturnsTrueWithTwoEntries() {
+    void canRestoreHistoryIndexReturnsTrueWithTwoEntries() {
         InMemoryConfigStore store = new InMemoryConfigStore(gson);
-        store.pushHistory(new ValueConfig(0));
-        store.pushHistory(new ValueConfig(1));
-        assertTrue(store.canUndo(1));
+        store.pushHistory(new ValueConfig(0), ChangeTrace.programmatic());
+        store.pushHistory(new ValueConfig(1), ChangeTrace.programmatic());
+        assertTrue(store.canRestoreHistoryIndex(1));
     }
 
     @Test
-    void canUndoRespectsStepsBack() {
+    void canRestoreHistoryIndexRespectsIndex() {
         InMemoryConfigStore store = new InMemoryConfigStore(gson);
-        store.pushHistory(new ValueConfig(0));
-        store.pushHistory(new ValueConfig(1));
-        // stepsBack=2 には3件必要
-        assertFalse(store.canUndo(2));
-        store.pushHistory(new ValueConfig(2));
-        assertTrue(store.canUndo(2));
+        store.pushHistory(new ValueConfig(0), ChangeTrace.programmatic());
+        store.pushHistory(new ValueConfig(1), ChangeTrace.programmatic());
+        // history[2] needs three entries.
+        assertFalse(store.canRestoreHistoryIndex(2));
+        store.pushHistory(new ValueConfig(2), ChangeTrace.programmatic());
+        assertTrue(store.canRestoreHistoryIndex(2));
     }
 
-    // ---- history: undo ----
+    // ---- history: restoreHistoryIndex ----
 
     @Test
-    void undoRemovesTopAndReturnsNewTop() {
+    void restoreHistoryIndexRemovesNewerEntriesAndReturnsSelectedEntry() {
         InMemoryConfigStore store = new InMemoryConfigStore(gson);
-        store.pushHistory(new ValueConfig(10)); // old
-        store.pushHistory(new ValueConfig(20)); // current
+        store.pushHistory(new ValueConfig(10), ChangeTrace.programmatic()); // old
+        store.pushHistory(new ValueConfig(20), ChangeTrace.programmatic()); // current
 
-        ValueConfig restored = (ValueConfig) store.undo(ValueConfig.class, noMigrations(), 1);
+        ValueConfig restored = (ValueConfig) store.restoreHistoryIndex(ValueConfig.class, noMigrations(), 1);
 
         assertEquals(10, restored.value);
         assertEquals(1,
@@ -227,19 +227,63 @@ class InMemoryConfigStoreTest {
     }
 
     @Test
-    void undoWithStepsBack2() {
+    void restoreHistoryIndex2() {
         InMemoryConfigStore store = new InMemoryConfigStore(gson);
-        store.pushHistory(new ValueConfig(0));
-        store.pushHistory(new ValueConfig(10));
-        store.pushHistory(new ValueConfig(20));
+        store.pushHistory(new ValueConfig(0), ChangeTrace.programmatic());
+        store.pushHistory(new ValueConfig(10), ChangeTrace.programmatic());
+        store.pushHistory(new ValueConfig(20), ChangeTrace.programmatic());
         // history: [20, 10, 0]
 
-        ValueConfig restored = (ValueConfig) store.undo(ValueConfig.class, noMigrations(), 2);
+        ValueConfig restored = (ValueConfig) store.restoreHistoryIndex(ValueConfig.class, noMigrations(), 2);
 
         assertEquals(0, restored.value);
         assertEquals(1,
                      store.readHistory(ValueConfig.class, noMigrations())
                           .size());
+    }
+
+    @Test
+    void pushAuditStoresChanges() {
+        InMemoryConfigStore store = new InMemoryConfigStore(gson);
+        store.pushAudit(new AuditEntry(123L,
+                                       new ChangeTrace(ChangeSource.COMMAND,
+                                                       new ChangeActor("console", null),
+                                                       "set value",
+                                                       List.of("value")),
+                                       List.of(new AuditChange("value", "10", "20"))));
+
+        AuditEntry entry = store.readAudit()
+                                .get(0);
+        assertEquals(123L, entry.timestamp());
+        assertEquals(ChangeSource.COMMAND,
+                     entry.trace()
+                          .source());
+        assertEquals("value",
+                     entry.changes()
+                          .get(0)
+                          .path());
+        assertEquals("10",
+                     entry.changes()
+                          .get(0)
+                          .beforeText());
+        assertEquals("20",
+                     entry.changes()
+                          .get(0)
+                          .afterText());
+    }
+
+    @Test
+    void readAuditAllowsLegacyEntriesWithoutChanges() {
+        InMemoryConfigStore store = new InMemoryConfigStore(gson);
+        store.pushAudit(new AuditEntry(1L, new ChangeTrace(ChangeSource.PROGRAMMATIC, null, null, List.of("value"))));
+
+        AuditEntry entry = store.readAudit()
+                                .get(0);
+        assertTrue(entry.changes()
+                        .isEmpty());
+        assertEquals(List.of("value"),
+                     entry.trace()
+                          .paths());
     }
 
     // ---- inner classes ----

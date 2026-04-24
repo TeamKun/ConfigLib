@@ -4,6 +4,7 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.configlib.command.MapValueClearCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
+import net.kunmc.lab.configlib.store.ChangeTrace;
 
 import java.util.Map;
 
@@ -26,7 +27,7 @@ class ModifyMapClearCommand extends Command {
                 config.mutate(() -> {
                     value.dispatchClear();
                     value.clear();
-                });
+                }, ChangeTrace.command(ctx, "clear " + schemaEntry.entryName(), schemaEntry.entryName()));
             } catch (ConfigValidationException e) {
                 e.sendMessage(ctx);
                 return;

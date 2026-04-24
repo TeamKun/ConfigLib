@@ -307,12 +307,7 @@ public final class PojoConfigSchemaEntry<E> extends ConfigSchemaEntry<E> {
     }
 
     @Override
-    public String displayString() {
-        return String.valueOf(get());
-    }
-
-    @Override
-    public String displayString(Object fieldValue) {
+    protected String displayRawString(Object fieldValue) {
         return String.valueOf(fieldValue);
     }
 

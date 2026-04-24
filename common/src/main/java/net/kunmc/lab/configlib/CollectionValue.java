@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.configlib.command.CollectionValueAddCommandMessageParameter;
 import net.kunmc.lab.configlib.command.CollectionValueClearCommandMessageParameter;
 import net.kunmc.lab.configlib.command.CollectionValueRemoveCommandMessageParameter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -151,9 +152,13 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
     protected abstract String elementToString(E e);
 
     @Override
-    protected String defaultDisplayString() {
-        return "[" + value.stream()
-                          .map(this::elementToString)
-                          .collect(Collectors.joining(", ")) + "]";
+    protected String defaultDisplayString(@Nullable T t) {
+        if (t == null) {
+            return "null";
+        }
+
+        return "[" + t.stream()
+                      .map(this::elementToString)
+                      .collect(Collectors.joining(", ")) + "]";
     }
 }

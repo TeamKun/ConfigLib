@@ -155,13 +155,17 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
     protected abstract String valueToString(V v);
 
     @Override
-    protected String defaultDisplayString() {
-        return "{" + value.entrySet()
-                          .stream()
-                          .map(entry -> String.format("%s:%s",
-                                                      keyToString(entry.getKey()),
-                                                      valueToString(entry.getValue())))
-                          .collect(Collectors.joining(", ")) + "}";
+    protected String defaultDisplayString(@Nullable Map<K, V> e) {
+        if (e == null) {
+            return "null";
+        }
+
+        return "{" + e.entrySet()
+                      .stream()
+                      .map(entry -> String.format("%s:%s",
+                                                  keyToString(entry.getKey()),
+                                                  valueToString(entry.getValue())))
+                      .collect(Collectors.joining(", ")) + "}";
     }
 
     public int size() {

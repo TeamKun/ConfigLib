@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.store;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.kunmc.lab.configlib.CommonBaseConfig;
@@ -19,6 +20,7 @@ public class InMemoryConfigStore implements ConfigStore {
     private final transient Logger logger = Logger.getLogger(InMemoryConfigStore.class.getName());
     private String data = null;
     private final Deque<String> history = new ArrayDeque<>();
+    private final Deque<String> audit = new ArrayDeque<>();
     private transient Migrations.MigrationResult lastAppliedMigrationResult;
 
     public InMemoryConfigStore(Gson gson) {
@@ -96,29 +98,26 @@ public class InMemoryConfigStore implements ConfigStore {
     }
 
     @Override
-    public void pushHistory(CommonBaseConfig config, HistorySource source) {
+    public void pushHistory(CommonBaseConfig config, ChangeTrace trace) {
         JsonObject obj = JsonParser.parseString(gson.toJson(config))
                                    .getAsJsonObject();
-        obj.addProperty(ConfigKeys.TIMESTAMP, System.currentTimeMillis());
-        obj.addProperty(ConfigKeys.HISTORY_SOURCE, source.name());
+        writeTrace(obj, trace, System.currentTimeMillis());
         history.addFirst(gson.toJson(obj));
         while (history.size() > maxHistorySize) {
             history.removeLast();
         }
     }
 
-    public void pushHistory(CommonBaseConfig config) {
-        pushHistory(config, HistorySource.PROGRAMMATIC);
+    @Override
+    public boolean canRestoreHistoryIndex(int historyIndex) {
+        return historyIndex > 0 && history.size() > historyIndex;
     }
 
     @Override
-    public boolean canUndo(int stepsBack) {
-        return history.size() >= stepsBack + 1;
-    }
-
-    @Override
-    public CommonBaseConfig undo(Class<? extends CommonBaseConfig> clazz, Migrations migrations, int stepsBack) {
-        for (int i = 0; i < stepsBack; i++) {
+    public CommonBaseConfig restoreHistoryIndex(Class<? extends CommonBaseConfig> clazz,
+                                                Migrations migrations,
+                                                int historyIndex) {
+        for (int i = 0; i < historyIndex; i++) {
             history.removeFirst();
         }
         String snapshot = history.peekFirst();
@@ -132,11 +131,32 @@ public class InMemoryConfigStore implements ConfigStore {
         for (String snapshot : history) {
             JsonObject obj = JsonParser.parseString(snapshot)
                                        .getAsJsonObject();
-            long ts = obj.has(ConfigKeys.TIMESTAMP) ? obj.get(ConfigKeys.TIMESTAMP)
-                                                         .getAsLong() : 0L;
-            HistorySource source = obj.has(ConfigKeys.HISTORY_SOURCE) ? HistorySource.valueOf(obj.get(ConfigKeys.HISTORY_SOURCE)
-                                                                                                 .getAsString()) : HistorySource.PROGRAMMATIC;
-            result.add(new HistoryEntry(ts, source, gson.fromJson(obj, clazz)));
+            long ts = obj.has(ChangeLogKeys.TIMESTAMP) ? obj.get(ChangeLogKeys.TIMESTAMP)
+                                                            .getAsLong() : 0L;
+            result.add(new HistoryEntry(ts, readTrace(obj), gson.fromJson(obj, clazz)));
+        }
+        return result;
+    }
+
+    @Override
+    public void pushAudit(AuditEntry entry) {
+        JsonObject obj = new JsonObject();
+        writeAuditEntry(obj, entry, entry.timestamp());
+        audit.addFirst(gson.toJson(obj));
+        while (audit.size() > maxHistorySize) {
+            audit.removeLast();
+        }
+    }
+
+    @Override
+    public List<AuditEntry> readAudit() {
+        List<AuditEntry> result = new ArrayList<>();
+        for (String snapshot : audit) {
+            JsonObject obj = JsonParser.parseString(snapshot)
+                                       .getAsJsonObject();
+            long ts = obj.get(ChangeLogKeys.TIMESTAMP)
+                         .getAsLong();
+            result.add(readAuditEntry(obj, ts));
         }
         return result;
     }
@@ -185,5 +205,84 @@ public class InMemoryConfigStore implements ConfigStore {
         }
         return operation.type()
                         .displayName() + " " + operation.path();
+    }
+
+    private static void writeTrace(JsonObject obj, ChangeTrace trace, long timestamp) {
+        obj.addProperty(ChangeLogKeys.TIMESTAMP, timestamp);
+        obj.addProperty(ChangeLogKeys.SOURCE,
+                        trace.source()
+                             .name());
+        if (trace.actor()
+                 .name() != null) {
+            obj.addProperty(ChangeLogKeys.ACTOR_NAME,
+                            trace.actor()
+                                 .name());
+        }
+        if (trace.actor()
+                 .uuid() != null) {
+            obj.addProperty(ChangeLogKeys.ACTOR_UUID,
+                            trace.actor()
+                                 .uuid());
+        }
+        if (trace.reason() != null) {
+            obj.addProperty(ChangeLogKeys.REASON, trace.reason());
+        }
+        if (!trace.paths()
+                  .isEmpty()) {
+            JsonArray array = new JsonArray();
+            trace.paths()
+                 .forEach(array::add);
+            obj.add(ChangeLogKeys.PATHS, array);
+        }
+    }
+
+    private static ChangeTrace readTrace(JsonObject obj) {
+        ChangeSource source = obj.has(ChangeLogKeys.SOURCE) ? ChangeSource.valueOf(obj.get(ChangeLogKeys.SOURCE)
+                                                                                      .getAsString()) : ChangeSource.PROGRAMMATIC;
+        String actorName = obj.has(ChangeLogKeys.ACTOR_NAME) ? obj.get(ChangeLogKeys.ACTOR_NAME)
+                                                                  .getAsString() : null;
+        String actorUuid = obj.has(ChangeLogKeys.ACTOR_UUID) ? obj.get(ChangeLogKeys.ACTOR_UUID)
+                                                                  .getAsString() : null;
+        String reason = obj.has(ChangeLogKeys.REASON) ? obj.get(ChangeLogKeys.REASON)
+                                                           .getAsString() : null;
+        List<String> paths = new ArrayList<>();
+        if (obj.has(ChangeLogKeys.PATHS)) {
+            obj.getAsJsonArray(ChangeLogKeys.PATHS)
+               .forEach(element -> paths.add(element.getAsString()));
+        }
+        return new ChangeTrace(source, new ChangeActor(actorName, actorUuid), reason, paths);
+    }
+
+    private static void writeAuditEntry(JsonObject obj, AuditEntry entry, long timestamp) {
+        writeTrace(obj, entry.trace(), timestamp);
+        if (!entry.changes()
+                  .isEmpty()) {
+            JsonArray changes = new JsonArray();
+            for (AuditChange change : entry.changes()) {
+                JsonObject item = new JsonObject();
+                item.addProperty(ChangeLogKeys.CHANGE_PATH, change.path());
+                item.addProperty(ChangeLogKeys.CHANGE_BEFORE, change.beforeText());
+                item.addProperty(ChangeLogKeys.CHANGE_AFTER, change.afterText());
+                changes.add(item);
+            }
+            obj.add(ChangeLogKeys.CHANGES, changes);
+        }
+    }
+
+    private static AuditEntry readAuditEntry(JsonObject obj, long timestamp) {
+        List<AuditChange> changes = new ArrayList<>();
+        if (obj.has(ChangeLogKeys.CHANGES)) {
+            obj.getAsJsonArray(ChangeLogKeys.CHANGES)
+               .forEach(element -> {
+                   JsonObject item = element.getAsJsonObject();
+                   changes.add(new AuditChange(item.get(ChangeLogKeys.CHANGE_PATH)
+                                                   .getAsString(),
+                                               item.get(ChangeLogKeys.CHANGE_BEFORE)
+                                                   .getAsString(),
+                                               item.get(ChangeLogKeys.CHANGE_AFTER)
+                                                   .getAsString()));
+               });
+        }
+        return new AuditEntry(timestamp, readTrace(obj), changes);
     }
 }

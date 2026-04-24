@@ -6,6 +6,7 @@ import net.kunmc.lab.commandlib.argument.DoubleArgument;
 import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
+import net.kunmc.lab.configlib.store.ChangeTrace;
 
 class ModifyDecCommand extends Command {
     private final ConfigSchemaEntry<?> schemaEntry;
@@ -41,7 +42,7 @@ class ModifyDecCommand extends Command {
             config.mutate(() -> {
                 value.dispatchModifyCommand(newValue);
                 value.value(newValue);
-            });
+            }, ChangeTrace.command(ctx, "dec " + schemaEntry.entryName(), schemaEntry.entryName()));
         } catch (ConfigValidationException e) {
             e.sendMessage(ctx);
             return;

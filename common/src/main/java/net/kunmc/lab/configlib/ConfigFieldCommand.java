@@ -7,6 +7,8 @@ import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
+import net.kunmc.lab.configlib.schema.DisplayContext;
+import net.kunmc.lab.configlib.store.ChangeTrace;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +30,7 @@ class ConfigFieldCommand extends Command {
             initMapValue(config, schemaEntry, (MapValue<?, ?, ?>) obj, getEnabled, modifyEnabled);
         } else if (getEnabled) {
             execute(ctx -> config.inspect(() -> {
-                ctx.sendSuccess(schemaEntry.entryName() + ": " + schemaEntry.displayString());
+                ctx.sendSuccess(schemaEntry.entryName() + ": " + schemaEntry.displayString(DisplayContext.command(ctx)));
             }));
         }
     }
@@ -61,7 +63,7 @@ class ConfigFieldCommand extends Command {
                         config.mutate(() -> {
                             value.dispatchModifyCommand(newValue);
                             setSchemaValue(schemaEntry, newValue);
-                        });
+                        }, ChangeTrace.command(ctx, "set " + schemaEntry.entryName(), schemaEntry.entryName()));
                     } catch (ConfigValidationException e) {
                         e.sendMessage(ctx);
                         return;
@@ -82,7 +84,8 @@ class ConfigFieldCommand extends Command {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
-            execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(schemaEntry.entryName() + ": " + schemaEntry.displayString(),
+            execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(schemaEntry.entryName() + ": " + schemaEntry.displayString(
+                                                                                  DisplayContext.command(ctx)),
                                                                           option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                                           .hoverText(StringUtils.defaultString(
                                                                                                   schemaEntry.metadata()
@@ -119,7 +122,8 @@ class ConfigFieldCommand extends Command {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
-            execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(schemaEntry.entryName() + ": " + v.displayString(),
+            execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(schemaEntry.entryName() + ": " + schemaEntry.displayString(
+                                                                                  DisplayContext.command(ctx)),
                                                                           option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                                           .hoverText(StringUtils.defaultString(
                                                                                                   schemaEntry.metadata()
@@ -151,7 +155,8 @@ class ConfigFieldCommand extends Command {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
-            execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(schemaEntry.entryName() + ": " + v.displayString(),
+            execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(schemaEntry.entryName() + ": " + schemaEntry.displayString(
+                                                                                  DisplayContext.command(ctx)),
                                                                           option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                                           .hoverText(StringUtils.defaultString(
                                                                                                   schemaEntry.metadata()
@@ -177,11 +182,13 @@ class ConfigFieldCommand extends Command {
 
     private static void resetEntry(CommandContext ctx, CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry) {
         try {
-            config.mutate(() -> config.resetEntryToDefault(schemaEntry));
+            config.mutate(() -> config.resetEntryToDefault(schemaEntry),
+                          ChangeTrace.command(ctx, "reset " + schemaEntry.entryName(), schemaEntry.entryName()));
         } catch (ConfigValidationException e) {
             e.sendMessage(ctx);
             return;
         }
-        ctx.sendSuccess(schemaEntry.entryName() + " was reset to default (" + schemaEntry.displayString() + ")");
+        ctx.sendSuccess(schemaEntry.entryName() + " was reset to default (" + schemaEntry.displayString(DisplayContext.command(
+                ctx)) + ")");
     }
 }

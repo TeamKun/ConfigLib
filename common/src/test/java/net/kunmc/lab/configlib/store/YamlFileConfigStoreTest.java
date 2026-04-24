@@ -131,7 +131,7 @@ class YamlFileConfigStoreTest {
     }
 
     @Test
-    void historyAndUndoUseYamlHistoryFile() throws IOException {
+    void historyAndRestoreHistoryIndexUseYamlHistoryFile() throws IOException {
         store.pushHistory(new SimpleConfig(10));
         store.pushHistory(new SimpleConfig(20));
 
@@ -140,15 +140,40 @@ class YamlFileConfigStoreTest {
         assertEquals(20,
                      ((SimpleConfig) history.get(0)
                                             .config()).value);
-        assertTrue(store.canUndo(1));
+        assertTrue(store.canRestoreHistoryIndex(1));
 
-        SimpleConfig restored = (SimpleConfig) store.undo(SimpleConfig.class, noMigrations(), 1);
+        SimpleConfig restored = (SimpleConfig) store.restoreHistoryIndex(SimpleConfig.class, noMigrations(), 1);
 
         assertEquals(10, restored.value);
         File historyFile = new File(tempDir, "config.history.yml");
         assertTrue(historyFile.exists());
         String historyYaml = Files.readString(historyFile.toPath(), StandardCharsets.UTF_8);
         assertTrue(historyYaml.startsWith("history:"), historyYaml);
+    }
+
+    @Test
+    void auditFileStoresChangesInYaml() throws IOException {
+        store.pushAudit(new AuditEntry(123L,
+                                       new ChangeTrace(ChangeSource.COMMAND,
+                                                       new ChangeActor("console", null),
+                                                       "set value",
+                                                       List.of("value")),
+                                       List.of(new AuditChange("value", "10", "20"))));
+
+        List<AuditEntry> audit = store.readAudit();
+        assertEquals(1, audit.size());
+        assertEquals("10",
+                     audit.get(0)
+                          .changes()
+                          .get(0)
+                          .beforeText());
+
+        File auditFile = new File(tempDir, "config.audit.yml");
+        assertTrue(auditFile.exists());
+        String raw = Files.readString(auditFile.toPath(), StandardCharsets.UTF_8);
+        assertTrue(raw.contains("changes:"), raw);
+        assertTrue(raw.contains("before: '10'") || raw.contains("before: \"10\"") || raw.contains("before: 10"), raw);
+        assertTrue(raw.contains("after: '20'") || raw.contains("after: \"20\"") || raw.contains("after: 20"), raw);
     }
 
     static class SimpleConfig extends CommonBaseConfig {

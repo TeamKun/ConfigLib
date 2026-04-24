@@ -38,18 +38,20 @@ public interface ConfigStore {
     /**
      * Save the current config state to history with its origin.
      */
-    void pushHistory(CommonBaseConfig config, HistorySource source);
+    void pushHistory(CommonBaseConfig config, ChangeTrace trace);
 
     /**
-     * Returns true if there are at least {@code stepsBack + 1} history entries.
+     * Returns true if the history entry at {@code historyIndex} can be restored.
      */
-    boolean canUndo(int stepsBack);
+    boolean canRestoreHistoryIndex(int historyIndex);
 
     /**
-     * Discards the top {@code stepsBack} entries and returns the new top as a deserialized config.
-     * Only call when {@link #canUndo(int)} is true.
+     * Discards newer entries and returns the requested entry as a deserialized config.
+     * Only call when {@link #canRestoreHistoryIndex(int)} is true.
      */
-    CommonBaseConfig undo(Class<? extends CommonBaseConfig> clazz, Migrations migrations, int stepsBack);
+    CommonBaseConfig restoreHistoryIndex(Class<? extends CommonBaseConfig> clazz,
+                                         Migrations migrations,
+                                         int historyIndex);
 
     /**
      * Returns all history entries, most recent first.
@@ -57,7 +59,17 @@ public interface ConfigStore {
     List<HistoryEntry> readHistory(Class<? extends CommonBaseConfig> clazz, Migrations migrations);
 
     /**
+     * Appends an accepted change event to the audit log.
+     */
+    void pushAudit(AuditEntry entry);
+
+    /**
+     * Returns all audit entries, most recent first.
+     */
+    List<AuditEntry> readAudit();
+
+    /**
      * Returns the most recent migration result applied during {@link #read}, if that read migrated data.
      */
-    java.util.Optional<Migrations.MigrationResult> lastAppliedMigrationResult();
+    Optional<Migrations.MigrationResult> lastAppliedMigrationResult();
 }

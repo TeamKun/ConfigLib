@@ -4,6 +4,7 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
+import net.kunmc.lab.configlib.schema.DisplayContext;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,7 +38,7 @@ class ConfigListCommand extends Command {
             ctx.sendMessage(ConfigUtil.configHeader(config));
             for (ConfigSchemaEntry<?> entry : config.schema()
                                                     .entries()) {
-                ctx.sendMessageWithOption(entry.entryName() + ": " + entry.displayString(),
+                ctx.sendMessageWithOption(entry.entryName() + ": " + entry.displayString(DisplayContext.command(ctx)),
                                           option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                           .hoverText(StringUtils.defaultString(entry.metadata()
                                                                                                     .description())));

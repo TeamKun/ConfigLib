@@ -5,6 +5,7 @@ import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.command.MapValuePutCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
+import net.kunmc.lab.configlib.store.ChangeTrace;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +47,7 @@ class ModifyMapPutCommand extends Command {
                         config.mutate(() -> {
                             value.dispatchPut(k, v);
                             value.put(k, v);
-                        });
+                        }, ChangeTrace.command(ctx, "put " + schemaEntry.entryName(), schemaEntry.entryName()));
                     } catch (ConfigValidationException e) {
                         e.sendMessage(ctx);
                         return;

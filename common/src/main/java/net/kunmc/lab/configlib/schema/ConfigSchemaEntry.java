@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.schema;
 
 import net.kunmc.lab.configlib.CommonBaseConfig;
+import net.kunmc.lab.configlib.annotation.Masked;
 import net.kunmc.lab.configlib.exception.InvalidValueException;
 
 import java.lang.reflect.Field;
@@ -35,6 +36,10 @@ public abstract class ConfigSchemaEntry<E> {
         return metadata;
     }
 
+    public boolean isMasked() {
+        return field.isAnnotationPresent(Masked.class);
+    }
+
     public abstract void validate(E value) throws InvalidValueException;
 
     public abstract E get();
@@ -47,9 +52,23 @@ public abstract class ConfigSchemaEntry<E> {
 
     public abstract boolean supportsModificationCommand();
 
-    public abstract String displayString();
+    public final String displayString() {
+        return displayString(get(), DisplayContext.raw());
+    }
 
-    public abstract String displayString(Object fieldValue);
+    public final String displayString(DisplayContext context) {
+        return displayString(get(), context);
+    }
+
+    public final String displayString(Object fieldValue) {
+        return displayString(fieldValue, DisplayContext.raw());
+    }
+
+    public final String displayString(Object fieldValue, DisplayContext context) {
+        return context.display(displayRawString(fieldValue), this);
+    }
+
+    protected abstract String displayRawString(Object fieldValue);
 
     public abstract int sourceHash();
 

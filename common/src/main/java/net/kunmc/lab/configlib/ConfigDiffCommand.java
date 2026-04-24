@@ -4,11 +4,13 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.argument.IntegerArgument;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
+import net.kunmc.lab.configlib.schema.DisplayContext;
 import net.kunmc.lab.configlib.store.HistoryEntry;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 class ConfigDiffCommand extends Command {
@@ -97,12 +99,14 @@ class ConfigDiffCommand extends Command {
             boolean anyDiff = false;
             for (ConfigSchemaEntry<?> entry : config.schema()
                                                     .entries()) {
-                String defaultFmt = config.formatDefaultValue(entry);
-                String currentFmt = entry.displayString();
-                if (defaultFmt.equals(currentFmt)) {
+                Object defaultValue = config.copyDefaultValue(entry);
+                Object currentValue = entry.get();
+                if (Objects.equals(defaultValue, currentValue)) {
                     continue;
                 }
                 anyDiff = true;
+                String defaultFmt = entry.displayString(defaultValue, DisplayContext.diff(ctx));
+                String currentFmt = entry.displayString(currentValue, DisplayContext.diff(ctx));
                 ctx.sendSuccess(entry.entryName() + ": " + defaultFmt + DIFF_ARROW + currentFmt);
             }
 
@@ -121,13 +125,13 @@ class ConfigDiffCommand extends Command {
                                                     .entries()) {
             Object older = entry.get(olderConfig);
             Object newer = entry.get(newerConfig);
-
-            String olderFmt = entry.displayString(older);
-            String newerFmt = entry.displayString(newer);
-            if (olderFmt.equals(newerFmt)) {
+            if (Objects.equals(older, newer)) {
                 continue;
             }
+
             anyDiff = true;
+            String olderFmt = entry.displayString(older, DisplayContext.diff(ctx));
+            String newerFmt = entry.displayString(newer, DisplayContext.diff(ctx));
             ctx.sendSuccess(entry.entryName() + ": " + olderFmt + DIFF_ARROW + newerFmt);
         }
 

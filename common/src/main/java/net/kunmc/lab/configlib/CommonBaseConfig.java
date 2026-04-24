@@ -7,9 +7,8 @@ import net.kunmc.lab.configlib.migration.MigrationDsl;
 import net.kunmc.lab.configlib.migration.Migrations;
 import net.kunmc.lab.configlib.schema.ConfigSchema;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
-import net.kunmc.lab.configlib.store.ConfigStore;
-import net.kunmc.lab.configlib.store.HistoryEntry;
-import net.kunmc.lab.configlib.store.HistorySource;
+import net.kunmc.lab.configlib.schema.DisplayContext;
+import net.kunmc.lab.configlib.store.*;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,15 +16,13 @@ import org.jetbrains.annotations.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Timer;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public abstract class CommonBaseConfig {
     @SuppressWarnings("unused")
@@ -66,10 +63,6 @@ public abstract class CommonBaseConfig {
         return schema;
     }
 
-    final String formatDefaultValue(ConfigSchemaEntry<?> entry) {
-        return entry.displayString(copyDefaultValue(entry));
-    }
-
     final void resetEntryToDefault(ConfigSchemaEntry<?> entry) {
         setSchemaValue(entry, copyDefaultValue(entry));
     }
@@ -87,8 +80,9 @@ public abstract class CommonBaseConfig {
         schema = ConfigSchema.fromConfig(this);
         defaultValues = schema.entries()
                               .stream()
-                              .collect(java.util.stream.Collectors.toUnmodifiableMap(ConfigSchemaEntry::entryName,
-                                                                                     this::snapshotDefaultValue));
+                              .collect(LinkedHashMap::new,
+                                       (m, v) -> m.put(v.entryName(), snapshotDefaultValue(v)),
+                                       LinkedHashMap::putAll);
 
         try {
             saveConfigIfAbsent();
@@ -99,10 +93,22 @@ public abstract class CommonBaseConfig {
 
         if (configStore.readHistory(getClass(), migrations)
                        .isEmpty()) {
-            HistorySource source = configStore.lastAppliedMigrationResult()
-                                              .map(x -> HistorySource.MIGRATION)
-                                              .orElse(HistorySource.INITIAL);
-            configStore.pushHistory(this, source);
+            ChangeTrace trace = configStore.lastAppliedMigrationResult()
+                                           .map(x -> ChangeTrace.migration())
+                                           .orElseGet(ChangeTrace::initial);
+            configStore.pushHistory(this, trace);
+            if (trace.source() == ChangeSource.INITIAL) {
+                configStore.pushAudit(new AuditEntry(System.currentTimeMillis(),
+                                                     trace,
+                                                     schema.entries()
+                                                           .stream()
+                                                           .map(entry -> new AuditChange(entry.entryName(),
+                                                                                         auditText(entry, null),
+                                                                                         auditText(entry, entry.get())))
+                                                           .collect(Collectors.toList())));
+            } else {
+                configStore.pushAudit(new AuditEntry(System.currentTimeMillis(), trace));
+            }
         }
 
         modificationDetector.start(timer, option.modifyDetectionTimerPeriod);
@@ -123,7 +129,7 @@ public abstract class CommonBaseConfig {
         onChangeListeners.forEach(Runnable::run);
     }
 
-    void detectModifications() {
+    final void detectModifications() {
         modificationDetector.detect();
     }
 
@@ -185,9 +191,9 @@ public abstract class CommonBaseConfig {
         });
     }
 
-    void pushHistory() {
+    final void pushHistory() {
         withIoLock(() -> {
-            configStore.pushHistory(this, HistorySource.PROGRAMMATIC);
+            recordAcceptedChange(ChangeTrace.programmatic());
         });
     }
 
@@ -208,14 +214,19 @@ public abstract class CommonBaseConfig {
      * @throws ConfigValidationException if the mutated config does not satisfy schema validation
      */
     public final void mutate(Runnable mutation) {
+        mutate(mutation, ChangeTrace.programmatic());
+    }
+
+    public final void mutate(Runnable mutation, ChangeTrace trace) {
         withIoLock(() -> {
+            Map<ConfigSchemaEntry<?>, Object> before = snapshotEntryValues();
             mutation.run();
             if (!initialized || !modificationDetector.isModified()) {
                 return;
             }
 
             saveConfigLocked();
-            configStore.pushHistory(this, HistorySource.PROGRAMMATIC);
+            recordAcceptedChange(resolveTrace(trace, before), before);
             modificationDetector.initializeHash();
             dispatchOnChange();
         });
@@ -260,37 +271,47 @@ public abstract class CommonBaseConfig {
         replaceWithValidatedConfig(saved);
     }
 
-    void withIoLock(Runnable action) {
+    final void withIoLock(Runnable action) {
         withIoLock(() -> {
             action.run();
             return null;
         });
     }
 
-    <T> T withIoLock(Supplier<T> action) {
+    final <T> T withIoLock(Supplier<T> action) {
         synchronized (ioLock) {
             return action.get();
         }
     }
 
-    public boolean applyUndo(int stepsBack) {
+    public final boolean applyUndo(int historyIndex) {
+        return applyUndo(historyIndex, ChangeTrace.undo("history[" + historyIndex + "]"));
+    }
+
+    public final boolean applyUndo(int historyIndex, ChangeTrace trace) {
         return withIoLock(() -> {
-            if (!configStore.canUndo(stepsBack)) {
+            if (!configStore.canRestoreHistoryIndex(historyIndex)) {
                 return false;
             }
-            CommonBaseConfig historical = configStore.undo(getClass(), migrations, stepsBack);
+            Map<ConfigSchemaEntry<?>, Object> before = snapshotEntryValues();
+            CommonBaseConfig historical = configStore.restoreHistoryIndex(getClass(), migrations, historyIndex);
             ConfigUtil.replaceFields(this, historical, this);
             saveConfigLocked();
+            pushAudit(resolveTrace(trace, before), before);
             modificationDetector.initializeHash();
             dispatchOnChange();
             return true;
         });
     }
 
-    public List<HistoryEntry> readHistory() {
+    public final List<HistoryEntry> readHistory() {
         return withIoLock(() -> {
             return configStore.readHistory(getClass(), migrations);
         });
+    }
+
+    public final List<AuditEntry> readAudit() {
+        return withIoLock(configStore::readAudit);
     }
 
     /**
@@ -306,6 +327,7 @@ public abstract class CommonBaseConfig {
                 return false;
             }
 
+            Map<ConfigSchemaEntry<?>, Object> before = initialized ? snapshotEntryValues() : Map.of();
             CommonBaseConfig config = configStore.read(getClass(), migrations, this);
             validateConfig(config);
 
@@ -320,6 +342,11 @@ public abstract class CommonBaseConfig {
                 return true;
             }
 
+            List<String> changedPaths = changedPaths(before);
+            if (!changedPaths.isEmpty()) {
+                recordAcceptedChange(ChangeTrace.file(changedPaths), before);
+                modificationDetector.initializeHash();
+            }
             dispatchOnChange();
             return true;
         });
@@ -330,6 +357,7 @@ public abstract class CommonBaseConfig {
         ConfigUtil.replaceFields(this, config, this);
     }
 
+    @Nullable
     private Object snapshotDefaultValue(ConfigSchemaEntry<?> entry) {
         Object value = entry.get();
         Value<?, ?> backingValue = resolveValueField(entry);
@@ -340,7 +368,8 @@ public abstract class CommonBaseConfig {
                                           .getGenericType(), value);
     }
 
-    private Object copyDefaultValue(ConfigSchemaEntry<?> entry) {
+    @Nullable
+    final Object copyDefaultValue(ConfigSchemaEntry<?> entry) {
         Object value = defaultValues.get(entry.entryName());
         Value<?, ?> backingValue = resolveValueField(entry);
         if (backingValue != null) {
@@ -351,6 +380,7 @@ public abstract class CommonBaseConfig {
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     private static Object copyValueDefault(Value<?, ?> value, Object rawValue) {
         return ((Value<Object, ?>) value).copyValue(rawValue);
     }
@@ -376,8 +406,78 @@ public abstract class CommonBaseConfig {
         ((ConfigSchemaEntry<Object>) entry).set(newValue);
     }
 
-    void validateCurrentConfig() {
+    final void validateCurrentConfig() {
         validateConfig(this);
+    }
+
+    final void recordAcceptedChange(ChangeTrace trace) {
+        configStore.pushHistory(this, trace);
+        configStore.pushAudit(new AuditEntry(System.currentTimeMillis(), trace));
+    }
+
+    final void recordAcceptedChange(ChangeTrace trace, Map<ConfigSchemaEntry<?>, Object> before) {
+        configStore.pushHistory(this, trace);
+        pushAudit(trace, before);
+    }
+
+    private Map<ConfigSchemaEntry<?>, Object> snapshotEntryValues() {
+        Map<ConfigSchemaEntry<?>, Object> snapshot = new LinkedHashMap<>();
+        for (ConfigSchemaEntry<?> entry : schema.entries()) {
+            snapshot.put(entry, copyEntryValue(entry, entry.get()));
+        }
+        return snapshot;
+    }
+
+    private List<String> changedPaths(Map<ConfigSchemaEntry<?>, Object> before) {
+        List<String> changedPaths = new ArrayList<>();
+        for (Map.Entry<ConfigSchemaEntry<?>, Object> entry : before.entrySet()) {
+            Object current = entry.getKey()
+                                  .get();
+            if (!Objects.equals(entry.getValue(), current)) {
+                changedPaths.add(entry.getKey()
+                                      .entryName());
+            }
+        }
+        return changedPaths;
+    }
+
+    private ChangeTrace resolveTrace(ChangeTrace trace, Map<ConfigSchemaEntry<?>, Object> before) {
+        if (trace.hasPaths()) {
+            return trace;
+        }
+        return trace.withPaths(changedPaths(before));
+    }
+
+    private void pushAudit(ChangeTrace trace, Map<ConfigSchemaEntry<?>, Object> before) {
+        configStore.pushAudit(new AuditEntry(System.currentTimeMillis(), trace, auditChanges(before)));
+    }
+
+    private List<AuditChange> auditChanges(Map<ConfigSchemaEntry<?>, Object> before) {
+        List<AuditChange> changes = new ArrayList<>();
+        for (Map.Entry<ConfigSchemaEntry<?>, Object> entry : before.entrySet()) {
+            Object current = entry.getKey()
+                                  .get();
+            if (!Objects.equals(entry.getValue(), current)) {
+                changes.add(new AuditChange(entry.getKey()
+                                                 .entryName(),
+                                            auditText(entry.getKey(), entry.getValue()),
+                                            auditText(entry.getKey(), current)));
+            }
+        }
+        return changes;
+    }
+
+    private String auditText(ConfigSchemaEntry<?> entry, Object value) {
+        return entry.displayString(value, DisplayContext.raw());
+    }
+
+    private Object copyEntryValue(ConfigSchemaEntry<?> entry, Object value) {
+        Value<?, ?> backingValue = resolveValueField(entry);
+        if (backingValue != null) {
+            return copyValueDefault(backingValue, value);
+        }
+        return configStore.copyValue(entry.field()
+                                          .getGenericType(), value);
     }
 
     void logValidationFailure(ConfigValidationException ex) {

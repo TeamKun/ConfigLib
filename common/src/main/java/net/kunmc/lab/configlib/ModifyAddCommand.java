@@ -5,6 +5,7 @@ import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.configlib.command.CollectionValueAddCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
+import net.kunmc.lab.configlib.store.ChangeTrace;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 
@@ -41,7 +42,7 @@ class ModifyAddCommand extends Command {
                         config.mutate(() -> {
                             value.dispatchAdd(newValue);
                             ((Collection) value.value()).addAll(newValue);
-                        });
+                        }, ChangeTrace.command(ctx, "add " + schemaEntry.entryName(), schemaEntry.entryName()));
                     } catch (ConfigValidationException e) {
                         e.sendMessage(ctx);
                         return;

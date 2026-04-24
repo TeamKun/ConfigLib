@@ -258,6 +258,31 @@ class JsonFileConfigStoreTest {
         assertTrue(readFile().contains("\"added\":10"), readFile());
     }
 
+    @Test
+    void auditFileStoresChanges() throws IOException {
+        store.pushAudit(new AuditEntry(123L,
+                                       new ChangeTrace(ChangeSource.COMMAND,
+                                                       new ChangeActor("console", null),
+                                                       "set value",
+                                                       List.of("value")),
+                                       List.of(new AuditChange("value", "10", "20"))));
+
+        List<AuditEntry> audit = store.readAudit();
+        assertEquals(1, audit.size());
+        assertEquals("20",
+                     audit.get(0)
+                          .changes()
+                          .get(0)
+                          .afterText());
+
+        File auditFile = new File(tempDir, "config.audit.json");
+        assertTrue(auditFile.exists());
+        String raw = Files.readString(auditFile.toPath(), StandardCharsets.UTF_8);
+        assertTrue(raw.contains("\"changes\""), raw);
+        assertTrue(raw.contains("\"before\":\"10\""), raw);
+        assertTrue(raw.contains("\"after\":\"20\""), raw);
+    }
+
     // ---- startWatching() ----
 
     @Test
@@ -388,43 +413,43 @@ class JsonFileConfigStoreTest {
                            .size());
     }
 
-    // ---- history: canUndo ----
+    // ---- history: canRestoreHistoryIndex ----
 
     @Test
-    void canUndoReturnsFalseWhenHistoryFileAbsent() {
-        assertFalse(store.canUndo(1));
+    void canRestoreHistoryIndexReturnsFalseWhenHistoryFileAbsent() {
+        assertFalse(store.canRestoreHistoryIndex(1));
     }
 
     @Test
-    void canUndoReturnsFalseWithSingleEntry() {
+    void canRestoreHistoryIndexReturnsFalseWithSingleEntry() {
         store.pushHistory(new ValueConfig(0));
-        assertFalse(store.canUndo(1));
+        assertFalse(store.canRestoreHistoryIndex(1));
     }
 
     @Test
-    void canUndoReturnsTrueWithTwoEntries() {
-        store.pushHistory(new ValueConfig(0));
-        store.pushHistory(new ValueConfig(1));
-        assertTrue(store.canUndo(1));
-    }
-
-    @Test
-    void canUndoRespectsStepsBack() {
+    void canRestoreHistoryIndexReturnsTrueWithTwoEntries() {
         store.pushHistory(new ValueConfig(0));
         store.pushHistory(new ValueConfig(1));
-        assertFalse(store.canUndo(2));
+        assertTrue(store.canRestoreHistoryIndex(1));
+    }
+
+    @Test
+    void canRestoreHistoryIndexRespectsIndex() {
+        store.pushHistory(new ValueConfig(0));
+        store.pushHistory(new ValueConfig(1));
+        assertFalse(store.canRestoreHistoryIndex(2));
         store.pushHistory(new ValueConfig(2));
-        assertTrue(store.canUndo(2));
+        assertTrue(store.canRestoreHistoryIndex(2));
     }
 
-    // ---- history: undo ----
+    // ---- history: restoreHistoryIndex ----
 
     @Test
-    void undoRemovesTopAndReturnsNewTop() {
+    void restoreHistoryIndexRemovesNewerEntriesAndReturnsSelectedEntry() {
         store.pushHistory(new ValueConfig(10)); // old
         store.pushHistory(new ValueConfig(20)); // current
 
-        ValueConfig restored = (ValueConfig) store.undo(ValueConfig.class, noMigrations(), 1);
+        ValueConfig restored = (ValueConfig) store.restoreHistoryIndex(ValueConfig.class, noMigrations(), 1);
 
         assertEquals(10, restored.value);
         assertEquals(1,
@@ -433,13 +458,13 @@ class JsonFileConfigStoreTest {
     }
 
     @Test
-    void undoWithStepsBack2() {
+    void restoreHistoryIndex2() {
         store.pushHistory(new ValueConfig(0));
         store.pushHistory(new ValueConfig(10));
         store.pushHistory(new ValueConfig(20));
         // history: [20, 10, 0]
 
-        ValueConfig restored = (ValueConfig) store.undo(ValueConfig.class, noMigrations(), 2);
+        ValueConfig restored = (ValueConfig) store.restoreHistoryIndex(ValueConfig.class, noMigrations(), 2);
 
         assertEquals(0, restored.value);
         assertEquals(1,

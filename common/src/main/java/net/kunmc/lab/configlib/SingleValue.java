@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,11 +114,11 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
     }
 
     @Override
-    protected String defaultDisplayString() {
-        if (value() == null) {
+    protected String defaultDisplayString(@Nullable E e) {
+        if (e == null) {
             return "null";
         }
-        return valueToString(value());
+        return valueToString(e);
     }
 
     protected abstract String valueToString(E e);

@@ -84,6 +84,7 @@ public class ConfigCommandBuilder {
         }
         if (historyEnabled) {
             createSubCommand(SubCommandType.History).ifPresent(configCommand::addChildren);
+            createSubCommand(SubCommandType.Audit).ifPresent(configCommand::addChildren);
             createSubCommand(SubCommandType.Undo).ifPresent(configCommand::addChildren);
             createSubCommand(SubCommandType.Diff).ifPresent(configCommand::addChildren);
         }
@@ -140,6 +141,7 @@ public class ConfigCommandBuilder {
                 Set<CommonBaseConfig> singleton = Collections.singleton(config);
                 if (historyEnabled && config.isHistoryEnabled()) {
                     addChildren(new ConfigHistoryCommand(singleton));
+                    addChildren(new ConfigAuditCommand(singleton));
                     addChildren(new ConfigUndoCommand(singleton));
                     addChildren(new ConfigDiffCommand(singleton));
                 }

@@ -3,6 +3,7 @@ package net.kunmc.lab.configlib;
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
+import net.kunmc.lab.configlib.store.ChangeTrace;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -27,7 +28,11 @@ class ConfigResetCommand extends Command {
 
     private void exec(CommandContext ctx, CommonBaseConfig config) {
         try {
-            config.mutate(config::resetAllEntriesToDefault);
+            config.mutate(() -> {
+                config.schema()
+                      .entries()
+                      .forEach(config::resetEntryToDefault);
+            }, ChangeTrace.command(ctx, "reset " + config.entryName()));
         } catch (ConfigValidationException e) {
             e.sendMessage(ctx);
             return;

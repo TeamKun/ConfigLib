@@ -2,6 +2,7 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
+import net.kunmc.lab.configlib.store.ChangeTrace;
 
 import java.util.*;
 
@@ -81,7 +82,9 @@ class ConfigModificationDetector {
                 return;
             }
             lastValidationFailure = null;
-            config.pushHistory();
+            List<String> changedPaths = new ArrayList<>();
+            modifiedEntries.forEach(entry -> changedPaths.add(entry.entryName()));
+            config.recordAcceptedChange(ChangeTrace.programmatic(changedPaths));
             // Saving may merge disk edits back into the live config. Reset hashes to the
             // persisted state instead of the pre-save values detected in this timer tick.
             initializeHash();
