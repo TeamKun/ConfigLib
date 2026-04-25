@@ -5,6 +5,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Allows a POJO config field to hold {@code null}.
+ * <p>
+ * Without this annotation, POJO fields are treated as non-null during validation.
+ * </p>
+ * <p>
+ * This annotation is for POJO fields. Value fields define their own nullability through
+ * their type and validators.
+ * </p>
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface ConfigNullable {

@@ -52,10 +52,12 @@ Read only what the request needs. Common public API files include:
 - `common/src/main/java/net/kunmc/lab/configlib/store/FileConfigStore.java`
 - `common/src/main/java/net/kunmc/lab/configlib/store/YamlFileConfigStore.java`
 - `common/src/main/java/net/kunmc/lab/configlib/store/HistoryEntry.java`
-- `common/src/main/java/net/kunmc/lab/configlib/store/HistorySource.java`
+- `common/src/main/java/net/kunmc/lab/configlib/store/AuditEntry.java`
+- `common/src/main/java/net/kunmc/lab/configlib/store/ChangeTrace.java`
 - `common/src/main/java/net/kunmc/lab/configlib/value/`
 - `bukkit/src/main/java/net/kunmc/lab/configlib/value/`
-- `common/src/main/java/net/kunmc/lab/configlib/annotation/` (POJO API: `@Description`, `@Range`, `@Nullable`)
+- `common/src/main/java/net/kunmc/lab/configlib/annotation/` (field annotations; prefer each annotation's Javadoc for
+  exact applicability)
 
 For extracted JAR sources, map those paths to the extracted package layout.
 

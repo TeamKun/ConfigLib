@@ -40,7 +40,8 @@ public final class MyPlugin extends JavaPlugin {
 }
 ```
 
-`ConfigCommandBuilder` auto-generates `list`, `reload`, `reset`, `history`, `undo`, `diff`, and per-field get/modify
+`ConfigCommandBuilder` auto-generates `list`, `reload`, `reset`, `history`, `audit`, `undo`, `diff`, and per-field
+get/modify
 subcommands. Value fields get their normal `set`, `reset`, numeric, collection, and map operations. Mutable POJO scalar
 fields (`String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equivalents) get `set` and `reset` commands.
 Complex POJO fields remain get-only. Config-level `list`, `reload`, and `reset` are generated whenever the config has
@@ -293,9 +294,13 @@ history:
 
 Older top-level-array YAML history files are still readable.
 
-Each history entry also has a source: `INITIAL`, `MIGRATION`, or `PROGRAMMATIC`.
-The first history entry is `MIGRATION` when ConfigLib had to migrate an existing file during load; otherwise it is
-`INITIAL`.
+History entry sources include `INITIAL`, `MIGRATION`, `COMMAND`, `FILE`, `PROGRAMMATIC`, and `UNDO`.
+
+Audit files are separate from history snapshots and store event-oriented entries such as actor, reason, changed paths,
+and before/after display text.
+
+Use `@Masked` when a field should be hidden in command-oriented output such as list/get/history/diff/audit. Masking is
+display-only: the config file and history snapshots still store the real value so restore remains exact.
 
 ## Multiple configs in one command tree
 

@@ -665,10 +665,10 @@ Mutable `String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equival
 Collection, map, object-valued leaf fields, and top-level `final` POJO fields are get-only. Nested POJO, immutable
 class, and record leaf fields are still modifiable when their leaf type is supported.
 
-| Command                       | Description              |
-|-------------------------------|--------------------------|
-| `/config <field> <value>`     | Set the POJO field value |
-| `/config <field> set <value>` | Set the POJO field value |
+| Command                       | Description                |
+|-------------------------------|----------------------------|
+| `/config <field> <value>`     | Set the POJO field value   |
+| `/config <field> set <value>` | Set the POJO field value   |
 | `/config <field> reset`       | Reset to the default value |
 
 **NumericValue — arithmetic** (IntegerValue, DoubleValue, FloatValue) — extends SingleValue, so `set` and `reset` also
@@ -715,11 +715,16 @@ Every time a configuration value is modified, the new state is automatically sav
 capped at
 50 entries by default (override `createConfigStore()` to change this).
 
+Audit entries are stored separately in `<configName>.audit.yml` / `.json`.
+
 Each history entry also records its source:
 
 - `INITIAL`: initial snapshot for a brand-new config
 - `MIGRATION`: initial snapshot created immediately after applying migrations on load
-- `PROGRAMMATIC`: normal updates, including command changes, undo results, and explicit programmatic mutations
+- `COMMAND`: generated command changes
+- `FILE`: file reload changes
+- `PROGRAMMATIC`: explicit programmatic mutations
+- `UNDO`: undo operations
 
 History uses **0-based indexing** where `[0]` is the current (latest) state.
 
@@ -731,34 +736,46 @@ History uses **0-based indexing** where `[0]` is the current (latest) state.
 | `/config history <index>`                | Show field values at that index                            |
 | `/config history diff <index>`           | Diff current state vs history entry                        |
 | `/config history diff <index1> <index2>` | Diff between two history entries                           |
-| `/config history undo`                   | Revert to the previous state                               |
-| `/config history undo <N>`               | Revert N steps back                                        |
-| `/config undo`                           | Revert to the previous state                               |
-| `/config undo <N>`                       | Revert N steps back                                        |
+| `/config history undo`                   | Restore `history[1]`                                       |
+| `/config history undo <index>`           | Restore `history[index]`                                   |
+| `/config undo`                           | Restore `history[1]`                                       |
+| `/config undo <index>`                   | Restore `history[index]`                                   |
 | `/config diff default`                   | Diff current state vs declared default values              |
 | `/config diff <index>`                   | Diff current state vs history entry                        |
 | `/config diff <index1> <index2>`         | Diff between two history entries                           |
+| `/config audit`                          | List audit entries                                         |
+| `/config audit <index>`                  | Show one audit entry with change details                   |
 
 **Multiple configs** — prefix with the config name using either order:
 
-| Command                                     | Description                     |
-|---------------------------------------------|---------------------------------|
-| `/config history <configName>`              | List entries for that config    |
-| `/config history <configName> <index>`      | Show field values at that index |
-| `/config history <configName> diff <index>` | Diff for that config            |
-| `/config history <configName> undo [N]`     | Undo for that config            |
-| `/config undo <configName> [N]`             | Undo for that config            |
-| `/config diff <configName> default`         | Diff for that config vs defaults |
-| `/config diff <configName> <index>`         | Diff for that config            |
-| `/config <configName> history [index]`      | Alternative prefix order        |
-| `/config <configName> undo [N]`             | Alternative prefix order        |
-| `/config <configName> diff default`         | Alternative prefix order        |
-| `/config <configName> diff <index>`         | Alternative prefix order        |
+| Command                                     | Description                          |
+|---------------------------------------------|--------------------------------------|
+| `/config history <configName>`              | List entries for that config         |
+| `/config history <configName> <index>`      | Show field values at that index      |
+| `/config history <configName> diff <index>` | Diff for that config                 |
+| `/config history <configName> undo [index]` | Undo for that config                 |
+| `/config undo <configName> [index]`         | Undo for that config                 |
+| `/config diff <configName> default`         | Diff for that config vs defaults     |
+| `/config diff <configName> <index>`         | Diff for that config                 |
+| `/config audit <configName>`                | List audit entries for that config   |
+| `/config audit <configName> <index>`        | Show one audit entry for that config |
+| `/config <configName> history [index]`      | Alternative prefix order             |
+| `/config <configName> undo [index]`         | Alternative prefix order             |
+| `/config <configName> diff default`         | Alternative prefix order             |
+| `/config <configName> diff <index>`         | Alternative prefix order             |
+| `/config <configName> audit [index]`        | Alternative prefix order             |
 
 `diff` shows only fields that differ, formatted as `fieldName: <old> → <new>`.
 
 `diff default` compares the current in-memory config against the defaults declared in Java code.
 Diff output is formatted as `fieldName: <old> -> <new>`.
+
+Audit entries are stored separately from history snapshots in `<configName>.audit.yml` / `.json`.
+They record the accepted change event with timestamp, source, actor, optional reason, changed paths, and before/after
+display text for each changed field.
+
+Use `@Masked` on a config field to mask its value in command-oriented output such as list/get/history/diff/audit. The
+stored config file and history snapshots remain unmasked so they can still be restored exactly.
 
 To hide history commands from the generated command tree:
 

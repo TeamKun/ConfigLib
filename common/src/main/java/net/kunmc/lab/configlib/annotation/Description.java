@@ -5,6 +5,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Supplies descriptive metadata for a config field.
+ * <p>
+ * ConfigLib uses this text for command hover/help output and, for YAML-based stores,
+ * emits it as a comment near the saved field.
+ * </p>
+ * <p>
+ * Applicable to POJO config fields.
+ * <p>
+ * Value fields expose descriptions via {@link net.kunmc.lab.configlib.Value#description(String)}
+ * instead of this annotation.
+ * </p>
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Description {
