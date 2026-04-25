@@ -202,7 +202,7 @@ class ConfigSchemaTest {
 
     @Test
     void customValidationMessageCanCarryLogReason() {
-        InvalidValueException cause = new InvalidValueException("log reason", ctx -> ctx.sendFailure("command reason"));
+        InvalidValueException cause = new InvalidValueException(ctx -> ctx.sendFailure("command reason"), "log reason");
         ConfigValidationException ex = new ConfigValidationException(new ConfigSchemaPath("custom"), "bad", cause);
 
         assertTrue(ex.getMessage()

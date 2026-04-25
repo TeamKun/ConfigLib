@@ -30,10 +30,10 @@ public class InvalidValueException extends Exception {
     }
 
     public InvalidValueException(Consumer<CommandContext> messageSender) {
-        this("Custom validation message", messageSender);
+        this(messageSender, "Custom validation message");
     }
 
-    public InvalidValueException(String logMessage, Consumer<CommandContext> messageSender) {
+    public InvalidValueException(Consumer<CommandContext> messageSender, String logMessage) {
         super(logMessage);
         this.messageSender = messageSender;
     }
