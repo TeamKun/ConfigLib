@@ -19,8 +19,8 @@ class MyCommand extends Command {
             builder.playerArgument("target")
                    .stringArgument("text")
                    .execute(ctx -> {
-                       Player p = ctx.getParsedArg("target", Player.class);
-                       String msg = ctx.getParsedArg("text", String.class);
+                       Player p = ctx.getArgument("target", Player.class);
+                       String msg = ctx.getArgument("text", String.class);
                        p.sendMessage(msg);
                    });
         });

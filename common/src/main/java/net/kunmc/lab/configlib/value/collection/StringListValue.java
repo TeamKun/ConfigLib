@@ -41,27 +41,25 @@ public class StringListValue extends ListValue<String, StringListValue> {
 
     @Override
     protected List<ArgumentDefinition<List<String>>> argumentDefinitionsForAdd() {
-        return List.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
-            opt.suggestionAction(sb -> {
-                   allowableStringList.forEach(sb::suggest);
-               })
-               .validator((x, ctx) -> {
-                   if (allowableStringList.stream()
-                                          .noneMatch(s -> s.equals(x))) {
-                       throw new ArgumentValidationException(x + "は不正な引数です");
-                   }
-               });
-        }, type), (s, ctx) -> {
+        return List.of(new ArgumentDefinition<>(new StringArgument(name, type).suggestionAction(sb -> {
+                                                                                  allowableStringList.forEach(sb::suggest);
+                                                                              })
+                                                                              .validator((x, ctx) -> {
+                                                                                  if (allowableStringList.stream()
+                                                                                                         .noneMatch(s -> s.equals(
+                                                                                                                 x))) {
+                                                                                      throw new ArgumentValidationException(
+                                                                                              x + "は不正な引数です");
+                                                                                  }
+                                                                              }), (s, ctx) -> {
             return List.of(s);
         }));
     }
 
     @Override
     protected List<ArgumentDefinition<List<String>>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
-            opt.suggestionAction(sb -> {
-                value.forEach(sb::suggest);
-            });
+        return List.of(new ArgumentDefinition<>(new StringArgument(name).suggestionAction(sb -> {
+            value.forEach(sb::suggest);
         }), (s, ctx) -> {
             return List.of(s);
         }));

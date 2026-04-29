@@ -40,29 +40,27 @@ public class StringSetValue extends SetValue<String, StringSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<String>>> argumentDefinitionsForAdd() {
-        return List.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
-            opt.suggestionAction(sb -> {
-                   allowableStringList.stream()
-                                      .filter(s -> !value.contains(s))
-                                      .forEach(sb::suggest);
-               })
-               .validator((x, ctx) -> {
-                   if (allowableStringList.stream()
-                                          .noneMatch(s -> s.equals(x))) {
-                       throw new ArgumentValidationException(x + "は不正な引数です");
-                   }
-               });
-        }, type), (s, ctx) -> {
+        return List.of(new ArgumentDefinition<>(new StringArgument(name, type).suggestionAction(sb -> {
+                                                                                  allowableStringList.stream()
+                                                                                                     .filter(s -> !value.contains(s))
+                                                                                                     .forEach(sb::suggest);
+                                                                              })
+                                                                              .validator((x, ctx) -> {
+                                                                                  if (allowableStringList.stream()
+                                                                                                         .noneMatch(s -> s.equals(
+                                                                                                                 x))) {
+                                                                                      throw new ArgumentValidationException(
+                                                                                              x + "は不正な引数です");
+                                                                                  }
+                                                                              }), (s, ctx) -> {
             return Set.of(s);
         }));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<String>>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new StringArgument(name, opt -> {
-            opt.suggestionAction(sb -> {
-                value.forEach(sb::suggest);
-            });
+        return List.of(new ArgumentDefinition<>(new StringArgument(name).suggestionAction(sb -> {
+            value.forEach(sb::suggest);
         }), (s, ctx) -> {
             return Set.of(s);
         }));

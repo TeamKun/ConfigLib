@@ -25,21 +25,22 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected List<ArgumentDefinition<UUID>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new UUIDArgument("key", opt -> {
-            List<UUID> offlinePlayerUUIDs = Arrays.stream(Bukkit.getOfflinePlayers())
-                                                  .map(OfflinePlayer::getUniqueId)
-                                                  .collect(Collectors.toList());
-            opt.validator(x -> {
-                   return value.containsKey(x);
-               })
-               .additionalSuggestionAction(sb -> {
-                   value.keySet()
-                        .stream()
-                        .filter(x -> !offlinePlayerUUIDs.contains(x))
-                        .map(Object::toString)
-                        .forEach(sb::suggest);
-               });
-        }), (uuid, ctx) -> uuid));
+        return List.of(new ArgumentDefinition<>(new UUIDArgument("key").validator(x -> {
+                                                                           return value.containsKey(x);
+                                                                       })
+                                                                       .additionalSuggestionAction(sb -> {
+                                                                           List<UUID> offlinePlayerUUIDs = Arrays.stream(
+                                                                                                                         Bukkit.getOfflinePlayers())
+                                                                                                                 .map(OfflinePlayer::getUniqueId)
+                                                                                                                 .collect(
+                                                                                                                         Collectors.toList());
+                                                                           value.keySet()
+                                                                                .stream()
+                                                                                .filter(x -> !offlinePlayerUUIDs.contains(
+                                                                                        x))
+                                                                                .map(Object::toString)
+                                                                                .forEach(sb::suggest);
+                                                                       }), (uuid, ctx) -> uuid));
     }
 
     @Override

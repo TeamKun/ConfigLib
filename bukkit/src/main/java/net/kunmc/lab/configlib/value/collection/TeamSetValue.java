@@ -30,27 +30,23 @@ public class TeamSetValue extends SetValue<Team, TeamSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<Team>>> argumentDefinitionsForAdd() {
-        return List.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
-            opt.suggestionAction(sb -> {
-                scoreboard.getTeams()
-                          .stream()
-                          .map(Team::getName)
-                          .filter(name -> value.stream()
-                                               .map(Team::getName)
-                                               .noneMatch(s -> s.equals(name)))
-                          .forEach(sb::suggest);
-            });
+        return List.of(new ArgumentDefinition<>(new TeamArgument("team").suggestionAction(sb -> {
+            scoreboard.getTeams()
+                      .stream()
+                      .map(Team::getName)
+                      .filter(name -> value.stream()
+                                           .map(Team::getName)
+                                           .noneMatch(s -> s.equals(name)))
+                      .forEach(sb::suggest);
         }), (team, ctx) -> Set.of(team)));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<Team>>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
-            opt.suggestionAction(sb -> {
-                value.stream()
-                     .map(Team::getName)
-                     .forEach(sb::suggest);
-            });
+        return List.of(new ArgumentDefinition<>(new TeamArgument("team").suggestionAction(sb -> {
+            value.stream()
+                 .map(Team::getName)
+                 .forEach(sb::suggest);
         }), (team, ctx) -> Set.of(team)));
     }
 

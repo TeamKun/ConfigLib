@@ -27,9 +27,10 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
     @Override
     protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForAdd() {
         List<ArgumentDefinition<Set<T>>> definitions = new ArrayList<>();
-        definitions.add(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> {
-            opt.validator((x, ctx) -> !value.contains(x) && filterForAdd.apply(x, ctx));
-        }), (name, ctx) -> {
+        definitions.add(new ArgumentDefinition<>(new EnumArgument<>("name",
+                                                                    clazz).validator((x, ctx) -> !value.contains(x) && filterForAdd.apply(
+                x,
+                ctx)), (name, ctx) -> {
             return Set.of(clazz.cast(name));
         }));
         return definitions;
@@ -37,11 +38,10 @@ public class EnumSetValue<T extends Enum<T>> extends SetValue<T, EnumSetValue<T>
 
     @Override
     protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(x -> {
-            return value.contains(x);
-        })), (name, ctx) -> {
-            return Set.of(name);
-        }));
+        return List.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz).validator(x -> value.contains(x)),
+                                                (name, ctx) -> {
+                                                    return Set.of(name);
+                                                }));
     }
 
     @Override

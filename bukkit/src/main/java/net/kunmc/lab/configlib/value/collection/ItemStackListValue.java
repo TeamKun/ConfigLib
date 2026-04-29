@@ -38,19 +38,22 @@ public class ItemStackListValue extends ListValue<ItemStack, ItemStackListValue>
 
     @Override
     protected List<ArgumentDefinition<List<ItemStack>>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new StringArgument("item", opt -> {
-            opt.displayDefaultSuggestions(false)
-               .suggestionAction(sb -> {
-                   value.stream()
-                        .map(GSON::toJson)
-                        .forEach(sb::suggest);
-               })
-               .validator(x -> {
-                   return value.stream()
-                               .map(GSON::toJson)
-                               .anyMatch(x::equals);
-               });
-        }, StringArgument.Type.PHRASE), (item, ctx) -> Lists.newArrayList(GSON.fromJson(item, ItemStack.class))));
+        return List.of(new ArgumentDefinition<>(new StringArgument("item",
+                                                                   StringArgument.Type.PHRASE).displayDefaultSuggestions(
+                                                                                                      false)
+                                                                                              .suggestionAction(sb -> {
+                                                                                                  value.stream()
+                                                                                                       .map(GSON::toJson)
+                                                                                                       .forEach(sb::suggest);
+                                                                                              })
+                                                                                              .validator(x -> {
+                                                                                                  return value.stream()
+                                                                                                              .map(GSON::toJson)
+                                                                                                              .anyMatch(
+                                                                                                                      x::equals);
+                                                                                              }),
+                                                (item, ctx) -> Lists.newArrayList(GSON.fromJson(item,
+                                                                                                ItemStack.class))));
     }
 
     @Override

@@ -27,20 +27,18 @@ public abstract class UUID2ObjectMapValue<V, T extends UUID2ObjectMapValue<V, T>
 
     @Override
     protected List<ArgumentDefinition<UUID>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new UUIDArgument("uuid", opt -> {
-            opt.additionalSuggestionAction(sb -> {
-                   value.keySet()
-                        .stream()
-                        .filter(x -> ServerLifecycleHooks.getCurrentServer()
-                                                         .getPlayerProfileCache()
-                                                         .getProfileByUUID(x) == null)
-                        .map(Object::toString)
-                        .forEach(sb::suggest);
-               })
-               .validator(x -> {
-                   return value.containsKey(x);
-               });
-        }), (uuid, ctx) -> uuid));
+        return List.of(new ArgumentDefinition<>(new UUIDArgument("uuid").additionalSuggestionAction(sb -> {
+                                                                            value.keySet()
+                                                                                 .stream()
+                                                                                 .filter(x -> ServerLifecycleHooks.getCurrentServer()
+                                                                                                                  .getPlayerProfileCache()
+                                                                                                                  .getProfileByUUID(x) == null)
+                                                                                 .map(Object::toString)
+                                                                                 .forEach(sb::suggest);
+                                                                        })
+                                                                        .validator(x -> {
+                                                                            return value.containsKey(x);
+                                                                        }), (uuid, ctx) -> uuid));
     }
 
     @Override

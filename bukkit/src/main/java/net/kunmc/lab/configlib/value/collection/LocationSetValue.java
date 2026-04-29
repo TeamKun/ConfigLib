@@ -26,35 +26,29 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<Location>>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new DoubleArgument("x", opt -> {
-            opt.suggestionAction(sb -> {
-                value.stream()
-                     .map(Location::getX)
-                     .map(Object::toString)
-                     .forEach(sb::suggest);
-            });
-        }), new DoubleArgument("y", opt -> {
-            opt.suggestionAction(sb -> {
-                double x = (Double) sb.getParsedArgs()
-                                      .get(0);
-                value.stream()
-                     .filter(l -> l.getX() == x)
-                     .map(Location::getY)
-                     .map(Object::toString)
-                     .forEach(sb::suggest);
-            });
-        }), new DoubleArgument("z", opt -> {
-            opt.suggestionAction(sb -> {
-                double x = (Double) sb.getParsedArgs()
-                                      .get(0);
-                double y = (Double) sb.getParsedArgs()
-                                      .get(1);
-                value.stream()
-                     .filter(l -> l.getX() == x && l.getY() == y)
-                     .map(Location::getZ)
-                     .map(Object::toString)
-                     .forEach(sb::suggest);
-            });
+        return List.of(new ArgumentDefinition<>(new DoubleArgument("x").suggestionAction(sb -> {
+            value.stream()
+                 .map(Location::getX)
+                 .map(Object::toString)
+                 .forEach(sb::suggest);
+        }), new DoubleArgument("y").suggestionAction(sb -> {
+            double x = (Double) sb.getArguments()
+                                  .get(0);
+            value.stream()
+                 .filter(l -> l.getX() == x)
+                 .map(Location::getY)
+                 .map(Object::toString)
+                 .forEach(sb::suggest);
+        }), new DoubleArgument("z").suggestionAction(sb -> {
+            double x = (Double) sb.getArguments()
+                                  .get(0);
+            double y = (Double) sb.getArguments()
+                                  .get(1);
+            value.stream()
+                 .filter(l -> l.getX() == x && l.getY() == y)
+                 .map(Location::getZ)
+                 .map(Object::toString)
+                 .forEach(sb::suggest);
         }), (x, y, z, ctx) -> {
             return value.stream()
                         .filter(l -> l.getX() == x && l.getY() == y && l.getZ() == z)

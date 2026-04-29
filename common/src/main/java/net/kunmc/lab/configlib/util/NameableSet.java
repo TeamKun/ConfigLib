@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib.util;
 
-import net.kunmc.lab.commandlib.Nameable;
+import net.kunmc.lab.commandlib.argument.Nameable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

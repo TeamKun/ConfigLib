@@ -26,29 +26,25 @@ public class TeamSetValue extends SetValue<ScorePlayerTeam, TeamSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<ScorePlayerTeam>>> argumentDefinitionsForAdd() {
-        return List.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
-            opt.suggestionAction(sb -> {
-                ServerLifecycleHooks.getCurrentServer()
-                                    .getScoreboard()
-                                    .getTeams()
-                                    .stream()
-                                    .map(Team::getName)
-                                    .filter(name -> value.stream()
-                                                         .map(Team::getName)
-                                                         .noneMatch(s -> s.equals(name)))
-                                    .forEach(sb::suggest);
-            });
+        return List.of(new ArgumentDefinition<>(new TeamArgument("team").suggestionAction(sb -> {
+            ServerLifecycleHooks.getCurrentServer()
+                                .getScoreboard()
+                                .getTeams()
+                                .stream()
+                                .map(Team::getName)
+                                .filter(name -> value.stream()
+                                                     .map(Team::getName)
+                                                     .noneMatch(s -> s.equals(name)))
+                                .forEach(sb::suggest);
         }), (team, ctx) -> Set.of(team)));
     }
 
     @Override
     protected List<ArgumentDefinition<Set<ScorePlayerTeam>>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new TeamArgument("team", opt -> {
-            opt.suggestionAction(sb -> {
-                value.stream()
-                     .map(Team::getName)
-                     .forEach(sb::suggest);
-            });
+        return List.of(new ArgumentDefinition<>(new TeamArgument("team").suggestionAction(sb -> {
+            value.stream()
+                 .map(Team::getName)
+                 .forEach(sb::suggest);
         }), (team, ctx) -> Set.of(team)));
     }
 

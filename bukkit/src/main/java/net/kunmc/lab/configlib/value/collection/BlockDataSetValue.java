@@ -35,13 +35,12 @@ public class BlockDataSetValue extends SetValue<BlockData, BlockDataSetValue> {
 
     @Override
     protected List<ArgumentDefinition<Set<BlockData>>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new StringArgument("name", opt -> {
-            opt.suggestionAction(sb -> {
-                value().stream()
-                       .map(BlockData::getAsString)
-                       .forEach(sb::suggest);
-            });
-        }, StringArgument.Type.PHRASE), (data, ctx) -> {
+        return List.of(new ArgumentDefinition<>(new StringArgument("name", StringArgument.Type.PHRASE).suggestionAction(
+                sb -> {
+                    value().stream()
+                           .map(BlockData::getAsString)
+                           .forEach(sb::suggest);
+                }), (data, ctx) -> {
             try {
                 return Set.of(Bukkit.createBlockData(data));
             } catch (IllegalArgumentException e) {

@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib.value;
 
-import net.kunmc.lab.commandlib.Nameable;
+import net.kunmc.lab.commandlib.argument.Nameable;
 import net.kunmc.lab.commandlib.argument.NameableObjectArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.SingleValue;
@@ -35,9 +35,7 @@ public class NameableObjectValue<T extends Nameable> extends SingleValue<T, Name
 
     @Override
     protected List<ArgumentDefinition<T>> argumentDefinitions() {
-        return List.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name",
-                                                                             candidates,
-                                                                             opt -> opt.validator(filter)),
+        return List.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name", candidates).validator(filter),
                                                 (name, ctx) -> {
                                                     return name;
                                                 }));

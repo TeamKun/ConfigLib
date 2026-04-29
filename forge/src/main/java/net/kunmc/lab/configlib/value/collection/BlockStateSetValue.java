@@ -33,12 +33,10 @@ public class BlockStateSetValue extends SetValue<BlockState, BlockStateSetValue>
 
     @Override
     protected List<ArgumentDefinition<Set<BlockState>>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new BlockStateArgument("state", opt -> {
-            opt.suggestionAction(sb -> {
-                value().stream()
-                       .map(BlockState::toString)
-                       .forEach(sb::suggest);
-            });
+        return List.of(new ArgumentDefinition<>(new BlockStateArgument("state").suggestionAction(sb -> {
+            value().stream()
+                   .map(BlockState::toString)
+                   .forEach(sb::suggest);
         }), (state, ctx) -> Set.of(state.getState())));
     }
 

@@ -29,10 +29,9 @@ public abstract class AbstractEnumValue<E extends Enum<E>, T extends AbstractEnu
 
     @Override
     protected List<ArgumentDefinition<E>> argumentDefinitions() {
-        return List.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(filter)),
-                                                (name, ctx) -> {
-                                                    return name;
-                                                }));
+        return List.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz).validator(filter), (name, ctx) -> {
+            return name;
+        }));
     }
 
     @Override

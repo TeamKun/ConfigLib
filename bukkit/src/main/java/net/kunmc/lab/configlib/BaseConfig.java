@@ -2,7 +2,7 @@ package net.kunmc.lab.configlib;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.kunmc.lab.commandlib.Nameable;
+import net.kunmc.lab.commandlib.argument.Nameable;
 import net.kunmc.lab.configlib.gson.*;
 import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.store.YamlFileConfigStore;

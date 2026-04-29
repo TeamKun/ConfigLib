@@ -31,7 +31,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10")
     implementation("org.snakeyaml:snakeyaml-engine:2.9")
     implementation("org.apache.commons:commons-lang3:3.12.0")
-    implementation("com.github.Maru32768.CommandLib:bukkit:0.17.1")
+    implementation("com.github.Maru32768.CommandLib:spigot:0.17.1")
 }
 
 configure<JavaPluginExtension> {

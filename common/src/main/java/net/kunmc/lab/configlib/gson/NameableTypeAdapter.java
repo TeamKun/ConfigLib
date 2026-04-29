@@ -1,7 +1,7 @@
 package net.kunmc.lab.configlib.gson;
 
 import com.google.gson.*;
-import net.kunmc.lab.commandlib.Nameable;
+import net.kunmc.lab.commandlib.argument.Nameable;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.util.ReflectionUtil;
 

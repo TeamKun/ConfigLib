@@ -25,9 +25,8 @@ public class String2EnumMapValue<T extends Enum<T>> extends String2ObjectMapValu
     @Override
     protected List<PutArgumentDefinition<String, T>> argumentDefinitionsForPut() {
         return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                   new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> {
-                                                       opt.validator(valueFilter);
-                                                   }), (name, ctx) -> {
+                                                   new ArgumentDefinition<>(new EnumArgument<>("name", clazz).validator(
+                                                           valueFilter), (name, ctx) -> {
                                                        return name;
                                                    })));
     }

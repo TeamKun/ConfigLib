@@ -25,17 +25,16 @@ public abstract class Enum2ObjectMapValue<T extends Enum<T>, V, U extends Enum2O
     }
 
     protected ArgumentDefinition<T> keyArgumentDefinitionForPut() {
-        return new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(keyFilter)),
-                                        (name, ctx) -> {
-                                            return name;
-                                        });
+        return new ArgumentDefinition<>(new EnumArgument<>("name", clazz).validator(keyFilter), (name, ctx) -> {
+            return name;
+        });
     }
 
     @Override
     protected List<ArgumentDefinition<T>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz, opt -> opt.validator(x -> {
+        return List.of(new ArgumentDefinition<>(new EnumArgument<>("name", clazz).validator(x -> {
             return value.containsKey(x);
-        })), (name, ctx) -> {
+        }), (name, ctx) -> {
             return name;
         }));
     }

@@ -1,6 +1,6 @@
 package net.kunmc.lab.configlib.value.collection;
 
-import net.kunmc.lab.commandlib.Nameable;
+import net.kunmc.lab.commandlib.argument.Nameable;
 import net.kunmc.lab.commandlib.argument.NameableObjectArgument;
 import net.kunmc.lab.configlib.ArgumentDefinition;
 import net.kunmc.lab.configlib.util.NameableSet;
@@ -27,16 +27,14 @@ public class NameableObjectSetValue<T extends Nameable> extends SetValue<T, Name
 
     @Override
     protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForAdd() {
-        return List.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name", candidates, opt -> {
-            opt.validator(x -> {
-                if (value.stream()
-                         .map(Nameable::tabCompleteName)
-                         .anyMatch(y -> y.equals(x.tabCompleteName()))) {
-                    return false;
-                }
+        return List.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name", candidates).validator(x -> {
+            if (value.stream()
+                     .map(Nameable::tabCompleteName)
+                     .anyMatch(y -> y.equals(x.tabCompleteName()))) {
+                return false;
+            }
 
-                return filter == null || filter.test(x);
-            });
+            return filter == null || filter.test(x);
         }), (name, ctx) -> {
             return Set.of(name);
         }));
@@ -44,12 +42,10 @@ public class NameableObjectSetValue<T extends Nameable> extends SetValue<T, Name
 
     @Override
     protected List<ArgumentDefinition<Set<T>>> argumentDefinitionsForRemove() {
-        return List.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name", candidates, opt -> {
-            opt.validator(x -> {
-                return value.stream()
-                            .map(Nameable::tabCompleteName)
-                            .anyMatch(y -> y.equals(x.tabCompleteName()));
-            });
+        return List.of(new ArgumentDefinition<>(new NameableObjectArgument<>("name", candidates).validator(x -> {
+            return value.stream()
+                        .map(Nameable::tabCompleteName)
+                        .anyMatch(y -> y.equals(x.tabCompleteName()));
         }), (name, ctx) -> {
             return Set.of(name);
         }));

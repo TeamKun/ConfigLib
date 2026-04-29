@@ -25,9 +25,9 @@ public class Enum2EnumMapValue<K extends Enum<K>, V extends Enum<V>> extends Enu
     @Override
     protected List<PutArgumentDefinition<K, V>> argumentDefinitionsForPut() {
         return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                   new ArgumentDefinition<>(new EnumArgument<>("value", clazz, opt -> {
-                                                       opt.validator(valueFilter);
-                                                   }), (v, ctx) -> {
+                                                   new ArgumentDefinition<>(new EnumArgument<>("value",
+                                                                                               clazz).validator(
+                                                           valueFilter), (v, ctx) -> {
                                                        return v;
                                                    })));
     }

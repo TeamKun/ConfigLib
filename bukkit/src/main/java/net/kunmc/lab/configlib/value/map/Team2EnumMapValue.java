@@ -26,11 +26,8 @@ public class Team2EnumMapValue<T extends Enum<T>> extends Team2ObjectMapValue<T,
     @Override
     protected List<PutArgumentDefinition<Team, T>> argumentDefinitionsForPut() {
         return List.of(new PutArgumentDefinition<>(keyArgumentDefinitionForPut(),
-                                                   new ArgumentDefinition<>(new EnumArgument<>("name",
-                                                                                               clazz,
-                                                                                               opt -> opt.validator(
-                                                                                                       valueFilter)),
-                                                                            (t, ctx) -> t)));
+                                                   new ArgumentDefinition<>(new EnumArgument<>("name", clazz).validator(
+                                                           valueFilter), (t, ctx) -> t)));
     }
 
     @Override

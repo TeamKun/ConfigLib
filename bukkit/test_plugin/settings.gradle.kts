@@ -14,6 +14,6 @@ rootProject.name = "ConfigLibTestPlugin"
 // TODO: Replace this local CommandLib composite build with released artifacts before publishing.
 includeBuild("../../../CommandLib") {
     dependencySubstitution {
-        substitute(module("com.github.Maru32768.CommandLib:bukkit")).using(project(":bukkit"))
+        substitute(module("com.github.Maru32768.CommandLib:spigot")).using(project(":spigot"))
     }
 }

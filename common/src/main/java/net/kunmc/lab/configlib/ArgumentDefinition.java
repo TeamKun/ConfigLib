@@ -20,117 +20,117 @@ public class ArgumentDefinition<T> implements ArgumentApplier, ArgumentMapper<T>
         this.mapper = mapper;
     }
 
-    public ArgumentDefinition(CommonArgument<T, CommandContext> argument1) {
+    public ArgumentDefinition(CommonArgument<T, CommandContext, ?> argument1) {
         this(singleArgumentApplier(argument1), singleArgumentMapper(argument1));
     }
 
-    private static <T> ArgumentApplier singleArgumentApplier(CommonArgument<T, CommandContext> argument1) {
-        return b -> b.customArgument(argument1);
+    private static <T> ArgumentApplier singleArgumentApplier(CommonArgument<T, CommandContext, ?> argument1) {
+        return b -> b.argument(argument1);
     }
 
-    private static <T> ArgumentMapper<T> singleArgumentMapper(CommonArgument<T, CommandContext> argument1) {
-        return ctx -> argument1.cast(ctx.getParsedArg(argument1.name()));
+    private static <T> ArgumentMapper<T> singleArgumentMapper(CommonArgument<T, CommandContext, ?> argument1) {
+        return ctx -> argument1.cast(ctx.getArgument(argument1.name()));
     }
 
-    public <A1> ArgumentDefinition(CommonArgument<A1, CommandContext> argument1, BiArgumentMapper<A1, T> mapper) {
+    public <A1> ArgumentDefinition(CommonArgument<A1, CommandContext, ?> argument1, BiArgumentMapper<A1, T> mapper) {
         this(b -> {
-            b.customArgument(argument1);
+            b.argument(argument1);
         }, (ctx) -> {
-            return mapper.apply(argument1.cast(ctx.getParsedArg(argument1.name())), ctx);
+            return mapper.apply(argument1.cast(ctx.getArgument(argument1.name())), ctx);
         });
     }
 
-    public <A1, A2> ArgumentDefinition(CommonArgument<A1, CommandContext> argument1,
-                                       CommonArgument<A2, CommandContext> argument2,
+    public <A1, A2> ArgumentDefinition(CommonArgument<A1, CommandContext, ?> argument1,
+                                       CommonArgument<A2, CommandContext, ?> argument2,
                                        TriArgumentMapper<A1, A2, T> mapper) {
         this(b -> {
-            b.customArgument(argument1);
-            b.customArgument(argument2);
+            b.argument(argument1);
+            b.argument(argument2);
         }, (ctx) -> {
-            return mapper.apply(argument1.cast(ctx.getParsedArg(argument1.name())),
-                                argument2.cast(ctx.getParsedArg(argument2.name())),
+            return mapper.apply(argument1.cast(ctx.getArgument(argument1.name())),
+                                argument2.cast(ctx.getArgument(argument2.name())),
                                 ctx);
         });
     }
 
-    public <A1, A2, A3> ArgumentDefinition(CommonArgument<A1, CommandContext> argument1,
-                                           CommonArgument<A2, CommandContext> argument2,
-                                           CommonArgument<A3, CommandContext> argument3,
+    public <A1, A2, A3> ArgumentDefinition(CommonArgument<A1, CommandContext, ?> argument1,
+                                           CommonArgument<A2, CommandContext, ?> argument2,
+                                           CommonArgument<A3, CommandContext, ?> argument3,
                                            QuadArgumentMapper<A1, A2, A3, T> mapper) {
         this(b -> {
-            b.customArgument(argument1);
-            b.customArgument(argument2);
-            b.customArgument(argument3);
+            b.argument(argument1);
+            b.argument(argument2);
+            b.argument(argument3);
         }, (ctx) -> {
-            return mapper.apply(argument1.cast(ctx.getParsedArg(argument1.name())),
-                                argument2.cast(ctx.getParsedArg(argument2.name())),
-                                argument3.cast(ctx.getParsedArg(argument3.name())),
+            return mapper.apply(argument1.cast(ctx.getArgument(argument1.name())),
+                                argument2.cast(ctx.getArgument(argument2.name())),
+                                argument3.cast(ctx.getArgument(argument3.name())),
                                 ctx);
         });
     }
 
-    public <A1, A2, A3, A4> ArgumentDefinition(CommonArgument<A1, CommandContext> argument1,
-                                               CommonArgument<A2, CommandContext> argument2,
-                                               CommonArgument<A3, CommandContext> argument3,
-                                               CommonArgument<A4, CommandContext> argument4,
+    public <A1, A2, A3, A4> ArgumentDefinition(CommonArgument<A1, CommandContext, ?> argument1,
+                                               CommonArgument<A2, CommandContext, ?> argument2,
+                                               CommonArgument<A3, CommandContext, ?> argument3,
+                                               CommonArgument<A4, CommandContext, ?> argument4,
                                                QuintArgumentMapper<A1, A2, A3, A4, T> mapper) {
         this(b -> {
-            b.customArgument(argument1);
-            b.customArgument(argument2);
-            b.customArgument(argument3);
-            b.customArgument(argument4);
+            b.argument(argument1);
+            b.argument(argument2);
+            b.argument(argument3);
+            b.argument(argument4);
         }, (ctx) -> {
-            return mapper.apply(argument1.cast(ctx.getParsedArg(argument1.name())),
-                                argument2.cast(ctx.getParsedArg(argument2.name())),
-                                argument3.cast(ctx.getParsedArg(argument3.name())),
-                                argument4.cast(ctx.getParsedArg(argument4.name())),
+            return mapper.apply(argument1.cast(ctx.getArgument(argument1.name())),
+                                argument2.cast(ctx.getArgument(argument2.name())),
+                                argument3.cast(ctx.getArgument(argument3.name())),
+                                argument4.cast(ctx.getArgument(argument4.name())),
                                 ctx);
         });
     }
 
-    public <A1, A2, A3, A4, A5> ArgumentDefinition(CommonArgument<A1, CommandContext> argument1,
-                                                   CommonArgument<A2, CommandContext> argument2,
-                                                   CommonArgument<A3, CommandContext> argument3,
-                                                   CommonArgument<A4, CommandContext> argument4,
-                                                   CommonArgument<A5, CommandContext> argument5,
+    public <A1, A2, A3, A4, A5> ArgumentDefinition(CommonArgument<A1, CommandContext, ?> argument1,
+                                                   CommonArgument<A2, CommandContext, ?> argument2,
+                                                   CommonArgument<A3, CommandContext, ?> argument3,
+                                                   CommonArgument<A4, CommandContext, ?> argument4,
+                                                   CommonArgument<A5, CommandContext, ?> argument5,
                                                    SextArgumentMapper<A1, A2, A3, A4, A5, T> mapper) {
         this(b -> {
-            b.customArgument(argument1);
-            b.customArgument(argument2);
-            b.customArgument(argument3);
-            b.customArgument(argument4);
-            b.customArgument(argument5);
+            b.argument(argument1);
+            b.argument(argument2);
+            b.argument(argument3);
+            b.argument(argument4);
+            b.argument(argument5);
         }, (ctx) -> {
-            return mapper.apply(argument1.cast(ctx.getParsedArg(argument1.name())),
-                                argument2.cast(ctx.getParsedArg(argument2.name())),
-                                argument3.cast(ctx.getParsedArg(argument3.name())),
-                                argument4.cast(ctx.getParsedArg(argument4.name())),
-                                argument5.cast(ctx.getParsedArg(argument5.name())),
+            return mapper.apply(argument1.cast(ctx.getArgument(argument1.name())),
+                                argument2.cast(ctx.getArgument(argument2.name())),
+                                argument3.cast(ctx.getArgument(argument3.name())),
+                                argument4.cast(ctx.getArgument(argument4.name())),
+                                argument5.cast(ctx.getArgument(argument5.name())),
                                 ctx);
         });
     }
 
-    public <A1, A2, A3, A4, A5, A6> ArgumentDefinition(CommonArgument<A1, CommandContext> argument1,
-                                                       CommonArgument<A2, CommandContext> argument2,
-                                                       CommonArgument<A3, CommandContext> argument3,
-                                                       CommonArgument<A4, CommandContext> argument4,
-                                                       CommonArgument<A5, CommandContext> argument5,
-                                                       CommonArgument<A6, CommandContext> argument6,
+    public <A1, A2, A3, A4, A5, A6> ArgumentDefinition(CommonArgument<A1, CommandContext, ?> argument1,
+                                                       CommonArgument<A2, CommandContext, ?> argument2,
+                                                       CommonArgument<A3, CommandContext, ?> argument3,
+                                                       CommonArgument<A4, CommandContext, ?> argument4,
+                                                       CommonArgument<A5, CommandContext, ?> argument5,
+                                                       CommonArgument<A6, CommandContext, ?> argument6,
                                                        SeptArgumentMapper<A1, A2, A3, A4, A5, A6, T> mapper) {
         this(b -> {
-            b.customArgument(argument1);
-            b.customArgument(argument2);
-            b.customArgument(argument3);
-            b.customArgument(argument4);
-            b.customArgument(argument5);
-            b.customArgument(argument6);
+            b.argument(argument1);
+            b.argument(argument2);
+            b.argument(argument3);
+            b.argument(argument4);
+            b.argument(argument5);
+            b.argument(argument6);
         }, (ctx) -> {
-            return mapper.apply(argument1.cast(ctx.getParsedArg(argument1.name())),
-                                argument2.cast(ctx.getParsedArg(argument2.name())),
-                                argument3.cast(ctx.getParsedArg(argument3.name())),
-                                argument4.cast(ctx.getParsedArg(argument4.name())),
-                                argument5.cast(ctx.getParsedArg(argument5.name())),
-                                argument6.cast(ctx.getParsedArg(argument6.name())),
+            return mapper.apply(argument1.cast(ctx.getArgument(argument1.name())),
+                                argument2.cast(ctx.getArgument(argument2.name())),
+                                argument3.cast(ctx.getArgument(argument3.name())),
+                                argument4.cast(ctx.getArgument(argument4.name())),
+                                argument5.cast(ctx.getArgument(argument5.name())),
+                                argument6.cast(ctx.getArgument(argument6.name())),
                                 ctx);
         });
     }
