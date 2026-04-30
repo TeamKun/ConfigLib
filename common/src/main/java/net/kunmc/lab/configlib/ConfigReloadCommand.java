@@ -9,7 +9,8 @@ import java.util.Set;
 
 class ConfigReloadCommand extends Command {
     public ConfigReloadCommand(@NotNull Set<CommonBaseConfig> configs,
-                               ConfigCommandDescriptions.Provider descriptions) {
+                               ConfigCommandDescriptions.Provider descriptions,
+                               MaskedRevealPolicy maskedRevealPolicy) {
         super(SubCommandType.Reload.name);
         description(ConfigCommandDescriptions.reload(descriptions));
 

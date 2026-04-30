@@ -17,6 +17,7 @@ public class ConfigCommandBuilder {
     private boolean getEnabled = true;
     private boolean modifyEnabled = true;
     private ConfigCommandDescriptions.Provider descriptionProvider = ConfigCommandDescriptions.defaultProvider();
+    private MaskedRevealPolicy maskedRevealPolicy = MaskedRevealPolicy.DEFAULT;
 
     public ConfigCommandBuilder(@NotNull CommonBaseConfig config) {
         configs.add(config);
@@ -67,6 +68,19 @@ public class ConfigCommandBuilder {
         return this;
     }
 
+    public ConfigCommandBuilder maskedRevealPermission(@NotNull String permission) {
+        Objects.requireNonNull(permission, "permission");
+        return maskedRevealPolicy((ctx, config, entry) -> {
+            net.kunmc.lab.commandlib.CommandActor actor = ctx.getActor();
+            return actor.isConsole() || actor.isOperator() || actor.hasPermission(permission);
+        });
+    }
+
+    public ConfigCommandBuilder maskedRevealPolicy(@NotNull MaskedRevealPolicy policy) {
+        this.maskedRevealPolicy = Objects.requireNonNull(policy);
+        return this;
+    }
+
     public ConfigCommandBuilder sort() {
         return sort(Comparator.comparing(CommonBaseConfig::entryName));
     }
@@ -109,7 +123,7 @@ public class ConfigCommandBuilder {
         if (applicable.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(type.of(applicable, descriptionProvider));
+        return Optional.of(type.of(applicable, descriptionProvider, maskedRevealPolicy));
     }
 
     /**
@@ -143,20 +157,20 @@ public class ConfigCommandBuilder {
                                      Set<String> conflictingFieldNames) {
         configCommand.addChildren(new Command(config.entryName()) {{
             description(ConfigCommandDescriptions.config(descriptionProvider, config.entryName()));
-            execute(ctx -> ConfigListCommand.listFields(ctx, config));
+            execute(ctx -> ConfigListCommand.listFields(ctx, config, maskedRevealPolicy));
             if (configs.size() > 1) {
                 Set<CommonBaseConfig> singleton = Collections.singleton(config);
                 if (historyEnabled && config.isHistoryEnabled()) {
-                    addChildren(new ConfigHistoryCommand(singleton, descriptionProvider));
-                    addChildren(new ConfigAuditCommand(singleton, descriptionProvider));
-                    addChildren(new ConfigUndoCommand(singleton, descriptionProvider));
-                    addChildren(new ConfigDiffCommand(singleton, descriptionProvider));
+                    addChildren(new ConfigHistoryCommand(singleton, descriptionProvider, maskedRevealPolicy));
+                    addChildren(new ConfigAuditCommand(singleton, descriptionProvider, maskedRevealPolicy));
+                    addChildren(new ConfigUndoCommand(singleton, descriptionProvider, maskedRevealPolicy));
+                    addChildren(new ConfigDiffCommand(singleton, descriptionProvider, maskedRevealPolicy));
                 }
             }
         }});
         configCommand.addChildren(new Command(config.entryName() + ".") {{
             description(ConfigCommandDescriptions.config(descriptionProvider, config.entryName()));
-            execute(ctx -> ConfigListCommand.listFields(ctx, config));
+            execute(ctx -> ConfigListCommand.listFields(ctx, config, maskedRevealPolicy));
         }});
 
         for (ConfigSchemaEntry<?> entry : getCommandEntries(config)) {
@@ -169,7 +183,8 @@ public class ConfigCommandBuilder {
                                                              entry,
                                                              getEnabled,
                                                              modifyEnabled,
-                                                             descriptionProvider));
+                                                             descriptionProvider,
+                                                             maskedRevealPolicy));
 
             // Non-prefixed command only when no conflict
             if (!conflictingFieldNames.contains(valueEntryName)) {
@@ -178,7 +193,8 @@ public class ConfigCommandBuilder {
                                                                  entry,
                                                                  getEnabled,
                                                                  modifyEnabled,
-                                                                 descriptionProvider));
+                                                                 descriptionProvider,
+                                                                 maskedRevealPolicy));
             }
         }
     }

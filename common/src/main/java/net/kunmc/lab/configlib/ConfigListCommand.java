@@ -11,7 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Set;
 
 class ConfigListCommand extends Command {
-    public ConfigListCommand(Set<CommonBaseConfig> configs, ConfigCommandDescriptions.Provider descriptions) {
+    public ConfigListCommand(Set<CommonBaseConfig> configs,
+                             ConfigCommandDescriptions.Provider descriptions,
+                             MaskedRevealPolicy maskedRevealPolicy) {
         super(SubCommandType.List.name);
         description(ConfigCommandDescriptions.list(descriptions));
 
@@ -20,7 +22,7 @@ class ConfigListCommand extends Command {
         }
 
         execute(ctx -> configs.forEach(config -> {
-            listFields(ctx, config);
+            listFields(ctx, config, maskedRevealPolicy);
         }));
 
         if (configs.size() > 1) {
@@ -28,19 +30,21 @@ class ConfigListCommand extends Command {
                 addChildren(new Command(config.entryName()) {{
                     description(ConfigCommandDescriptions.config(descriptions, config.entryName()));
                     execute(ctx -> {
-                        listFields(ctx, config);
+                        listFields(ctx, config, maskedRevealPolicy);
                     });
                 }});
             });
         }
     }
 
-    static void listFields(CommandContext ctx, CommonBaseConfig config) {
+    static void listFields(CommandContext ctx, CommonBaseConfig config, MaskedRevealPolicy maskedRevealPolicy) {
         config.inspect(() -> {
             ctx.sendMessage(ConfigUtil.configHeader(config));
             for (ConfigSchemaEntry<?> entry : config.schema()
                                                     .entries()) {
-                ctx.sendMessageWithOption(entry.entryName() + ": " + entry.displayString(DisplayContext.command(ctx)),
+                ctx.sendMessageWithOption(entry.entryName() + ": " + entry.displayString(DisplayContext.command(ctx,
+                                                                                                                config,
+                                                                                                                maskedRevealPolicy)),
                                           option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                           .hoverText(StringUtils.defaultString(entry.metadata()
                                                                                                     .description())));

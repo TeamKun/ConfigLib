@@ -16,7 +16,9 @@ import java.util.Set;
 class ConfigDiffCommand extends Command {
     private static final String DIFF_ARROW = " -> ";
 
-    public ConfigDiffCommand(@NotNull Set<CommonBaseConfig> configs, ConfigCommandDescriptions.Provider descriptions) {
+    public ConfigDiffCommand(@NotNull Set<CommonBaseConfig> configs,
+                             ConfigCommandDescriptions.Provider descriptions,
+                             MaskedRevealPolicy maskedRevealPolicy) {
         super(SubCommandType.Diff.name);
         description(ConfigCommandDescriptions.diff(descriptions));
 
@@ -32,14 +34,19 @@ class ConfigDiffCommand extends Command {
                 description(ConfigCommandDescriptions.diffConfig(descriptions, config.entryName()));
                 addChildren(new Command("default") {{
                     description(ConfigCommandDescriptions.diffDefault(descriptions));
-                    execute(ctx -> execDefaultDiff(ctx, config, descriptions));
+                    execute(ctx -> execDefaultDiff(ctx, config, descriptions, maskedRevealPolicy));
                 }});
                 argument(new IntegerArgument("index",
                                              1,
                                              Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndex(
                                                                         descriptions))
                                                                 .execute((index, ctx) -> {
-                                                                    execDiff(ctx, config, 0, index, descriptions);
+                                                                    execDiff(ctx,
+                                                                             config,
+                                                                             0,
+                                                                             index,
+                                                                             descriptions,
+                                                                             maskedRevealPolicy);
                                                                 });
                 argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
                          new IntegerArgument("index2",
@@ -47,7 +54,12 @@ class ConfigDiffCommand extends Command {
                                              Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndexPair(
                                                                         descriptions))
                                                                 .execute((index1, index2, ctx) -> {
-                                                                    execDiff(ctx, config, index1, index2, descriptions);
+                                                                    execDiff(ctx,
+                                                                             config,
+                                                                             index1,
+                                                                             index2,
+                                                                             descriptions,
+                                                                             maskedRevealPolicy);
                                                                 });
             }}));
             return;
@@ -60,12 +72,17 @@ class ConfigDiffCommand extends Command {
                                          .next();
         addChildren(new Command("default") {{
             description(ConfigCommandDescriptions.diffDefault(descriptions));
-            execute(ctx -> execDefaultDiff(ctx, config, descriptions));
+            execute(ctx -> execDefaultDiff(ctx, config, descriptions, maskedRevealPolicy));
         }});
         argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndex(
                                                                             descriptions))
                                                                     .execute((index, ctx) -> {
-                                                                        execDiff(ctx, config, 0, index, descriptions);
+                                                                        execDiff(ctx,
+                                                                                 config,
+                                                                                 0,
+                                                                                 index,
+                                                                                 descriptions,
+                                                                                 maskedRevealPolicy);
                                                                     });
         argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
                  new IntegerArgument("index2",
@@ -73,19 +90,21 @@ class ConfigDiffCommand extends Command {
                                      Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndexPair(
                                                                 descriptions))
                                                         .execute((index1, index2, ctx) -> {
-                                                            execDiff(ctx, config, index1, index2, descriptions);
+                                                            execDiff(ctx,
+                                                                     config,
+                                                                     index1,
+                                                                     index2,
+                                                                     descriptions,
+                                                                     maskedRevealPolicy);
                                                         });
-    }
-
-    static void execDiff(CommandContext ctx, CommonBaseConfig config, int index1, int index2) {
-        execDiff(ctx, config, index1, index2, ConfigCommandDescriptions.defaultProvider());
     }
 
     static void execDiff(CommandContext ctx,
                          CommonBaseConfig config,
                          int index1,
                          int index2,
-                         ConfigCommandDescriptions.Provider descriptions) {
+                         ConfigCommandDescriptions.Provider descriptions,
+                         MaskedRevealPolicy maskedRevealPolicy) {
         config.inspect(() -> {
             if (index1 == index2) {
                 ctx.sendFailure(descriptions.describe(ctx, ConfigCommandDescriptions.Key.DIFF_SAME_INDEX));
@@ -118,17 +137,14 @@ class ConfigDiffCommand extends Command {
 
             ctx.sendMessage(ConfigUtil.configHeader(config));
             ctx.sendSuccess("[" + olderIndex + "]" + DIFF_ARROW + "[" + newerIndex + "]");
-            emitDiff(ctx, config, olderConfig, newerConfig, descriptions);
+            emitDiff(ctx, config, olderConfig, newerConfig, descriptions, maskedRevealPolicy);
         });
-    }
-
-    static void execDefaultDiff(CommandContext ctx, CommonBaseConfig config) {
-        execDefaultDiff(ctx, config, ConfigCommandDescriptions.defaultProvider());
     }
 
     static void execDefaultDiff(CommandContext ctx,
                                 CommonBaseConfig config,
-                                ConfigCommandDescriptions.Provider descriptions) {
+                                ConfigCommandDescriptions.Provider descriptions,
+                                MaskedRevealPolicy maskedRevealPolicy) {
         config.inspect(() -> {
             ctx.sendMessage(ConfigUtil.configHeader(config));
             ctx.sendSuccess("[" + descriptions.describe(ctx,
@@ -145,8 +161,10 @@ class ConfigDiffCommand extends Command {
                     continue;
                 }
                 anyDiff = true;
-                String defaultFmt = entry.displayString(defaultValue, DisplayContext.diff(ctx));
-                String currentFmt = entry.displayString(currentValue, DisplayContext.diff(ctx));
+                String defaultFmt = entry.displayString(defaultValue,
+                                                        DisplayContext.diff(ctx, config, maskedRevealPolicy));
+                String currentFmt = entry.displayString(currentValue,
+                                                        DisplayContext.diff(ctx, config, maskedRevealPolicy));
                 ctx.sendSuccess(entry.entryName() + ": " + defaultFmt + DIFF_ARROW + currentFmt);
             }
 
@@ -160,7 +178,8 @@ class ConfigDiffCommand extends Command {
                                  CommonBaseConfig liveConfig,
                                  CommonBaseConfig olderConfig,
                                  CommonBaseConfig newerConfig,
-                                 ConfigCommandDescriptions.Provider descriptions) {
+                                 ConfigCommandDescriptions.Provider descriptions,
+                                 MaskedRevealPolicy maskedRevealPolicy) {
         boolean anyDiff = false;
         for (ConfigSchemaEntry<?> entry : liveConfig.schema()
                                                     .entries()) {
@@ -171,8 +190,8 @@ class ConfigDiffCommand extends Command {
             }
 
             anyDiff = true;
-            String olderFmt = entry.displayString(older, DisplayContext.diff(ctx));
-            String newerFmt = entry.displayString(newer, DisplayContext.diff(ctx));
+            String olderFmt = entry.displayString(older, DisplayContext.diff(ctx, liveConfig, maskedRevealPolicy));
+            String newerFmt = entry.displayString(newer, DisplayContext.diff(ctx, liveConfig, maskedRevealPolicy));
             ctx.sendSuccess(entry.entryName() + ": " + olderFmt + DIFF_ARROW + newerFmt);
         }
 

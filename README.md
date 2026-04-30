@@ -775,7 +775,21 @@ They record the accepted change event with timestamp, source, actor, optional re
 display text for each changed field.
 
 Use `@Masked` on a config field to mask its value in command-oriented output such as list/get/history/diff/audit. The
-stored config file and history snapshots remain unmasked so they can still be restored exactly.
+stored config file and history snapshots remain unmasked so they can still be restored exactly. Masked values are
+revealed by default only to console senders, operators, or senders with `configlib.masked.reveal`.
+
+You can override the reveal rule for generated commands:
+
+```java
+public final class TestPlugin extends JavaPlugin {
+    public void onEnable() {
+        new ConfigCommandBuilder(config).maskedRevealPolicy((ctx, cfg, entry) -> ctx.getActor()
+                                                                                    .isConsole() || ctx.getActor()
+                                                                                                       .hasPermission(
+                                                                                                               "myplugin.config.secret.view"));
+    }
+}
+```
 
 To hide history commands from the generated command tree:
 

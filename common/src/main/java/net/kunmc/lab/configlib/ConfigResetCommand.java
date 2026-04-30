@@ -9,7 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 class ConfigResetCommand extends Command {
-    public ConfigResetCommand(@NotNull Set<CommonBaseConfig> configs, ConfigCommandDescriptions.Provider descriptions) {
+    public ConfigResetCommand(@NotNull Set<CommonBaseConfig> configs,
+                              ConfigCommandDescriptions.Provider descriptions,
+                              MaskedRevealPolicy maskedRevealPolicy) {
         super(SubCommandType.Reset.name);
         description(ConfigCommandDescriptions.reset(descriptions));
 
@@ -19,16 +21,19 @@ class ConfigResetCommand extends Command {
 
 
         if (configs.size() == 1) {
-            execute(ctx -> configs.forEach(config -> exec(ctx, config, descriptions)));
+            execute(ctx -> configs.forEach(config -> exec(ctx, config, descriptions, maskedRevealPolicy)));
         } else {
             configs.forEach(config -> addChildren(new Command(config.entryName()) {{
                 description(ConfigCommandDescriptions.resetConfig(descriptions, config.entryName()));
-                execute(ctx -> exec(ctx, config, descriptions));
+                execute(ctx -> exec(ctx, config, descriptions, maskedRevealPolicy));
             }}));
         }
     }
 
-    private void exec(CommandContext ctx, CommonBaseConfig config, ConfigCommandDescriptions.Provider descriptions) {
+    private void exec(CommandContext ctx,
+                      CommonBaseConfig config,
+                      ConfigCommandDescriptions.Provider descriptions,
+                      MaskedRevealPolicy maskedRevealPolicy) {
         try {
             config.mutate(() -> {
                 config.schema()
@@ -40,6 +45,6 @@ class ConfigResetCommand extends Command {
             return;
         }
         ctx.sendSuccess(descriptions.describe(ctx, ConfigCommandDescriptions.Key.RESET_SUCCESS, config.entryName()));
-        ConfigListCommand.listFields(ctx, config);
+        ConfigListCommand.listFields(ctx, config, maskedRevealPolicy);
     }
 }

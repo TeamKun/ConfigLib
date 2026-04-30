@@ -13,11 +13,13 @@ class ModifyDecCommand extends Command {
     private final NumericValue value;
     private final CommonBaseConfig config;
     private final ConfigCommandDescriptions.Provider descriptions;
+    private final MaskedRevealPolicy maskedRevealPolicy;
 
     public ModifyDecCommand(CommonBaseConfig config,
                             ConfigSchemaEntry<?> schemaEntry,
                             NumericValue value,
-                            ConfigCommandDescriptions.Provider descriptions) {
+                            ConfigCommandDescriptions.Provider descriptions,
+                            MaskedRevealPolicy maskedRevealPolicy) {
         super("dec");
         description(ConfigCommandDescriptions.decrement(descriptions, schemaEntry.entryName()));
 
@@ -25,6 +27,7 @@ class ModifyDecCommand extends Command {
         this.schemaEntry = schemaEntry;
         this.value = value;
         this.descriptions = descriptions;
+        this.maskedRevealPolicy = maskedRevealPolicy;
 
         addPrerequisite(value::checkExecutable);
         execute(ctx -> exec(1.0, ctx));
@@ -56,8 +59,18 @@ class ModifyDecCommand extends Command {
             return;
         }
 
-        ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(schemaEntry.entryName(),
-                                                                                                ctx,
-                                                                                                descriptions)));
+        if (MaskedCommandOutput.shouldMask(ctx, config, schemaEntry, maskedRevealPolicy)) {
+            ctx.sendSuccess(descriptions.describe(ctx,
+                                                  ConfigCommandDescriptions.Key.SINGLE_VALUE_MODIFY_SUCCESS,
+                                                  schemaEntry.entryName(),
+                                                  MaskedCommandOutput.text(ctx,
+                                                                           config,
+                                                                           schemaEntry,
+                                                                           maskedRevealPolicy)));
+        } else {
+            ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(schemaEntry.entryName(),
+                                                                                                    ctx,
+                                                                                                    descriptions)));
+        }
     }
 }

@@ -15,7 +15,8 @@ class ModifyMapRemoveCommand extends Command {
     public ModifyMapRemoveCommand(CommonBaseConfig config,
                                   ConfigSchemaEntry<?> schemaEntry,
                                   MapValue value,
-                                  ConfigCommandDescriptions.Provider descriptions) {
+                                  ConfigCommandDescriptions.Provider descriptions,
+                                  MaskedRevealPolicy maskedRevealPolicy) {
         super("remove");
         description(ConfigCommandDescriptions.removeMap(descriptions, schemaEntry.entryName()));
 
@@ -54,12 +55,21 @@ class ModifyMapRemoveCommand extends Command {
                         return;
                     }
 
-                    ctx.sendSuccess(value.succeedMessageForRemove(new MapValueRemoveCommandMessageParameter<>(
-                            schemaEntry.entryName(),
-                            ctx,
-                            k,
-                            v,
-                            descriptions)));
+                    if (MaskedCommandOutput.shouldMask(ctx, config, schemaEntry, maskedRevealPolicy)) {
+                        String masked = MaskedCommandOutput.text(ctx, config, schemaEntry, maskedRevealPolicy);
+                        ctx.sendSuccess(descriptions.describe(ctx,
+                                                              ConfigCommandDescriptions.Key.MAP_REMOVE_SUCCESS,
+                                                              schemaEntry.entryName(),
+                                                              masked,
+                                                              masked));
+                    } else {
+                        ctx.sendSuccess(value.succeedMessageForRemove(new MapValueRemoveCommandMessageParameter<>(
+                                schemaEntry.entryName(),
+                                ctx,
+                                k,
+                                v,
+                                descriptions)));
+                    }
                 });
             }).description(ConfigCommandDescriptions.removeMap(descriptions, schemaEntry.entryName()));
         }

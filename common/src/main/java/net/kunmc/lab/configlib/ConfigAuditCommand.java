@@ -19,7 +19,9 @@ import java.util.StringJoiner;
 class ConfigAuditCommand extends Command {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public ConfigAuditCommand(@NotNull Set<CommonBaseConfig> configs, ConfigCommandDescriptions.Provider descriptions) {
+    public ConfigAuditCommand(@NotNull Set<CommonBaseConfig> configs,
+                              ConfigCommandDescriptions.Provider descriptions,
+                              MaskedRevealPolicy maskedRevealPolicy) {
         super(SubCommandType.Audit.name);
         description(ConfigCommandDescriptions.audit(descriptions));
 
@@ -38,7 +40,8 @@ class ConfigAuditCommand extends Command {
                                                             .execute((index, ctx) -> execDetail(ctx,
                                                                                                 config,
                                                                                                 index,
-                                                                                                descriptions));
+                                                                                                descriptions,
+                                                                                                maskedRevealPolicy));
             return;
         }
 
@@ -52,7 +55,8 @@ class ConfigAuditCommand extends Command {
                                                             .execute((index, ctx) -> execDetail(ctx,
                                                                                                 config,
                                                                                                 index,
-                                                                                                descriptions));
+                                                                                                descriptions,
+                                                                                                maskedRevealPolicy));
         }}));
     }
 
@@ -79,7 +83,8 @@ class ConfigAuditCommand extends Command {
     private static void execDetail(CommandContext ctx,
                                    CommonBaseConfig config,
                                    int index,
-                                   ConfigCommandDescriptions.Provider descriptions) {
+                                   ConfigCommandDescriptions.Provider descriptions,
+                                   MaskedRevealPolicy maskedRevealPolicy) {
         config.inspect(() -> {
             List<AuditEntry> audit = config.readAudit();
             if (audit.isEmpty()) {
@@ -125,11 +130,13 @@ class ConfigAuditCommand extends Command {
                 ctx.sendSuccess(change.path() + ": " + displayChangeValue(config,
                                                                           ctx,
                                                                           change.path(),
-                                                                          change.beforeText()) + " -> " + displayChangeValue(
+                                                                          change.beforeText(),
+                                                                          maskedRevealPolicy) + " -> " + displayChangeValue(
                         config,
                         ctx,
                         change.path(),
-                        change.afterText()));
+                        change.afterText(),
+                        maskedRevealPolicy));
             }
         });
     }
@@ -191,14 +198,18 @@ class ConfigAuditCommand extends Command {
                     .uuid();
     }
 
-    static String displayChangeValue(CommonBaseConfig config, CommandContext ctx, String path, String rawText) {
+    static String displayChangeValue(CommonBaseConfig config,
+                                     CommandContext ctx,
+                                     String path,
+                                     String rawText,
+                                     MaskedRevealPolicy maskedRevealPolicy) {
         ConfigSchemaEntry<?> entry = config.schema()
                                            .findEntry(path)
                                            .orElse(null);
         if (entry == null) {
             return rawText;
         }
-        return DisplayContext.audit(ctx)
+        return DisplayContext.audit(ctx, config, maskedRevealPolicy)
                              .display(rawText, entry);
     }
 }

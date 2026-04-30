@@ -15,7 +15,8 @@ class ModifyRemoveCommand extends Command {
     public ModifyRemoveCommand(CommonBaseConfig config,
                                ConfigSchemaEntry<?> schemaEntry,
                                CollectionValue value,
-                               ConfigCommandDescriptions.Provider descriptions) {
+                               ConfigCommandDescriptions.Provider descriptions,
+                               MaskedRevealPolicy maskedRevealPolicy) {
         super("remove");
         description(ConfigCommandDescriptions.remove(descriptions, schemaEntry.entryName()));
 
@@ -51,11 +52,21 @@ class ModifyRemoveCommand extends Command {
                         return;
                     }
 
-                    ctx.sendSuccess(value.succeedMessageForRemove(new CollectionValueRemoveCommandMessageParameter<>(
-                            schemaEntry.entryName(),
-                            ctx,
-                            removeValue,
-                            descriptions)));
+                    if (MaskedCommandOutput.shouldMask(ctx, config, schemaEntry, maskedRevealPolicy)) {
+                        ctx.sendSuccess(descriptions.describe(ctx,
+                                                              ConfigCommandDescriptions.Key.COLLECTION_REMOVE_SUCCESS,
+                                                              schemaEntry.entryName(),
+                                                              MaskedCommandOutput.text(ctx,
+                                                                                       config,
+                                                                                       schemaEntry,
+                                                                                       maskedRevealPolicy)));
+                    } else {
+                        ctx.sendSuccess(value.succeedMessageForRemove(new CollectionValueRemoveCommandMessageParameter<>(
+                                schemaEntry.entryName(),
+                                ctx,
+                                removeValue,
+                                descriptions)));
+                    }
                 });
             }).description(ConfigCommandDescriptions.remove(descriptions, schemaEntry.entryName()));
         }

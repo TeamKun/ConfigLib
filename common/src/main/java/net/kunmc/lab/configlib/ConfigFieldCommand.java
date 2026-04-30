@@ -19,25 +19,41 @@ class ConfigFieldCommand extends Command {
                        ConfigSchemaEntry<?> schemaEntry,
                        boolean getEnabled,
                        boolean modifyEnabled,
-                       ConfigCommandDescriptions.Provider descriptions) {
+                       ConfigCommandDescriptions.Provider descriptions,
+                       MaskedRevealPolicy maskedRevealPolicy) {
         super(entryName);
         description(ConfigCommandDescriptions.field(descriptions, schemaEntry.entryName(), getEnabled, modifyEnabled));
         Object obj = schemaEntry.commandObject();
 
         if (obj instanceof SingleValue) {
-            initSingleValue(config, schemaEntry, (SingleValue<?, ?>) obj, getEnabled, modifyEnabled, descriptions);
+            initSingleValue(config,
+                            schemaEntry,
+                            (SingleValue<?, ?>) obj,
+                            getEnabled,
+                            modifyEnabled,
+                            descriptions,
+                            maskedRevealPolicy);
         } else if (obj instanceof CollectionValue) {
             initCollectionValue(config,
                                 schemaEntry,
                                 (CollectionValue<?, ?, ?>) obj,
                                 getEnabled,
                                 modifyEnabled,
-                                descriptions);
+                                descriptions,
+                                maskedRevealPolicy);
         } else if (obj instanceof MapValue) {
-            initMapValue(config, schemaEntry, (MapValue<?, ?, ?>) obj, getEnabled, modifyEnabled, descriptions);
+            initMapValue(config,
+                         schemaEntry,
+                         (MapValue<?, ?, ?>) obj,
+                         getEnabled,
+                         modifyEnabled,
+                         descriptions,
+                         maskedRevealPolicy);
         } else if (getEnabled) {
             execute(ctx -> config.inspect(() -> {
-                ctx.sendSuccess(schemaEntry.entryName() + ": " + schemaEntry.displayString(DisplayContext.command(ctx)));
+                ctx.sendSuccess(schemaEntry.entryName() + ": " + schemaEntry.displayString(DisplayContext.command(ctx,
+                                                                                                                  config,
+                                                                                                                  maskedRevealPolicy)));
             }));
         }
     }
@@ -46,7 +62,8 @@ class ConfigFieldCommand extends Command {
                          Command command,
                          ConfigSchemaEntry<?> schemaEntry,
                          SingleValue value,
-                         ConfigCommandDescriptions.Provider descriptions) {
+                         ConfigCommandDescriptions.Provider descriptions,
+                         MaskedRevealPolicy maskedRevealPolicy) {
         for (Object definition : value.argumentDefinitions()) {
             command.argument(builder -> {
                        ((ArgumentApplier) definition).applyArgument(builder);
@@ -77,9 +94,20 @@ class ConfigFieldCommand extends Command {
                                return;
                            }
 
-                           ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(schemaEntry.entryName(),
-                                                                                                                   ctx,
-                                                                                                                   descriptions)));
+                           if (MaskedCommandOutput.shouldMask(ctx, config, schemaEntry, maskedRevealPolicy)) {
+                               ctx.sendSuccess(descriptions.describe(ctx,
+                                                                     ConfigCommandDescriptions.Key.SINGLE_VALUE_MODIFY_SUCCESS,
+                                                                     schemaEntry.entryName(),
+                                                                     MaskedCommandOutput.text(ctx,
+                                                                                              config,
+                                                                                              schemaEntry,
+                                                                                              maskedRevealPolicy)));
+                           } else {
+                               ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(
+                                       schemaEntry.entryName(),
+                                       ctx,
+                                       descriptions)));
+                           }
                        });
                    })
                    .description(ConfigCommandDescriptions.set(descriptions, schemaEntry.entryName()));
@@ -91,12 +119,13 @@ class ConfigFieldCommand extends Command {
                                  SingleValue<?, ?> v,
                                  boolean getEnabled,
                                  boolean modifyEnabled,
-                                 ConfigCommandDescriptions.Provider descriptions) {
+                                 ConfigCommandDescriptions.Provider descriptions,
+                                 MaskedRevealPolicy maskedRevealPolicy) {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
             execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(schemaEntry.entryName() + ": " + schemaEntry.displayString(
-                                                                                  DisplayContext.command(ctx)),
+                                                                                  DisplayContext.command(ctx, config, maskedRevealPolicy)),
                                                                           option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                                           .hoverText(StringUtils.defaultString(
                                                                                                   schemaEntry.metadata()
@@ -104,20 +133,28 @@ class ConfigFieldCommand extends Command {
         }
 
         if (modifyEnabled && v.isModifyEnabled()) {
-            applySet(config, this, schemaEntry, v, descriptions);
+            applySet(config, this, schemaEntry, v, descriptions, maskedRevealPolicy);
             addChildren(new Command("set") {{
                 description(ConfigCommandDescriptions.set(descriptions, schemaEntry.entryName()));
-                applySet(config, this, schemaEntry, v, descriptions);
+                applySet(config, this, schemaEntry, v, descriptions, maskedRevealPolicy);
             }});
 
             if (v instanceof NumericValue) {
-                addChildren(new ModifyIncCommand(config, schemaEntry, (NumericValue<?, ?>) v, descriptions));
-                addChildren(new ModifyDecCommand(config, schemaEntry, (NumericValue<?, ?>) v, descriptions));
+                addChildren(new ModifyIncCommand(config,
+                                                 schemaEntry,
+                                                 (NumericValue<?, ?>) v,
+                                                 descriptions,
+                                                 maskedRevealPolicy));
+                addChildren(new ModifyDecCommand(config,
+                                                 schemaEntry,
+                                                 (NumericValue<?, ?>) v,
+                                                 descriptions,
+                                                 maskedRevealPolicy));
             }
 
             addChildren(new Command("reset") {{
                 description(ConfigCommandDescriptions.resetEntry(descriptions, schemaEntry.entryName()));
-                execute(ctx -> resetEntry(ctx, config, schemaEntry, descriptions));
+                execute(ctx -> resetEntry(ctx, config, schemaEntry, descriptions, maskedRevealPolicy));
             }});
         }
     }
@@ -132,12 +169,13 @@ class ConfigFieldCommand extends Command {
                                      CollectionValue<?, ?, ?> v,
                                      boolean getEnabled,
                                      boolean modifyEnabled,
-                                     ConfigCommandDescriptions.Provider descriptions) {
+                                     ConfigCommandDescriptions.Provider descriptions,
+                                     MaskedRevealPolicy maskedRevealPolicy) {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
             execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(schemaEntry.entryName() + ": " + schemaEntry.displayString(
-                                                                                  DisplayContext.command(ctx)),
+                                                                                  DisplayContext.command(ctx, config, maskedRevealPolicy)),
                                                                           option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                                           .hoverText(StringUtils.defaultString(
                                                                                                   schemaEntry.metadata()
@@ -146,10 +184,10 @@ class ConfigFieldCommand extends Command {
 
         if (modifyEnabled) {
             if (v.isAddEnabled()) {
-                addChildren(new ModifyAddCommand(config, schemaEntry, v, descriptions));
+                addChildren(new ModifyAddCommand(config, schemaEntry, v, descriptions, maskedRevealPolicy));
             }
             if (v.isRemoveEnabled()) {
-                addChildren(new ModifyRemoveCommand(config, schemaEntry, v, descriptions));
+                addChildren(new ModifyRemoveCommand(config, schemaEntry, v, descriptions, maskedRevealPolicy));
             }
             if (v.isClearEnabled()) {
                 addChildren(new ModifyClearCommand(config, schemaEntry, v, descriptions));
@@ -157,7 +195,7 @@ class ConfigFieldCommand extends Command {
 
             addChildren(new Command("reset") {{
                 description(ConfigCommandDescriptions.resetEntry(descriptions, schemaEntry.entryName()));
-                execute(ctx -> resetEntry(ctx, config, schemaEntry, descriptions));
+                execute(ctx -> resetEntry(ctx, config, schemaEntry, descriptions, maskedRevealPolicy));
             }});
         }
     }
@@ -167,12 +205,13 @@ class ConfigFieldCommand extends Command {
                               MapValue<?, ?, ?> v,
                               boolean getEnabled,
                               boolean modifyEnabled,
-                              ConfigCommandDescriptions.Provider descriptions) {
+                              ConfigCommandDescriptions.Provider descriptions,
+                              MaskedRevealPolicy maskedRevealPolicy) {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
             execute(ctx -> config.inspect(() -> ctx.sendMessageWithOption(schemaEntry.entryName() + ": " + schemaEntry.displayString(
-                                                                                  DisplayContext.command(ctx)),
+                                                                                  DisplayContext.command(ctx, config, maskedRevealPolicy)),
                                                                           option -> option.rgb(ChatColorUtil.GREEN.getRGB())
                                                                                           .hoverText(StringUtils.defaultString(
                                                                                                   schemaEntry.metadata()
@@ -181,10 +220,10 @@ class ConfigFieldCommand extends Command {
 
         if (modifyEnabled) {
             if (v.isPutEnabled()) {
-                addChildren(new ModifyMapPutCommand(config, schemaEntry, v, descriptions));
+                addChildren(new ModifyMapPutCommand(config, schemaEntry, v, descriptions, maskedRevealPolicy));
             }
             if (v.isRemoveEnabled()) {
-                addChildren(new ModifyMapRemoveCommand(config, schemaEntry, v, descriptions));
+                addChildren(new ModifyMapRemoveCommand(config, schemaEntry, v, descriptions, maskedRevealPolicy));
             }
             if (v.isClearEnabled()) {
                 addChildren(new ModifyMapClearCommand(config, schemaEntry, v, descriptions));
@@ -192,7 +231,7 @@ class ConfigFieldCommand extends Command {
 
             addChildren(new Command("reset") {{
                 description(ConfigCommandDescriptions.resetEntry(descriptions, schemaEntry.entryName()));
-                execute(ctx -> resetEntry(ctx, config, schemaEntry, descriptions));
+                execute(ctx -> resetEntry(ctx, config, schemaEntry, descriptions, maskedRevealPolicy));
             }});
         }
     }
@@ -200,7 +239,8 @@ class ConfigFieldCommand extends Command {
     private static void resetEntry(CommandContext ctx,
                                    CommonBaseConfig config,
                                    ConfigSchemaEntry<?> schemaEntry,
-                                   ConfigCommandDescriptions.Provider descriptions) {
+                                   ConfigCommandDescriptions.Provider descriptions,
+                                   MaskedRevealPolicy maskedRevealPolicy) {
         try {
             config.mutate(() -> config.resetEntryToDefault(schemaEntry),
                           ChangeTrace.command(ctx, "reset " + schemaEntry.entryName(), schemaEntry.entryName()));
@@ -211,6 +251,8 @@ class ConfigFieldCommand extends Command {
         ctx.sendSuccess(descriptions.describe(ctx,
                                               ConfigCommandDescriptions.Key.FIELD_RESET_SUCCESS,
                                               schemaEntry.entryName(),
-                                              schemaEntry.displayString(DisplayContext.command(ctx))));
+                                              schemaEntry.displayString(DisplayContext.command(ctx,
+                                                                                               config,
+                                                                                               maskedRevealPolicy))));
     }
 }

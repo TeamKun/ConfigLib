@@ -10,7 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 class ConfigUndoCommand extends Command {
-    public ConfigUndoCommand(@NotNull Set<CommonBaseConfig> configs, ConfigCommandDescriptions.Provider descriptions) {
+    public ConfigUndoCommand(@NotNull Set<CommonBaseConfig> configs,
+                             ConfigCommandDescriptions.Provider descriptions,
+                             MaskedRevealPolicy maskedRevealPolicy) {
         super(SubCommandType.Undo.name);
         description(ConfigCommandDescriptions.undo(descriptions));
 
@@ -19,7 +21,7 @@ class ConfigUndoCommand extends Command {
         }
 
         // /config undo - restore history[1]
-        execute(ctx -> configs.forEach(config -> exec(ctx, config, 1, descriptions)));
+        execute(ctx -> configs.forEach(config -> exec(ctx, config, 1, descriptions, maskedRevealPolicy)));
 
         // /config undo <index> - restore history[index]
         argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).description(ConfigCommandDescriptions.undoIndex(
@@ -28,34 +30,36 @@ class ConfigUndoCommand extends Command {
                                                                         configs.forEach(config -> exec(ctx,
                                                                                                        config,
                                                                                                        index,
-                                                                                                       descriptions));
+                                                                                                       descriptions,
+                                                                                                       maskedRevealPolicy));
                                                                     });
 
         if (configs.size() > 1) {
             configs.forEach(config -> {
                 addChildren(new Command(config.entryName()) {{
                     description(ConfigCommandDescriptions.undoConfig(descriptions, config.entryName()));
-                    execute(ctx -> exec(ctx, config, 1, descriptions));
+                    execute(ctx -> exec(ctx, config, 1, descriptions, maskedRevealPolicy));
                     argument(new IntegerArgument("index",
                                                  1,
                                                  Integer.MAX_VALUE)).description(ConfigCommandDescriptions.undoIndex(
                                                                             descriptions))
                                                                     .execute((index, ctx) -> {
-                                                                        exec(ctx, config, index, descriptions);
+                                                                        exec(ctx,
+                                                                             config,
+                                                                             index,
+                                                                             descriptions,
+                                                                             maskedRevealPolicy);
                                                                     });
                 }});
             });
         }
     }
 
-    static void exec(CommandContext ctx, CommonBaseConfig config, int index) {
-        exec(ctx, config, index, ConfigCommandDescriptions.defaultProvider());
-    }
-
     static void exec(CommandContext ctx,
                      CommonBaseConfig config,
                      int index,
-                     ConfigCommandDescriptions.Provider descriptions) {
+                     ConfigCommandDescriptions.Provider descriptions,
+                     MaskedRevealPolicy maskedRevealPolicy) {
         if (config.inspect(() -> config.readHistory()
                                        .size()) <= 1) {
             ctx.sendFailure(descriptions.describe(ctx,
@@ -80,7 +84,7 @@ class ConfigUndoCommand extends Command {
                                                   ConfigCommandDescriptions.Key.UNDO_SUCCESS,
                                                   config.entryName(),
                                                   index));
-            ConfigListCommand.listFields(ctx, config);
+            ConfigListCommand.listFields(ctx, config, maskedRevealPolicy);
         } else {
             ctx.sendFailure(descriptions.describe(ctx,
                                                   ConfigCommandDescriptions.Key.UNDO_NOT_RESTORABLE,

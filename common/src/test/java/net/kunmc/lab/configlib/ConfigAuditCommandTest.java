@@ -9,6 +9,7 @@ import net.kunmc.lab.configlib.store.InMemoryConfigStore;
 import net.kunmc.lab.configlib.value.StringValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static net.kunmc.lab.configlib.ConfigCommandTestSupport.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,7 +46,8 @@ class ConfigAuditCommandTest {
     @Test
     void auditCommandMasksConfiguredValues() {
         MaskedAuditConfig masked = initConfig(new MaskedAuditConfig());
-        FakeSender sender = FakeSender.console();
+        FakeSender sender = FakeSender.player("Steve");
+        denyRevealPermission(sender);
 
         try (CommandTester tester = new CommandTester(commandFor(masked), "configlib.test")) {
             tester.execute("config secret updated", sender);
@@ -56,6 +58,63 @@ class ConfigAuditCommandTest {
 
         assertTrue(messages(sender).stream()
                                    .anyMatch(x -> x.contains("secret: <masked> -> <masked>")),
+                   messages(sender).toString());
+        assertTrue(messages(sender).stream()
+                                   .noneMatch(x -> x.contains("updated")), messages(sender).toString());
+    }
+
+    @Test
+    void auditCommandRevealsConfiguredValuesForOperator() {
+        MaskedAuditConfig masked = initConfig(new MaskedAuditConfig());
+        FakeSender sender = FakeSender.player("Steve")
+                                      .op(true);
+
+        try (CommandTester tester = new CommandTester(commandFor(masked), "configlib.test")) {
+            tester.execute("config secret updated", sender);
+            tester.execute("config audit 0", sender);
+        } finally {
+            masked.close();
+        }
+
+        assertTrue(messages(sender).stream()
+                                   .anyMatch(x -> x.contains("secret: initial -> updated")),
+                   messages(sender).toString());
+    }
+
+    @Test
+    void auditCommandRevealsConfiguredValuesForRevealPermission() {
+        MaskedAuditConfig masked = initConfig(new MaskedAuditConfig());
+        FakeSender sender = FakeSender.player("Steve");
+
+        try (CommandTester tester = new CommandTester(commandFor(masked), "configlib.test")) {
+            tester.execute("config secret updated", sender);
+            tester.execute("config audit 0", sender);
+        } finally {
+            masked.close();
+        }
+
+        assertTrue(messages(sender).stream()
+                                   .anyMatch(x -> x.contains("secret: initial -> updated")),
+                   messages(sender).toString());
+    }
+
+    @Test
+    void auditCommandUsesCustomMaskedRevealPolicy() {
+        MaskedAuditConfig masked = initConfig(new MaskedAuditConfig());
+        FakeSender sender = FakeSender.player("Steve");
+        denyRevealPermission(sender);
+
+        try (CommandTester tester = new CommandTester(new ConfigCommandBuilder(masked).maskedRevealPolicy((ctx, config, entry) -> config == masked && entry.entryName()
+                                                                                                                                                           .equals("secret"))
+                                                                                      .build(), "configlib.test")) {
+            tester.execute("config secret updated", sender);
+            tester.execute("config audit 0", sender);
+        } finally {
+            masked.close();
+        }
+
+        assertTrue(messages(sender).stream()
+                                   .anyMatch(x -> x.contains("secret: initial -> updated")),
                    messages(sender).toString());
     }
 
@@ -68,5 +127,11 @@ class ConfigAuditCommandTest {
         protected ConfigStore createConfigStore() {
             return store;
         }
+    }
+
+    private static void denyRevealPermission(FakeSender sender) {
+        Mockito.when(sender.asSender()
+                           .hasPermission(Mockito.anyString()))
+               .thenAnswer(invocation -> !MaskedRevealPolicy.DEFAULT_REVEAL_PERMISSION.equals(invocation.getArgument(0)));
     }
 }

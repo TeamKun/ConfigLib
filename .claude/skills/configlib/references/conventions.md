@@ -50,6 +50,10 @@ at least one schema entry, including POJO-only configs.
 Use `.disableList()`, `.disableReload()`, `.disableReset()`, `.disableHistory()`, `.disableGet()`, `.disableModify()` to
 suppress subcommands you don't want.
 
+Use `.maskedRevealPolicy((ctx, config, entry) -> ...)` when you need custom reveal rules for fields annotated with
+`@Masked`. The default reveal rule allows console senders, operators, and senders with `configlib.masked.reveal`.
+For a simple custom permission node, use `.maskedRevealPermission("myplugin.config.secret.view")`.
+
 ## Value type selection guide
 
 **Single values**
@@ -300,7 +304,33 @@ Audit files are separate from history snapshots and store event-oriented entries
 and before/after display text.
 
 Use `@Masked` when a field should be hidden in command-oriented output such as list/get/history/diff/audit. Masking is
-display-only: the config file and history snapshots still store the real value so restore remains exact.
+display-only: the config file and history snapshots still store the real value so restore remains exact. Masked values
+are revealed by default only to console senders, operators, or senders with `configlib.masked.reveal`.
+
+```java
+public final class SecretConfig extends BaseConfig {
+    @Masked
+    public final StringValue token = new StringValue("change-me");
+
+    public SecretConfig(Plugin plugin) {
+        super(plugin);
+        initialize();
+    }
+}
+```
+
+Override the reveal rule on the generated command tree when the plugin needs stricter or plugin-specific behavior:
+
+```java
+public final class TestPlugin extends JavaPlugin {
+    public void onEnable() {
+        new ConfigCommandBuilder(config).maskedRevealPolicy((ctx, cfg, entry) -> ctx.getActor()
+                                                                                    .isConsole() || ctx.getActor()
+                                                                                                       .hasPermission(
+                                                                                                               "myplugin.config.secret.view"));
+    }
+}
+```
 
 ## Multiple configs in one command tree
 

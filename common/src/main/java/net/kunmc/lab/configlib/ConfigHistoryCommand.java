@@ -21,7 +21,8 @@ class ConfigHistoryCommand extends Command {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public ConfigHistoryCommand(@NotNull Set<CommonBaseConfig> configs,
-                                ConfigCommandDescriptions.Provider descriptions) {
+                                ConfigCommandDescriptions.Provider descriptions,
+                                MaskedRevealPolicy maskedRevealPolicy) {
         super(SubCommandType.History.name);
         description(ConfigCommandDescriptions.history(descriptions));
 
@@ -44,17 +45,22 @@ class ConfigHistoryCommand extends Command {
                                                                 configs.forEach(config -> execDetail(ctx,
                                                                                                      config,
                                                                                                      index,
-                                                                                                     descriptions));
+                                                                                                     descriptions,
+                                                                                                     maskedRevealPolicy));
                                                             });
             configs.forEach(config -> addChildren(new Command(config.entryName()) {{
                 description(ConfigCommandDescriptions.historyConfig(descriptions, config.entryName()));
-                execute(ctx -> execList(ctx, config, descriptions));
+                execute(ctx -> execList(ctx, config, descriptions, maskedRevealPolicy));
                 argument(new IntegerArgument("index",
                                              0,
                                              Integer.MAX_VALUE)).description(ConfigCommandDescriptions.historyIndex(
                                                                         descriptions))
                                                                 .execute((index, ctx) -> {
-                                                                    execDetail(ctx, config, index, descriptions);
+                                                                    execDetail(ctx,
+                                                                               config,
+                                                                               index,
+                                                                               descriptions,
+                                                                               maskedRevealPolicy);
                                                                 });
                 addChildren(new Command("diff") {{
                     description(ConfigCommandDescriptions.historyDiff(descriptions));
@@ -67,7 +73,8 @@ class ConfigHistoryCommand extends Command {
                                                                                                    config,
                                                                                                    0,
                                                                                                    index,
-                                                                                                   descriptions);
+                                                                                                   descriptions,
+                                                                                                   maskedRevealPolicy);
                                                                     });
                     argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
                              new IntegerArgument("index2",
@@ -79,12 +86,13 @@ class ConfigHistoryCommand extends Command {
                                                                                                    config,
                                                                                                    index1,
                                                                                                    index2,
-                                                                                                   descriptions);
+                                                                                                   descriptions,
+                                                                                                   maskedRevealPolicy);
                                                                     });
                 }});
                 addChildren(new Command("undo") {{
                     description(ConfigCommandDescriptions.undoConfig(descriptions, config.entryName()));
-                    execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1, descriptions));
+                    execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1, descriptions, maskedRevealPolicy));
                     argument(new IntegerArgument("index",
                                                  1,
                                                  Integer.MAX_VALUE)).description(ConfigCommandDescriptions.undoIndex(
@@ -93,7 +101,8 @@ class ConfigHistoryCommand extends Command {
                                                                         ConfigUndoCommand.exec(ctx,
                                                                                                config,
                                                                                                index,
-                                                                                               descriptions);
+                                                                                               descriptions,
+                                                                                               maskedRevealPolicy);
                                                                     });
                 }});
             }}));
@@ -105,13 +114,17 @@ class ConfigHistoryCommand extends Command {
             // /config history undo <index> - restore history[index]
             CommonBaseConfig config = configs.iterator()
                                              .next();
-            execute(ctx -> execList(ctx, config, descriptions));
+            execute(ctx -> execList(ctx, config, descriptions, maskedRevealPolicy));
             argument(new IntegerArgument("index",
                                          0,
                                          Integer.MAX_VALUE)).description(ConfigCommandDescriptions.historyIndex(
                                                                     descriptions))
                                                             .execute((index, ctx) -> {
-                                                                execDetail(ctx, config, index, descriptions);
+                                                                execDetail(ctx,
+                                                                           config,
+                                                                           index,
+                                                                           descriptions,
+                                                                           maskedRevealPolicy);
                                                             });
             addChildren(new Command("diff") {{
                 description(ConfigCommandDescriptions.historyDiff(descriptions));
@@ -124,7 +137,8 @@ class ConfigHistoryCommand extends Command {
                                                                                                config,
                                                                                                0,
                                                                                                index,
-                                                                                               descriptions);
+                                                                                               descriptions,
+                                                                                               maskedRevealPolicy);
                                                                 });
                 argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
                          new IntegerArgument("index2",
@@ -136,12 +150,13 @@ class ConfigHistoryCommand extends Command {
                                                                                                config,
                                                                                                index1,
                                                                                                index2,
-                                                                                               descriptions);
+                                                                                               descriptions,
+                                                                                               maskedRevealPolicy);
                                                                 });
             }});
             addChildren(new Command("undo") {{
                 description(ConfigCommandDescriptions.undo(descriptions));
-                execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1, descriptions));
+                execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1, descriptions, maskedRevealPolicy));
                 argument(new IntegerArgument("index",
                                              1,
                                              Integer.MAX_VALUE)).description(ConfigCommandDescriptions.undoIndex(
@@ -150,7 +165,8 @@ class ConfigHistoryCommand extends Command {
                                                                     ConfigUndoCommand.exec(ctx,
                                                                                            config,
                                                                                            index,
-                                                                                           descriptions);
+                                                                                           descriptions,
+                                                                                           maskedRevealPolicy);
                                                                 });
             }});
         }
@@ -158,7 +174,8 @@ class ConfigHistoryCommand extends Command {
 
     private static void execList(CommandContext ctx,
                                  CommonBaseConfig config,
-                                 ConfigCommandDescriptions.Provider descriptions) {
+                                 ConfigCommandDescriptions.Provider descriptions,
+                                 MaskedRevealPolicy maskedRevealPolicy) {
         config.inspect(() -> {
             List<HistoryEntry> history = config.readHistory();
             if (history.isEmpty()) {
@@ -174,7 +191,7 @@ class ConfigHistoryCommand extends Command {
                 String dateStr = dateText(entry, ctx, descriptions);
                 String label = "[" + i + "]: " + dateStr + (isLatest ? descriptions.describe(ctx,
                                                                                              ConfigCommandDescriptions.Key.HISTORY_LATEST_SUFFIX) : "");
-                String hoverText = buildFieldsText(config, entry.config());
+                String hoverText = buildFieldsText(ctx, config, entry.config(), maskedRevealPolicy);
                 ctx.sendMessageWithOption(label, opt -> {
                     opt.rgb(ChatColorUtil.GREEN.getRGB());
                     if (!hoverText.isEmpty()) {
@@ -188,7 +205,8 @@ class ConfigHistoryCommand extends Command {
     private static void execDetail(CommandContext ctx,
                                    CommonBaseConfig config,
                                    int index,
-                                   ConfigCommandDescriptions.Provider descriptions) {
+                                   ConfigCommandDescriptions.Provider descriptions,
+                                   MaskedRevealPolicy maskedRevealPolicy) {
         config.inspect(() -> {
             List<HistoryEntry> history = config.readHistory();
             if (history.isEmpty()) {
@@ -208,11 +226,14 @@ class ConfigHistoryCommand extends Command {
             String dateStr = dateText(entry, ctx, descriptions);
             ctx.sendMessage(ConfigUtil.configHeader(config));
             ctx.sendSuccess("[" + index + "]: " + dateStr);
-            listFields(ctx, config, entry.config());
+            listFields(ctx, config, entry.config(), maskedRevealPolicy);
         });
     }
 
-    private static String buildFieldsText(CommonBaseConfig liveConfig, CommonBaseConfig histConfig) {
+    private static String buildFieldsText(CommandContext ctx,
+                                          CommonBaseConfig liveConfig,
+                                          CommonBaseConfig histConfig,
+                                          MaskedRevealPolicy maskedRevealPolicy) {
         StringBuilder sb = new StringBuilder();
         for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(liveConfig.getClass())) {
             if (!ConfigUtil.isConfigFieldModifier(field)) {
@@ -232,7 +253,7 @@ class ConfigHistoryCommand extends Command {
                 }
                 sb.append(entry.entryName())
                   .append(": ")
-                  .append(entry.displayString(hist, DisplayContext.history(null)));
+                  .append(entry.displayString(hist, DisplayContext.history(ctx, liveConfig, maskedRevealPolicy)));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -249,7 +270,10 @@ class ConfigHistoryCommand extends Command {
         return descriptions.describe(ctx, ConfigCommandDescriptions.Key.HISTORY_UNKNOWN_TIMESTAMP);
     }
 
-    private static void listFields(CommandContext ctx, CommonBaseConfig liveConfig, CommonBaseConfig histConfig) {
+    private static void listFields(CommandContext ctx,
+                                   CommonBaseConfig liveConfig,
+                                   CommonBaseConfig histConfig,
+                                   MaskedRevealPolicy maskedRevealPolicy) {
         for (Field field : ReflectionUtil.getFieldsIncludingSuperclasses(liveConfig.getClass())) {
             if (!ConfigUtil.isConfigFieldModifier(field)) {
                 continue;
@@ -263,7 +287,10 @@ class ConfigHistoryCommand extends Command {
             field.setAccessible(true);
             try {
                 Object hist = field.get(histConfig);
-                ctx.sendSuccess(entry.entryName() + ": " + entry.displayString(hist, DisplayContext.history(ctx)));
+                ctx.sendSuccess(entry.entryName() + ": " + entry.displayString(hist,
+                                                                               DisplayContext.history(ctx,
+                                                                                                      liveConfig,
+                                                                                                      maskedRevealPolicy)));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

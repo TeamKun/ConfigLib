@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -37,12 +36,12 @@ enum SubCommandType {
     public final String name;
     private final Predicate<CommonBaseConfig> isEnabledFor;
     private final Predicate<CommonBaseConfig> hasEntryFor;
-    private final BiFunction<Set<CommonBaseConfig>, ConfigCommandDescriptions.Provider, Command> instantiator;
+    private final Instantiator instantiator;
 
     SubCommandType(String name,
                    Predicate<CommonBaseConfig> isEnabledFor,
                    Predicate<CommonBaseConfig> hasEntryFor,
-                   BiFunction<Set<CommonBaseConfig>, ConfigCommandDescriptions.Provider, Command> instantiator) {
+                   Instantiator instantiator) {
         this.name = name;
         this.isEnabledFor = isEnabledFor;
         this.hasEntryFor = hasEntryFor;
@@ -64,7 +63,16 @@ enum SubCommandType {
                       }, LinkedHashMap::new));
     }
 
-    public Command of(Set<CommonBaseConfig> configs, ConfigCommandDescriptions.Provider descriptions) {
-        return instantiator.apply(configs, descriptions);
+    public Command of(Set<CommonBaseConfig> configs,
+                      ConfigCommandDescriptions.Provider descriptions,
+                      MaskedRevealPolicy maskedRevealPolicy) {
+        return instantiator.apply(configs, descriptions, maskedRevealPolicy);
+    }
+
+    @FunctionalInterface
+    private interface Instantiator {
+        Command apply(Set<CommonBaseConfig> configs,
+                      ConfigCommandDescriptions.Provider descriptions,
+                      MaskedRevealPolicy maskedRevealPolicy);
     }
 }

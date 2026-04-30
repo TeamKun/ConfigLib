@@ -15,7 +15,8 @@ class ModifyAddCommand extends Command {
     public ModifyAddCommand(CommonBaseConfig config,
                             ConfigSchemaEntry<?> schemaEntry,
                             CollectionValue value,
-                            ConfigCommandDescriptions.Provider descriptions) {
+                            ConfigCommandDescriptions.Provider descriptions,
+                            MaskedRevealPolicy maskedRevealPolicy) {
         super("add");
         description(ConfigCommandDescriptions.add(descriptions, schemaEntry.entryName()));
 
@@ -52,11 +53,21 @@ class ModifyAddCommand extends Command {
                         return;
                     }
 
-                    ctx.sendSuccess(value.succeedMessageForAdd(new CollectionValueAddCommandMessageParameter<>(
-                            schemaEntry.entryName(),
-                            ctx,
-                            newValue,
-                            descriptions)));
+                    if (MaskedCommandOutput.shouldMask(ctx, config, schemaEntry, maskedRevealPolicy)) {
+                        ctx.sendSuccess(descriptions.describe(ctx,
+                                                              ConfigCommandDescriptions.Key.COLLECTION_ADD_SUCCESS,
+                                                              schemaEntry.entryName(),
+                                                              MaskedCommandOutput.text(ctx,
+                                                                                       config,
+                                                                                       schemaEntry,
+                                                                                       maskedRevealPolicy)));
+                    } else {
+                        ctx.sendSuccess(value.succeedMessageForAdd(new CollectionValueAddCommandMessageParameter<>(
+                                schemaEntry.entryName(),
+                                ctx,
+                                newValue,
+                                descriptions)));
+                    }
                 });
             }).description(ConfigCommandDescriptions.add(descriptions, schemaEntry.entryName()));
         }

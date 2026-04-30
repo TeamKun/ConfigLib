@@ -15,7 +15,8 @@ class ModifyMapPutCommand extends Command {
     public ModifyMapPutCommand(CommonBaseConfig config,
                                ConfigSchemaEntry<?> schemaEntry,
                                MapValue value,
-                               ConfigCommandDescriptions.Provider descriptions) {
+                               ConfigCommandDescriptions.Provider descriptions,
+                               MaskedRevealPolicy maskedRevealPolicy) {
         super("put");
         description(ConfigCommandDescriptions.put(descriptions, schemaEntry.entryName()));
 
@@ -57,11 +58,20 @@ class ModifyMapPutCommand extends Command {
                         return;
                     }
 
-                    ctx.sendSuccess(value.succeedMessageForPut(new MapValuePutCommandMessageParameter<>(schemaEntry.entryName(),
-                                                                                                        ctx,
-                                                                                                        k,
-                                                                                                        v,
-                                                                                                        descriptions)));
+                    if (MaskedCommandOutput.shouldMask(ctx, config, schemaEntry, maskedRevealPolicy)) {
+                        String masked = MaskedCommandOutput.text(ctx, config, schemaEntry, maskedRevealPolicy);
+                        ctx.sendSuccess(descriptions.describe(ctx,
+                                                              ConfigCommandDescriptions.Key.MAP_PUT_SUCCESS,
+                                                              schemaEntry.entryName(),
+                                                              masked,
+                                                              masked));
+                    } else {
+                        ctx.sendSuccess(value.succeedMessageForPut(new MapValuePutCommandMessageParameter<>(schemaEntry.entryName(),
+                                                                                                            ctx,
+                                                                                                            k,
+                                                                                                            v,
+                                                                                                            descriptions)));
+                    }
                 });
             }).description(ConfigCommandDescriptions.put(descriptions, schemaEntry.entryName()));
         }
