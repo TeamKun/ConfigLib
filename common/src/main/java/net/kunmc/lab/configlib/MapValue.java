@@ -67,10 +67,10 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         if (successMessageForPut != null) {
             return successMessageForPut.apply(param);
         }
-        return String.format("%sに{%s:%s}を追加しました.",
-                             param.entryName(),
-                             keyToString(param.key()),
-                             valueToString(param.value()));
+        return param.describe(ConfigCommandDescriptions.Key.MAP_PUT_SUCCESS,
+                              param.entryName(),
+                              keyToString(param.key()),
+                              valueToString(param.value()));
     }
 
     public final T disableRemove() {
@@ -108,10 +108,10 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         if (successMessageForRemove != null) {
             return successMessageForRemove.apply(param);
         }
-        return String.format("%sから{%s:%s}を削除しました.",
-                             param.entryName(),
-                             keyToString(param.key()),
-                             valueToString(param.value()));
+        return param.describe(ConfigCommandDescriptions.Key.MAP_REMOVE_SUCCESS,
+                              param.entryName(),
+                              keyToString(param.key()),
+                              valueToString(param.value()));
     }
 
     public final T disableClear() {
@@ -147,7 +147,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
         if (successMessageForClear != null) {
             return successMessageForClear.apply(param);
         }
-        return param.entryName() + "をクリアしました";
+        return param.describe(ConfigCommandDescriptions.Key.MAP_CLEAR_SUCCESS, param.entryName());
     }
 
     protected abstract String keyToString(K k);

@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -37,12 +37,12 @@ enum SubCommandType {
     public final String name;
     private final Predicate<CommonBaseConfig> isEnabledFor;
     private final Predicate<CommonBaseConfig> hasEntryFor;
-    private final Function<Set<CommonBaseConfig>, Command> instantiator;
+    private final BiFunction<Set<CommonBaseConfig>, ConfigCommandDescriptions.Provider, Command> instantiator;
 
     SubCommandType(String name,
                    Predicate<CommonBaseConfig> isEnabledFor,
                    Predicate<CommonBaseConfig> hasEntryFor,
-                   Function<Set<CommonBaseConfig>, Command> instantiator) {
+                   BiFunction<Set<CommonBaseConfig>, ConfigCommandDescriptions.Provider, Command> instantiator) {
         this.name = name;
         this.isEnabledFor = isEnabledFor;
         this.hasEntryFor = hasEntryFor;
@@ -64,7 +64,7 @@ enum SubCommandType {
                       }, LinkedHashMap::new));
     }
 
-    public Command of(Set<CommonBaseConfig> configs) {
-        return instantiator.apply(configs);
+    public Command of(Set<CommonBaseConfig> configs, ConfigCommandDescriptions.Provider descriptions) {
+        return instantiator.apply(configs, descriptions);
     }
 }

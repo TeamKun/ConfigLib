@@ -40,7 +40,8 @@ public class LocationSetValue extends SetValue<Location, LocationSetValue> {
                  .forEach(sb::suggest);
         }), new DoubleArgument("z").suggestionAction(sb -> {
             double x = (Double) sb.getArgument(0);
-            double y = (Double) sb.getArguments(1);
+            double y = (Double) sb.getArguments()
+                                  .get(1);
             value.stream()
                  .filter(l -> l.getX() == x && l.getY() == y)
                  .map(Location::getZ)

@@ -18,16 +18,23 @@ class ConfigFieldCommand extends Command {
                        String entryName,
                        ConfigSchemaEntry<?> schemaEntry,
                        boolean getEnabled,
-                       boolean modifyEnabled) {
+                       boolean modifyEnabled,
+                       ConfigCommandDescriptions.Provider descriptions) {
         super(entryName);
+        description(ConfigCommandDescriptions.field(descriptions, schemaEntry.entryName(), getEnabled, modifyEnabled));
         Object obj = schemaEntry.commandObject();
 
         if (obj instanceof SingleValue) {
-            initSingleValue(config, schemaEntry, (SingleValue<?, ?>) obj, getEnabled, modifyEnabled);
+            initSingleValue(config, schemaEntry, (SingleValue<?, ?>) obj, getEnabled, modifyEnabled, descriptions);
         } else if (obj instanceof CollectionValue) {
-            initCollectionValue(config, schemaEntry, (CollectionValue<?, ?, ?>) obj, getEnabled, modifyEnabled);
+            initCollectionValue(config,
+                                schemaEntry,
+                                (CollectionValue<?, ?, ?>) obj,
+                                getEnabled,
+                                modifyEnabled,
+                                descriptions);
         } else if (obj instanceof MapValue) {
-            initMapValue(config, schemaEntry, (MapValue<?, ?, ?>) obj, getEnabled, modifyEnabled);
+            initMapValue(config, schemaEntry, (MapValue<?, ?, ?>) obj, getEnabled, modifyEnabled, descriptions);
         } else if (getEnabled) {
             execute(ctx -> config.inspect(() -> {
                 ctx.sendSuccess(schemaEntry.entryName() + ": " + schemaEntry.displayString(DisplayContext.command(ctx)));
@@ -38,41 +45,44 @@ class ConfigFieldCommand extends Command {
     static void applySet(CommonBaseConfig config,
                          Command command,
                          ConfigSchemaEntry<?> schemaEntry,
-                         SingleValue value) {
+                         SingleValue value,
+                         ConfigCommandDescriptions.Provider descriptions) {
         for (Object definition : value.argumentDefinitions()) {
             command.argument(builder -> {
-                ((ArgumentApplier) definition).applyArgument(builder);
+                       ((ArgumentApplier) definition).applyArgument(builder);
 
-                builder.execute(ctx -> {
-                    Object newValue;
-                    try {
-                        newValue = ((ArgumentMapper<?>) definition).mapArgument(ctx);
-                    } catch (ArgumentValidationException e) {
-                        e.sendMessage(ctx);
-                        return;
-                    }
+                       builder.execute(ctx -> {
+                           Object newValue;
+                           try {
+                               newValue = ((ArgumentMapper<?>) definition).mapArgument(ctx);
+                           } catch (ArgumentValidationException e) {
+                               e.sendMessage(ctx);
+                               return;
+                           }
 
-                    try {
-                        ConfigSchemaValidation.validate(schemaEntry, newValue);
-                    } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
-                        return;
-                    }
+                           try {
+                               ConfigSchemaValidation.validate(schemaEntry, newValue);
+                           } catch (ConfigValidationException e) {
+                               e.sendMessage(ctx, descriptions);
+                               return;
+                           }
 
-                    try {
-                        config.mutate(() -> {
-                            value.dispatchModifyCommand(newValue);
-                            setSchemaValue(schemaEntry, newValue);
-                        }, ChangeTrace.command(ctx, "set " + schemaEntry.entryName(), schemaEntry.entryName()));
-                    } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
-                        return;
-                    }
+                           try {
+                               config.mutate(() -> {
+                                   value.dispatchModifyCommand(newValue);
+                                   setSchemaValue(schemaEntry, newValue);
+                               }, ChangeTrace.command(ctx, "set " + schemaEntry.entryName(), schemaEntry.entryName()));
+                           } catch (ConfigValidationException e) {
+                               e.sendMessage(ctx, descriptions);
+                               return;
+                           }
 
-                    ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(schemaEntry.entryName(),
-                                                                                                            ctx)));
-                });
-            });
+                           ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(schemaEntry.entryName(),
+                                                                                                                   ctx,
+                                                                                                                   descriptions)));
+                       });
+                   })
+                   .description(ConfigCommandDescriptions.set(descriptions, schemaEntry.entryName()));
         }
     }
 
@@ -80,7 +90,8 @@ class ConfigFieldCommand extends Command {
                                  ConfigSchemaEntry<?> schemaEntry,
                                  SingleValue<?, ?> v,
                                  boolean getEnabled,
-                                 boolean modifyEnabled) {
+                                 boolean modifyEnabled,
+                                 ConfigCommandDescriptions.Provider descriptions) {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
@@ -93,18 +104,20 @@ class ConfigFieldCommand extends Command {
         }
 
         if (modifyEnabled && v.isModifyEnabled()) {
-            applySet(config, this, schemaEntry, v);
+            applySet(config, this, schemaEntry, v, descriptions);
             addChildren(new Command("set") {{
-                applySet(config, this, schemaEntry, v);
+                description(ConfigCommandDescriptions.set(descriptions, schemaEntry.entryName()));
+                applySet(config, this, schemaEntry, v, descriptions);
             }});
 
             if (v instanceof NumericValue) {
-                addChildren(new ModifyIncCommand(config, schemaEntry, (NumericValue<?, ?>) v));
-                addChildren(new ModifyDecCommand(config, schemaEntry, (NumericValue<?, ?>) v));
+                addChildren(new ModifyIncCommand(config, schemaEntry, (NumericValue<?, ?>) v, descriptions));
+                addChildren(new ModifyDecCommand(config, schemaEntry, (NumericValue<?, ?>) v, descriptions));
             }
 
             addChildren(new Command("reset") {{
-                execute(ctx -> resetEntry(ctx, config, schemaEntry));
+                description(ConfigCommandDescriptions.resetEntry(descriptions, schemaEntry.entryName()));
+                execute(ctx -> resetEntry(ctx, config, schemaEntry, descriptions));
             }});
         }
     }
@@ -118,7 +131,8 @@ class ConfigFieldCommand extends Command {
                                      ConfigSchemaEntry<?> schemaEntry,
                                      CollectionValue<?, ?, ?> v,
                                      boolean getEnabled,
-                                     boolean modifyEnabled) {
+                                     boolean modifyEnabled,
+                                     ConfigCommandDescriptions.Provider descriptions) {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
@@ -132,17 +146,18 @@ class ConfigFieldCommand extends Command {
 
         if (modifyEnabled) {
             if (v.isAddEnabled()) {
-                addChildren(new ModifyAddCommand(config, schemaEntry, v));
+                addChildren(new ModifyAddCommand(config, schemaEntry, v, descriptions));
             }
             if (v.isRemoveEnabled()) {
-                addChildren(new ModifyRemoveCommand(config, schemaEntry, v));
+                addChildren(new ModifyRemoveCommand(config, schemaEntry, v, descriptions));
             }
             if (v.isClearEnabled()) {
-                addChildren(new ModifyClearCommand(config, schemaEntry, v));
+                addChildren(new ModifyClearCommand(config, schemaEntry, v, descriptions));
             }
 
             addChildren(new Command("reset") {{
-                execute(ctx -> resetEntry(ctx, config, schemaEntry));
+                description(ConfigCommandDescriptions.resetEntry(descriptions, schemaEntry.entryName()));
+                execute(ctx -> resetEntry(ctx, config, schemaEntry, descriptions));
             }});
         }
     }
@@ -151,7 +166,8 @@ class ConfigFieldCommand extends Command {
                               ConfigSchemaEntry<?> schemaEntry,
                               MapValue<?, ?, ?> v,
                               boolean getEnabled,
-                              boolean modifyEnabled) {
+                              boolean modifyEnabled,
+                              ConfigCommandDescriptions.Provider descriptions) {
         addPrerequisite(v::checkExecutable);
 
         if (getEnabled) {
@@ -165,30 +181,36 @@ class ConfigFieldCommand extends Command {
 
         if (modifyEnabled) {
             if (v.isPutEnabled()) {
-                addChildren(new ModifyMapPutCommand(config, schemaEntry, v));
+                addChildren(new ModifyMapPutCommand(config, schemaEntry, v, descriptions));
             }
             if (v.isRemoveEnabled()) {
-                addChildren(new ModifyMapRemoveCommand(config, schemaEntry, v));
+                addChildren(new ModifyMapRemoveCommand(config, schemaEntry, v, descriptions));
             }
             if (v.isClearEnabled()) {
-                addChildren(new ModifyMapClearCommand(config, schemaEntry, v));
+                addChildren(new ModifyMapClearCommand(config, schemaEntry, v, descriptions));
             }
 
             addChildren(new Command("reset") {{
-                execute(ctx -> resetEntry(ctx, config, schemaEntry));
+                description(ConfigCommandDescriptions.resetEntry(descriptions, schemaEntry.entryName()));
+                execute(ctx -> resetEntry(ctx, config, schemaEntry, descriptions));
             }});
         }
     }
 
-    private static void resetEntry(CommandContext ctx, CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry) {
+    private static void resetEntry(CommandContext ctx,
+                                   CommonBaseConfig config,
+                                   ConfigSchemaEntry<?> schemaEntry,
+                                   ConfigCommandDescriptions.Provider descriptions) {
         try {
             config.mutate(() -> config.resetEntryToDefault(schemaEntry),
                           ChangeTrace.command(ctx, "reset " + schemaEntry.entryName(), schemaEntry.entryName()));
         } catch (ConfigValidationException e) {
-            e.sendMessage(ctx);
+            e.sendMessage(ctx, descriptions);
             return;
         }
-        ctx.sendSuccess(schemaEntry.entryName() + " was reset to default (" + schemaEntry.displayString(DisplayContext.command(
-                ctx)) + ")");
+        ctx.sendSuccess(descriptions.describe(ctx,
+                                              ConfigCommandDescriptions.Key.FIELD_RESET_SUCCESS,
+                                              schemaEntry.entryName(),
+                                              schemaEntry.displayString(DisplayContext.command(ctx))));
     }
 }

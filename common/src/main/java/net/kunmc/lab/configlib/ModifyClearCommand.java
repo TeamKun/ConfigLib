@@ -9,8 +9,12 @@ import net.kunmc.lab.configlib.store.ChangeTrace;
 import java.util.Collection;
 
 class ModifyClearCommand extends Command {
-    public ModifyClearCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, CollectionValue value) {
+    public ModifyClearCommand(CommonBaseConfig config,
+                              ConfigSchemaEntry<?> schemaEntry,
+                              CollectionValue value,
+                              ConfigCommandDescriptions.Provider descriptions) {
         super("clear");
+        description(ConfigCommandDescriptions.clear(descriptions, schemaEntry.entryName()));
 
         addPrerequisite(value::checkExecutable);
         execute(ctx -> {
@@ -19,7 +23,7 @@ class ModifyClearCommand extends Command {
                 cleared.clear();
                 ConfigSchemaValidation.validate(schemaEntry, cleared);
             } catch (ConfigValidationException e) {
-                e.sendMessage(ctx);
+                e.sendMessage(ctx, descriptions);
                 return;
             }
 
@@ -29,12 +33,13 @@ class ModifyClearCommand extends Command {
                     ((Collection) value.value()).clear();
                 }, ChangeTrace.command(ctx, "clear " + schemaEntry.entryName(), schemaEntry.entryName()));
             } catch (ConfigValidationException e) {
-                e.sendMessage(ctx);
+                e.sendMessage(ctx, descriptions);
                 return;
             }
 
             ctx.sendSuccess(value.succeedMessageForClear(new CollectionValueClearCommandMessageParameter(schemaEntry.entryName(),
-                                                                                                         ctx)));
+                                                                                                         ctx,
+                                                                                                         descriptions)));
         });
     }
 }

@@ -12,8 +12,12 @@ import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 import java.util.Collection;
 
 class ModifyRemoveCommand extends Command {
-    public ModifyRemoveCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, CollectionValue value) {
+    public ModifyRemoveCommand(CommonBaseConfig config,
+                               ConfigSchemaEntry<?> schemaEntry,
+                               CollectionValue value,
+                               ConfigCommandDescriptions.Provider descriptions) {
         super("remove");
+        description(ConfigCommandDescriptions.remove(descriptions, schemaEntry.entryName()));
 
         addPrerequisite(value::checkExecutable);
         for (Object definition : value.argumentDefinitionsForRemove()) {
@@ -33,7 +37,7 @@ class ModifyRemoveCommand extends Command {
                         Collection remaining = value.toRemoved(removeValue.toArray());
                         ConfigSchemaValidation.validate(schemaEntry, remaining);
                     } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
+                        e.sendMessage(ctx, descriptions);
                         return;
                     }
 
@@ -43,16 +47,17 @@ class ModifyRemoveCommand extends Command {
                             ((Collection) value.value()).removeAll(removeValue);
                         }, ChangeTrace.command(ctx, "remove " + schemaEntry.entryName(), schemaEntry.entryName()));
                     } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
+                        e.sendMessage(ctx, descriptions);
                         return;
                     }
 
                     ctx.sendSuccess(value.succeedMessageForRemove(new CollectionValueRemoveCommandMessageParameter<>(
                             schemaEntry.entryName(),
                             ctx,
-                            removeValue)));
+                            removeValue,
+                            descriptions)));
                 });
-            });
+            }).description(ConfigCommandDescriptions.remove(descriptions, schemaEntry.entryName()));
         }
     }
 }

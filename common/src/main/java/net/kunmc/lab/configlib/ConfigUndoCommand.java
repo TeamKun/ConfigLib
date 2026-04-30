@@ -10,37 +10,57 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 class ConfigUndoCommand extends Command {
-    public ConfigUndoCommand(@NotNull Set<CommonBaseConfig> configs) {
+    public ConfigUndoCommand(@NotNull Set<CommonBaseConfig> configs, ConfigCommandDescriptions.Provider descriptions) {
         super(SubCommandType.Undo.name);
+        description(ConfigCommandDescriptions.undo(descriptions));
 
         if (configs.isEmpty()) {
             throw new IllegalArgumentException("configs is empty");
         }
 
         // /config undo - restore history[1]
-        execute(ctx -> configs.forEach(config -> exec(ctx, config, 1)));
+        execute(ctx -> configs.forEach(config -> exec(ctx, config, 1, descriptions)));
 
         // /config undo <index> - restore history[index]
-        argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
-            configs.forEach(config -> exec(ctx, config, index));
-        });
+        argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).description(ConfigCommandDescriptions.undoIndex(
+                                                                            descriptions))
+                                                                    .execute((index, ctx) -> {
+                                                                        configs.forEach(config -> exec(ctx,
+                                                                                                       config,
+                                                                                                       index,
+                                                                                                       descriptions));
+                                                                    });
 
         if (configs.size() > 1) {
             configs.forEach(config -> {
                 addChildren(new Command(config.entryName()) {{
-                    execute(ctx -> exec(ctx, config, 1));
-                    argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
-                        exec(ctx, config, index);
-                    });
+                    description(ConfigCommandDescriptions.undoConfig(descriptions, config.entryName()));
+                    execute(ctx -> exec(ctx, config, 1, descriptions));
+                    argument(new IntegerArgument("index",
+                                                 1,
+                                                 Integer.MAX_VALUE)).description(ConfigCommandDescriptions.undoIndex(
+                                                                            descriptions))
+                                                                    .execute((index, ctx) -> {
+                                                                        exec(ctx, config, index, descriptions);
+                                                                    });
                 }});
             });
         }
     }
 
     static void exec(CommandContext ctx, CommonBaseConfig config, int index) {
+        exec(ctx, config, index, ConfigCommandDescriptions.defaultProvider());
+    }
+
+    static void exec(CommandContext ctx,
+                     CommonBaseConfig config,
+                     int index,
+                     ConfigCommandDescriptions.Provider descriptions) {
         if (config.inspect(() -> config.readHistory()
                                        .size()) <= 1) {
-            ctx.sendFailure("No restorable history entries for " + config.entryName());
+            ctx.sendFailure(descriptions.describe(ctx,
+                                                  ConfigCommandDescriptions.Key.UNDO_NO_RESTORABLE_HISTORY,
+                                                  config.entryName()));
             return;
         }
 
@@ -51,15 +71,21 @@ class ConfigUndoCommand extends Command {
                                                            "undo " + config.entryName(),
                                                            "history[" + index + "]"));
         } catch (ConfigValidationException e) {
-            e.sendMessage(ctx);
+            e.sendMessage(ctx, descriptions);
             return;
         }
 
         if (applied) {
-            ctx.sendSuccess(config.entryName() + " restored history[" + index + "]");
+            ctx.sendSuccess(descriptions.describe(ctx,
+                                                  ConfigCommandDescriptions.Key.UNDO_SUCCESS,
+                                                  config.entryName(),
+                                                  index));
             ConfigListCommand.listFields(ctx, config);
         } else {
-            ctx.sendFailure("History index " + index + " is not restorable for " + config.entryName());
+            ctx.sendFailure(descriptions.describe(ctx,
+                                                  ConfigCommandDescriptions.Key.UNDO_NOT_RESTORABLE,
+                                                  index,
+                                                  config.entryName()));
         }
     }
 }

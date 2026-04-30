@@ -110,7 +110,9 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
         if (successMessage != null) {
             return successMessage.apply(param);
         }
-        return param.entryName() + "の値を" + valueToString(value()) + "に変更しました.";
+        return param.describe(ConfigCommandDescriptions.Key.SINGLE_VALUE_MODIFY_SUCCESS,
+                              param.entryName(),
+                              valueToString(value()));
     }
 
     @Override

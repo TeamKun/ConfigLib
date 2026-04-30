@@ -12,8 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 class ModifyMapRemoveCommand extends Command {
-    public ModifyMapRemoveCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, MapValue value) {
+    public ModifyMapRemoveCommand(CommonBaseConfig config,
+                                  ConfigSchemaEntry<?> schemaEntry,
+                                  MapValue value,
+                                  ConfigCommandDescriptions.Provider descriptions) {
         super("remove");
+        description(ConfigCommandDescriptions.removeMap(descriptions, schemaEntry.entryName()));
 
         addPrerequisite(value::checkExecutable);
         for (ArgumentDefinition<?> definition : ((List<ArgumentDefinition<?>>) value.argumentDefinitionsForRemove())) {
@@ -36,7 +40,7 @@ class ModifyMapRemoveCommand extends Command {
                         remaining.remove(k);
                         ConfigSchemaValidation.validate(schemaEntry, remaining);
                     } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
+                        e.sendMessage(ctx, descriptions);
                         return;
                     }
 
@@ -46,7 +50,7 @@ class ModifyMapRemoveCommand extends Command {
                             value.dispatchRemove(k, v);
                         }, ChangeTrace.command(ctx, "remove " + schemaEntry.entryName(), schemaEntry.entryName()));
                     } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
+                        e.sendMessage(ctx, descriptions);
                         return;
                     }
 
@@ -54,9 +58,10 @@ class ModifyMapRemoveCommand extends Command {
                             schemaEntry.entryName(),
                             ctx,
                             k,
-                            v)));
+                            v,
+                            descriptions)));
                 });
-            });
+            }).description(ConfigCommandDescriptions.removeMap(descriptions, schemaEntry.entryName()));
         }
     }
 }

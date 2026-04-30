@@ -12,17 +12,25 @@ class ModifyDecCommand extends Command {
     private final ConfigSchemaEntry<?> schemaEntry;
     private final NumericValue value;
     private final CommonBaseConfig config;
+    private final ConfigCommandDescriptions.Provider descriptions;
 
-    public ModifyDecCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, NumericValue value) {
+    public ModifyDecCommand(CommonBaseConfig config,
+                            ConfigSchemaEntry<?> schemaEntry,
+                            NumericValue value,
+                            ConfigCommandDescriptions.Provider descriptions) {
         super("dec");
+        description(ConfigCommandDescriptions.decrement(descriptions, schemaEntry.entryName()));
 
         this.config = config;
         this.schemaEntry = schemaEntry;
         this.value = value;
+        this.descriptions = descriptions;
 
         addPrerequisite(value::checkExecutable);
         execute(ctx -> exec(1.0, ctx));
-        argument(new DoubleArgument("decValue")).execute(this::exec);
+        argument(new DoubleArgument("decValue")).description(ConfigCommandDescriptions.decrementBy(descriptions,
+                                                                                                   schemaEntry.entryName()))
+                                                .execute(this::exec);
     }
 
     private void exec(double amount, CommandContext ctx) {
@@ -34,7 +42,7 @@ class ModifyDecCommand extends Command {
         try {
             ConfigSchemaValidation.validate(schemaEntry, newValue);
         } catch (ConfigValidationException e) {
-            e.sendMessage(ctx);
+            e.sendMessage(ctx, descriptions);
             return;
         }
 
@@ -44,11 +52,12 @@ class ModifyDecCommand extends Command {
                 value.value(newValue);
             }, ChangeTrace.command(ctx, "dec " + schemaEntry.entryName(), schemaEntry.entryName()));
         } catch (ConfigValidationException e) {
-            e.sendMessage(ctx);
+            e.sendMessage(ctx, descriptions);
             return;
         }
 
         ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(schemaEntry.entryName(),
-                                                                                                ctx)));
+                                                                                                ctx,
+                                                                                                descriptions)));
     }
 }

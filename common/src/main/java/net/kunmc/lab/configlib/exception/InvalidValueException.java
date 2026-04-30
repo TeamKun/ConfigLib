@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.exception;
 
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.ConfigCommandDescriptions;
 import net.kunmc.lab.configlib.util.ListUtil;
 
 import java.util.List;
@@ -10,7 +11,9 @@ public class InvalidValueException extends Exception {
     private final Consumer<CommandContext> messageSender;
 
     public InvalidValueException() {
-        this("不正な値です");
+        this(ctx -> ctx.sendFailure(ConfigCommandDescriptions.describe(ctx,
+                                                                       ConfigCommandDescriptions.Key.INVALID_VALUE)),
+             "Invalid value.");
     }
 
     public InvalidValueException(String message, String... messages) {
@@ -24,9 +27,7 @@ public class InvalidValueException extends Exception {
 
     private InvalidValueException(List<String> messages, String logMessage) {
         super(logMessage);
-        this.messageSender = ctx -> {
-            messages.forEach(ctx::sendFailure);
-        };
+        this.messageSender = ctx -> messages.forEach(ctx::sendFailure);
     }
 
     public InvalidValueException(Consumer<CommandContext> messageSender) {

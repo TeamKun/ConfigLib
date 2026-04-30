@@ -588,7 +588,7 @@ different value based on old file contents.
 
 ## Usage Notes
 
-1. Calling `initialize()`
+1. Calling `initialize()`  
    `initialize()` must be called at the end of the concrete config class constructor, after all fields have been
    assigned. This ensures that the initial config load and file watching start only after the subclass is fully
    constructed.
@@ -602,7 +602,7 @@ different value based on old file contents.
         }
     }
     ```
-2. Asynchronous Change Detection
+2. Asynchronous Change Detection  
    Change detection, including when modifying values with the `set` method, is handled asynchronously. Keep this in mind
    to avoid race conditions in your application logic.
 

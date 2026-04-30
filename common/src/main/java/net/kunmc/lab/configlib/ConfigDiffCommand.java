@@ -16,8 +16,9 @@ import java.util.Set;
 class ConfigDiffCommand extends Command {
     private static final String DIFF_ARROW = " -> ";
 
-    public ConfigDiffCommand(@NotNull Set<CommonBaseConfig> configs) {
+    public ConfigDiffCommand(@NotNull Set<CommonBaseConfig> configs, ConfigCommandDescriptions.Provider descriptions) {
         super(SubCommandType.Diff.name);
+        description(ConfigCommandDescriptions.diff(descriptions));
 
         if (configs.isEmpty()) {
             throw new IllegalArgumentException("configs is empty");
@@ -28,16 +29,26 @@ class ConfigDiffCommand extends Command {
             // /config diff <name> <index>
             // /config diff <name> <index1> <index2>
             configs.forEach(config -> addChildren(new Command(config.entryName()) {{
+                description(ConfigCommandDescriptions.diffConfig(descriptions, config.entryName()));
                 addChildren(new Command("default") {{
-                    execute(ctx -> execDefaultDiff(ctx, config));
+                    description(ConfigCommandDescriptions.diffDefault(descriptions));
+                    execute(ctx -> execDefaultDiff(ctx, config, descriptions));
                 }});
-                argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
-                    execDiff(ctx, config, 0, index);
-                });
+                argument(new IntegerArgument("index",
+                                             1,
+                                             Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndex(
+                                                                        descriptions))
+                                                                .execute((index, ctx) -> {
+                                                                    execDiff(ctx, config, 0, index, descriptions);
+                                                                });
                 argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
-                         new IntegerArgument("index2", 0, Integer.MAX_VALUE)).execute((index1, index2, ctx) -> {
-                    execDiff(ctx, config, index1, index2);
-                });
+                         new IntegerArgument("index2",
+                                             0,
+                                             Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndexPair(
+                                                                        descriptions))
+                                                                .execute((index1, index2, ctx) -> {
+                                                                    execDiff(ctx, config, index1, index2, descriptions);
+                                                                });
             }}));
             return;
         }
@@ -48,33 +59,53 @@ class ConfigDiffCommand extends Command {
         CommonBaseConfig config = configs.iterator()
                                          .next();
         addChildren(new Command("default") {{
-            execute(ctx -> execDefaultDiff(ctx, config));
+            description(ConfigCommandDescriptions.diffDefault(descriptions));
+            execute(ctx -> execDefaultDiff(ctx, config, descriptions));
         }});
-        argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
-            execDiff(ctx, config, 0, index);
-        });
+        argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndex(
+                                                                            descriptions))
+                                                                    .execute((index, ctx) -> {
+                                                                        execDiff(ctx, config, 0, index, descriptions);
+                                                                    });
         argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
-                 new IntegerArgument("index2", 0, Integer.MAX_VALUE)).execute((index1, index2, ctx) -> {
-            execDiff(ctx, config, index1, index2);
-        });
+                 new IntegerArgument("index2",
+                                     0,
+                                     Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndexPair(
+                                                                descriptions))
+                                                        .execute((index1, index2, ctx) -> {
+                                                            execDiff(ctx, config, index1, index2, descriptions);
+                                                        });
     }
 
     static void execDiff(CommandContext ctx, CommonBaseConfig config, int index1, int index2) {
+        execDiff(ctx, config, index1, index2, ConfigCommandDescriptions.defaultProvider());
+    }
+
+    static void execDiff(CommandContext ctx,
+                         CommonBaseConfig config,
+                         int index1,
+                         int index2,
+                         ConfigCommandDescriptions.Provider descriptions) {
         config.inspect(() -> {
             if (index1 == index2) {
-                ctx.sendFailure("Cannot diff the same index");
+                ctx.sendFailure(descriptions.describe(ctx, ConfigCommandDescriptions.Key.DIFF_SAME_INDEX));
                 return;
             }
 
             List<HistoryEntry> history = config.readHistory();
             if (history.size() <= 1) {
-                ctx.sendFailure("Not enough history entries for " + config.entryName());
+                ctx.sendFailure(descriptions.describe(ctx,
+                                                      ConfigCommandDescriptions.Key.DIFF_NOT_ENOUGH_HISTORY,
+                                                      config.entryName()));
                 return;
             }
 
             int maxIndex = Math.max(index1, index2);
             if (maxIndex >= history.size()) {
-                ctx.sendFailure("Index " + maxIndex + " is out of range (0-" + (history.size() - 1) + ")");
+                ctx.sendFailure(descriptions.describe(ctx,
+                                                      ConfigCommandDescriptions.Key.INDEX_OUT_OF_RANGE,
+                                                      maxIndex,
+                                                      history.size() - 1));
                 return;
             }
 
@@ -87,14 +118,23 @@ class ConfigDiffCommand extends Command {
 
             ctx.sendMessage(ConfigUtil.configHeader(config));
             ctx.sendSuccess("[" + olderIndex + "]" + DIFF_ARROW + "[" + newerIndex + "]");
-            emitDiff(ctx, config, olderConfig, newerConfig);
+            emitDiff(ctx, config, olderConfig, newerConfig, descriptions);
         });
     }
 
     static void execDefaultDiff(CommandContext ctx, CommonBaseConfig config) {
+        execDefaultDiff(ctx, config, ConfigCommandDescriptions.defaultProvider());
+    }
+
+    static void execDefaultDiff(CommandContext ctx,
+                                CommonBaseConfig config,
+                                ConfigCommandDescriptions.Provider descriptions) {
         config.inspect(() -> {
             ctx.sendMessage(ConfigUtil.configHeader(config));
-            ctx.sendSuccess("[default]" + DIFF_ARROW + "[current]");
+            ctx.sendSuccess("[" + descriptions.describe(ctx,
+                                                        ConfigCommandDescriptions.Key.DIFF_DEFAULT_LABEL) + "]" + DIFF_ARROW + "[" + descriptions.describe(
+                    ctx,
+                    ConfigCommandDescriptions.Key.DIFF_CURRENT_LABEL) + "]");
 
             boolean anyDiff = false;
             for (ConfigSchemaEntry<?> entry : config.schema()
@@ -111,7 +151,7 @@ class ConfigDiffCommand extends Command {
             }
 
             if (!anyDiff) {
-                ctx.sendSuccess("No differences found");
+                ctx.sendSuccess(descriptions.describe(ctx, ConfigCommandDescriptions.Key.DIFF_NONE));
             }
         });
     }
@@ -119,7 +159,8 @@ class ConfigDiffCommand extends Command {
     private static void emitDiff(CommandContext ctx,
                                  CommonBaseConfig liveConfig,
                                  CommonBaseConfig olderConfig,
-                                 CommonBaseConfig newerConfig) {
+                                 CommonBaseConfig newerConfig,
+                                 ConfigCommandDescriptions.Provider descriptions) {
         boolean anyDiff = false;
         for (ConfigSchemaEntry<?> entry : liveConfig.schema()
                                                     .entries()) {
@@ -136,7 +177,7 @@ class ConfigDiffCommand extends Command {
         }
 
         if (!anyDiff) {
-            ctx.sendSuccess("No differences found");
+            ctx.sendSuccess(descriptions.describe(ctx, ConfigCommandDescriptions.Key.DIFF_NONE));
         }
     }
 }

@@ -20,8 +20,10 @@ import java.util.Set;
 class ConfigHistoryCommand extends Command {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public ConfigHistoryCommand(@NotNull Set<CommonBaseConfig> configs) {
+    public ConfigHistoryCommand(@NotNull Set<CommonBaseConfig> configs,
+                                ConfigCommandDescriptions.Provider descriptions) {
         super(SubCommandType.History.name);
+        description(ConfigCommandDescriptions.history(descriptions));
 
         if (configs.isEmpty()) {
             throw new IllegalArgumentException("configs is empty");
@@ -34,28 +36,65 @@ class ConfigHistoryCommand extends Command {
             // /config history <name> diff <index>  - diff current vs history[index]
             // /config history <name> undo          - restore history[1]
             // /config history <name> undo <index>  - restore history[index]
-            argument(new IntegerArgument("index", 0, Integer.MAX_VALUE)).execute((index, ctx) -> {
-                configs.forEach(config -> execDetail(ctx, config, index));
-            });
+            argument(new IntegerArgument("index",
+                                         0,
+                                         Integer.MAX_VALUE)).description(ConfigCommandDescriptions.historyIndex(
+                                                                    descriptions))
+                                                            .execute((index, ctx) -> {
+                                                                configs.forEach(config -> execDetail(ctx,
+                                                                                                     config,
+                                                                                                     index,
+                                                                                                     descriptions));
+                                                            });
             configs.forEach(config -> addChildren(new Command(config.entryName()) {{
-                execute(ctx -> execList(ctx, config));
-                argument(new IntegerArgument("index", 0, Integer.MAX_VALUE)).execute((index, ctx) -> {
-                    execDetail(ctx, config, index);
-                });
+                description(ConfigCommandDescriptions.historyConfig(descriptions, config.entryName()));
+                execute(ctx -> execList(ctx, config, descriptions));
+                argument(new IntegerArgument("index",
+                                             0,
+                                             Integer.MAX_VALUE)).description(ConfigCommandDescriptions.historyIndex(
+                                                                        descriptions))
+                                                                .execute((index, ctx) -> {
+                                                                    execDetail(ctx, config, index, descriptions);
+                                                                });
                 addChildren(new Command("diff") {{
-                    argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
-                        ConfigDiffCommand.execDiff(ctx, config, 0, index);
-                    });
+                    description(ConfigCommandDescriptions.historyDiff(descriptions));
+                    argument(new IntegerArgument("index",
+                                                 1,
+                                                 Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndex(
+                                                                            descriptions))
+                                                                    .execute((index, ctx) -> {
+                                                                        ConfigDiffCommand.execDiff(ctx,
+                                                                                                   config,
+                                                                                                   0,
+                                                                                                   index,
+                                                                                                   descriptions);
+                                                                    });
                     argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
-                             new IntegerArgument("index2", 0, Integer.MAX_VALUE)).execute((index1, index2, ctx) -> {
-                        ConfigDiffCommand.execDiff(ctx, config, index1, index2);
-                    });
+                             new IntegerArgument("index2",
+                                                 0,
+                                                 Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndexPair(
+                                                                            descriptions))
+                                                                    .execute((index1, index2, ctx) -> {
+                                                                        ConfigDiffCommand.execDiff(ctx,
+                                                                                                   config,
+                                                                                                   index1,
+                                                                                                   index2,
+                                                                                                   descriptions);
+                                                                    });
                 }});
                 addChildren(new Command("undo") {{
-                    execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1));
-                    argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
-                        ConfigUndoCommand.exec(ctx, config, index);
-                    });
+                    description(ConfigCommandDescriptions.undoConfig(descriptions, config.entryName()));
+                    execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1, descriptions));
+                    argument(new IntegerArgument("index",
+                                                 1,
+                                                 Integer.MAX_VALUE)).description(ConfigCommandDescriptions.undoIndex(
+                                                                            descriptions))
+                                                                    .execute((index, ctx) -> {
+                                                                        ConfigUndoCommand.exec(ctx,
+                                                                                               config,
+                                                                                               index,
+                                                                                               descriptions);
+                                                                    });
                 }});
             }}));
         } else {
@@ -66,41 +105,75 @@ class ConfigHistoryCommand extends Command {
             // /config history undo <index> - restore history[index]
             CommonBaseConfig config = configs.iterator()
                                              .next();
-            execute(ctx -> execList(ctx, config));
-            argument(new IntegerArgument("index", 0, Integer.MAX_VALUE)).execute((index, ctx) -> {
-                execDetail(ctx, config, index);
-            });
+            execute(ctx -> execList(ctx, config, descriptions));
+            argument(new IntegerArgument("index",
+                                         0,
+                                         Integer.MAX_VALUE)).description(ConfigCommandDescriptions.historyIndex(
+                                                                    descriptions))
+                                                            .execute((index, ctx) -> {
+                                                                execDetail(ctx, config, index, descriptions);
+                                                            });
             addChildren(new Command("diff") {{
-                argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
-                    ConfigDiffCommand.execDiff(ctx, config, 0, index);
-                });
+                description(ConfigCommandDescriptions.historyDiff(descriptions));
+                argument(new IntegerArgument("index",
+                                             1,
+                                             Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndex(
+                                                                        descriptions))
+                                                                .execute((index, ctx) -> {
+                                                                    ConfigDiffCommand.execDiff(ctx,
+                                                                                               config,
+                                                                                               0,
+                                                                                               index,
+                                                                                               descriptions);
+                                                                });
                 argument(new IntegerArgument("index1", 0, Integer.MAX_VALUE),
-                         new IntegerArgument("index2", 0, Integer.MAX_VALUE)).execute((index1, index2, ctx) -> {
-                    ConfigDiffCommand.execDiff(ctx, config, index1, index2);
-                });
+                         new IntegerArgument("index2",
+                                             0,
+                                             Integer.MAX_VALUE)).description(ConfigCommandDescriptions.diffIndexPair(
+                                                                        descriptions))
+                                                                .execute((index1, index2, ctx) -> {
+                                                                    ConfigDiffCommand.execDiff(ctx,
+                                                                                               config,
+                                                                                               index1,
+                                                                                               index2,
+                                                                                               descriptions);
+                                                                });
             }});
             addChildren(new Command("undo") {{
-                execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1));
-                argument(new IntegerArgument("index", 1, Integer.MAX_VALUE)).execute((index, ctx) -> {
-                    ConfigUndoCommand.exec(ctx, config, index);
-                });
+                description(ConfigCommandDescriptions.undo(descriptions));
+                execute(ctx -> ConfigUndoCommand.exec(ctx, config, 1, descriptions));
+                argument(new IntegerArgument("index",
+                                             1,
+                                             Integer.MAX_VALUE)).description(ConfigCommandDescriptions.undoIndex(
+                                                                        descriptions))
+                                                                .execute((index, ctx) -> {
+                                                                    ConfigUndoCommand.exec(ctx,
+                                                                                           config,
+                                                                                           index,
+                                                                                           descriptions);
+                                                                });
             }});
         }
     }
 
-    private static void execList(CommandContext ctx, CommonBaseConfig config) {
+    private static void execList(CommandContext ctx,
+                                 CommonBaseConfig config,
+                                 ConfigCommandDescriptions.Provider descriptions) {
         config.inspect(() -> {
             List<HistoryEntry> history = config.readHistory();
             if (history.isEmpty()) {
-                ctx.sendSuccess(config.entryName() + "の変更履歴はありません");
+                ctx.sendSuccess(descriptions.describe(ctx,
+                                                      ConfigCommandDescriptions.Key.HISTORY_EMPTY,
+                                                      config.entryName()));
                 return;
             }
             ctx.sendMessage(ConfigUtil.configHeader(config));
             for (int i = 0; i < history.size(); i++) {
                 HistoryEntry entry = history.get(i);
                 boolean isLatest = (i == 0);
-                String dateStr = entry.timestamp() > 0 ? DATE_FORMAT.format(new Date(entry.timestamp())) : "不明";
-                String label = "[" + i + "]: " + dateStr + (isLatest ? " (最新)" : "");
+                String dateStr = dateText(entry, ctx, descriptions);
+                String label = "[" + i + "]: " + dateStr + (isLatest ? descriptions.describe(ctx,
+                                                                                             ConfigCommandDescriptions.Key.HISTORY_LATEST_SUFFIX) : "");
                 String hoverText = buildFieldsText(config, entry.config());
                 ctx.sendMessageWithOption(label, opt -> {
                     opt.rgb(ChatColorUtil.GREEN.getRGB());
@@ -112,19 +185,27 @@ class ConfigHistoryCommand extends Command {
         });
     }
 
-    private static void execDetail(CommandContext ctx, CommonBaseConfig config, int index) {
+    private static void execDetail(CommandContext ctx,
+                                   CommonBaseConfig config,
+                                   int index,
+                                   ConfigCommandDescriptions.Provider descriptions) {
         config.inspect(() -> {
             List<HistoryEntry> history = config.readHistory();
             if (history.isEmpty()) {
-                ctx.sendFailure(config.entryName() + "の変更履歴がありません");
+                ctx.sendFailure(descriptions.describe(ctx,
+                                                      ConfigCommandDescriptions.Key.HISTORY_EMPTY,
+                                                      config.entryName()));
                 return;
             }
             if (index >= history.size()) {
-                ctx.sendFailure("インデックス " + index + " は範囲外です (0–" + (history.size() - 1) + ")");
+                ctx.sendFailure(descriptions.describe(ctx,
+                                                      ConfigCommandDescriptions.Key.HISTORY_INDEX_OUT_OF_RANGE,
+                                                      index,
+                                                      history.size() - 1));
                 return;
             }
             HistoryEntry entry = history.get(index);
-            String dateStr = entry.timestamp() > 0 ? DATE_FORMAT.format(new Date(entry.timestamp())) : "不明";
+            String dateStr = dateText(entry, ctx, descriptions);
             ctx.sendMessage(ConfigUtil.configHeader(config));
             ctx.sendSuccess("[" + index + "]: " + dateStr);
             listFields(ctx, config, entry.config());
@@ -157,6 +238,15 @@ class ConfigHistoryCommand extends Command {
             }
         }
         return sb.toString();
+    }
+
+    private static String dateText(HistoryEntry entry,
+                                   CommandContext ctx,
+                                   ConfigCommandDescriptions.Provider descriptions) {
+        if (entry.timestamp() > 0) {
+            return DATE_FORMAT.format(new Date(entry.timestamp()));
+        }
+        return descriptions.describe(ctx, ConfigCommandDescriptions.Key.HISTORY_UNKNOWN_TIMESTAMP);
     }
 
     private static void listFields(CommandContext ctx, CommonBaseConfig liveConfig, CommonBaseConfig histConfig) {

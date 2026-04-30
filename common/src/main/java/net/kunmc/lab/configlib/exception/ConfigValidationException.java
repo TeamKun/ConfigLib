@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.exception;
 
 import net.kunmc.lab.commandlib.CommandContext;
+import net.kunmc.lab.configlib.ConfigCommandDescriptions;
 import net.kunmc.lab.configlib.schema.ConfigSchemaPath;
 
 import java.util.Objects;
@@ -39,7 +40,14 @@ public final class ConfigValidationException extends RuntimeException {
     }
 
     public void sendMessage(CommandContext ctx) {
-        ctx.sendFailure("Validation failed for " + path.asString() + " (value: " + String.valueOf(value) + ").");
+        sendMessage(ctx, ConfigCommandDescriptions.defaultProvider());
+    }
+
+    public void sendMessage(CommandContext ctx, ConfigCommandDescriptions.Provider descriptions) {
+        ctx.sendFailure(descriptions.describe(ctx,
+                                              ConfigCommandDescriptions.Key.VALIDATION_FAILED,
+                                              path.asString(),
+                                              String.valueOf(value)));
         validationCause.sendMessage(ctx);
     }
 }

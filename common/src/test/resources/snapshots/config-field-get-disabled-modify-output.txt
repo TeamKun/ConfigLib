@@ -1,9 +1,10 @@
-\u00A7acount\u306E\u5024\u309222\u306B\u5909\u66F4\u3057\u307E\u3057\u305F.
+\u00A7acount was changed to 22.
 \u00A7f\u00A77--------------------------------------------------
+\u00A7fModify 'count'.
 \u00A7f\u00A7cUsage:
-\u00A7f\u00A7b  /config count \u00A7eset
-\u00A7f\u00A7b  /config count \u00A7einc
-\u00A7f\u00A7b  /config count \u00A7edec
-\u00A7f\u00A7b  /config count \u00A7ereset
-\u00A7f  \u00A7b/config count \u00A77<\u00A7eInteger\u00A77>
+\u00A7f\u00A7b  /config count \u00A7eset\u00A77: Set 'count' to a new value.
+\u00A7f\u00A7b  /config count \u00A7einc\u00A77: Increase 'count'.
+\u00A7f\u00A7b  /config count \u00A7edec\u00A77: Decrease 'count'.
+\u00A7f\u00A7b  /config count \u00A7ereset\u00A77: Reset 'count' to its default value.
+\u00A7f  \u00A7b/config count \u00A77<\u00A7eInteger\u00A77>\u00A77: Set 'count' to a new value.
 \u00A7f\u00A77--------------------------------------------------

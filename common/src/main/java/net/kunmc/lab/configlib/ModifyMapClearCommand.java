@@ -9,8 +9,12 @@ import net.kunmc.lab.configlib.store.ChangeTrace;
 import java.util.Map;
 
 class ModifyMapClearCommand extends Command {
-    public ModifyMapClearCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, MapValue value) {
+    public ModifyMapClearCommand(CommonBaseConfig config,
+                                 ConfigSchemaEntry<?> schemaEntry,
+                                 MapValue value,
+                                 ConfigCommandDescriptions.Provider descriptions) {
         super("clear");
+        description(ConfigCommandDescriptions.clearMap(descriptions, schemaEntry.entryName()));
 
         addPrerequisite(value::checkExecutable);
         execute(ctx -> {
@@ -19,7 +23,7 @@ class ModifyMapClearCommand extends Command {
                 cleared.clear();
                 ConfigSchemaValidation.validate(schemaEntry, cleared);
             } catch (ConfigValidationException e) {
-                e.sendMessage(ctx);
+                e.sendMessage(ctx, descriptions);
                 return;
             }
 
@@ -29,12 +33,13 @@ class ModifyMapClearCommand extends Command {
                     value.clear();
                 }, ChangeTrace.command(ctx, "clear " + schemaEntry.entryName(), schemaEntry.entryName()));
             } catch (ConfigValidationException e) {
-                e.sendMessage(ctx);
+                e.sendMessage(ctx, descriptions);
                 return;
             }
 
             ctx.sendSuccess(value.succeedMessageForClear(new MapValueClearCommandMessageParameter(schemaEntry.entryName(),
-                                                                                                  ctx)));
+                                                                                                  ctx,
+                                                                                                  descriptions)));
         });
     }
 }

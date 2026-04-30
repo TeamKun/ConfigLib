@@ -18,7 +18,11 @@ public abstract class NumericValue<E extends Number & Comparable<E>, T extends N
                 return;
             }
             if (x.compareTo(min) < 0 || x.compareTo(max) > 0) {
-                throw new InvalidValueException(min + "以上" + max + "以下の値を入力してください.");
+                throw new InvalidValueException(ctx -> ctx.sendFailure(ConfigCommandDescriptions.describe(ctx,
+                                                                                                          ConfigCommandDescriptions.Key.NUMERIC_RANGE,
+                                                                                                          min,
+                                                                                                          max)),
+                                                "Enter a value between " + min + " and " + max + ".");
             }
         });
     }

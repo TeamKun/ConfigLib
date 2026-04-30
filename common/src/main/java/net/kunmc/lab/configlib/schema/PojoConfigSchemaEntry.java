@@ -1,6 +1,7 @@
 package net.kunmc.lab.configlib.schema;
 
 import net.kunmc.lab.configlib.CommonBaseConfig;
+import net.kunmc.lab.configlib.ConfigCommandDescriptions;
 import net.kunmc.lab.configlib.annotation.ConfigNullable;
 import net.kunmc.lab.configlib.annotation.Description;
 import net.kunmc.lab.configlib.annotation.Range;
@@ -99,7 +100,10 @@ public final class PojoConfigSchemaEntry<E> extends ConfigSchemaEntry<E> {
 
     private static void validateNotNull(Field field, Object value) throws InvalidValueException {
         if (value == null) {
-            throw new InvalidValueException(field.getName() + " must not be null.");
+            throw new InvalidValueException(ctx -> ctx.sendFailure(ConfigCommandDescriptions.describe(ctx,
+                                                                                                      ConfigCommandDescriptions.Key.POJO_NOT_NULL,
+                                                                                                      field.getName())),
+                                            field.getName() + " must not be null.");
         }
     }
 
@@ -108,13 +112,22 @@ public final class PojoConfigSchemaEntry<E> extends ConfigSchemaEntry<E> {
             return;
         }
         if (!(value instanceof Number)) {
-            throw new InvalidValueException("@Range can only be used on numeric fields: " + field.getName());
+            throw new InvalidValueException(ctx -> ctx.sendFailure(ConfigCommandDescriptions.describe(ctx,
+                                                                                                      ConfigCommandDescriptions.Key.POJO_RANGE_NON_NUMERIC,
+                                                                                                      field.getName())),
+                                            "@Range can only be used on numeric fields: " + field.getName());
         }
 
         double numericValue = ((Number) value).doubleValue();
         if (numericValue < range.min() || numericValue > range.max()) {
-            throw new InvalidValueException(field.getName() + " must be between " + formatRangeBound(range.min()) + " and " + formatRangeBound(
-                    range.max()) + ".");
+            String min = formatRangeBound(range.min());
+            String max = formatRangeBound(range.max());
+            throw new InvalidValueException(ctx -> ctx.sendFailure(ConfigCommandDescriptions.describe(ctx,
+                                                                                                      ConfigCommandDescriptions.Key.POJO_RANGE,
+                                                                                                      field.getName(),
+                                                                                                      min,
+                                                                                                      max)),
+                                            field.getName() + " must be between " + min + " and " + max + ".");
         }
     }
 

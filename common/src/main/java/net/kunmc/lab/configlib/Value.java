@@ -176,7 +176,8 @@ public abstract class Value<E, T extends Value<E, T>> {
     public final T executableIf(Predicate<CommandContext> condition) {
         return executableIf(ctx -> {
             if (!condition.test(ctx)) {
-                throw new CommandPrerequisiteException(c -> c.sendFailure("このコマンドを実行できません"));
+                throw new CommandPrerequisiteException(c -> c.sendFailure(ConfigCommandDescriptions.describe(c,
+                                                                                                             ConfigCommandDescriptions.Key.COMMAND_NOT_EXECUTABLE)));
             }
         });
     }

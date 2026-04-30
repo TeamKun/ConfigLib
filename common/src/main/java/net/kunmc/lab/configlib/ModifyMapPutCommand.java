@@ -12,8 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 class ModifyMapPutCommand extends Command {
-    public ModifyMapPutCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, MapValue value) {
+    public ModifyMapPutCommand(CommonBaseConfig config,
+                               ConfigSchemaEntry<?> schemaEntry,
+                               MapValue value,
+                               ConfigCommandDescriptions.Provider descriptions) {
         super("put");
+        description(ConfigCommandDescriptions.put(descriptions, schemaEntry.entryName()));
 
         addPrerequisite(value::checkExecutable);
         for (MapValue.PutArgumentDefinition<?, ?> definition : ((List<MapValue.PutArgumentDefinition<?, ?>>) value.argumentDefinitionsForPut())) {
@@ -39,7 +43,7 @@ class ModifyMapPutCommand extends Command {
                         result.put(k, v);
                         ConfigSchemaValidation.validate(schemaEntry, result);
                     } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
+                        e.sendMessage(ctx, descriptions);
                         return;
                     }
 
@@ -49,16 +53,17 @@ class ModifyMapPutCommand extends Command {
                             value.put(k, v);
                         }, ChangeTrace.command(ctx, "put " + schemaEntry.entryName(), schemaEntry.entryName()));
                     } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
+                        e.sendMessage(ctx, descriptions);
                         return;
                     }
 
                     ctx.sendSuccess(value.succeedMessageForPut(new MapValuePutCommandMessageParameter<>(schemaEntry.entryName(),
                                                                                                         ctx,
                                                                                                         k,
-                                                                                                        v)));
+                                                                                                        v,
+                                                                                                        descriptions)));
                 });
-            });
+            }).description(ConfigCommandDescriptions.put(descriptions, schemaEntry.entryName()));
         }
     }
 }

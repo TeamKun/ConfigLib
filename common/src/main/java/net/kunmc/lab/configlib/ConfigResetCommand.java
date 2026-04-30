@@ -9,8 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 class ConfigResetCommand extends Command {
-    public ConfigResetCommand(@NotNull Set<CommonBaseConfig> configs) {
+    public ConfigResetCommand(@NotNull Set<CommonBaseConfig> configs, ConfigCommandDescriptions.Provider descriptions) {
         super(SubCommandType.Reset.name);
+        description(ConfigCommandDescriptions.reset(descriptions));
 
         if (configs.isEmpty()) {
             throw new IllegalArgumentException("configs is empty");
@@ -18,15 +19,16 @@ class ConfigResetCommand extends Command {
 
 
         if (configs.size() == 1) {
-            execute(ctx -> configs.forEach(config -> exec(ctx, config)));
+            execute(ctx -> configs.forEach(config -> exec(ctx, config, descriptions)));
         } else {
             configs.forEach(config -> addChildren(new Command(config.entryName()) {{
-                execute(ctx -> exec(ctx, config));
+                description(ConfigCommandDescriptions.resetConfig(descriptions, config.entryName()));
+                execute(ctx -> exec(ctx, config, descriptions));
             }}));
         }
     }
 
-    private void exec(CommandContext ctx, CommonBaseConfig config) {
+    private void exec(CommandContext ctx, CommonBaseConfig config, ConfigCommandDescriptions.Provider descriptions) {
         try {
             config.mutate(() -> {
                 config.schema()
@@ -34,10 +36,10 @@ class ConfigResetCommand extends Command {
                       .forEach(config::resetEntryToDefault);
             }, ChangeTrace.command(ctx, "reset " + config.entryName()));
         } catch (ConfigValidationException e) {
-            e.sendMessage(ctx);
+            e.sendMessage(ctx, descriptions);
             return;
         }
-        ctx.sendSuccess(config.entryName() + "をデフォルト値にリセットしました");
+        ctx.sendSuccess(descriptions.describe(ctx, ConfigCommandDescriptions.Key.RESET_SUCCESS, config.entryName()));
         ConfigListCommand.listFields(ctx, config);
     }
 }

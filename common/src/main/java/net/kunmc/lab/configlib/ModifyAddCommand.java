@@ -12,8 +12,12 @@ import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 import java.util.Collection;
 
 class ModifyAddCommand extends Command {
-    public ModifyAddCommand(CommonBaseConfig config, ConfigSchemaEntry<?> schemaEntry, CollectionValue value) {
+    public ModifyAddCommand(CommonBaseConfig config,
+                            ConfigSchemaEntry<?> schemaEntry,
+                            CollectionValue value,
+                            ConfigCommandDescriptions.Provider descriptions) {
         super("add");
+        description(ConfigCommandDescriptions.add(descriptions, schemaEntry.entryName()));
 
         for (Object definition : value.argumentDefinitionsForAdd()) {
             argument(builder -> {
@@ -34,7 +38,7 @@ class ModifyAddCommand extends Command {
                         Collection result = value.toAdded(newValue.toArray());
                         ConfigSchemaValidation.validate(schemaEntry, result);
                     } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
+                        e.sendMessage(ctx, descriptions);
                         return;
                     }
 
@@ -44,16 +48,17 @@ class ModifyAddCommand extends Command {
                             ((Collection) value.value()).addAll(newValue);
                         }, ChangeTrace.command(ctx, "add " + schemaEntry.entryName(), schemaEntry.entryName()));
                     } catch (ConfigValidationException e) {
-                        e.sendMessage(ctx);
+                        e.sendMessage(ctx, descriptions);
                         return;
                     }
 
                     ctx.sendSuccess(value.succeedMessageForAdd(new CollectionValueAddCommandMessageParameter<>(
                             schemaEntry.entryName(),
                             ctx,
-                            newValue)));
+                            newValue,
+                            descriptions)));
                 });
-            });
+            }).description(ConfigCommandDescriptions.add(descriptions, schemaEntry.entryName()));
         }
     }
 }

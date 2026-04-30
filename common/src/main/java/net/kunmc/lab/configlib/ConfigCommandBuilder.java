@@ -16,6 +16,7 @@ public class ConfigCommandBuilder {
     private boolean historyEnabled = true;
     private boolean getEnabled = true;
     private boolean modifyEnabled = true;
+    private ConfigCommandDescriptions.Provider descriptionProvider = ConfigCommandDescriptions.defaultProvider();
 
     public ConfigCommandBuilder(@NotNull CommonBaseConfig config) {
         configs.add(config);
@@ -61,6 +62,11 @@ public class ConfigCommandBuilder {
         return this;
     }
 
+    public ConfigCommandBuilder descriptionProvider(@NotNull ConfigCommandDescriptions.Provider provider) {
+        this.descriptionProvider = Objects.requireNonNull(provider);
+        return this;
+    }
+
     public ConfigCommandBuilder sort() {
         return sort(Comparator.comparing(CommonBaseConfig::entryName));
     }
@@ -71,7 +77,7 @@ public class ConfigCommandBuilder {
     }
 
     public ConfigCommand build() {
-        ConfigCommand configCommand = new ConfigCommand(name);
+        ConfigCommand configCommand = new ConfigCommand(name, descriptionProvider);
 
         if (listEnabled) {
             createSubCommand(SubCommandType.List).ifPresent(configCommand::addChildren);
@@ -103,7 +109,7 @@ public class ConfigCommandBuilder {
         if (applicable.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(type.of(applicable));
+        return Optional.of(type.of(applicable, descriptionProvider));
     }
 
     /**
@@ -136,18 +142,20 @@ public class ConfigCommandBuilder {
                                      CommonBaseConfig config,
                                      Set<String> conflictingFieldNames) {
         configCommand.addChildren(new Command(config.entryName()) {{
+            description(ConfigCommandDescriptions.config(descriptionProvider, config.entryName()));
             execute(ctx -> ConfigListCommand.listFields(ctx, config));
             if (configs.size() > 1) {
                 Set<CommonBaseConfig> singleton = Collections.singleton(config);
                 if (historyEnabled && config.isHistoryEnabled()) {
-                    addChildren(new ConfigHistoryCommand(singleton));
-                    addChildren(new ConfigAuditCommand(singleton));
-                    addChildren(new ConfigUndoCommand(singleton));
-                    addChildren(new ConfigDiffCommand(singleton));
+                    addChildren(new ConfigHistoryCommand(singleton, descriptionProvider));
+                    addChildren(new ConfigAuditCommand(singleton, descriptionProvider));
+                    addChildren(new ConfigUndoCommand(singleton, descriptionProvider));
+                    addChildren(new ConfigDiffCommand(singleton, descriptionProvider));
                 }
             }
         }});
         configCommand.addChildren(new Command(config.entryName() + ".") {{
+            description(ConfigCommandDescriptions.config(descriptionProvider, config.entryName()));
             execute(ctx -> ConfigListCommand.listFields(ctx, config));
         }});
 
@@ -156,7 +164,12 @@ public class ConfigCommandBuilder {
             String prefixedName = config.entryName() + "." + valueEntryName;
 
             // Prefixed command is always available
-            configCommand.addChildren(new ConfigFieldCommand(config, prefixedName, entry, getEnabled, modifyEnabled));
+            configCommand.addChildren(new ConfigFieldCommand(config,
+                                                             prefixedName,
+                                                             entry,
+                                                             getEnabled,
+                                                             modifyEnabled,
+                                                             descriptionProvider));
 
             // Non-prefixed command only when no conflict
             if (!conflictingFieldNames.contains(valueEntryName)) {
@@ -164,7 +177,8 @@ public class ConfigCommandBuilder {
                                                                  valueEntryName,
                                                                  entry,
                                                                  getEnabled,
-                                                                 modifyEnabled));
+                                                                 modifyEnabled,
+                                                                 descriptionProvider));
             }
         }
     }

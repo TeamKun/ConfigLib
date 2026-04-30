@@ -62,10 +62,10 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         if (successMessageForAdd != null) {
             return successMessageForAdd.apply(param);
         }
-        return String.format("%sに%sを追加しました.",
-                             param.entryName(),
-                             elementToString(((E[]) param.added()
-                                                         .toArray())[0]));
+        return param.describe(ConfigCommandDescriptions.Key.COLLECTION_ADD_SUCCESS,
+                              param.entryName(),
+                              elementToString(((E[]) param.added()
+                                                          .toArray())[0]));
     }
 
     public final U disableRemove() {
@@ -103,10 +103,10 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         if (successMessageForRemove != null) {
             return successMessageForRemove.apply(param);
         }
-        return String.format("%sから%sを削除しました.",
-                             param.entryName(),
-                             elementToString(((E[]) param.removed()
-                                                         .toArray())[0]));
+        return param.describe(ConfigCommandDescriptions.Key.COLLECTION_REMOVE_SUCCESS,
+                              param.entryName(),
+                              elementToString(((E[]) param.removed()
+                                                          .toArray())[0]));
     }
 
     public final U disableClear() {
@@ -142,7 +142,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
         if (successMessageForClear != null) {
             return successMessageForClear.apply(param);
         }
-        return param.entryName() + "をクリアしました";
+        return param.describe(ConfigCommandDescriptions.Key.COLLECTION_CLEAR_SUCCESS, param.entryName());
     }
 
     public abstract T toAdded(E... elements);

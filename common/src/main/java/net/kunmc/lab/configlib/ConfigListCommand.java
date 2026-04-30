@@ -11,8 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Set;
 
 class ConfigListCommand extends Command {
-    public ConfigListCommand(Set<CommonBaseConfig> configs) {
+    public ConfigListCommand(Set<CommonBaseConfig> configs, ConfigCommandDescriptions.Provider descriptions) {
         super(SubCommandType.List.name);
+        description(ConfigCommandDescriptions.list(descriptions));
 
         if (configs.isEmpty()) {
             throw new IllegalArgumentException("configs is empty");
@@ -25,6 +26,7 @@ class ConfigListCommand extends Command {
         if (configs.size() > 1) {
             configs.forEach(config -> {
                 addChildren(new Command(config.entryName()) {{
+                    description(ConfigCommandDescriptions.config(descriptions, config.entryName()));
                     execute(ctx -> {
                         listFields(ctx, config);
                     });
