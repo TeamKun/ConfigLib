@@ -12,7 +12,9 @@ import java.lang.annotation.Target;
  * emits it as a comment near the saved field.
  * </p>
  * <p>
- * Applicable to POJO config fields.
+ * Applicable to POJO config fields. For records, put this annotation on the
+ * record component.
+ * </p>
  * <p>
  * Value fields expose descriptions via {@link net.kunmc.lab.configlib.Value#description(String)}
  * instead of this annotation.

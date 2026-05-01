@@ -11,8 +11,12 @@ import java.lang.annotation.Target;
  * ConfigLib applies this range during file load and generated command mutation validation.
  * </p>
  * <p>
- * Intended for numeric POJO fields. Value fields should typically use their own constructor
- * bounds and/or {@code addValidator(...)}.
+ * Intended only for numeric POJO config leaf fields. For records, put this
+ * annotation on a numeric record component.
+ * Do not put this annotation on section/object fields such as
+ * {@code public ArenaSettings arena}; put it on a numeric field inside that object
+ * instead. Value fields should typically use their own constructor bounds and/or
+ * {@code addValidator(...)}.
  * </p>
  */
 @Retention(RetentionPolicy.RUNTIME)

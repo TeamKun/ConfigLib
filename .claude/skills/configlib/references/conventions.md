@@ -381,11 +381,11 @@ public final class ServerConfig extends BaseConfig {
 
 ### Annotations
 
-| Annotation        | Target        | Effect                                            |
-|-------------------|---------------|---------------------------------------------------|
-| `@Description`    | field         | YAML comment + hover text in commands             |
-| `@Range`          | numeric field | Validates `min ≤ value ≤ max` on load and command |
-| `@ConfigNullable` | field         | Allows `null`; fields without it reject `null`    |
+| Annotation        | Target                  | Effect                                            |
+|-------------------|-------------------------|---------------------------------------------------|
+| `@Description`    | POJO field              | YAML comment + hover text in commands             |
+| `@Range`          | numeric POJO leaf field | Validates `min ≤ value ≤ max` on load and command |
+| `@ConfigNullable` | POJO field              | Allows `null`; fields without it reject `null`    |
 
 ### POJO generated commands
 
@@ -468,7 +468,8 @@ public record ArenaSettings(@Description("Maximum number of arenas.") @Range(min
 }
 ```
 
-Nesting is supported to any depth. Records can be nested inside records.
+Nesting is supported to any depth. Records can be nested inside records. For records, annotations are written on record
+components and are handled like POJO field metadata.
 
 ### When to use POJO API vs Value API
 

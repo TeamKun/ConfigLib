@@ -288,15 +288,15 @@ public final class PluginConfig extends BaseConfig {
 ```
 
 Nesting is supported to any depth. Records can be nested inside records; immutable classes can be nested inside
-immutable classes.
+immutable classes. For records, annotations are written on record components and are handled like POJO field metadata.
 
 **Available annotations:**
 
-| Annotation        | Target        | Effect                                                |
-|-------------------|---------------|-------------------------------------------------------|
-| `@Description`    | field         | Written as a YAML comment; shown on hover in commands |
-| `@Range`          | numeric field | Validates `min ≤ value ≤ max` on load and command set |
-| `@ConfigNullable` | field         | Allows `null`; non-annotated fields reject `null`     |
+| Annotation        | Target                  | Effect                                                |
+|-------------------|-------------------------|-------------------------------------------------------|
+| `@Description`    | POJO field              | Written as a YAML comment; shown on hover in commands |
+| `@Range`          | numeric POJO leaf field | Validates `min ≤ value ≤ max` on load and command set |
+| `@ConfigNullable` | POJO field              | Allows `null`; non-annotated fields reject `null`     |
 
 **Generated commands for POJO fields:**
 

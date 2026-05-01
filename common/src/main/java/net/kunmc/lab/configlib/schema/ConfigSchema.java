@@ -3,7 +3,6 @@ package net.kunmc.lab.configlib.schema;
 import net.kunmc.lab.configlib.CommonBaseConfig;
 import net.kunmc.lab.configlib.Value;
 import net.kunmc.lab.configlib.ValueConfigSchemaEntry;
-import net.kunmc.lab.configlib.annotation.Description;
 import net.kunmc.lab.configlib.store.ConfigStore;
 import net.kunmc.lab.configlib.util.ConfigUtil;
 import net.kunmc.lab.configlib.util.ReflectionUtil;
@@ -37,11 +36,11 @@ public final class ConfigSchema {
                     entries.add(ValueConfigSchemaEntry.from(field, value));
                     addDescription(descriptionsByPath, field.getName(), value.description());
                 } else if (isNestedPojoType(field.getType())) {
-                    addDescription(descriptionsByPath, field.getName(), descriptionOf(field));
+                    addDescription(descriptionsByPath, field.getName(), PojoAnnotations.descriptionOf(field));
                     collectNestedEntries(config, new Field[]{field}, field.getType(), entries, descriptionsByPath);
                 } else {
                     entries.add(PojoConfigSchemaEntry.from(config, new Field[0], field));
-                    addDescription(descriptionsByPath, field.getName(), descriptionOf(field));
+                    addDescription(descriptionsByPath, field.getName(), PojoAnnotations.descriptionOf(field));
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
@@ -67,7 +66,7 @@ public final class ConfigSchema {
                 continue;
             }
             field.setAccessible(true);
-            addDescription(descriptionsByPath, buildPath(parentChain, field), descriptionOf(field));
+            addDescription(descriptionsByPath, buildPath(parentChain, field), PojoAnnotations.descriptionOf(field));
             if (isNestedPojoType(field.getType())) {
                 Field[] newChain = appendToChain(parentChain, field);
                 collectNestedEntries(root, newChain, field.getType(), result, descriptionsByPath);
@@ -85,11 +84,6 @@ public final class ConfigSchema {
         }
         sb.append(leafField.getName());
         return sb.toString();
-    }
-
-    private static String descriptionOf(Field field) {
-        Description description = field.getAnnotation(Description.class);
-        return description == null ? null : description.value();
     }
 
     private static void addDescription(Map<String, String> descriptionsByPath, String path, String description) {
