@@ -7,14 +7,15 @@ import java.util.function.Consumer;
 
 public class YamlFileConfigStore extends FileConfigStore {
     public YamlFileConfigStore(File file, Gson gson) {
-        super(file, gson, new YamlConfigFormat(gson));
+        this(file, gson, (e) -> {
+        }, 50, UnknownKeyPolicy.PRESERVE);
     }
 
-    public YamlFileConfigStore(File file, Gson gson, Consumer<Exception> exceptionHandler) {
-        super(file, gson, new YamlConfigFormat(gson), exceptionHandler);
-    }
-
-    public YamlFileConfigStore(File file, Gson gson, Consumer<Exception> exceptionHandler, int maxHistorySize) {
-        super(file, gson, new YamlConfigFormat(gson), exceptionHandler, maxHistorySize);
+    public YamlFileConfigStore(File file,
+                               Gson gson,
+                               Consumer<Exception> exceptionHandler,
+                               int maxHistorySize,
+                               UnknownKeyPolicy unknownKeyPolicy) {
+        super(file, gson, new YamlConfigFormat(gson), exceptionHandler, maxHistorySize, unknownKeyPolicy);
     }
 }

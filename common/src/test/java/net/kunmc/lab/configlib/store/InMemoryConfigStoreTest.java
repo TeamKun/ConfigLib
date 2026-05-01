@@ -126,6 +126,59 @@ class InMemoryConfigStoreTest {
                                            "Migration v1 failed while applying set broken.child")));
     }
 
+    @Test
+    void defaultUnknownKeyPolicyPreservesUnknownKeys() {
+        InMemoryConfigStore store = storeWith("{\"value\":1,\"unknown\":2,\"_version_\":0}");
+        ValueConfig loaded = (ValueConfig) store.read(ValueConfig.class, noMigrations(), new ValueConfig());
+
+        loaded.value = 10;
+        store.write(loaded, ValueConfig.class, noMigrations());
+
+        assertTrue(store.readRaw()
+                        .contains("\"unknown\":2"), store.readRaw());
+    }
+
+    @Test
+    void removeUnknownKeyPolicyRemovesUnknownKeysOnWrite() {
+        InMemoryConfigStore store = storeWith("{\"value\":1,\"unknown\":2,\"_version_\":0}");
+        store.unknownKeyPolicy(UnknownKeyPolicy.REMOVE);
+        ValueConfig loaded = (ValueConfig) store.read(ValueConfig.class, noMigrations(), new ValueConfig());
+
+        loaded.value = 10;
+        store.write(loaded, ValueConfig.class, noMigrations());
+
+        assertFalse(store.readRaw()
+                         .contains("\"unknown\""), store.readRaw());
+    }
+
+    @Test
+    void failUnknownKeyPolicyRejectsUnknownKeysOnRead() {
+        InMemoryConfigStore store = storeWith("{\"value\":1,\"unknown\":2,\"_version_\":0}");
+        store.unknownKeyPolicy(UnknownKeyPolicy.FAIL);
+
+        UnknownConfigKeyException ex = assertThrows(UnknownConfigKeyException.class,
+                                                    () -> store.read(ValueConfig.class,
+                                                                     noMigrations(),
+                                                                     new ValueConfig()));
+
+        assertEquals("Unknown config key: unknown", ex.getMessage());
+    }
+
+    @Test
+    void customUnknownKeyPolicyCanFilterByPath() {
+        InMemoryConfigStore store = storeWith("{\"value\":1,\"keepCustom\":2,\"dropCustom\":3,\"_version_\":0}");
+        store.unknownKeyPolicy(UnknownKeyPolicy.filter(path -> path.startsWith("keep")));
+        ValueConfig loaded = (ValueConfig) store.read(ValueConfig.class, noMigrations(), new ValueConfig());
+
+        loaded.value = 10;
+        store.write(loaded, ValueConfig.class, noMigrations());
+
+        assertTrue(store.readRaw()
+                        .contains("\"keepCustom\":2"), store.readRaw());
+        assertFalse(store.readRaw()
+                         .contains("\"dropCustom\""), store.readRaw());
+    }
+
     // ---- history: pushHistory / readHistory ----
 
     @Test

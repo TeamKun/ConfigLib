@@ -7,14 +7,15 @@ import java.util.function.Consumer;
 
 public class JsonFileConfigStore extends FileConfigStore {
     public JsonFileConfigStore(File file, Gson gson) {
-        super(file, gson, new JsonConfigFormat(gson));
+        this(file, gson, (e) -> {
+        }, 50, UnknownKeyPolicy.PRESERVE);
     }
 
-    public JsonFileConfigStore(File file, Gson gson, Consumer<Exception> exceptionHandler) {
-        super(file, gson, new JsonConfigFormat(gson), exceptionHandler);
-    }
-
-    public JsonFileConfigStore(File file, Gson gson, Consumer<Exception> exceptionHandler, int maxHistorySize) {
-        super(file, gson, new JsonConfigFormat(gson), exceptionHandler, maxHistorySize);
+    public JsonFileConfigStore(File file,
+                               Gson gson,
+                               Consumer<Exception> exceptionHandler,
+                               int maxHistorySize,
+                               UnknownKeyPolicy unknownKeyPolicy) {
+        super(file, gson, new JsonConfigFormat(gson), exceptionHandler, maxHistorySize, unknownKeyPolicy);
     }
 }

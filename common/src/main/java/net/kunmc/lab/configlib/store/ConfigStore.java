@@ -10,6 +10,10 @@ import java.util.Optional;
 import java.util.Timer;
 
 public interface ConfigStore {
+    UnknownKeyPolicy unknownKeyPolicy();
+
+    void unknownKeyPolicy(UnknownKeyPolicy unknownKeyPolicy);
+
     boolean exists();
 
     CommonBaseConfig read(Class<? extends CommonBaseConfig> clazz, Migrations migrations, CommonBaseConfig defaults);

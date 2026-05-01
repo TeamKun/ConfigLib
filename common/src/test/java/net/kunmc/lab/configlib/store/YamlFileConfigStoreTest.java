@@ -131,6 +131,40 @@ class YamlFileConfigStoreTest {
     }
 
     @Test
+    void removeUnknownKeyPolicyRemovesUnknownKeysOnWrite() throws IOException {
+        YamlFileConfigStore removing = new YamlFileConfigStore(configFile,
+                                                               gson,
+                                                               Throwable::printStackTrace,
+                                                               50,
+                                                               UnknownKeyPolicy.REMOVE);
+        writeFile("value: 1\nunknown: 2\n_version_: 0\n");
+        SimpleConfig loaded = (SimpleConfig) removing.read(SimpleConfig.class, noMigrations(), new SimpleConfig());
+
+        loaded.value = 10;
+        removing.write(loaded, SimpleConfig.class, noMigrations());
+
+        assertFalse(readFile().contains("unknown:"), readFile());
+        assertTrue(readFile().contains("value: 10"), readFile());
+    }
+
+    @Test
+    void failUnknownKeyPolicyRejectsUnknownKeysOnRead() throws IOException {
+        YamlFileConfigStore failing = new YamlFileConfigStore(configFile,
+                                                              gson,
+                                                              Throwable::printStackTrace,
+                                                              50,
+                                                              UnknownKeyPolicy.FAIL);
+        writeFile("value: 1\nunknown: 2\n_version_: 0\n");
+
+        UnknownConfigKeyException ex = assertThrows(UnknownConfigKeyException.class,
+                                                    () -> failing.read(SimpleConfig.class,
+                                                                       noMigrations(),
+                                                                       new SimpleConfig()));
+
+        assertEquals("Unknown config key: unknown", ex.getMessage());
+    }
+
+    @Test
     void historyAndRestoreHistoryIndexUseYamlHistoryFile() throws IOException {
         store.pushHistory(new SimpleConfig(10));
         store.pushHistory(new SimpleConfig(20));

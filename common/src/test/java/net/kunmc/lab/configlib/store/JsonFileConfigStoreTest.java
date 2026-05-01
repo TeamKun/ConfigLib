@@ -231,6 +231,82 @@ class JsonFileConfigStoreTest {
     }
 
     @Test
+    void defaultUnknownKeyPolicyPreservesUnknownKeys() throws IOException {
+        writeFile("{\"value\":1,\"unknown\":2,\"_version_\":0}");
+        SimpleConfig loaded = (SimpleConfig) store.read(SimpleConfig.class, noMigrations(), new SimpleConfig());
+
+        loaded.value = 10;
+        store.write(loaded, SimpleConfig.class, noMigrations());
+
+        assertTrue(readFile().contains("\"unknown\":2"), readFile());
+    }
+
+    @Test
+    void removeUnknownKeyPolicyRemovesUnknownKeysOnWrite() throws IOException {
+        JsonFileConfigStore removing = new JsonFileConfigStore(configFile,
+                                                               gson,
+                                                               Throwable::printStackTrace,
+                                                               50,
+                                                               UnknownKeyPolicy.REMOVE);
+        writeFile("{\"value\":1,\"unknown\":2,\"_version_\":0}");
+        SimpleConfig loaded = (SimpleConfig) removing.read(SimpleConfig.class, noMigrations(), new SimpleConfig());
+
+        loaded.value = 10;
+        removing.write(loaded, SimpleConfig.class, noMigrations());
+
+        assertFalse(readFile().contains("\"unknown\""), readFile());
+        assertTrue(readFile().contains("\"value\":10"), readFile());
+    }
+
+    @Test
+    void failUnknownKeyPolicyRejectsUnknownKeysOnRead() throws IOException {
+        JsonFileConfigStore failing = new JsonFileConfigStore(configFile,
+                                                              gson,
+                                                              Throwable::printStackTrace,
+                                                              50,
+                                                              UnknownKeyPolicy.FAIL);
+        writeFile("{\"value\":1,\"unknown\":2,\"_version_\":0}");
+
+        UnknownConfigKeyException ex = assertThrows(UnknownConfigKeyException.class,
+                                                    () -> failing.read(SimpleConfig.class,
+                                                                       noMigrations(),
+                                                                       new SimpleConfig()));
+
+        assertEquals("Unknown config key: unknown", ex.getMessage());
+    }
+
+    @Test
+    void unknownKeyPolicyChecksNestedPojoKeys() throws IOException {
+        JsonFileConfigStore failing = new JsonFileConfigStore(configFile,
+                                                              gson,
+                                                              Throwable::printStackTrace,
+                                                              50,
+                                                              UnknownKeyPolicy.FAIL);
+        writeFile("{\"nested\":{\"value\":1,\"unknown\":2},\"_version_\":0}");
+
+        UnknownConfigKeyException ex = assertThrows(UnknownConfigKeyException.class,
+                                                    () -> failing.read(NestedPojoConfig.class,
+                                                                       noMigrations(),
+                                                                       new NestedPojoConfig()));
+
+        assertEquals("Unknown config key: nested.unknown", ex.getMessage());
+    }
+
+    @Test
+    void unknownKeyPolicyDoesNotInspectLeafMapEntries() throws IOException {
+        JsonFileConfigStore failing = new JsonFileConfigStore(configFile,
+                                                              gson,
+                                                              Throwable::printStackTrace,
+                                                              50,
+                                                              UnknownKeyPolicy.FAIL);
+        writeFile("{\"scores\":{\"alice\":100},\"_version_\":0}");
+
+        MapConfig loaded = (MapConfig) failing.read(MapConfig.class, noMigrations(), new MapConfig());
+
+        assertEquals(100, (int) loaded.scores.get("alice"));
+    }
+
+    @Test
     void writeLetsDiskWinWhenSameFieldChangedInMemoryAndOnDisk() throws IOException {
         writeFile("{\"value\":1,\"other\":2,\"_version_\":0}");
         TwoFieldConfig loaded = (TwoFieldConfig) store.read(TwoFieldConfig.class, noMigrations(), new TwoFieldConfig());
@@ -403,7 +479,11 @@ class JsonFileConfigStoreTest {
 
     @Test
     void historyCapAtMaxSize() {
-        JsonFileConfigStore capped = new JsonFileConfigStore(configFile, gson, Throwable::printStackTrace, 3);
+        JsonFileConfigStore capped = new JsonFileConfigStore(configFile,
+                                                             gson,
+                                                             Throwable::printStackTrace,
+                                                             3,
+                                                             UnknownKeyPolicy.PRESERVE);
         for (int i = 0; i < 5; i++) {
             capped.pushHistory(new ValueConfig(i));
         }
@@ -552,6 +632,19 @@ class JsonFileConfigStoreTest {
         @Override
         protected ConfigStore createConfigStore() {
             return new InMemoryConfigStore(new Gson());
+        }
+    }
+
+    static class NestedPojoConfig extends CommonBaseConfig {
+        Nested nested = new Nested();
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return new InMemoryConfigStore(new Gson());
+        }
+
+        static class Nested {
+            int value;
         }
     }
 

@@ -6,6 +6,7 @@ import net.kunmc.lab.commandlib.argument.Nameable;
 import net.kunmc.lab.commandlib.util.Location;
 import net.kunmc.lab.configlib.gson.*;
 import net.kunmc.lab.configlib.store.ConfigStore;
+import net.kunmc.lab.configlib.store.UnknownKeyPolicy;
 import net.kunmc.lab.configlib.store.YamlFileConfigStore;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
@@ -83,7 +84,7 @@ public abstract class BaseConfig extends CommonBaseConfig {
 
     @Override
     protected ConfigStore createConfigStore() {
-        return new YamlFileConfigStore(defaultConfigFile(), gson, exceptionHandler);
+        return new YamlFileConfigStore(defaultConfigFile(), gson, exceptionHandler, 50, UnknownKeyPolicy.PRESERVE);
     }
 
     public static final class Option extends CommonBaseConfig.Option {

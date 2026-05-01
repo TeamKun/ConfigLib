@@ -8,6 +8,7 @@ import net.kunmc.lab.configlib.CommonBaseConfig;
 import net.kunmc.lab.configlib.ConfigKeys;
 import net.kunmc.lab.configlib.migration.MigrationExecutionException;
 import net.kunmc.lab.configlib.migration.Migrations;
+import net.kunmc.lab.configlib.schema.ConfigSchema;
 
 import java.io.Closeable;
 import java.lang.reflect.Type;
@@ -21,6 +22,7 @@ public class InMemoryConfigStore implements ConfigStore {
     private String data = null;
     private final Deque<String> history = new ArrayDeque<>();
     private final Deque<String> audit = new ArrayDeque<>();
+    private UnknownKeyPolicy unknownKeyPolicy = UnknownKeyPolicy.PRESERVE;
     private transient Migrations.MigrationResult lastAppliedMigrationResult;
 
     public InMemoryConfigStore(Gson gson) {
@@ -30,6 +32,16 @@ public class InMemoryConfigStore implements ConfigStore {
     public InMemoryConfigStore(Gson gson, int maxHistorySize) {
         this.gson = gson;
         this.maxHistorySize = maxHistorySize;
+    }
+
+    @Override
+    public UnknownKeyPolicy unknownKeyPolicy() {
+        return unknownKeyPolicy;
+    }
+
+    @Override
+    public void unknownKeyPolicy(UnknownKeyPolicy unknownKeyPolicy) {
+        this.unknownKeyPolicy = Objects.requireNonNull(unknownKeyPolicy, "unknownKeyPolicy");
     }
 
     @Override
@@ -59,6 +71,8 @@ public class InMemoryConfigStore implements ConfigStore {
             data = gson.toJson(jsonObject);
             logMigrationResult(migrationResult);
         }
+        ConfigSchema schema = ConfigSchema.fromConfig(defaults);
+        unknownKeyPolicy.apply(jsonObject, schema);
         JsonObject defaultObject = JsonConfigDefaults.fromConfig(defaults, gson);
         JsonObject merged = JsonConfigDefaults.fillMissing(jsonObject, defaultObject);
         return gson.fromJson(merged, clazz);
@@ -68,8 +82,18 @@ public class InMemoryConfigStore implements ConfigStore {
     public CommonBaseConfig write(CommonBaseConfig config,
                                   Class<? extends CommonBaseConfig> clazz,
                                   Migrations migrations) {
-        data = gson.toJson(config);
-        return gson.fromJson(data, clazz);
+        JsonObject memory = gson.toJsonTree(config)
+                                .getAsJsonObject();
+        ConfigSchema schema = ConfigSchema.fromConfig(config);
+        if (data != null) {
+            JsonObject disk = JsonParser.parseString(data)
+                                        .getAsJsonObject();
+            unknownKeyPolicy.apply(disk, schema);
+            unknownKeyPolicy.beforeWrite(memory, disk, schema);
+        }
+        unknownKeyPolicy.apply(memory, schema);
+        data = gson.toJson(memory);
+        return gson.fromJson(memory, clazz);
     }
 
     @Override

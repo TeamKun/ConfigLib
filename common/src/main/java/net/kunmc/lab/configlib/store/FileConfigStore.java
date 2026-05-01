@@ -33,32 +33,37 @@ public class FileConfigStore implements ConfigStore {
     private final Consumer<Exception> exceptionHandler;
     private final int maxHistorySize;
     private final transient Logger logger = Logger.getLogger(FileConfigStore.class.getName());
+    private UnknownKeyPolicy unknownKeyPolicy;
     private JsonObject lastLoadedSnapshot;
     private JsonObject lastWrittenSnapshot;
     private transient Migrations.MigrationResult lastAppliedMigrationResult;
-
-    public FileConfigStore(File file, Gson gson, ConfigFormat format) {
-        this(file, gson, format, Throwable::printStackTrace, 50);
-    }
-
-    public FileConfigStore(File file, Gson gson, ConfigFormat format, Consumer<Exception> exceptionHandler) {
-        this(file, gson, format, exceptionHandler, 50);
-    }
 
     public FileConfigStore(File file,
                            Gson gson,
                            ConfigFormat format,
                            Consumer<Exception> exceptionHandler,
-                           int maxHistorySize) {
+                           int maxHistorySize,
+                           UnknownKeyPolicy unknownKeyPolicy) {
         this.file = file;
         this.gson = gson;
         this.format = format;
         this.exceptionHandler = exceptionHandler;
         this.maxHistorySize = maxHistorySize;
+        this.unknownKeyPolicy = Objects.requireNonNull(unknownKeyPolicy, "unknownKeyPolicy");
     }
 
     public File file() {
         return file;
+    }
+
+    @Override
+    public UnknownKeyPolicy unknownKeyPolicy() {
+        return unknownKeyPolicy;
+    }
+
+    @Override
+    public void unknownKeyPolicy(UnknownKeyPolicy unknownKeyPolicy) {
+        this.unknownKeyPolicy = Objects.requireNonNull(unknownKeyPolicy, "unknownKeyPolicy");
     }
 
     @Override
@@ -73,6 +78,7 @@ public class FileConfigStore implements ConfigStore {
         JsonObject jsonObject = format.parseObject(readString(file));
         int storedVersion = jsonObject.has(ConfigKeys.VERSION) ? jsonObject.get(ConfigKeys.VERSION)
                                                                            .getAsInt() : 0;
+
         Migrations.MigrationResult migrationResult;
         try {
             migrationResult = migrations.execute(storedVersion, gson, jsonObject);
@@ -88,6 +94,10 @@ public class FileConfigStore implements ConfigStore {
             writeStringAtomically(file, format.write(jsonObject, null));
             logMigrationResult(migrationResult);
         }
+
+        ConfigSchema schema = schemaFor(defaults);
+        unknownKeyPolicy.apply(jsonObject, schema);
+
         // The merge base must be the content that actually existed on disk.
         // Defaults are still applied to the returned config, but recording the filled config
         // as the base would make newly added fields look changed on disk from default to absent.
@@ -103,9 +113,11 @@ public class FileConfigStore implements ConfigStore {
                                   Migrations migrations) {
         file.getParentFile()
             .mkdirs();
+
         JsonObject memory = gson.toJsonTree(config)
                                 .getAsJsonObject();
         JsonObject merged = memory;
+        ConfigSchema schema = schemaFor(config);
         if (file.exists()) {
             JsonObject disk = format.parseObject(readString(file));
             int storedVersion = disk.has(ConfigKeys.VERSION) ? disk.get(ConfigKeys.VERSION)
@@ -115,9 +127,12 @@ public class FileConfigStore implements ConfigStore {
                 disk = migrationResult.document();
                 disk.addProperty(ConfigKeys.VERSION, migrations.latestVersion());
             }
+            unknownKeyPolicy.apply(disk, schema);
             merged = mergeWithDiskPriority(lastLoadedSnapshot, memory, disk);
+            unknownKeyPolicy.beforeWrite(merged, disk, schema);
         }
-        String content = format.write(merged, schemaFor(config));
+        unknownKeyPolicy.apply(merged, schema);
+        String content = format.write(merged, schema);
         writeStringAtomically(file, content);
         lastLoadedSnapshot = merged.deepCopy();
         lastWrittenSnapshot = merged.deepCopy();
@@ -580,4 +595,5 @@ public class FileConfigStore implements ConfigStore {
             return present ? element.hashCode() : 0;
         }
     }
+
 }
