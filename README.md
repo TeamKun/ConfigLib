@@ -44,6 +44,16 @@ You can find the latest version on
 the [CommandLib Release Page](https://github.com/Maru32768/CommandLib/releases)
 and [ConfigLib Release Page](https://github.com/Maru32768/ConfigLib/releases).
 
+ConfigLib also provides an optional annotation processor for compile-time checks of POJO annotations:
+
+```kotlin
+dependencies {
+    annotationProcessor("com.github.Maru32768.ConfigLib:processor:latest.release")
+}
+```
+
+The processor is a lint layer only. Runtime validation still runs without it.
+
 <details>
   <summary>Bukkit (Groovy DSL)</summary>
 

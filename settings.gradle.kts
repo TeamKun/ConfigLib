@@ -10,7 +10,7 @@ plugins {
 }
 
 rootProject.name = "ConfigLib"
-include("bukkit", "common", "common-java17-tests", "forge")
+include("bukkit", "common", "common-java17-tests", "forge", "processor", "processor-smoke-test")
 
 // TODO: Replace this local CommandLib composite build with released artifacts before publishing.
 includeBuild("../CommandLib") {

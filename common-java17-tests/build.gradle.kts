@@ -7,12 +7,6 @@ configure<JavaPluginExtension> {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 }
 
-// This module is test-only and must not be published.
-afterEvaluate {
-    tasks.withType<AbstractPublishToMaven>().configureEach { enabled = false }
-    tasks.withType<GenerateModuleMetadata>().configureEach { enabled = false }
-}
-
 val commandLibVersion: String by project
 
 repositories {

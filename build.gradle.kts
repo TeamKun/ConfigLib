@@ -6,10 +6,11 @@ allprojects {
     version = "0.21.0"
 }
 
+val publishedProjects = setOf("common", "bukkit", "forge", "processor")
+
 subprojects {
     apply(plugin = "java")
     apply(plugin = "java-library")
-    apply(plugin = "maven-publish")
     apply(plugin = "idea")
 
     configure<JavaPluginExtension> {
@@ -28,13 +29,17 @@ subprojects {
         options.encoding = "UTF-8"
     }
 
-    configure<PublishingExtension> {
-        publications {
-            create<MavenPublication>("maven") {
-                groupId = "net.kunmc.lab"
-                artifactId = project.name
-                version = project.version.toString()
-                from(components["java"])
+    if (project.name in publishedProjects) {
+        apply(plugin = "maven-publish")
+
+        configure<PublishingExtension> {
+            publications {
+                create<MavenPublication>("maven") {
+                    groupId = "net.kunmc.lab"
+                    artifactId = project.name
+                    version = project.version.toString()
+                    from(components["java"])
+                }
             }
         }
     }
