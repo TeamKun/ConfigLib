@@ -2,7 +2,6 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
-import net.kunmc.lab.configlib.command.MapValuePutCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.store.ChangeTrace;
@@ -66,11 +65,11 @@ class ModifyMapPutCommand extends Command {
                                                               masked,
                                                               masked));
                     } else {
-                        ctx.sendSuccess(value.succeedMessageForPut(new MapValuePutCommandMessageParameter<>(schemaEntry.entryName(),
-                                                                                                            ctx,
-                                                                                                            k,
-                                                                                                            v,
-                                                                                                            descriptions)));
+                        ctx.sendSuccess(descriptions.describe(ctx,
+                                                              ConfigCommandDescriptions.Key.MAP_PUT_SUCCESS,
+                                                              schemaEntry.entryName(),
+                                                              value.keyToString(k),
+                                                              value.valueToString(v)));
                     }
                 });
             }).description(ConfigCommandDescriptions.put(descriptions, schemaEntry.entryName()));

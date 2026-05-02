@@ -4,7 +4,6 @@ import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.CommandContext;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
 import net.kunmc.lab.commandlib.util.ChatColorUtil;
-import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.schema.DisplayContext;
@@ -103,10 +102,10 @@ class ConfigFieldCommand extends Command {
                                                                                               schemaEntry,
                                                                                               maskedRevealPolicy)));
                            } else {
-                               ctx.sendSuccess(value.succeedModifyMessage(new SingleValueModifyCommandMessageParameter(
-                                       schemaEntry.entryName(),
-                                       ctx,
-                                       descriptions)));
+                               ctx.sendSuccess(descriptions.describe(ctx,
+                                                                     ConfigCommandDescriptions.Key.SINGLE_VALUE_MODIFY_SUCCESS,
+                                                                     schemaEntry.entryName(),
+                                                                     value.valueToString(value.value())));
                            }
                        });
                    })

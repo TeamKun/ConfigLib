@@ -2,7 +2,6 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
-import net.kunmc.lab.configlib.command.CollectionValueRemoveCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.store.ChangeTrace;
@@ -61,11 +60,11 @@ class ModifyRemoveCommand extends Command {
                                                                                        schemaEntry,
                                                                                        maskedRevealPolicy)));
                     } else {
-                        ctx.sendSuccess(value.succeedMessageForRemove(new CollectionValueRemoveCommandMessageParameter<>(
-                                schemaEntry.entryName(),
-                                ctx,
-                                removeValue,
-                                descriptions)));
+                        ctx.sendSuccess(descriptions.describe(ctx,
+                                                              ConfigCommandDescriptions.Key.COLLECTION_REMOVE_SUCCESS,
+                                                              schemaEntry.entryName(),
+                                                              value.elementToString(removeValue.iterator()
+                                                                                               .next())));
                     }
                 });
             }).description(ConfigCommandDescriptions.remove(descriptions, schemaEntry.entryName()));

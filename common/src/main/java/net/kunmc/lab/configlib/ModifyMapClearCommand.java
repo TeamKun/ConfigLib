@@ -1,7 +1,6 @@
 package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
-import net.kunmc.lab.configlib.command.MapValueClearCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.store.ChangeTrace;
@@ -37,9 +36,9 @@ class ModifyMapClearCommand extends Command {
                 return;
             }
 
-            ctx.sendSuccess(value.succeedMessageForClear(new MapValueClearCommandMessageParameter(schemaEntry.entryName(),
-                                                                                                  ctx,
-                                                                                                  descriptions)));
+            ctx.sendSuccess(descriptions.describe(ctx,
+                                                  ConfigCommandDescriptions.Key.MAP_CLEAR_SUCCESS,
+                                                  schemaEntry.entryName()));
         });
     }
 }

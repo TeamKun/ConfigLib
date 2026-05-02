@@ -144,7 +144,6 @@ public final class MyConfig extends BaseConfig {
 |----------------------------|-----------------------------------------------------|
 | `disableModify()`          | Make read-only via command (still writable by file) |
 | `onSet(Consumer<E>)`       | Fires only on command set, not file reload          |
-| `successMessage(Function)` | Custom success message after command set            |
 
 **`CollectionValue` extras:**
 
@@ -159,6 +158,10 @@ public final class MyConfig extends BaseConfig {
 
 **`MapValue` extras** — same pattern with `disablePut()` / `disableRemove()` / `disableClear()` / `onPut` / `onRemove` /
 `onClear`.
+
+Customize generated command text, including operation success messages, with
+`ConfigCommandBuilder#descriptionProvider(...)`. For field-specific wording, branch on the message key and the named
+`entry` argument in the provider.
 
 ## Reading values
 

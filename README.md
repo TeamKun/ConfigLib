@@ -370,9 +370,13 @@ public final class TestConfig extends BaseConfig {
 | `onModify(Consumer<E>)`            | Stable | Run after accepted file reload, command mutation, or programmatic mutation                                |
 | `onModify(listener, true)`         | Stable | Same as `onModify`, and also run after initialization                                                     |
 
-`SingleValue` also keeps `disableModify()`, `onSet(...)`, and `successMessage(...)` as command-specific APIs.
-`CollectionValue` keeps `disableAdd/remove/clear`, `onAdd/remove/clear`, and `successMessageForAdd/remove/clear`.
-`MapValue` keeps `disablePut/remove/clear`, `onPut/remove/clear`, and `successMessageForPut/remove/clear`.
+`SingleValue` also keeps `disableModify()` and `onSet(...)` as command-specific APIs.
+`CollectionValue` keeps `disableAdd/remove/clear` and `onAdd/remove/clear`.
+`MapValue` keeps `disablePut/remove/clear` and `onPut/remove/clear`.
+
+Customize generated command text, including operation success messages, with
+`ConfigCommandBuilder#descriptionProvider(...)`. If one field needs special wording, branch on the message key and
+the named `entry` argument in the provider.
 
 </details>
 

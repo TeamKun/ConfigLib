@@ -119,12 +119,14 @@ class ConfigCommandMessageSnapshotTest {
     }
 
     @Test
-    void customSuccessMessagesMatchSnapshot() {
+    void customSuccessMessagesCanBeProvidedByDescriptionProvider() {
         CustomSuccessMessageSnapshotConfig cfg = initConfig(new CustomSuccessMessageSnapshotConfig());
         config = cfg;
         FakeSender sender = FakeSender.console();
 
-        try (CommandTester tester = new CommandTester(new ConfigCommandBuilder(cfg).build(), "configlib.test")) {
+        try (CommandTester tester = new CommandTester(new ConfigCommandBuilder(cfg).descriptionProvider(
+                                                                                           customSuccessMessages())
+                                                                                   .build(), "configlib.test")) {
             tester.execute("config count 25", sender);
 
             tester.execute("config names add alex", sender);
@@ -267,26 +269,47 @@ class ConfigCommandMessageSnapshotTest {
     }
 
     static class CustomSuccessMessageSnapshotConfig extends CommonBaseConfig {
-        final IntegerValue count = new IntegerValue(10, 0, 100).successMessage(p -> "custom " + p.entryName());
+        final IntegerValue count = new IntegerValue(10, 0, 100);
         final StringListValue names = new StringListValue().addAllowableString("alex")
-                                                           .addAllowableString("steve")
-                                                           .successMessageForAdd(p -> "custom add " + p.entryName() + "=" + p.added())
-                                                           .successMessageForRemove(p -> "custom remove " + p.entryName() + "=" + p.removed())
-                                                           .successMessageForClear(p -> "custom clear " + p.entryName());
+                                                           .addAllowableString("steve");
         final String2IntegerMapValue scores = new String2IntegerMapValue(new LinkedHashMap<>()).addAllowableKeyString(
                                                                                                        "alice")
                                                                                                .addAllowableKeyString(
-                                                                                                       "bob")
-                                                                                               .successMessageForPut(p -> "custom put " + p.entryName() + "=" + p.key() + ":" + p.value())
-                                                                                               .successMessageForRemove(
-                                                                                                       p -> "custom map remove " + p.entryName() + "=" + p.key() + ":" + p.value())
-                                                                                               .successMessageForClear(p -> "custom map clear " + p.entryName());
+                                                                                                       "bob");
         final transient InMemoryConfigStore store = new InMemoryConfigStore(new Gson());
 
         @Override
         protected ConfigStore createConfigStore() {
             return store;
         }
+    }
+
+    private ConfigCommandDescriptions.Provider customSuccessMessages() {
+        ConfigCommandDescriptions.Provider fallback = ConfigCommandDescriptions.defaultProvider();
+        return (ctx, key, args) -> {
+            switch (key) {
+                case SINGLE_VALUE_MODIFY_SUCCESS:
+                    if ("count".equals(args.get("entry"))) {
+                        return "custom " + args.get("entry");
+                    }
+                    break;
+                case COLLECTION_ADD_SUCCESS:
+                    return "custom add " + args.get("entry") + "=[" + args.get("value") + "]";
+                case COLLECTION_REMOVE_SUCCESS:
+                    return "custom remove " + args.get("entry") + "=[" + args.get("value") + "]";
+                case COLLECTION_CLEAR_SUCCESS:
+                    return "custom clear " + args.get("entry");
+                case MAP_PUT_SUCCESS:
+                    return "custom put " + args.get("entry") + "=" + args.get("key") + ":" + args.get("value");
+                case MAP_REMOVE_SUCCESS:
+                    return "custom map remove " + args.get("entry") + "=" + args.get("key") + ":" + args.get("value");
+                case MAP_CLEAR_SUCCESS:
+                    return "custom map clear " + args.get("entry");
+                default:
+                    break;
+            }
+            return fallback.describe(ctx, key, args);
+        };
     }
 
     static class ListenerValidatedSnapshotConfig extends ValidatedSnapshotConfig {

@@ -1,6 +1,5 @@
 package net.kunmc.lab.configlib;
 
-import net.kunmc.lab.configlib.command.SingleValueModifyCommandMessageParameter;
 import net.kunmc.lab.configlib.util.function.ArgumentApplier;
 import net.kunmc.lab.configlib.util.function.ArgumentMapper;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +14,6 @@ import java.util.function.Supplier;
 public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<E, T> {
     private transient final List<Consumer<E>> modifyCommandListeners = new ArrayList<>();
     private transient boolean modifyEnabled = true;
-    private transient Function<SingleValueModifyCommandMessageParameter, String> successMessage;
 
     public SingleValue(E value) {
         super(value);
@@ -93,27 +91,6 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
 
     final void dispatchModifyCommand(E newValue) {
         modifyCommandListeners.forEach(x -> x.accept(newValue));
-    }
-
-    /**
-     * Sets a custom success message shown after the value is modified via command.
-     *
-     * <pre>{@code
-     * new IntegerValue(10).successMessage(p -> p.entryName() + " set to " + value())
-     * }</pre>
-     */
-    public final T successMessage(Function<SingleValueModifyCommandMessageParameter, String> successMessage) {
-        this.successMessage = successMessage;
-        return (T) this;
-    }
-
-    protected String succeedModifyMessage(SingleValueModifyCommandMessageParameter param) {
-        if (successMessage != null) {
-            return successMessage.apply(param);
-        }
-        return param.describe(ConfigCommandDescriptions.Key.SINGLE_VALUE_MODIFY_SUCCESS,
-                              param.entryName(),
-                              valueToString(value()));
     }
 
     @Override

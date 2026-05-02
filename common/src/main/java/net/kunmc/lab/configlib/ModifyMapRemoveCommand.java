@@ -2,7 +2,6 @@ package net.kunmc.lab.configlib;
 
 import net.kunmc.lab.commandlib.Command;
 import net.kunmc.lab.commandlib.exception.ArgumentValidationException;
-import net.kunmc.lab.configlib.command.MapValueRemoveCommandMessageParameter;
 import net.kunmc.lab.configlib.exception.ConfigValidationException;
 import net.kunmc.lab.configlib.schema.ConfigSchemaEntry;
 import net.kunmc.lab.configlib.store.ChangeTrace;
@@ -63,12 +62,11 @@ class ModifyMapRemoveCommand extends Command {
                                                               masked,
                                                               masked));
                     } else {
-                        ctx.sendSuccess(value.succeedMessageForRemove(new MapValueRemoveCommandMessageParameter<>(
-                                schemaEntry.entryName(),
-                                ctx,
-                                k,
-                                v,
-                                descriptions)));
+                        ctx.sendSuccess(descriptions.describe(ctx,
+                                                              ConfigCommandDescriptions.Key.MAP_REMOVE_SUCCESS,
+                                                              schemaEntry.entryName(),
+                                                              value.keyToString(k),
+                                                              value.valueToString(v)));
                     }
                 });
             }).description(ConfigCommandDescriptions.removeMap(descriptions, schemaEntry.entryName()));
