@@ -14,7 +14,7 @@ developers.
    Choose the style that fits your needs:
     - **Value API** — wrap each field in a typed `Value` object for full control over commands, validation,
       tab-completion, and display.
-    - **POJO API** — declare plain Java fields (including `final`/immutable classes and Java 16+ `record`s) and annotate
+    - **POJO API** — declare plain Java fields, nested immutable classes, and nested Java 16+ `record`s, then annotate
       with `@Description`, `@Range`, `@ConfigNullable`. Nested POJOs are expanded automatically.
 3. **YAML and JSON Storage**  
    YAML is the default format for Bukkit and Forge. `description()` and `@Description` annotations are written as YAML
@@ -299,6 +299,8 @@ public final class PluginConfig extends BaseConfig {
 
 Nesting is supported to any depth. Records can be nested inside records; immutable classes can be nested inside
 immutable classes. For records, annotations are written on record components and are handled like POJO field metadata.
+Top-level custom object fields are treated as opaque leaf values rather than expanded POJO sections. Use nested static
+classes or nested records for structured POJO config sections.
 
 **Available annotations:**
 
@@ -311,7 +313,8 @@ immutable classes. For records, annotations are written on record components and
 **Generated commands for POJO fields:**
 
 - All POJO fields are listed and can be read with `/config <field>`.
-- Mutable `String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equivalents support set commands:
+- Mutable `String`, `boolean`, `int`, `long`, `float`, `double`, `enum`, and boxed equivalents support scalar set
+  commands:
   `/config <field> <value>` and `/config <field> set <value>`.
 - Any schema entry, including mutable POJO scalar fields and nested POJO leaves such as `arena.maxArenas`, also
   supports `/config <field> reset`.
@@ -320,6 +323,8 @@ immutable classes. For records, annotations are written on record components and
   commands. Nested POJO, immutable class, and record leaf fields are still modifiable when their leaf type is supported.
 - POJO fields do not generate per-field `inc`, `dec`, `add`, `remove`, `clear`, or `put` commands. Use the Value API
   when those operations, custom tab-completion, custom command parsing, or command listeners are needed.
+- The POJO scalar command type set is fixed in v1.0. For custom scalar parsing, Minecraft-specific types, or additional
+  command behavior, define a custom `Value` type instead of extending POJO scalar support.
 
 Value API and POJO fields can be mixed freely in the same config class.
 
@@ -710,7 +715,8 @@ For POJO fields, nested entries use dotted paths such as `arena.maxArenas`.
 
 **POJO field — set**
 
-Mutable `String`, `boolean`, `int`, `float`, `double`, `enum`, and boxed equivalents support set commands.
+Mutable `String`, `boolean`, `int`, `long`, `float`, `double`, `enum`, and boxed equivalents support scalar set
+commands.
 Collection, map, object-valued leaf fields, and top-level `final` POJO fields are get-only. Nested POJO, immutable
 class, and record leaf fields are still modifiable when their leaf type is supported.
 
