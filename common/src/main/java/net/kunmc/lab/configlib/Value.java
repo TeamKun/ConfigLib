@@ -36,9 +36,11 @@ public abstract class Value<E, T extends Value<E, T>> {
     private transient Function<E, String> displayFormatter;
     private transient String entryName;
     private transient ExecutionCondition executableIf;
+    private boolean nullable;
 
     public Value(E value) {
         this.value = value;
+        this.nullable = value == null;
     }
 
     /**
@@ -105,6 +107,28 @@ public abstract class Value<E, T extends Value<E, T>> {
     public final T displayFormatter(Function<@Nullable E, String> formatter) {
         this.displayFormatter = formatter;
         return (T) this;
+    }
+
+    /**
+     * Allows this value to be {@code null}.
+     * <p>
+     * Values are non-null by default. Passing {@code null} to the constructor also
+     * marks the value as nullable, so this method is mainly for values with a
+     * non-null default that should still accept {@code null} from files or custom
+     * code.
+     * </p>
+     */
+    @SuppressWarnings("unchecked")
+    public final T nullable() {
+        this.nullable = true;
+        return (T) this;
+    }
+
+    /**
+     * Returns whether this value accepts {@code null}.
+     */
+    public final boolean isNullable() {
+        return nullable;
     }
 
     final int valueHashCode() {
@@ -182,6 +206,14 @@ public abstract class Value<E, T extends Value<E, T>> {
     }
 
     public final void validate(E value) throws InvalidValueException {
+        if (value == null) {
+            if (nullable) {
+                return;
+            }
+            throw new InvalidValueException(ctx -> ctx.sendFailure(ConfigCommandDescriptions.describe(ctx,
+                                                                                                      ConfigCommandDescriptions.Key.VALUE_NOT_NULL)),
+                                            "Value must not be null.");
+        }
         validator.validate(value);
     }
 

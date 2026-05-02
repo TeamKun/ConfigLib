@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
@@ -126,6 +127,33 @@ class ConfigSchemaTest {
         assertTrue(entry.isPresent());
         @SuppressWarnings("unchecked") ConfigSchemaEntry<Integer> typed = (ConfigSchemaEntry<Integer>) entry.get();
         assertDoesNotThrow(() -> typed.validate(10));
+    }
+
+    @Test
+    void valueRejectsNullByDefaultBeforeCustomValidators() {
+        AtomicBoolean validatorCalled = new AtomicBoolean(false);
+        StringValue value = new StringValue("default").addValidator(v -> validatorCalled.set(true));
+
+        InvalidValueException ex = assertThrows(InvalidValueException.class, () -> value.validate(null));
+
+        assertEquals("Value must not be null.", ex.getMessage());
+        assertFalse(validatorCalled.get());
+    }
+
+    @Test
+    void valueNullableAllowsNullForNonNullDefault() {
+        StringValue value = new StringValue("default").nullable();
+
+        assertTrue(value.isNullable());
+        assertDoesNotThrow(() -> value.validate(null));
+    }
+
+    @Test
+    void valueConstructedWithNullIsNullable() {
+        StringValue value = new StringValue(null);
+
+        assertTrue(value.isNullable());
+        assertDoesNotThrow(() -> value.validate(null));
     }
 
     @Test
@@ -287,12 +315,34 @@ class ConfigSchemaTest {
     }
 
     @Test
-    void loadPassesNullValueToValueValidator() {
+    void loadRejectsNullValueFieldByDefault() {
         ValueNullConfig cfg = new ValueNullConfig();
         cfg.init(new CommonBaseConfig.Option());
         cfg.store.writeRaw("{\"label\":{\"value\":null},\"_version_\":0}");
 
         assertThrows(ConfigValidationException.class, cfg::loadConfig);
+    }
+
+    @Test
+    void loadAllowsNullValueFieldWhenNullable() {
+        NullableValueConfig cfg = new NullableValueConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        cfg.store.writeRaw("{\"label\":{\"value\":null},\"_version_\":0}");
+
+        cfg.loadConfig();
+
+        assertNull(cfg.label.value());
+    }
+
+    @Test
+    void loadAllowsNullValueFieldWhenDefaultIsNull() {
+        NullDefaultValueConfig cfg = new NullDefaultValueConfig();
+        cfg.init(new CommonBaseConfig.Option());
+        cfg.store.writeRaw("{\"label\":{\"value\":null},\"_version_\":0}");
+
+        cfg.loadConfig();
+
+        assertNull(cfg.label.value());
     }
 
     @Test
@@ -483,6 +533,26 @@ class ConfigSchemaTest {
                 throw new InvalidValueException("label must not be null");
             }
         });
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return store;
+        }
+    }
+
+    static final class NullableValueConfig extends CommonBaseConfig {
+        final transient InMemoryConfigStore store = new InMemoryConfigStore(new Gson());
+        public final StringValue label = new StringValue("default").nullable();
+
+        @Override
+        protected ConfigStore createConfigStore() {
+            return store;
+        }
+    }
+
+    static final class NullDefaultValueConfig extends CommonBaseConfig {
+        final transient InMemoryConfigStore store = new InMemoryConfigStore(new Gson());
+        public final StringValue label = new StringValue(null);
 
         @Override
         protected ConfigStore createConfigStore() {

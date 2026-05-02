@@ -153,6 +153,7 @@ public final class ConfigCommandDescriptions {
         descriptions.put(Key.MAP_CLEAR_SUCCESS, "{entry} was cleared.");
         descriptions.put(Key.VALIDATION_FAILED, "Validation failed for {path} (value: {value}).");
         descriptions.put(Key.INVALID_VALUE, "Invalid value.");
+        descriptions.put(Key.VALUE_NOT_NULL, "Value must not be null.");
         descriptions.put(Key.NUMERIC_RANGE, "Enter a value between {min} and {max}.");
         descriptions.put(Key.POJO_NOT_NULL, "{field} must not be null.");
         descriptions.put(Key.POJO_RANGE_NON_NUMERIC, "@Range can only be used on numeric fields: {field}.");
@@ -231,6 +232,7 @@ public final class ConfigCommandDescriptions {
         descriptions.put(Key.MAP_CLEAR_SUCCESS, "{entry} をクリアしました。");
         descriptions.put(Key.VALIDATION_FAILED, "{path} の検証に失敗しました (value: {value})。");
         descriptions.put(Key.INVALID_VALUE, "不正な値です。");
+        descriptions.put(Key.VALUE_NOT_NULL, "値をnullにできません。");
         descriptions.put(Key.NUMERIC_RANGE, "{min}以上{max}以下の値を入力してください。");
         descriptions.put(Key.POJO_NOT_NULL, "{field} はnullにできません。");
         descriptions.put(Key.POJO_RANGE_NON_NUMERIC, "@Range は数値フィールドにのみ使用できます: {field}。");
@@ -649,6 +651,7 @@ public final class ConfigCommandDescriptions {
         MAP_CLEAR_SUCCESS,
         VALIDATION_FAILED,
         INVALID_VALUE,
+        VALUE_NOT_NULL,
         NUMERIC_RANGE,
         POJO_NOT_NULL,
         POJO_RANGE_NON_NUMERIC,

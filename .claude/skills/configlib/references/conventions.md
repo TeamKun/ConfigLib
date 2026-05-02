@@ -134,16 +134,17 @@ public final class MyConfig extends BaseConfig {
 | `onModify(listener, true)`         | Also fires on initialize                                                                                                 |
 | `addValidator(Validator<E>)`       | Validates on command modify and file load; throw `InvalidValueException` to reject                                       |
 | `displayFormatter(Function)`       | Custom display string for list/get/history/diff/audit command output                                                     |
+| `nullable()`                       | Allow `null`; values are non-null by default unless constructed with a `null` default                                    |
 | `entryName(String)`                | Override the field name used in commands                                                                                 |
 | `executableIf(ExecutionCondition)` | Guard command execution; throw `CommandPrerequisiteException` to block                                                   |
 
 **`SingleValue` extras:**
 
-| Method                         | Purpose                                             |
-|--------------------------------|-----------------------------------------------------|
-| `disableModify()`              | Make read-only via command (still writable by file) |
-| `onSet(Consumer<E>)`           | Fires only on command set, not file reload          |
-| `successMessage(Function)`     | Custom success message after command set            |
+| Method                     | Purpose                                             |
+|----------------------------|-----------------------------------------------------|
+| `disableModify()`          | Make read-only via command (still writable by file) |
+| `onSet(Consumer<E>)`       | Fires only on command set, not file reload          |
+| `successMessage(Function)` | Custom success message after command set            |
 
 **`CollectionValue` extras:**
 
@@ -266,7 +267,8 @@ When a config class gains a new field, existing config files usually do not cont
 field's Java-side default value for missing keys during load, so adding a field does not require a migration by itself.
 
 This only applies to missing keys. If a config file explicitly contains `null`, the loaded `null` is validated normally:
-POJO fields require `@ConfigNullable`, and `Value` fields must accept `null` in their validators.
+POJO fields require `@ConfigNullable`. Value fields are non-null by default; call `.nullable()` or construct the value
+with a `null` default to allow `null`.
 
 Use a migration when an existing key must be renamed, moved, removed, converted to another type, or changed to a
 different value based on old file contents.

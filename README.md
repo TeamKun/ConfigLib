@@ -357,11 +357,12 @@ public final class TestConfig extends BaseConfig {
 
 `Value` API public surface for v1.0:
 
-| Method                             | Status | Purpose                                                                                                  |
-|------------------------------------|--------|----------------------------------------------------------------------------------------------------------|
+| Method                             | Status | Purpose                                                                                                   |
+|------------------------------------|--------|-----------------------------------------------------------------------------------------------------------|
 | `description(String)`              | Stable | User-facing description for generated commands and YAML comments                                          |
 | `entryName(String)`                | Stable | Override the Java field name used in schema paths and generated commands                                  |
-| `displayFormatter(Function)`       | Stable | Custom display string for list/get/history/diff/audit command output                                     |
+| `displayFormatter(Function)`       | Stable | Custom display string for list/get/history/diff/audit command output                                      |
+| `nullable()`                       | Stable | Allow `null`; values are non-null by default unless constructed with a `null` default                     |
 | `addValidator(Validator<E>)`       | Stable | Validate file load, command mutation, and accepted programmatic changes through the schema pipeline       |
 | `executableIf(ExecutionCondition)` | Stable | Guard generated per-field command execution; throw `CommandPrerequisiteException` to block with a message |
 | `executableIf(Predicate)`          | Stable | Boolean command guard with ConfigLib's default denial message                                             |
@@ -622,7 +623,8 @@ When a config class gains a new field, existing config files usually do not cont
 field's Java-side default value for missing keys during load, so adding a field does not require a migration by itself.
 
 This only applies to missing keys. If a config file explicitly contains `null`, the loaded `null` is validated normally:
-POJO fields require `@ConfigNullable`, and `Value` fields must accept `null` in their validators.
+POJO fields require `@ConfigNullable`. Value fields are non-null by default; call `.nullable()` or construct the value
+with a `null` default to allow `null`.
 
 Use a migration when an existing key must be renamed, moved, removed, converted to another type, or changed to a
 different value based on old file contents.
