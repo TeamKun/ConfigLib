@@ -83,9 +83,10 @@ public abstract class SingleValue<E, T extends SingleValue<E, T>> extends Value<
     protected abstract <A extends ArgumentApplier & ArgumentMapper<E>> List<A> argumentDefinitions();
 
     /**
-     * Add a listener fired on modify command.
+     * Adds a listener fired only after this value is set by a generated command.
+     * File reloads and programmatic changes do not trigger this command-specific listener.
      */
-    public final T onModifyCommand(Consumer<E> listener) {
+    public final T onSet(Consumer<E> listener) {
         modifyCommandListeners.add(listener);
         return ((T) this);
     }

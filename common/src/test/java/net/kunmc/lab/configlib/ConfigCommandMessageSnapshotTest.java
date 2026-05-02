@@ -299,7 +299,7 @@ class ConfigCommandMessageSnapshotTest {
         final transient AtomicInteger mapClearCount = new AtomicInteger();
 
         ListenerValidatedSnapshotConfig() {
-            count.onModifyCommand(v -> singleModifyCount.incrementAndGet());
+            count.onSet(v -> singleModifyCount.incrementAndGet());
             names.onAdd(v -> collectionAddCount.incrementAndGet())
                  .onRemove(v -> collectionRemoveCount.incrementAndGet())
                  .onClear(collectionClearCount::incrementAndGet);

@@ -39,7 +39,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
     protected abstract List<ArgumentDefinition<T>> argumentDefinitionsForAdd();
 
     /**
-     * Add a listener fired on add command.
+     * Adds a listener fired only after an element is added by a generated command.
      */
     public final U onAdd(Consumer<T> listener) {
         addListeners.add(listener);
@@ -80,7 +80,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
     protected abstract List<ArgumentDefinition<T>> argumentDefinitionsForRemove();
 
     /**
-     * Add a listener fired on remove command.
+     * Adds a listener fired only after an element is removed by a generated command.
      */
     public final U onRemove(Consumer<T> listener) {
         removeListeners.add(listener);
@@ -119,7 +119,7 @@ public abstract class CollectionValue<T extends Collection<E>, E, U extends Coll
     }
 
     /**
-     * Add a listener fired on clear command.
+     * Adds a listener fired only after this collection is cleared by a generated command.
      */
     public final U onClear(Runnable listener) {
         clearListeners.add(listener);

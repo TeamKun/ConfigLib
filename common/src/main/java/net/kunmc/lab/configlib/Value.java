@@ -13,6 +13,17 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * Base class for ConfigLib's typed Value API.
+ * <p>
+ * Value fields are the public API for configs that need command-aware behavior
+ * such as custom parsing, display formatting, validation, execution guards, or
+ * listeners. Metadata is configured with fluent methods on the value instance.
+ * </p>
+ *
+ * @param <E> wrapped value type
+ * @param <T> concrete fluent return type
+ */
 public abstract class Value<E, T extends Value<E, T>> {
     private transient final List<Consumer<E>> initializeListeners = new ArrayList<>();
     private transient final List<Consumer<E>> modifyListeners = new ArrayList<>();
@@ -30,10 +41,21 @@ public abstract class Value<E, T extends Value<E, T>> {
         this.value = value;
     }
 
+    /**
+     * Returns the current raw value.
+     */
     public E value() {
         return value;
     }
 
+    /**
+     * Replaces the current raw value.
+     * <p>
+     * Prefer {@link CommonBaseConfig#mutate(Runnable)} when changing values from
+     * plugin code so ConfigLib can validate, save, record history, and dispatch
+     * config-level change listeners as one accepted change.
+     * </p>
+     */
     public void value(E value) {
         this.value = value;
     }
@@ -47,6 +69,12 @@ public abstract class Value<E, T extends Value<E, T>> {
         return description;
     }
 
+    /**
+     * Sets the user-facing description for this value.
+     * <p>
+     * The description is used by generated commands and YAML comment generation.
+     * </p>
+     */
     @SuppressWarnings("unchecked")
     public final T description(String description) {
         this.description = description;
@@ -54,8 +82,8 @@ public abstract class Value<E, T extends Value<E, T>> {
     }
 
     /**
-     * Sets a custom entry name used when registering this value's command.
-     * By default, the field name is used.
+     * Sets a custom entry name used for this value in schema entries and generated commands.
+     * By default, the Java field name is used.
      */
     @SuppressWarnings("unchecked")
     public final T entryName(String entryName) {
@@ -65,8 +93,9 @@ public abstract class Value<E, T extends Value<E, T>> {
 
     /**
      * Sets a custom formatter for converting this value to a display string.
-     * The formatter takes precedence over the default {@link #defaultDisplayString(Object)} implementation
-     * and is used wherever the value is displayed as text (e.g. list and get commands).
+     * The formatter takes precedence over the default {@link #defaultDisplayString(Object)}
+     * implementation and is used wherever the value is displayed as text, including list,
+     * get, history, diff, and audit command output.
      *
      * <pre>{@code
      * new IntegerValue(10).displayFormatter(n -> n + " items")
@@ -86,8 +115,8 @@ public abstract class Value<E, T extends Value<E, T>> {
     }
 
     /**
-     * Adds a listener that will be triggered after the value has been initialized.
-     * If initialization has already been completed, the listener will be immediately triggered.
+     * Adds a listener that is triggered after the value has been initialized.
+     * If initialization has already completed, the listener is triggered immediately.
      */
     @SuppressWarnings("unchecked")
     public final T onInitialize(Consumer<E> listener) {
@@ -107,15 +136,20 @@ public abstract class Value<E, T extends Value<E, T>> {
     }
 
     /**
-     * Adds a listener triggered on value modified.
+     * Adds a listener triggered after this value is modified and accepted.
+     * <p>
+     * This listener is used for command changes, file reloads, and programmatic changes
+     * that pass validation and are accepted by modification detection.
+     * </p>
      */
     public final T onModify(Consumer<E> listener) {
         return onModify(listener, false);
     }
 
     /**
-     * Adds a listener triggered on value modified.
-     * If triggeredOnInitialize is true, The listener also will be triggered after the value has been initialized.
+     * Adds a listener triggered after this value is modified and accepted.
+     * If {@code triggeredOnInitialize} is true, the listener is also triggered after
+     * the value has been initialized.
      *
      * @see Value#onInitialize(Consumer)
      */
@@ -134,8 +168,12 @@ public abstract class Value<E, T extends Value<E, T>> {
     }
 
     /**
-     * Validates values on executing modify command and loading config.<br>
-     * Throwing {@link net.kunmc.lab.configlib.exception.InvalidValueException}, you can customize the error message.
+     * Adds validation to this value.
+     * <p>
+     * Validators run through the schema validation pipeline for file load, command
+     * mutation, and accepted programmatic changes. Throw {@link InvalidValueException}
+     * to reject the value with a custom message.
+     * </p>
      */
     @SuppressWarnings("unchecked")
     public final T addValidator(Validator<E> validator) {
@@ -147,6 +185,12 @@ public abstract class Value<E, T extends Value<E, T>> {
         validator.validate(value);
     }
 
+    /**
+     * Resolves the schema and command entry name for this value.
+     *
+     * @param fieldName Java field name to use when no override was set
+     * @return the configured entry name or {@code fieldName}
+     */
     public final String resolveEntryName(String fieldName) {
         if (entryName != null) {
             return entryName;

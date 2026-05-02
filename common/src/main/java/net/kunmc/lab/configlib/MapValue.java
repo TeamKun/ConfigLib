@@ -44,7 +44,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
     protected abstract List<PutArgumentDefinition<K, V>> argumentDefinitionsForPut();
 
     /**
-     * Add a listener fired on put command.
+     * Adds a listener fired only after an entry is put by a generated command.
      */
     public final T onPut(BiConsumer<K, V> listener) {
         putListeners.add(listener);
@@ -85,7 +85,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
     protected abstract List<ArgumentDefinition<K>> argumentDefinitionsForRemove();
 
     /**
-     * Add a listener fired on remove command.
+     * Adds a listener fired only after an entry is removed by a generated command.
      */
     public final T onRemove(BiConsumer<K, V> listener) {
         removeListeners.add(listener);
@@ -124,7 +124,7 @@ public abstract class MapValue<K, V, T extends MapValue<K, V, T>> extends Value<
     }
 
     /**
-     * Add a listener fired on clear command.
+     * Adds a listener fired only after this map is cleared by a generated command.
      */
     public final T onClear(Runnable listener) {
         clearListeners.add(listener);

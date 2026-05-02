@@ -112,7 +112,7 @@ public final class MyConfig extends BaseConfig {
                                                                                         "Must be even");
                                                                             }
                                                                         })
-                                                                        .formatter(v -> v + " blocks")
+                                                                        .displayFormatter(v -> v + " blocks")
                                                                         .executableIf(ctx -> ctx.getSender()
                                                                                                 .hasPermission(
                                                                                                         "myplugin.admin"));
@@ -133,7 +133,7 @@ public final class MyConfig extends BaseConfig {
 | `onModify(Consumer<E>)`            | Fires on any change: file reload, command modify, or programmatic `value(E)` setter (timer-detected, up to ~100ms delay) |
 | `onModify(listener, true)`         | Also fires on initialize                                                                                                 |
 | `addValidator(Validator<E>)`       | Validates on command modify and file load; throw `InvalidValueException` to reject                                       |
-| `formatter(Function<E, String>)`   | Custom display string for list/get                                                                                       |
+| `displayFormatter(Function)`       | Custom display string for list/get/history/diff/audit command output                                                     |
 | `entryName(String)`                | Override the field name used in commands                                                                                 |
 | `executableIf(ExecutionCondition)` | Guard command execution; throw `CommandPrerequisiteException` to block                                                   |
 
@@ -142,8 +142,8 @@ public final class MyConfig extends BaseConfig {
 | Method                         | Purpose                                             |
 |--------------------------------|-----------------------------------------------------|
 | `disableModify()`              | Make read-only via command (still writable by file) |
-| `onModifyCommand(Consumer<E>)` | Fires only on command modify, not file reload       |
-| `successMessage(Function)`     | Custom success message after command modify         |
+| `onSet(Consumer<E>)`           | Fires only on command set, not file reload          |
+| `successMessage(Function)`     | Custom success message after command set            |
 
 **`CollectionValue` extras:**
 

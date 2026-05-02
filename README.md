@@ -328,10 +328,25 @@ Value API and POJO fields can be mixed freely in the same config class.
 <details>
 <summary>Defining Configuration Classes (Value API)</summary>
 
+Use the Value API when a config field needs command-aware behavior: custom command parsing, tab completion, display
+formatting, validation, execution guards, listeners, arithmetic commands, collection commands, or map commands.
+
 ```java
 public final class TestConfig extends BaseConfig {
-    public final IntegerValue integerValue = new IntegerValue(10);
-    public final StringValue stringValue = new StringValue("testValue");
+    public final IntegerValue maxPlayers = new IntegerValue(20, 1, 100).description("Maximum players per arena.")
+                                                                       .entryName("maxPlayers")
+                                                                       .displayFormatter(v -> v + " players")
+                                                                       .addValidator(v -> {
+                                                                           if (v % 2 != 0) {
+                                                                               throw new InvalidValueException(
+                                                                                       "maxPlayers must be even.");
+                                                                           }
+                                                                       })
+                                                                       .executableIf(ctx -> ctx.getSender()
+                                                                                               .hasPermission(
+                                                                                                       "myplugin.config"));
+
+    public final StringValue welcomeMessage = new StringValue("Welcome!");
 
     public TestConfig(Plugin plugin) {
         super(plugin);
@@ -339,6 +354,24 @@ public final class TestConfig extends BaseConfig {
     }
 }
 ```
+
+`Value` API public surface for v1.0:
+
+| Method                             | Status | Purpose                                                                                                  |
+|------------------------------------|--------|----------------------------------------------------------------------------------------------------------|
+| `description(String)`              | Stable | User-facing description for generated commands and YAML comments                                          |
+| `entryName(String)`                | Stable | Override the Java field name used in schema paths and generated commands                                  |
+| `displayFormatter(Function)`       | Stable | Custom display string for list/get/history/diff/audit command output                                     |
+| `addValidator(Validator<E>)`       | Stable | Validate file load, command mutation, and accepted programmatic changes through the schema pipeline       |
+| `executableIf(ExecutionCondition)` | Stable | Guard generated per-field command execution; throw `CommandPrerequisiteException` to block with a message |
+| `executableIf(Predicate)`          | Stable | Boolean command guard with ConfigLib's default denial message                                             |
+| `onInitialize(Consumer<E>)`        | Stable | Run after initial load; runs immediately if initialization has already completed                          |
+| `onModify(Consumer<E>)`            | Stable | Run after accepted file reload, command mutation, or programmatic mutation                                |
+| `onModify(listener, true)`         | Stable | Same as `onModify`, and also run after initialization                                                     |
+
+`SingleValue` also keeps `disableModify()`, `onSet(...)`, and `successMessage(...)` as command-specific APIs.
+`CollectionValue` keeps `disableAdd/remove/clear`, `onAdd/remove/clear`, and `successMessageForAdd/remove/clear`.
+`MapValue` keeps `disablePut/remove/clear`, `onPut/remove/clear`, and `successMessageForPut/remove/clear`.
 
 </details>
 
